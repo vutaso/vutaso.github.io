@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="pageTitle">MoneyBay – Quản lý chi tiêu cá nhân hiệu quả</title>
+    <meta name="description" content="MoneyBay – Ứng dụng quản lý chi tiêu cá nhân, ghi chép thu chi, báo cáo tài chính, đồng bộ iCloud, xuất CSV. Đơn giản, bảo mật, miễn phí. Tải ngay!">
+    <meta name="keywords" content="quản lý chi tiêu, app quản lý chi tiêu, ứng dụng quản lý chi tiêu cá nhân, ghi chép thu chi, quản lý tài chính, MoneyBay, sổ thu chi, quản lý tiền bạc, báo cáo tài chính, app chi tiêu miễn phí">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://vutaso.com/moneybay/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vutaso.com/moneybay/">
+    <meta property="og:title" content="MoneyBay – Ứng dụng quản lý chi tiêu cá nhân hiệu quả">
+    <meta property="og:description" content="Quản lý chi tiêu cá nhân, ghi chép thu chi, báo cáo tài chính, đồng bộ iCloud, xuất CSV. Đơn giản, bảo mật, miễn phí.">
+    <meta property="og:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://vutaso.com/moneybay/">
+    <meta name="twitter:title" content="MoneyBay – Ứng dụng quản lý chi tiêu cá nhân hiệu quả">
+    <meta name="twitter:description" content="Quản lý chi tiêu cá nhân, ghi chép thu chi, báo cáo tài chính, đồng bộ iCloud, xuất CSV. Đơn giản, bảo mật, miễn phí.">
+    <meta name="twitter:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PWZKM6JT9L"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-PWZKM6JT9L');
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "MoneyBay",
+      "operatingSystem": "iOS, Android",
+      "applicationCategory": "FinanceApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "1200"
+      },
+      "description": "MoneyBay – Ứng dụng quản lý chi tiêu cá nhân, ghi chép thu chi, báo cáo tài chính, đồng bộ iCloud, xuất CSV. Đơn giản, bảo mật, miễn phí.",
+      "url": "https://vutaso.com/moneybay/",
+      "image": "https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png"
+    }
+    </script>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        // Luôn đặt chế độ sáng bằng cách xóa class 'dark'
+        document.documentElement.classList.remove('dark');
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background-image: none;
+        }
+        .hero-gradient {
+             background-image: none;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .faq-answer.open {
+             max-height: 500px; /* Adjust as needed */
+             padding-top: 1.25rem;
+             padding-bottom: 1.25rem;
+        }
+        .faq-question span {
+            transition: transform 0.3s ease;
+        }
+        .faq-question.active span {
+            transform: rotate(0deg);
+        }
+        /* Typing Demo Styles */
+        .typing-demo {
+            font-family: 'Courier New', monospace;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+        .typing-demo.visible {
+            opacity: 1;
+        }
+        .cursor-blink {
+            animation: blink 1s infinite;
+            color: #c21a6c;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        .income-line {
+            color: #c21a6c;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        .expense-line {
+            color: #ef4444;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        .summary-line {
+            color: #3b82f6;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .demo-line {
+            font-weight: 700;
+            transition: opacity 0.3s ease;
+            min-height: 20px;
+            opacity: 0;
+        }
+        .demo-line:first-child {
+            opacity: 1;
+        }
+        .demo-line.show {
+            opacity: 1 !important;
+        }
+        .typing-demo {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #c21a6c;
+            box-shadow: 0 0 20px rgba(194, 26, 108, 0.3);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased bg-white text-slate-800">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-slate-900">
+                Money<span style="color: #c21a6c;">Bay</span>
+            </a>
+            <div class="flex items-center">
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-[#c21a6c] transition-colors" data-lang-key="navFeatures">Tính năng</a>
+                    <a href="#ai" class="text-gray-600 hover:text-[#c21a6c] transition-colors" data-lang-key="navAI">Trợ lý AI</a>
+                    <a href="#scanner" class="text-gray-600 hover:text-[#c21a6c] transition-colors" data-lang-key="navScanner">PDF Scanner</a>
+                    <a href="#limits" class="text-gray-600 hover:text-[#c21a6c] transition-colors" data-lang-key="navLimits">Hạn mức chi</a>
+                    <a href="#faq" class="text-gray-600 hover:text-[#c21a6c] transition-colors" data-lang-key="navFaq">FAQ</a>
+                </nav>
+
+                <div class="hidden md:flex items-center border-l border-gray-200 ml-6 pl-6 space-x-4">
+                    <div class="relative">
+                        <button id="lang-switcher-button" class="flex items-center text-gray-600 hover:text-[#c21a6c] transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 7 7.502 7 8.5c0 .998-.488 2.77-1.756 3.179a6.012 6.012 0 01-1.912-2.706zM10 4a6 6 0 100 12 6 6 0 000-12zm-5.668 4.027c-.244.702-.435 1.516-.543 2.473a6.013 6.013 0 010-4.946c.108.957.299 1.77.543 2.473zM15.668 11.973c.244-.702.435-1.516.543-2.473a6.013 6.013 0 010 4.946c-.108-.957-.299-1.77-.543-2.473zM12.756 5.321a6.012 6.012 0 011.912 2.706c-1.268-.409-1.756-2.181-1.756-3.179 0-.998.488-2.77 1.756-3.179a6.012 6.012 0 01-1.912 2.706z" clip-rule="evenodd" /></svg>
+                            <span id="current-lang-desktop">VI</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="lang-switcher-dropdown" class="hidden absolute right-0 mt-2 py-1 w-20 bg-white rounded-md shadow-lg border border-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="vi">VI</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="en">EN</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" class="hidden md:inline-block ml-6 bg-slate-800 text-white font-semibold px-5 py-2 rounded-lg hover:bg-slate-900 transition-all" data-lang-key="navDownload">
+                    Tải ứng dụng
+                </a>
+
+                <button id="mobile-menu-button" class="md:hidden ml-4 text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4 border-t border-gray-200">
+            <a href="#features" class="block py-2 text-gray-600 hover:text-[#c21a6c]" data-lang-key="mNavFeatures">Tính năng</a>
+            <a href="#ai" class="block py-2 text-gray-600 hover:text-[#c21a6c]" data-lang-key="mNavAI">Trợ lý AI</a>
+            <a href="#scanner" class="block py-2 text-gray-600 hover:text-[#c21a6c]" data-lang-key="mNavScanner">PDF Scanner</a>
+            <a href="#limits" class="block py-2 text-gray-600 hover:text-[#c21a6c]" data-lang-key="mNavLimits">Hạn mức chi</a>
+            <a href="#faq" class="block py-2 text-gray-600 hover:text-[#c21a6c]" data-lang-key="mNavFaq">FAQ</a>
+             
+            <div class="pt-2 border-t border-gray-200 mt-2">
+                <div class="flex items-center justify-between">
+                     <span class="py-2 text-gray-500 text-sm" data-lang-key="mNavLanguage">Ngôn ngữ</span>
+                     <div class="flex items-center space-x-4 mt-1">
+                          <a href="#" class="text-gray-600 hover:text-[#c21a6c]" data-lang="vi">VI</a>
+                          <a href="#" class="text-gray-600 hover:text-[#c21a6c]" data-lang="en">EN</a>
+                     </div>
+                </div>
+            </div>
+            <a href="#download" class="block mt-4 text-center bg-slate-800 text-white font-semibold w-full py-2 rounded-lg hover:bg-slate-900" data-lang-key="mNavDownload">Tải ứng dụng</a>
+        </div>
+    </header>
+
+    <main>
+       <section class="relative pt-32 pb-20 md:pt-48 md:pb-32 text-center overflow-hidden hero-gradient">
+    <div class="container mx-auto px-6">
+        <div class="max-w-3xl mx-auto reveal">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight" data-lang-key="heroTitle">
+                MoneyBay
+            </h1>
+            
+       <div class="mt-8 mb-6">
+    <div class="typing-demo bg-black/95 rounded-xl p-6 max-w-2xl mx-auto">
+        <div class="flex items-center mb-4">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+        </div>
+        
+        <div class="text-left font-mono text-sm space-y-2">
+            <div class="demo-line text-blue-400" id="line1">
+                <span class="text-gray-400">></span> <span id="typing-text-1"></span><span class="cursor-blink">|</span>
+            </div>
+            <div class="demo-line income-line" id="line2">
+                <span class="text-gray-400">$</span> <span id="typing-text-2"></span><span class="cursor-blink">|</span>
+            </div>
+            <div class="demo-line expense-line" id="line3">
+                <span class="text-gray-400">$</span> <span id="typing-text-3"></span><span class="cursor-blink">|</span>
+            </div>
+            <div class="demo-line expense-line" id="line4">
+                <span class="text-gray-400">$</span> <span id="typing-text-4"></span><span class="cursor-blink">|</span>
+            </div>
+            <div class="demo-line summary-line" id="line5">
+                <span class="text-gray-400">></span> <span id="typing-text-5"></span><span class="cursor-blink">|</span>
+            </div>
+        </div>
+    </div>
+</div>
+            
+            <p class="mt-6 text-lg md:text-xl text-slate-600 max-w-2xl mx-auto" data-lang-key="heroSubtitle">
+                Quản lý chi tiêu cá nhân một cách đơn giản, nhanh chóng và hiệu quả. Nắm bắt toàn cảnh tài chính của bạn chỉ trong vài thao tác.
+            </p>
+            
+            <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank" class="cta-button w-full sm:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white font-semibold px-6 py-4 rounded-lg shadow-lg">
+                    <img src="assets/images/apple-logo.png" alt="Apple Logo" class="w-6 h-6">
+                    <span data-lang-key="downloadAppStore">Tải từ App Store</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-16 md:mt-24 reveal">
+            <div class="relative max-w-4xl mx-auto">
+                <img src="assets/images/banner_moneybay_1200x750.png" 
+                     alt="App quản lý chi tiêu cá nhân MoneyBay – Giao diện ứng dụng"
+                     class="relative rounded-2xl shadow-2xl border border-gray-200">
+    </div>
+    </div>
+  </div>
+</section>
+
+        <section id="features" class="py-20 md:py-32 gradient-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="featuresTitle">Tất cả trong một ứng dụng</h2>
+                    <p class="mt-4 text-slate-600" data-lang-key="featuresSubtitle">
+                        MoneyBay cung cấp đầy đủ công cụ bạn cần để kiểm soát ngân sách và tối ưu hóa tài chính cá nhân.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-pink-100 text-[#c21a6c] rounded-lg w-12 h-12 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><path d="M17 7l3-3-3-3"/><path d="M10 17l-3 3 3 3"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature1Title">Giao diện trực quan</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature1Desc">Thiết kế đơn giản, dễ dàng thao tác ngay từ lần đầu sử dụng.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-blue-100 text-blue-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature2Title">Không cần tài khoản</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature2Desc">Bắt đầu sử dụng ngay lập tức mà không cần quy trình đăng ký phức tạp.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-purple-100 text-purple-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature3Title">Nhập liệu dễ dàng</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature3Desc">Ghi lại các khoản thu hoặc chi chỉ trong vài giây.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-yellow-100 text-yellow-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2v6h6M21.5 22v-6h-6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature4Title">Đồng bộ iCloud</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature4Desc">Dữ liệu an toàn và luôn được cập nhật trên mọi thiết bị iOS của bạn.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-pink-100 text-pink-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><path d="M12 22a7.07 7.07 0 0 0 5-2M7 15a7.07 7.07 0 0 1 5-2"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature5Title">Chế độ màu sắc</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature5Desc">Tùy biến giao diện với nhiều chủ đề màu sắc phong phú, hợp sở thích.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-teal-100 text-teal-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature6Title">Xuất dữ liệu CSV</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature6Desc">Dễ dàng sao lưu và xuất dữ liệu ra file CSV để lưu trữ hoặc phân tích.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ai" class="py-20 md:py-32 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="reveal">
+                        <span class="text-[#c21a6c] font-semibold" data-lang-key="aiTag">Trợ lý thông minh</span>
+                        <h2 class="mt-4 text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="aiTitle">Ghi chép rảnh tay với Trợ lý AI</h2>
+                        <p class="mt-6 text-slate-600" data-lang-key="aiDesc">
+                            Không cần nhập liệu thủ công. Chỉ cần trò chuyện hoặc ghi âm giọng nói, Trợ lý AI của MoneyBay sẽ tự động nhận diện và ghi lại các khoản thu chi cho bạn. Nhanh chóng, chính xác và vô cùng tiện lợi.
+                        </p>
+                        <ul class="mt-8 space-y-4 text-slate-700">
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-[#c21a6c] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="aiFeature1">Ghi chép chi tiêu qua chat.</span>
+                            </li>
+                             <li class="flex items-start">
+                                <svg class="w-6 h-6 text-[#c21a6c] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="aiFeature2">Tự động nhận diện nội dung qua giọng nói.</span>
+                            </li>
+                             <li class="flex items-start">
+                                <svg class="w-6 h-6 text-[#c21a6c] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="aiFeature3">Phân loại giao dịch thông minh.</span>
+                            </li>
+                        </ul>
+                    </div>
+                     <div class="reveal">
+                        <img src="assets/images/banner_moneybay_800x600_01.png" alt="Trợ lý AI của MoneyBay" class="rounded-2xl shadow-xl border border-gray-200">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="scanner" class="py-20 md:py-32 gradient-bg overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="reveal lg:order-2">
+                        <span class="text-blue-600 font-semibold" data-lang-key="scannerTag">Công cụ tiện ích</span>
+                        <h2 class="mt-4 text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="scannerTitle">Quét hóa đơn và Lập danh sách mua sắm</h2>
+                        <p class="mt-6 text-slate-600" data-lang-key="scannerDesc">
+                            Tích hợp các công cụ mạnh mẽ giúp bạn quản lý cuộc sống dễ dàng hơn. Quét và lưu trữ mọi hóa đơn, tài liệu với MoneyBay PDF Scanner. Lên kế hoạch mua sắm thông minh để không bao giờ bỏ sót món đồ nào.
+                        </p>
+                         <ul class="mt-8 space-y-4 text-slate-700">
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="scannerFeature1"><strong>PDF Scanner:</strong> Quét tài liệu, hóa đơn thành file PDF chất lượng cao, không watermark.</span>
+                            </li>
+                             <li class="flex items-start">
+                                <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="scannerFeature2"><strong>Danh sách mua sắm:</strong> Lập kế hoạch các món đồ cần mua hiệu quả.</span>
+                            </li>
+                        </ul>
+                    </div>
+                     <div class="reveal lg:order-1">
+                        <img src="assets/images/banner_moneybay_800x600_02.png" alt="MoneyBay PDF Scanner" class="rounded-2xl shadow-xl border border-gray-200">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="limits" class="py-20 md:py-32 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="reveal">
+                        <span class="text-purple-600 font-semibold" data-lang-key="limitsTag">Kiểm soát tài chính</span>
+                        <h2 class="mt-4 text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="limitsTitle">Hạn mức chi và Chuyển đổi tiền tệ</h2>
+                        <p class="mt-6 text-slate-600" data-lang-key="limitsDesc">
+                            Thiết lập giới hạn chi tiêu cho từng danh mục để quản lý ngân sách hiệu quả hơn. Công cụ chuyển đổi tiền tệ tích hợp giúp bạn dễ dàng theo dõi các giao dịch quốc tế.
+                        </p>
+                        <ul class="mt-8 space-y-4 text-slate-700">
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-purple-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="limitsFeature1"><strong>Hạn mức chi:</strong> Đặt ra các giới hạn chi tiêu và nhận cảnh báo khi gần đạt đến.</span>
+                            </li>
+                             <li class="flex items-start">
+                                <svg class="w-6 h-6 text-purple-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span data-lang-key="limitsFeature2"><strong>Chuyển đổi tiền tệ:</strong> Tích hợp công cụ chuyển đổi tiền tệ nhanh chóng và chính xác.</span>
+                            </li>
+                        </ul>
+    </div>
+                     <div class="reveal">
+                        <img src="assets/images/banner_moneybay_800x600_03.png" alt="Hạn mức chi và Chuyển đổi tiền tệ" class="rounded-2xl shadow-xl border border-gray-200">
+    </div>
+    </div>
+  </div>
+</section>
+
+        <section id="faq" class="py-20 md:py-32 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="faqTitle">Câu Hỏi Thường Gặp</h2>
+                    <p class="mt-4 text-slate-600" data-lang-key="faqSubtitle">
+                        Tìm câu trả lời cho các câu hỏi phổ biến nhất về MoneyBay.
+                    </p>
+                </div>
+
+                <div class="max-w-3xl mx-auto mt-12 space-y-4 reveal">
+                    <div class="faq-item border border-gray-200 rounded-lg">
+                        <button class="faq-question w-full flex justify-between items-center text-left text-lg font-semibold p-5 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg">
+                            <span data-lang-key="faq1q">Làm thế nào để bắt đầu sử dụng MoneyBay?</span>
+                            <span class="text-[#c21a6c] text-2xl font-light">+</span>
+                        </button>
+                        <div class="faq-answer bg-white text-slate-600 px-5 rounded-b-lg">
+                            <p data-lang-key="faq1a">Để bắt đầu, bạn chỉ cần tải ứng dụng MoneyBay về thiết bị của mình. Sau khi mở ứng dụng, bạn có thể thêm thu nhập và chi tiêu của mình vào các mục tương ứng. Ứng dụng sẽ tự động tính toán và đưa ra báo cáo tài chính cho bạn.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item border border-gray-200 rounded-lg">
+                        <button class="faq-question w-full flex justify-between items-center text-left text-lg font-semibold p-5 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg">
+                            <span data-lang-key="faq2q">Làm sao để xuất dữ liệu chi tiêu dưới dạng CSV?</span>
+                            <span class="text-[#c21a6c] text-2xl font-light">+</span>
+                        </button>
+                        <div class="faq-answer bg-white text-slate-600 px-5 rounded-b-lg">
+                            <p data-lang-key="faq2a">Để xuất dữ liệu chi tiêu, bạn chỉ cần vào phần "Cài đặt", chọn "Sao lưu/Khôi phục dữ liệu", chọn "Xuất sang CSV". Dữ liệu sẽ được xuất dưới dạng file CSV, mà bạn có thể mở trên máy tính hoặc gửi qua email để phân tích thêm.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item border border-gray-200 rounded-lg">
+                        <button class="faq-question w-full flex justify-between items-center text-left text-lg font-semibold p-5 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg">
+                            <span data-lang-key="faq3q">Ứng dụng có hỗ trợ sao lưu dữ liệu không?</span>
+                             <span class="text-[#c21a6c] text-2xl font-light">+</span>
+                        </button>
+                        <div class="faq-answer bg-white text-slate-600 px-5 rounded-b-lg">
+                            <p data-lang-key="faq3a">Có, MoneyBay hỗ trợ sao lưu dữ liệu vào đám mây thông qua iCloud. Bạn chỉ cần bật tính năng sao lưu trong phần "Cài đặt" của ứng dụng để đảm bảo dữ liệu của bạn được lưu trữ an toàn và có thể phục hồi khi cần thiết.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item border border-gray-200 rounded-lg">
+                        <button class="faq-question w-full flex justify-between items-center text-left text-lg font-semibold p-5 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg">
+                            <span data-lang-key="faq4q">Làm sao để bảo vệ dữ liệu của tôi trong ứng dụng?</span>
+                             <span class="text-[#c21a6c] text-2xl font-light">+</span>
+                        </button>
+                        <div class="faq-answer bg-white text-slate-600 px-5 rounded-b-lg">
+                            <p data-lang-key="faq4a">MoneyBay cam kết bảo vệ sự riêng tư của bạn. Dữ liệu của bạn được lưu trữ cục bộ trên thiết bị hoặc trên iCloud cá nhân của bạn và không được chia sẻ với bất kỳ bên thứ ba nào.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item border border-gray-200 rounded-lg">
+                        <button class="faq-question w-full flex justify-between items-center text-left text-lg font-semibold p-5 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg">
+                            <span data-lang-key="faq5q">Tôi có thể liên hệ với đội ngũ hỗ trợ không?</span>
+                             <span class="text-[#c21a6c] text-2xl font-light">+</span>
+                        </button>
+                        <div class="faq-answer bg-white text-slate-600 px-5 rounded-b-lg">
+                             <p data-lang-key="faq5a">Chắc chắn rồi! Để được hỗ trợ thêm, bạn có thể liên hệ với chúng tôi qua email hoặc Facebook:</p>
+                             <ul class="list-disc pl-5 mt-2 space-y-1">
+                                <li>Email: <a href="mailto:vutaso.com@gmail.com" class="text-[#c21a6c] hover:underline">vutaso.com@gmail.com</a></li>
+                                <li>Facebook: <a href="https://www.facebook.com/moneybayapp" target="_blank" class="text-[#c21a6c] hover:underline">MoneyBay trên Facebook</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+  </div>
+</section>
+
+        <section id="download" class="py-20 md:py-32 text-center">
+            <div class="container mx-auto px-6 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="ctaTitle">
+                    Bắt đầu quản lý tài chính của bạn ngay hôm nay!
+                </h2>
+                <p class="mt-4 text-slate-600 max-w-xl mx-auto" data-lang-key="ctaSubtitle">
+                    Tải MoneyBay miễn phí và trải nghiệm phương pháp quản lý chi tiêu thông minh và hiệu quả nhất.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank" class="cta-button w-full sm:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white font-semibold px-6 py-4 rounded-lg shadow-lg">
+                        <img src="assets/images/apple-logo.png" alt="Apple Logo" class="w-6 h-6">
+                        <span data-lang-key="ctaAppStore">Tải từ App Store</span>
+                    </a>
+                </div>
+            </div>
+</section> 
+
+        <section id="testimonials" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4" data-lang-key="testimonialsTitle">Cảm nhận của người dùng</h2>
+                    <p class="mt-2 text-slate-600" data-lang-key="testimonialsSubtitle">Người dùng MoneyBay nói gì về trải nghiệm quản lý chi tiêu cá nhân?</p>
+                </div>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="reveal bg-white p-8 rounded-2xl border border-gray-200 shadow-md flex flex-col items-center text-center">
+                        <img src="assets/images/avatar_01.png" alt="Người dùng MoneyBay" class="w-16 h-16 rounded-full mb-4 border-2 border-green-400 shadow">
+                        <h3 class="font-semibold text-lg text-slate-900" data-lang-key="testimonial1Name">Ngọc Mai</h3>
+                        <div class="flex items-center justify-center my-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                        </div>
+                        <p class="mt-3 text-slate-600 italic" data-lang-key="testimonial1Quote">"MoneyBay giúp mình kiểm soát chi tiêu cực kỳ dễ dàng. Giao diện đẹp, tính năng xuất CSV rất tiện cho việc tổng hợp cuối tháng!"</p>
+                    </div>
+                    <div class="reveal bg-white p-8 rounded-2xl border border-gray-200 shadow-md flex flex-col items-center text-center">
+                        <img src="assets/images/avatar_02.png" alt="Người dùng MoneyBay" class="w-16 h-16 rounded-full mb-4 border-2 border-blue-400 shadow">
+                        <h3 class="font-semibold text-lg text-slate-900" data-lang-key="testimonial2Name">Quân Nguyễn</h3>
+                        <div class="flex items-center justify-center my-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                        </div>
+                        <p class="mt-3 text-slate-600 italic" data-lang-key="testimonial2Quote">"Ứng dụng rất trực quan, không cần đăng ký tài khoản mà vẫn đồng bộ được dữ liệu. Rất phù hợp cho người bận rộn như mình!"</p>
+                    </div>
+                    <div class="reveal bg-white p-8 rounded-2xl border border-gray-200 shadow-md flex flex-col items-center text-center">
+                        <img src="assets/images/avatar_03.png" alt="Người dùng MoneyBay" class="w-16 h-16 rounded-full mb-4 border-2 border-pink-400 shadow">
+                        <h3 class="font-semibold text-lg text-slate-900" data-lang-key="testimonial3Name">Thảo Vy</h3>
+                        <div class="flex items-center justify-center my-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+                        </div>
+                        <p class="mt-3 text-slate-600 italic" data-lang-key="testimonial3Quote">"Từ ngày dùng MoneyBay, mình kiểm soát được chi tiêu tốt hơn, không còn bị lố ngân sách mỗi tháng. Rất hài lòng!"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-200">
+        <div class="container mx-auto px-6 py-10 text-center text-slate-500">
+            
+            <div class="flex justify-center items-center gap-6 mb-6">
+                <a href="https://www.facebook.com/moneybayapp" target="_blank" rel="noopener noreferrer" class="transition-colors" title="MoneyBay on Facebook">
+                    <img src="assets/images/facebook.png" alt="Facebook" class="w-6 h-6 rounded-full grayscale hover:grayscale-0 hover:ring-2 hover:ring-[#c21a6c] transition-all" />
+                </a>
+                <a href="https://tiktok.com/@moneybay.app" target="_blank" rel="noopener noreferrer" class="transition-colors" title="MoneyBay on TikTok">
+                    <img src="assets/images/tiktok.png" alt="TikTok" class="w-6 h-6 rounded-full grayscale hover:grayscale-0 hover:ring-2 hover:ring-pink-400 transition-all" />
+                </a>
+                <a href="https://www.facebook.com/groups/moneybay" target="_blank" rel="noopener noreferrer" class="transition-colors" title="MoneyBay Group">
+                    <img src="assets/images/teamwork.png" alt="Groups" class="w-6 h-6 rounded-full grayscale hover:grayscale-0 hover:ring-2 hover:ring-blue-400 transition-all" />
+                </a>
+                <a href="https://www.facebook.com/messages/t/moneybayapp" target="_blank" rel="noopener noreferrer" class="transition-colors" title="MoneyBay Support">
+                    <img src="assets/images/customer-support.png" alt="Support" class="w-6 h-6 rounded-full grayscale hover:grayscale-0 hover:ring-2 hover:ring-purple-400 transition-all" />
+                </a>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm">
+                     <a href="mailto:vutaso.com@gmail.com" class="hover:text-[#c21a6c] transition-colors" data-lang-key="footerEmail">Email</a>
+                     <span class="hidden sm:inline">•</span>
+                     <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank" class="hover:text-[#c21a6c] transition-colors">App Store</a>
+                     <span class="hidden sm:inline">•</span>
+                      <a href="https://vutaso.com/moneybay/privacy" target="_blank" class="hover:text-[#c21a6c] transition-colors">Privacy</a>
+                      <span class="hidden sm:inline">•</span>
+                      <a href="https://vutaso.com/moneybay/terms" target="_blank" class="hover:text-[#c21a6c] transition-colors">Terms</a>
+                </div>
+            </div>
+            
+            <p>&copy; 2025 MoneyBay. All Rights Reserved.</p>
+            <p class="text-sm mt-2" data-lang-key="footerTagline">Một sản phẩm được tạo ra với ❤️ để giúp bạn quản lý tài chính tốt hơn.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ===== START: Language Switcher Logic =====
+            const translations = {
+                vi: {
+                    pageTitle: "MoneyBay – Quản lý chi tiêu cá nhân hiệu quả", navFeatures: "Tính năng", navAI: "Trợ lý AI", navScanner: "PDF Scanner", navLimits: "Hạn mức chi", navFaq: "FAQ", navDownload: "Tải ứng dụng", mNavFeatures: "Tính năng", mNavAI: "Trợ lý AI", mNavScanner: "PDF Scanner", mNavLimits: "Hạn mức", mNavFaq: "FAQ", mNavLanguage: "Ngôn ngữ", mNavDownload: "Tải ứng dụng", heroTitle: "Quản lý chi tiêu đơn giản & hiệu quả với <span style='color: #c21a6c;'>MoneyBay</span>", heroSubtitle: "Quản lý chi tiêu cá nhân một cách đơn giản, nhanh chóng và hiệu quả. Nắm bắt toàn cảnh tài chính của bạn chỉ trong vài thao tác.", downloadAppStore: "Tải từ App Store", downloadGooglePlay: "Tải từ Google Play (Soon)", featuresTitle: "Tất cả trong một ứng dụng", featuresSubtitle: "MoneyBay cung cấp đầy đủ công cụ bạn cần để kiểm soát ngân sách và tối ưu hóa tài chính cá nhân.", feature1Title: "Giao diện trực quan", feature1Desc: "Thiết kế đơn giản, dễ dàng thao tác ngay từ lần đầu sử dụng.", feature2Title: "Không cần tài khoản", feature2Desc: "Bắt đầu sử dụng ngay lập tức mà không cần quy trình đăng ký phức tạp.", feature3Title: "Nhập liệu dễ dàng", feature3Desc: "Ghi lại các khoản thu hoặc chi chỉ trong vài giây.", feature4Title: "Đồng bộ iCloud", feature4Desc: "Dữ liệu an toàn và luôn được cập nhật trên mọi thiết bị iOS của bạn.", feature5Title: "Chế độ màu sắc", feature5Desc: "Tùy biến giao diện với nhiều chủ đề màu sắc phong phú, hợp sở thích.", feature6Title: "Xuất dữ liệu CSV", feature6Desc: "Dễ dàng sao lưu và xuất dữ liệu ra file CSV để lưu trữ hoặc phân tích.", aiTag: "Trợ lý thông minh", aiTitle: "Ghi chép rảnh tay với Trợ lý AI", aiDesc: "Không cần nhập liệu thủ công. Chỉ cần trò chuyện hoặc ghi âm giọng nói, Trợ lý AI của MoneyBay sẽ tự động nhận diện và ghi lại các khoản thu chi cho bạn. Nhanh chóng, chính xác và vô cùng tiện lợi.", aiFeature1: "Ghi chép chi tiêu qua chat.", aiFeature2: "Tự động nhận diện nội dung qua giọng nói.", aiFeature3: "Phân loại giao dịch thông minh.", scannerTag: "Công cụ tiện ích", scannerTitle: "Quét hóa đơn và Lập danh sách mua sắm", scannerDesc: "Tích hợp các công cụ mạnh mẽ giúp bạn quản lý cuộc sống dễ dàng hơn. Quét và lưu trữ mọi hóa đơn, tài liệu với MoneyBay PDF Scanner. Lên kế hoạch mua sắm thông minh để không bao giờ bỏ sót món đồ nào.", scannerFeature1: "<strong>PDF Scanner:</strong> Quét tài liệu, hóa đơn thành file PDF chất lượng cao, không watermark.", scannerFeature2: "<strong>Danh sách mua sắm:</strong> Lập kế hoạch các món đồ cần mua hiệu quả.", limitsTag: "Kiểm soát tài chính", limitsTitle: "Hạn mức chi và Chuyển đổi tiền tệ", limitsDesc: "Thiết lập giới hạn chi tiêu cho từng danh mục để quản lý ngân sách hiệu quả hơn. Công cụ chuyển đổi tiền tệ tích hợp giúp bạn dễ dàng theo dõi các giao dịch quốc tế.", limitsFeature1: "<strong>Hạn mức chi:</strong> Đặt ra các giới hạn chi tiêu và nhận cảnh báo khi gần đạt đến.", limitsFeature2: "<strong>Chuyển đổi tiền tệ:</strong> Tích hợp công cụ chuyển đổi tiền tệ nhanh chóng và chính xác.", faqTitle: "Câu Hỏi Thường Gặp", faqSubtitle: "Tìm câu trả lời cho các câu hỏi phổ biến nhất về MoneyBay.", faq1q: "Làm thế nào để bắt đầu sử dụng MoneyBay?", faq1a: "Để bắt đầu, bạn chỉ cần tải ứng dụng MoneyBay về thiết bị của mình. Sau khi mở ứng dụng, bạn có thể thêm thu nhập và chi tiêu của mình vào các mục tương ứng. Ứng dụng sẽ tự động tính toán và đưa ra báo cáo tài chính cho bạn.", faq2q: "Làm sao để xuất dữ liệu chi tiêu dưới dạng CSV?", faq2a: "Để xuất dữ liệu chi tiêu, bạn chỉ cần vào phần \"Cài đặt\", chọn \"Sao lưu/Khôi phục dữ liệu\", chọn \"Xuất sang CSV\". Dữ liệu sẽ được xuất dưới dạng file CSV, mà bạn có thể mở trên máy tính hoặc gửi qua email để phân tích thêm.", faq3q: "Ứng dụng có hỗ trợ sao lưu dữ liệu không?", faq3a: "Có, MoneyBay hỗ trợ sao lưu dữ liệu vào đám mây thông qua iCloud. Bạn chỉ cần bật tính năng sao lưu trong phần \"Cài đặt\" của ứng dụng để đảm bảo dữ liệu của bạn được lưu trữ an toàn và có thể phục hồi khi cần thiết.", faq4q: "Làm sao để bảo vệ dữ liệu của tôi trong ứng dụng?", faq4a: "MoneyBay cam kết bảo vệ sự riêng tư của bạn. Dữ liệu của bạn được lưu trữ cục bộ trên thiết bị hoặc trên iCloud cá nhân của bạn và không được chia sẻ với bất kỳ bên thứ ba nào.", faq5q: "Tôi có thể liên hệ với đội ngũ hỗ trợ không?", faq5a: "Chắc chắn rồi! Để được hỗ trợ thêm, bạn có thể liên hệ với chúng tôi qua email hoặc Facebook:", ctaTitle: "Bắt đầu quản lý tài chính của bạn ngay hôm nay!", ctaSubtitle: "Tải MoneyBay miễn phí và trải nghiệm phương pháp quản lý chi tiêu thông minh và hiệu quả nhất.", ctaAppStore: "Tải từ App Store", ctaGooglePlay: "Tải từ Google Play", footerContact: "Liên hệ & Hỗ trợ", footerEmail: "Email", footerTagline: "Một sản phẩm được tạo ra với ❤️ để giúp bạn quản lý tài chính tốt hơn.",
+                    testimonialsTitle: "Cảm nhận của người dùng", 
+                    testimonialsSubtitle: "Người dùng MoneyBay nói gì về trải nghiệm quản lý chi tiêu cá nhân?",
+                    testimonial1Name: "Ngọc Mai",
+                    testimonial1Quote: `"MoneyBay giúp mình kiểm soát chi tiêu cực kỳ dễ dàng. Giao diện đẹp, tính năng xuất CSV rất tiện cho việc tổng hợp cuối tháng!"`,
+                    testimonial2Name: "Quân Nguyễn",
+                    testimonial2Quote: `"Ứng dụng rất trực quan, không cần đăng ký tài khoản mà vẫn đồng bộ được dữ liệu. Rất phù hợp cho người bận rộn như mình!"`,
+                    testimonial3Name: "Thảo Vy",
+                    testimonial3Quote: `"Từ ngày dùng MoneyBay, mình kiểm soát được chi tiêu tốt hơn, không còn bị lố ngân sách mỗi tháng. Rất hài lòng!"`
+                },
+                en: {
+                    pageTitle: "MoneyBay Money Tracker – Effective Personal Expense Management", navFeatures: "Features", navAI: "AI Assistant", navScanner: "PDF Scanner", navLimits: "Spending limit", navFaq: "FAQ", navDownload: "Download App", mNavFeatures: "Features", mNavAI: "AI Assistant", mNavScanner: "PDF Scanner", mNavLimits: "Limits", mNavFaq: "FAQ", mNavLanguage: "Language", mNavDownload: "Download App", heroTitle: "Manage your expenses simply & effectively with <span style='color: #c21a6c;'>MoneyBay</span>", heroSubtitle: "Manage your personal spending simply, quickly, and effectively. Get a complete overview of your finances in just a few taps.", downloadAppStore: "Download on the App Store", downloadGooglePlay: "Get it on Google Play (Soon)", featuresTitle: "All in one application", featuresSubtitle: "MoneyBay provides all the tools you need to control your budget and optimize your personal finances.", feature1Title: "Intuitive Interface", feature1Desc: "Simple design, easy to use from the very first time.", feature2Title: "No Account Needed", feature2Desc: "Start using immediately without a complicated registration process.", feature3Title: "Easy Data Entry", feature3Desc: "Record your income or expenses in just a few seconds.", feature4Title: "iCloud Sync", feature4Desc: "Your data is secure and always updated across all your iOS devices.", feature5Title: "Color Themes", feature5Desc: "Customize the interface with a variety of rich color themes to suit your taste.", feature6Title: "Export CSV Data", feature6Desc: "Easily back up and export data to a CSV file for storage or analysis.", aiTag: "Smart Assistant", aiTitle: "Hands-Free Logging with AI Assistant", aiDesc: "No manual data entry required. Just chat or record your voice, and MoneyBay's AI Assistant will automatically recognize and log your income and expenses for you. Fast, accurate, and incredibly convenient.", aiFeature1: "Log expenses via chat.", aiFeature2: "Automatically recognize content through voice.", aiFeature3: "Smart transaction categorization.", scannerTag: "Utility Tools", scannerTitle: "Bill Scanner & Shopping List", scannerDesc: "Integrated with powerful tools to make your life easier. Scan and store all your bills and documents with MoneyBay PDF Scanner. Plan your shopping smartly so you never miss an item.", scannerFeature1: "<strong>PDF Scanner:</strong> Scan documents and bills into high-quality, watermark-free PDF files.", scannerFeature2: "<strong>Shopping List:</strong> Effectively plan the items you need to buy.", limitsTag: "Financial Control", limitsTitle: "Spending Limits & Currency Converter", limitsDesc: "Set spending limits for each category to manage your budget more effectively. The integrated currency converter helps you easily track international transactions.", limitsFeature1: "<strong>Spending Limits:</strong> Set spending limits and receive alerts when you're getting close.", limitsFeature2: "<strong>Currency Converter:</strong> Quick and accurate integrated currency conversion tool.", faqTitle: "Frequently Asked Questions", faqSubtitle: "Find answers to the most common questions about MoneyBay.", faq1q: "How do I get started with MoneyBay?", faq1a: "To get started, simply download the MoneyBay app to your device. Once you open the app, you can add your income and expenses in the respective sections. The app will automatically calculate and provide you with financial reports.", faq2q: "How can I export my expense data as a CSV file?", faq2a: "To export your expense data, go to 'Settings', select 'Backup/Restore Data', and choose 'Export to CSV'. The data will be exported as a CSV file, which you can open on your computer or send via email for further analysis.", faq3q: "Does the app support data backup?", faq3a: "Yes, MoneyBay supports data backup to the cloud via iCloud. You just need to enable the backup feature in the app's 'Settings' to ensure your data is stored securely and can be restored when needed.", faq4q: "How is my data protected within the app?", faq4a: "MoneyBay is committed to protecting your privacy. Your data is stored locally on your. device or in your personal iCloud and is not shared with any third parties.", faq5q: "Can I contact the support team?", faq5a: "Of course! for further assistance, you can contact our support team via email or Facebook:", ctaTitle: "Start managing your finances today!", ctaSubtitle: "Download MoneyBay for free and experience the smartest and most effective way to manage your expenses.", ctaAppStore: "Download on the App Store", ctaGooglePlay: "Get it on Google Play", footerContact: "Contact & Support", footerEmail: "Email", footerTagline: "A product created with ❤️ to help you manage your finances better.",
+                    testimonialsTitle: "What users say",
+                    testimonialsSubtitle: "What do MoneyBay users say about their personal finance experience?",
+                    testimonial1Name: "Mai Nguyen",
+                    testimonial1Quote: `"MoneyBay makes it super easy for me to control my spending. Beautiful interface, and the CSV export feature is so convenient for my monthly summary!"`,
+                    testimonial2Name: "Quan Nguyen",
+                    testimonial2Quote: `"The app is very intuitive, no account needed but still syncs data. Perfect for busy people like me!"`,
+                    testimonial3Name: "Vy Thao",
+                    testimonial3Quote: `"Since using MoneyBay, I manage my expenses much better and never go over budget each month. Very satisfied!"`
+                }
+            };
+            
+            const langSwitcherButton = document.getElementById('lang-switcher-button');
+            const langSwitcherDropdown = document.getElementById('lang-switcher-dropdown');
+            const currentLangDesktop = document.getElementById('current-lang-desktop');
+            const allLangLinks = document.querySelectorAll('a[data-lang]');
+
+            const setLanguage = (lang) => {
+                if (!translations[lang]) return;
+                document.documentElement.lang = lang;
+                currentLangDesktop.textContent = lang.toUpperCase();
+                document.querySelectorAll('[data-lang-key]').forEach(element => {
+                    const key = element.getAttribute('data-lang-key');
+                    if (translations[lang][key]) {
+                        element.innerHTML = translations[lang][key];
+                    }
+                });
+                localStorage.setItem('moneybay-lang', lang);
+                langSwitcherDropdown.classList.add('hidden');
+                
+                if (typeof updateTypingLanguage === 'function') {
+                    updateTypingLanguage(lang);
+                }
+            };
+
+            langSwitcherButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langSwitcherDropdown.classList.toggle('hidden');
+            });
+
+            allLangLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const selectedLang = link.getAttribute('data-lang');
+                    setLanguage(selectedLang);
+                });
+            });
+
+            document.addEventListener('click', () => {
+                 if (!langSwitcherDropdown.classList.contains('hidden')) {
+                    langSwitcherDropdown.classList.add('hidden');
+                }
+            });
+            
+            const detectUserLanguage = () => {
+                const savedLang = localStorage.getItem('moneybay-lang');
+                if (savedLang && translations[savedLang]) {
+                    return savedLang;
+                }
+                const browserLang = navigator.language || navigator.userLanguage;
+                if (browserLang && browserLang.startsWith('vi')) {
+                    return 'vi';
+                }
+                return 'en';
+            };
+            
+            const initialLang = detectUserLanguage();
+            setLanguage(initialLang);
+            // ===== END: Language Switcher Logic =====
+
+
+            // ===== START: General UI Logic =====
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            revealElements.forEach(el => {
+                revealObserver.observe(el);
+            });
+
+            const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                     if (!link.hasAttribute('data-lang')) {
+                        mobileMenu.classList.add('hidden');
+                     }
+                });
+            });
+
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(button => {
+                button.addEventListener('click', () => {
+                    const answer = button.nextElementSibling;
+                    button.classList.toggle('active');
+                    answer.classList.toggle('open');
+                });
+            });
+             // ===== END: General UI Logic =====
+        });
+
+
+   // ===== TYPING ANIMATION WITH MULTI-LANGUAGE SUPPORT =====
+const typingTextsMultiLang = {
+    vi: [ "MoneyBay Xin chào!", "Thêm thu nhập: +2,500,000 VND - Lương tháng 10", "Thêm chi tiêu: -500,000 VND - Tiền điện nước", "Thêm chi tiêu: -800,000 VND - Tiền ăn uống", "Tổng kết: Tiết kiệm được 1,200,000 VND ✓" ],
+    en: [ "MoneyBay Hello!", "Add income: +$1,000 USD - October salary", "Add expense: -$200 USD - Electricity bill", "Add expense: -$320 USD - Food & dining", "Summary: Saved $480 USD ✓" ]
+};
+
+let currentLineIndex = 0;
+let currentCharIndex = 0;
+let isTyping = false;
+let typingTimeout = null;
+let currentLanguage = 'vi';
+
+function getCurrentTexts() { return typingTextsMultiLang[currentLanguage] || typingTextsMultiLang.vi; }
+
+function typeText() {
+    const typingTexts = getCurrentTexts();
+    if (currentLineIndex >= typingTexts.length) {
+        typingTimeout = setTimeout(() => { resetTypingAnimation(); startTypingAnimation(); }, 3000);
+        return;
+    }
+    const currentText = typingTexts[currentLineIndex];
+    const currentElement = document.getElementById(`typing-text-${currentLineIndex + 1}`);
+    const currentLine = document.getElementById(`line${currentLineIndex + 1}`);
+    if (!currentElement || !currentLine) return;
+    currentLine.classList.add('show');
+    currentLine.style.opacity = '1';
+    if (currentCharIndex < currentText.length) {
+        currentElement.textContent = currentText.substring(0, currentCharIndex + 1);
+        currentCharIndex++;
+        typingTimeout = setTimeout(typeText, 80);
+    } else {
+        typingTimeout = setTimeout(() => { currentLineIndex++; currentCharIndex = 0; typeText(); }, 1200);
+    }
+}
+
+function resetTypingAnimation() {
+    currentLineIndex = 0;
+    currentCharIndex = 0;
+    isTyping = false;
+    if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; }
+    for (let i = 1; i <= 5; i++) {
+        const line = document.getElementById(`line${i}`);
+        const text = document.getElementById(`typing-text-${i}`);
+        if (line && text) { line.classList.remove('show'); line.style.opacity = i === 1 ? '1' : '0'; text.textContent = ''; }
+    }
+}
+
+function startTypingAnimation() {
+    if (!isTyping) { isTyping = true; typingTimeout = setTimeout(() => { typeText(); }, 500); }
+}
+
+function updateTypingLanguage(newLang) {
+    if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; }
+    currentLanguage = newLang;
+    resetTypingAnimation();
+    setTimeout(() => { startTypingAnimation(); }, 300);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const detectTypingLanguage = () => {
+        const savedLang = localStorage.getItem('moneybay-lang');
+        if (savedLang && (savedLang === 'vi' || savedLang === 'en')) { return savedLang; }
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang && browserLang.startsWith('vi')) { return 'vi'; }
+        return 'en';
+    };
+    currentLanguage = detectTypingLanguage();
+    setTimeout(() => { startTypingAnimation(); }, 2000);
+});
+    </script>
+</body>
+</html>
