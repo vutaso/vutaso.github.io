@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRBay - Quét & Tạo mã QR Nhanh chóng | Miễn Phí iOS</title>
+    <meta name="description"
+        content="QRBay – Ứng dụng quét mã QR và mã vạch nhanh, chính xác. Tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Hỗ trợ đa ngôn ngữ, miễn phí.">
+    <meta name="keywords"
+        content="quét mã qr, tạo mã qr, app quét mã vạch, QRBay, quét giá sản phẩm, quét qr wifi, tạo qr liên hệ, ứng dụng qr code, app qr miễn phí, qr scanner, barcode scanner, qr code reader">
+    <meta name="author" content="VUTASO">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="Vietnamese">
+    <meta name="geo.region" content="VN">
+    <meta name="geo.placename" content="Vietnam">
+    <link rel="canonical" href="https://vutaso.com/qrbay/">
+
+    <!-- Hreflang for multilingual SEO -->
+    <link rel="alternate" hreflang="vi" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="en" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="ja" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/qrbay/">
+
+    <!-- English Keywords for International Search -->
+    <meta name="keywords-en"
+        content="QR code scanner, barcode scanner, QR code reader, create QR code, QR generator, free QR app, fast QR scanner, iOS QR scanner, barcode reader, price scanner, wifi QR code, contact QR, inventory scanner, batch scanning">
+
+    <!-- Japanese Keywords for Japan Search -->
+    <meta name="keywords-ja"
+        content="QRコードリーダー, バーコードスキャナー, QRコード作成, QRコード生成, 無料QRアプリ, 高速スキャン, iPhone QRコード, バーコードリーダー, 価格スキャナー, Wi-Fi QRコード, 連絡先QR, 在庫スキャナー, 一括スキャン">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vutaso.com/qrbay/">
+    <meta property="og:site_name" content="VUTASO - QRBay">
+    <meta property="og:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
+    <meta property="og:description"
+        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta property="og:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="750">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://vutaso.com/qrbay/">
+    <meta name="twitter:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
+    <meta name="twitter:description"
+        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta name="twitter:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
+
+    <!-- Apple Meta Tags -->
+    <meta name="apple-itunes-app" content="app-id=6499323043">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="QRBay">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#0071e3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" href="assets/images/favicon_qrbay.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "VUTASO",
+      "url": "https://vutaso.com",
+      "logo": "https://vutaso.com/assets/logo_moneybay.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "vutaso.com@gmail.com",
+        "contactType": "Customer Service",
+        "availableLanguage": ["Vietnamese", "English", "Japanese"]
+      },
+      "sameAs": [
+        "https://www.facebook.com/qrbayapp"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: QRBay App -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "QRBay",
+      "alternateName": "QRBay - QR & Barcode Scanner",
+      "description": "Ứng dụng quét mã QR và mã vạch nhanh chóng, chính xác. Hỗ trợ tạo mã QR, quét hàng loạt, xuất dữ liệu CSV. Miễn phí và bảo mật.",
+      "operatingSystem": "iOS 14.0 or later",
+      "applicationCategory": "UtilitiesApplication",
+      "url": "https://vutaso.com/qrbay/",
+      "downloadUrl": "https://apps.apple.com/app/qrbay/id6499323043",
+      "screenshot": "https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png",
+      "featureList": "Fast QR Scanning, Barcode Reader, Batch Scanning, QR Code Generator, History Management, CSV Export",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "500"
+      },
+      "inLanguage": ["vi", "en", "ja"],
+      "keywords": "QR scanner, barcode reader, create QR code, quét mã QR, tạo mã QR, QRコードリーダー"
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #0071e3;
+            --text-color: #1d1d1f;
+            --bg-color: #ffffff;
+            --secondary-bg: #f5f5f7;
+            --section-padding: 120px 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav.top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 980px;
+            width: 100%;
+            padding: 0 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-weight: 600;
+            font-size: 19px;
+            color: var(--text-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a {
+            font-size: 12px;
+            color: var(--text-color);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        /* Dropdown Menu */
+        .nav-item-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            background: none;
+            border: none;
+            color: #1d1d1f;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            font-family: inherit;
+        }
+
+        .nav-item-dropdown:hover .nav-dropdown-btn {
+            opacity: 1;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 8px 0;
+            z-index: 1002;
+            margin-top: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #fff;
+        }
+
+        .nav-dropdown-content::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: transparent;
+        }
+
+        .nav-item-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .nav-dropdown-content a {
+            color: #1d1d1f;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 13px !important;
+            text-align: left;
+            white-space: nowrap;
+            opacity: 1 !important;
+        }
+
+        .nav-dropdown-content a:hover {
+            background-color: #f5f5f7;
+            color: #0071e3;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .lang-btn {
+            background: #f5f5f7;
+            border: none;
+            font-size: 11px;
+            font-weight: 500;
+            color: #1d1d1f;
+            opacity: 0.7;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 980px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .lang-btn:hover {
+            opacity: 1;
+            background: #e5e5e7;
+            transform: scale(1.05);
+        }
+
+        .lang-btn.active {
+            opacity: 1;
+            font-weight: 600;
+            background: #1d1d1f;
+            color: #fff;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: #1d1d1f;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .hamburger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                display: flex;
+            }
+
+            nav.top-nav .nav-links {
+                position: fixed;
+                top: 44px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                padding: 20px 22px;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            nav.top-nav .nav-links.active {
+                max-height: 1000px;
+                opacity: 1;
+            }
+
+            nav.top-nav .nav-links a {
+                padding: 12px 0;
+                font-size: 14px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                width: 100%;
+                text-align: center;
+            }
+
+            nav.top-nav .nav-links a:last-child {
+                border-bottom: none;
+            }
+
+            .language-toggle {
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                justify-content: center;
+                width: 100%;
+            }
+
+            /* Mobile Dropdown */
+            .nav-item-dropdown {
+                width: 100%;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .nav-dropdown-btn {
+                width: 100%;
+                padding: 12px 0;
+                font-size: 14px;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-dropdown-content {
+                position: static;
+                transform: none;
+                width: 100%;
+                min-width: auto;
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin: 0;
+                display: none;
+                text-align: center;
+            }
+
+            /* Show on tap (hover state on mobile) */
+            .nav-item-dropdown:hover .nav-dropdown-content,
+            .nav-item-dropdown:active .nav-dropdown-content {
+                display: block;
+                animation: none;
+            }
+
+            .nav-dropdown-content::before,
+            .nav-dropdown-content::after {
+                display: none;
+            }
+
+            .nav-dropdown-content a {
+                padding: 10px 0;
+                color: #666;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                text-align: center;
+            }
+
+            .nav-dropdown-content a:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* Scroll offset */
+        section[id] {
+            scroll-margin-top: 60px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #000;
+            color: #f5f5f7;
+            padding-top: 120px;
+            padding-bottom: 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 22px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            line-height: 1.07143;
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 24px;
+            line-height: 1.16667;
+            font-weight: 400;
+            letter-spacing: 0.009em;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #a1a1a6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 980px;
+            font-size: 17px;
+            line-height: 1.17648;
+            font-weight: 400;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #0071e3;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0077ed;
+        }
+
+        .hero-image {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Features Grid (Bento Style) */
+        .features {
+            padding: var(--section-padding);
+            background: var(--secondary-bg);
+        }
+
+        .section-headline {
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 22px;
+        }
+
+        .section-headline h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .section-headline p {
+            font-size: 21px;
+            color: #86868b;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+
+        .bento-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .bento-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .bento-icon {
+            width: 64px;
+            height: 64px;
+            background: #f5f5f7;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
+
+        .bento-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .bento-card p {
+            font-size: 17px;
+            color: #86868b;
+            line-height: 1.5;
+        }
+
+        /* Supported Formats */
+        .formats {
+            padding: var(--section-padding);
+            background: #fff;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+
+        .format-item {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 14px;
+            color: #1d1d1f;
+            transition: all 0.2s;
+        }
+
+        .format-item:hover {
+            background: #e5e5e7;
+            transform: translateY(-2px);
+        }
+
+        /* FAQ */
+        .faq {
+            padding: var(--section-padding);
+            background: var(--secondary-bg);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+
+        .faq-item {
+            background: #fff;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .faq-question {
+            padding: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .faq-answer {
+            padding: 0 24px 24px;
+            color: #86868b;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Footer */
+        /* Footer */
+        footer {
+            background: #f5f5f7;
+            padding: 40px 22px;
+            text-align: center;
+            border-top: 1px solid #d2d2d7;
+        }
+
+        .social-links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .social-link-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: #fff;
+            border: 1px solid #d2d2d7;
+            border-radius: 12px;
+            min-width: 100px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .social-link-card:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-link-card img {
+            width: 32px;
+            height: 32px;
+            transition: transform 0.3s;
+        }
+
+        .social-link-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .social-link-card span {
+            font-size: 12px;
+            line-height: 1.33337;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+
+        footer p {
+            font-size: 12px;
+            line-height: 1.33337;
+            color: #6e6e73;
+        }
+
+        footer a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Link Buttons */
+        .footer-link-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            line-height: 1.42857;
+            font-weight: 400;
+            color: #1d1d1f !important;
+            background: #fff;
+            border: 1px solid #d2d2d7;
+            border-radius: 980px;
+            text-decoration: none !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-link-button:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero p {
+                font-size: 19px;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                QRBay
+            </a>
+            <button class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links">
+                <a href="#features" data-key="nav-features">Tính năng</a>
+                <a href="#formats" data-key="nav-formats">Định dạng</a>
+                <a href="#faq" data-key="nav-faq">Hỏi đáp</a>
+
+                <!-- Download Dropdown -->
+                <div class="nav-item-dropdown">
+                    <button class="nav-dropdown-btn">
+                        <span data-key="nav-download">Tải ngay</span>
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" />
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown-content">
+                        <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
+                            data-key="nav-download-moneybay">Tải MoneyBay</a>
+                        <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank"
+                            data-key="nav-download-qrbay">Tải QRBay</a>
+                    </div>
+                </div>
+
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="vi">VI</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ja">JP</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 data-key="hero-title">QRBay<br>Quét & Tạo mã QR Nhanh chóng</h1>
+            <p data-key="hero-subtitle">Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử dụng. Trợ thủ
+                đắc lực cho mọi nhu cầu hàng ngày của bạn.</p>
+            <div class="hero-buttons">
+                <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="btn btn-primary"
+                    data-key="hero-download-appstore">Tải từ App Store</a>
+            </div>
+            <img src="assets/images/banner_qrbay_1200x750.png" alt="QRBay App Interface" class="hero-image">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-headline">
+            <h2 data-key="features-title">Trọn bộ công cụ QR trong tay bạn</h2>
+            <p data-key="features-subtitle">Từ quét mã siêu tốc đến tạo mã QR cá nhân hóa, QRBay đáp ứng mọi nhu cầu của
+                bạn một cách hoàn hảo.</p>
+        </div>
+        <div class="bento-grid">
+            <!-- Feature 1 -->
+            <div class="bento-card">
+                <div class="bento-icon">⚡️</div>
+                <h3 data-key="feature-1-title">Quét nhanh & chính xác</h3>
+                <p data-key="feature-1-desc">Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong
+                    điều kiện thiếu sáng.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="bento-card">
+                <div class="bento-icon">🔍</div>
+                <h3 data-key="feature-2-title">Tra cứu giá sản phẩm</h3>
+                <p data-key="feature-2-desc">Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định
+                    mua sắm thông minh.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="bento-card">
+                <div class="bento-icon">🎨</div>
+                <h3 data-key="feature-3-title">Tạo & Tùy chỉnh QR</h3>
+                <p data-key="feature-3-desc">Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo
+                    phong cách của bạn.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="bento-card">
+                <div class="bento-icon">📂</div>
+                <h3 data-key="feature-4-title">Quản lý lịch sử</h3>
+                <p data-key="feature-4-desc">Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp
+                    và truy cập lại khi cần.</p>
+            </div>
+            <!-- Feature 5 -->
+            <div class="bento-card">
+                <div class="bento-icon">📑</div>
+                <h3 data-key="feature-5-title">Quét hàng loạt</h3>
+                <p data-key="feature-5-desc">Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một
+                    lúc trong một lần quét.</p>
+            </div>
+            <!-- Feature 6 -->
+            <div class="bento-card">
+                <div class="bento-icon">📤</div>
+                <h3 data-key="feature-6-title">Xuất & Chia sẻ</h3>
+                <p data-key="feature-6-desc">Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR
+                    của bạn lên mạng xã hội.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Formats Section -->
+    <section id="formats" class="formats">
+        <div class="section-headline">
+            <h2 data-key="formats-title">Hỗ trợ mọi định dạng phổ biến</h2>
+            <p data-key="formats-subtitle">QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.
+            </p>
+        </div>
+        <div class="format-grid">
+            <div class="format-item">QRCode</div>
+            <div class="format-item">Data Matrix</div>
+            <div class="format-item">Aztec</div>
+            <div class="format-item">PDF 417</div>
+            <div class="format-item">EAN-13</div>
+            <div class="format-item">EAN-8</div>
+            <div class="format-item">UPC-A</div>
+            <div class="format-item">UPC-E</div>
+            <div class="format-item">Code 128</div>
+            <div class="format-item">Code 93</div>
+            <div class="format-item">Code 39</div>
+            <div class="format-item">Codabar</div>
+            <div class="format-item">ITF</div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq">
+        <div class="section-headline">
+            <h2 data-key="faq-title">Câu hỏi thường gặp</h2>
+            <p data-key="faq-subtitle">Tìm câu trả lời cho các câu hỏi phổ biến nhất về QRBay.</p>
+        </div>
+        <div class="faq-container">
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-1-q">Làm thế nào để quét mã QR?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-1-a">
+                    Mở ứng dụng QRBay và hướng camera vào mã QR mà bạn muốn quét. Ứng dụng sẽ tự động nhận diện và quét
+                    mã.
+                </div>
+            </div>
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-2-q">Làm sao để quét thẻ căn cước công dân?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-2-a">
+                    QRBay hỗ trợ quét thông tin từ thẻ căn cước công dân và bằng lái xe một cách nhanh chóng và chính
+                    xác.
+                </div>
+            </div>
+            <!-- FAQ 3 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-3-q">Tra cứu thông tin sản phẩm như thế nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-3-a">
+                    Sau khi quét mã vạch, bạn có thể sử dụng chức năng tra cứu nhanh để tìm thông tin sản phẩm trên
+                    Google, Bing hoặc Amazon.
+                </div>
+            </div>
+            <!-- FAQ 4 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-4-q">Ứng dụng hỗ trợ định dạng nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-4-a">
+                    QRBay hỗ trợ: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix,
+                    AZTec, PDF 417, Codabar.
+                </div>
+            </div>
+            <!-- FAQ 5 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-5-q">Tại sao không quét được mã?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-5-a">
+                    Hãy chắc chắn rằng mã có đủ ánh sáng và không bị mờ. Kiểm tra camera của bạn.
+                </div>
+            </div>
+            <!-- FAQ 6 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-6-q">Làm cách nào để chia sẻ kết quả?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-6-a">
+                    Bạn có thể lưu vào thư viện hoặc chia sẻ trực tiếp qua email, tin nhắn hoặc mạng xã hội.
+                </div>
+            </div>
+            <!-- FAQ 7 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-7-q">Có hỗ trợ quét offline không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-7-a">
+                    Có, QRBay hỗ trợ quét offline. Tuy nhiên cần internet để truy cập liên kết online.
+                </div>
+            </div>
+            <!-- FAQ 8 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-8-q">Sử dụng trong lớp học được không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-8-a">
+                    Có, giáo viên có thể tạo mã QR cho bài tập và học sinh quét để truy cập nhanh chóng.
+                </div>
+            </div>
+            <!-- FAQ 9 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-9-q">Có thu thập dữ liệu cá nhân không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-9-a">
+                    QRBay cam kết bảo vệ quyền riêng tư. Dữ liệu chỉ được lưu trên thiết bị của bạn.
+                </div>
+            </div>
+            <!-- FAQ 10 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-10-q">Cập nhật ứng dụng như thế nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-10-a">
+                    Cập nhật qua App Store hoặc Google Play Store.
+                </div>
+            </div>
+            <!-- FAQ 11 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-11-q">Hỗ trợ ngôn ngữ nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-11-a">
+                    QRBay hỗ trợ 18 ngôn ngữ bao gồm Tiếng Việt, Anh, Nhật, v.v.
+                </div>
+            </div>
+            <!-- FAQ 12 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-12-q">Có thể tạo mã QR không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-12-a">
+                    Có, bạn có thể tạo mã QR từ văn bản, URL, liên hệ và nhiều hơn nữa.
+                </div>
+            </div>
+            <!-- FAQ 13 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-13-q">Quét từ thư viện ảnh được không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-13-a">
+                    Có, chọn "Quét từ Thư Viện" để quét mã QR từ ảnh có sẵn.
+                </div>
+            </div>
+            <!-- FAQ 14 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-14-q">Tạo mã QR tùy chỉnh được không?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-14-a">
+                    Có, bạn có thể tùy chỉnh màu sắc và logo cho mã QR.
+                </div>
+            </div>
+            <!-- FAQ 15 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-15-q">Quản lý lịch sử như thế nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-15-a">
+                    Xem và quản lý lịch sử trong phần "Lịch Sử" của ứng dụng.
+                </div>
+            </div>
+            <!-- FAQ 16 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-16-q">Chia sẻ lên mạng xã hội?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-16-a">
+                    Có, dễ dàng chia sẻ qua nút chia sẻ trong chi tiết mã QR.
+                </div>
+            </div>
+            <!-- FAQ 17 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-17-q">Quét hàng loạt như thế nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-17-a">
+                    Chọn chế độ quét hàng loạt để quét nhiều mã liên tục.
+                </div>
+            </div>
+            <!-- FAQ 18 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-18-q">Xuất dữ liệu định dạng nào?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-18-a">
+                    Xuất ra CSV, văn bản hoặc hình ảnh.
+                </div>
+            </div>
+            <!-- FAQ 19 -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span data-key="faq-19-q">Liên hệ hỗ trợ?</span>
+                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="faq-answer" data-key="faq-19-a">
+                    Liên hệ qua email vutaso.com@gmail.com hoặc Facebook.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom: 32px;">
+            <p style="font-size: 14px; color: #86868b; margin-bottom: 16px; font-weight: 500;"
+                data-key="footer-connect">Kết nối với chúng tôi</p>
+            <div class="social-links-grid">
+                <a href="https://www.facebook.com/qrbayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay on Facebook">
+                    <img src="assets/images/facebook.png" alt="Facebook">
+                    <span>Facebook</span>
+                </a>
+                <a href="https://tiktok.com/@moneybay.app" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO on TikTok">
+                    <img src="assets/images/tiktok.png" alt="TikTok">
+                    <span>TikTok</span>
+                </a>
+                <!-- <a href="https://www.facebook.com/groups/qrbay" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay Community">
+                    <img src="assets/images/teamwork.png" alt="Groups">
+                    <span data-key="footer-community">Cộng đồng</span>
+                </a> -->
+                <a href="https://www.facebook.com/messages/t/qrbayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay Support">
+                    <img src="assets/images/customer-support.png" alt="Support">
+                    <span data-key="footer-support">Hỗ trợ</span>
+                </a>
+            </div>
+        </div>
+
+        <div
+            style="margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;">
+            <a href="mailto:vutaso.com@gmail.com" class="footer-link-button" data-key="footer-email">Email</a>
+            <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
+                rel="noopener noreferrer" class="footer-link-button" data-key="footer-download-moneybay">Tải
+                MoneyBay</a>
+            <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
+                class="footer-link-button" data-key="footer-download-qrbay">Tải QRBay</a>
+        </div>
+
+        <p data-key="footer-copyright">&copy; 2025 VUTASO. All Rights Reserved.</p>
+        <p style="margin-top: 8px;" data-key="footer-tagline">Sản phẩm được tạo ra với ❤️ tại Việt Nam.</p>
+    </footer>
+
+    <script src="qrbay-translations.js"></script>
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // Hamburger Menu
+        const hamburger = document.querySelector('.hamburger-menu');
+        const navLinks = document.querySelector('.nav-links');
+        const navLinksItems = document.querySelectorAll('.nav-links a');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking a link
+        navLinksItems.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,1278 +1,736 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="vi" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRBay - Quét & Tạo mã QR Nhanh chóng | Miễn Phí iOS</title>
-    <meta name="description"
-        content="QRBay – Ứng dụng quét mã QR và mã vạch nhanh, chính xác. Tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Hỗ trợ đa ngôn ngữ, miễn phí.">
-    <meta name="keywords"
-        content="quét mã qr, tạo mã qr, app quét mã vạch, QRBay, quét giá sản phẩm, quét qr wifi, tạo qr liên hệ, ứng dụng qr code, app qr miễn phí, qr scanner, barcode scanner, qr code reader">
-    <meta name="author" content="VUTASO">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="language" content="Vietnamese">
-    <meta name="geo.region" content="VN">
-    <meta name="geo.placename" content="Vietnam">
+    <title data-lang-key="pageTitle">QRBay – Quét & Tạo mã QR Nhanh chóng</title>
+    <meta name="description" content="QRBay – Ứng dụng quét mã QR và mã vạch nhanh, chính xác. Tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Hỗ trợ đa ngôn ngữ, miễn phí. Tải ngay!">
+    <meta name="keywords" content="quét mã qr, tạo mã qr, app quét mã vạch, QRBay, quét giá sản phẩm, quét qr wifi, tạo qr liên hệ, ứng dụng qr code, app qr miễn phí, qr scanner">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://vutaso.com/qrbay/">
-
-    <!-- Hreflang for multilingual SEO -->
-    <link rel="alternate" hreflang="vi" href="https://vutaso.com/qrbay/">
-    <link rel="alternate" hreflang="en" href="https://vutaso.com/qrbay/">
-    <link rel="alternate" hreflang="ja" href="https://vutaso.com/qrbay/">
-    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/qrbay/">
-
-    <!-- English Keywords for International Search -->
-    <meta name="keywords-en"
-        content="QR code scanner, barcode scanner, QR code reader, create QR code, QR generator, free QR app, fast QR scanner, iOS QR scanner, barcode reader, price scanner, wifi QR code, contact QR, inventory scanner, batch scanning">
-
-    <!-- Japanese Keywords for Japan Search -->
-    <meta name="keywords-ja"
-        content="QRコードリーダー, バーコードスキャナー, QRコード作成, QRコード生成, 無料QRアプリ, 高速スキャン, iPhone QRコード, バーコードリーダー, 価格スキャナー, Wi-Fi QRコード, 連絡先QR, 在庫スキャナー, 一括スキャン">
-
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://vutaso.com/qrbay/">
-    <meta property="og:site_name" content="VUTASO - QRBay">
     <meta property="og:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
-    <meta property="og:description"
-        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta property="og:description" content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
     <meta property="og:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="750">
-    <meta property="og:locale" content="vi_VN">
-    <meta property="og:locale:alternate" content="en_US">
-    <meta property="og:locale:alternate" content="ja_JP">
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://vutaso.com/qrbay/">
     <meta name="twitter:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
-    <meta name="twitter:description"
-        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta name="twitter:description" content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
     <meta name="twitter:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
 
-    <!-- Apple Meta Tags -->
-    <meta name="apple-itunes-app" content="app-id=6499323043">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="QRBay">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ABC123XYZ"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-    <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#0071e3">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" href="assets/images/favicon_qrbay.png" type="image/png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Structured Data: Organization -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "VUTASO",
-      "url": "https://vutaso.com",
-      "logo": "https://vutaso.com/assets/logo_moneybay.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "vutaso.com@gmail.com",
-        "contactType": "Customer Service",
-        "availableLanguage": ["Vietnamese", "English", "Japanese"]
-      },
-      "sameAs": [
-        "https://www.facebook.com/qrbayapp"
-      ]
-    }
+    gtag('config', 'G-ABC123XYZ');
     </script>
 
-    <!-- Structured Data: QRBay App -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "MobileApplication",
       "name": "QRBay",
-      "alternateName": "QRBay - QR & Barcode Scanner",
-      "description": "Ứng dụng quét mã QR và mã vạch nhanh chóng, chính xác. Hỗ trợ tạo mã QR, quét hàng loạt, xuất dữ liệu CSV. Miễn phí và bảo mật.",
-      "operatingSystem": "iOS 14.0 or later",
+      "operatingSystem": "iOS",
       "applicationCategory": "UtilitiesApplication",
-      "url": "https://vutaso.com/qrbay/",
-      "downloadUrl": "https://apps.apple.com/app/qrbay/id6499323043",
-      "screenshot": "https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png",
-      "featureList": "Fast QR Scanning, Barcode Reader, Batch Scanning, QR Code Generator, History Management, CSV Export",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "VND"
       },
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "500"
+        "ratingValue": "4.9",
+        "reviewCount": "540"
       },
-      "inLanguage": ["vi", "en", "ja"],
-      "keywords": "QR scanner, barcode reader, create QR code, quét mã QR, tạo mã QR, QRコードリーダー"
+      "description": "QRBay – Ứng dụng quét mã QR và mã vạch nhanh, chính xác. Tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Hỗ trợ đa ngôn ngữ, miễn phí.",
+      "url": "https://vutaso.com/qrbay/",
+      "image": "https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png"
     }
     </script>
+    <link rel="icon" type="image/png" href="assets/images/favicon_qrbay.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary-color: #0071e3;
-            --text-color: #1d1d1f;
-            --bg-color: #ffffff;
-            --secondary-bg: #f5f5f7;
-            --section-padding: 120px 0;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            line-height: 1.5;
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
         }
-
-        /* Navigation */
-        nav.top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 44px;
-            background: #ffffff;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+        }
+        .cta-button {
             transition: all 0.3s ease;
         }
-
-        .nav-container {
-            max-width: 980px;
-            width: 100%;
-            padding: 0 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .cta-button:hover {
+            transform: scale(1.05);
         }
-
-        .nav-logo {
-            font-weight: 600;
-            font-size: 19px;
-            color: var(--text-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a {
-            font-size: 12px;
-            color: var(--text-color);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        .nav-links a:hover {
-            opacity: 1;
-        }
-
-        /* Dropdown Menu */
-        .nav-item-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .nav-dropdown-btn {
-            background: none;
-            border: none;
-            color: #1d1d1f;
-            font-size: 12px;
-            font-weight: 400;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 0;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-            font-family: inherit;
-        }
-
-        .nav-item-dropdown:hover .nav-dropdown-btn {
-            opacity: 1;
-        }
-
-        .nav-dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #fff;
-            min-width: 160px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            padding: 8px 0;
-            z-index: 1002;
-            margin-top: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-dropdown-content::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 6px solid #fff;
-        }
-
-        .nav-dropdown-content::after {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 0;
-            width: 100%;
-            height: 20px;
-            background: transparent;
-        }
-
-        .nav-item-dropdown:hover .nav-dropdown-content {
-            display: block;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        .nav-dropdown-content a {
-            color: #1d1d1f;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 13px !important;
-            text-align: left;
-            white-space: nowrap;
-            opacity: 1 !important;
-        }
-
-        .nav-dropdown-content a:hover {
-            background-color: #f5f5f7;
-            color: #0071e3;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, 10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-        }
-
-        /* Language Toggle */
-        .language-toggle {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .lang-btn {
-            background: none;
-            border: none;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-color);
-            opacity: 0.5;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .lang-btn:hover {
-            opacity: 0.8;
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .lang-btn.active {
-            opacity: 1;
-            font-weight: 600;
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        /* Hamburger Menu */
-        .hamburger-menu {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 20px;
-            height: 14px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 1001;
-        }
-
-        .hamburger-menu span {
-            display: block;
-            width: 100%;
-            height: 2px;
-            background-color: #1d1d1f;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger-menu.active span:nth-child(1) {
-            transform: translateY(6px) rotate(45deg);
-        }
-
-        .hamburger-menu.active span:nth-child(2) {
+        /* Typing Demo Styles */
+        .typing-demo {
+            font-family: 'Courier New', monospace;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
             opacity: 0;
         }
-
-        .hamburger-menu.active span:nth-child(3) {
-            transform: translateY(-6px) rotate(-45deg);
+        .typing-demo.visible {
+            opacity: 1;
         }
-
-        /* Mobile Navigation */
-        @media (max-width: 768px) {
-            .hamburger-menu {
-                display: flex;
-            }
-
-            nav.top-nav .nav-links {
-                position: fixed;
-                top: 44px;
-                left: 0;
-                right: 0;
-                flex-direction: column;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: saturate(180%) blur(20px);
-                -webkit-backdrop-filter: saturate(180%) blur(20px);
-                padding: 20px 22px;
-                gap: 0;
-                max-height: 0;
-                overflow: hidden;
+        .cursor-blink {
+            animation: blink 1s infinite;
+            color: #3b82f6; /* Blue */
+            font-weight: 700;
+        }
+        .command-line {
+            color: #3b82f6; /* Blue */
+            font-weight: 700;
+        }
+        .result-line {
+            color: #10b981; /* Green */
+            font-weight: 700;
+        }
+        .info-line {
+            color: #f59e0b; /* Amber */
+            font-weight: 700;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .demo-line {
+            transition: opacity 0.3s ease;
+            min-height: 20px;
+            opacity: 0;
+        }
+        .demo-line:first-child {
+            opacity: 1;
+        }
+        .demo-line.show {
+            opacity: 1 !important;
+        }
+        .typing-demo {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        @keyframes fadeInUp {
+            from {
                 opacity: 0;
-                transition: all 0.3s ease;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                transform: translateY(30px);
             }
-
-            nav.top-nav .nav-links.active {
-                max-height: 1000px;
+            to {
                 opacity: 1;
-            }
-
-            nav.top-nav .nav-links a {
-                padding: 12px 0;
-                font-size: 14px;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                width: 100%;
-                text-align: center;
-            }
-
-            nav.top-nav .nav-links a:last-child {
-                border-bottom: none;
-            }
-
-            .language-toggle {
-                margin-top: 12px;
-                padding-top: 12px;
-                border-top: 1px solid rgba(0, 0, 0, 0.05);
-                justify-content: center;
-                width: 100%;
-            }
-
-            /* Mobile Dropdown */
-            .nav-item-dropdown {
-                width: 100%;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            }
-
-            .nav-dropdown-btn {
-                width: 100%;
-                padding: 12px 0;
-                font-size: 14px;
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .nav-dropdown-content {
-                position: static;
-                transform: none;
-                width: 100%;
-                min-width: auto;
-                box-shadow: none;
-                border: none;
-                background: transparent;
-                padding: 0;
-                margin: 0;
-                display: none;
-                text-align: center;
-            }
-
-            /* Show on tap (hover state on mobile) */
-            .nav-item-dropdown:hover .nav-dropdown-content,
-            .nav-item-dropdown:active .nav-dropdown-content {
-                display: block;
-                animation: none;
-            }
-
-            .nav-dropdown-content::before,
-            .nav-dropdown-content::after {
-                display: none;
-            }
-
-            .nav-dropdown-content a {
-                padding: 10px 0;
-                color: #666;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                text-align: center;
-            }
-
-            .nav-dropdown-content a:last-child {
-                border-bottom: none;
-            }
-        }
-
-        /* Scroll offset */
-        section[id] {
-            scroll-margin-top: 60px;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: #000;
-            color: #f5f5f7;
-            padding-top: 120px;
-            padding-bottom: 80px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 0 22px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero h1 {
-            font-size: 56px;
-            line-height: 1.07143;
-            font-weight: 600;
-            letter-spacing: -0.005em;
-            margin-bottom: 12px;
-        }
-
-        .hero p {
-            font-size: 24px;
-            line-height: 1.16667;
-            font-weight: 400;
-            letter-spacing: 0.009em;
-            margin-bottom: 40px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            color: #a1a1a6;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 60px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 12px 24px;
-            border-radius: 980px;
-            font-size: 17px;
-            line-height: 1.17648;
-            font-weight: 400;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #0071e3;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: #0077ed;
-        }
-
-        .hero-image {
-            margin-top: 40px;
-            width: 100%;
-            max-width: 1000px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Features Grid (Bento Style) */
-        .features {
-            padding: var(--section-padding);
-            background: var(--secondary-bg);
-        }
-
-        .section-headline {
-            text-align: center;
-            margin-bottom: 60px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 22px;
-        }
-
-        .section-headline h2 {
-            font-size: 40px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .section-headline p {
-            font-size: 21px;
-            color: #86868b;
-        }
-
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 22px;
-        }
-
-        .bento-card {
-            background: #fff;
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .bento-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-        }
-
-        .bento-icon {
-            width: 64px;
-            height: 64px;
-            background: #f5f5f7;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-            font-size: 32px;
-        }
-
-        .bento-card h3 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .bento-card p {
-            font-size: 17px;
-            color: #86868b;
-            line-height: 1.5;
-        }
-
-        /* Supported Formats */
-        .formats {
-            padding: var(--section-padding);
-            background: #fff;
-        }
-
-        .format-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 16px;
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 0 22px;
-        }
-
-        .format-item {
-            background: #f5f5f7;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            font-family: monospace;
-            font-size: 14px;
-            color: #1d1d1f;
-            transition: all 0.2s;
-        }
-
-        .format-item:hover {
-            background: #e5e5e7;
-            transform: translateY(-2px);
-        }
-
-        /* FAQ */
-        .faq {
-            padding: var(--section-padding);
-            background: var(--secondary-bg);
-        }
-
-        .faq-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 22px;
-        }
-
-        .faq-item {
-            background: #fff;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
-        }
-
-        .faq-question {
-            padding: 24px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 17px;
-        }
-
-        .faq-answer {
-            padding: 0 24px 24px;
-            color: #86868b;
-            line-height: 1.6;
-            display: none;
-        }
-
-        .faq-item.active .faq-answer {
-            display: block;
-        }
-
-        .faq-icon {
-            transition: transform 0.3s;
-        }
-
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
-        }
-
-        /* Footer */
-        /* Footer */
-        footer {
-            background: #f5f5f7;
-            padding: 40px 22px;
-            text-align: center;
-            border-top: 1px solid #d2d2d7;
-        }
-
-        .social-links-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .social-link-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px 20px;
-            background: #fff;
-            border: 1px solid #d2d2d7;
-            border-radius: 12px;
-            min-width: 100px;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .social-link-card:hover {
-            background: #f5f5f7;
-            border-color: #86868b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .social-link-card img {
-            width: 32px;
-            height: 32px;
-            transition: transform 0.3s;
-        }
-
-        .social-link-card:hover img {
-            transform: scale(1.1);
-        }
-
-        .social-link-card span {
-            font-size: 12px;
-            line-height: 1.33337;
-            color: #1d1d1f;
-            font-weight: 500;
-        }
-
-        footer p {
-            font-size: 12px;
-            line-height: 1.33337;
-            color: #6e6e73;
-        }
-
-        footer a {
-            color: #0066cc;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Footer Link Buttons */
-        .footer-link-button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 14px;
-            line-height: 1.42857;
-            font-weight: 400;
-            color: #1d1d1f !important;
-            background: #fff;
-            border: 1px solid #d2d2d7;
-            border-radius: 980px;
-            text-decoration: none !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .footer-link-button:hover {
-            background: #f5f5f7;
-            border-color: #86868b;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 40px;
-            }
-
-            .hero p {
-                font-size: 19px;
-            }
-
-            .bento-grid {
-                grid-template-columns: 1fr;
+                transform: translateY(0);
             }
         }
     </style>
 </head>
+<body class="antialiased bg-white text-slate-800">
 
-<body>
-
-    <!-- Navigation -->
-    <nav class="top-nav">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">
-                QRBay
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-slate-900">
+                QR<span style="color: #3b82f6;">Bay</span>
             </a>
-            <button class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <div class="nav-links">
-                <a href="#features" data-key="nav-features">Tính năng</a>
-                <a href="#formats" data-key="nav-formats">Định dạng</a>
-                <a href="#faq" data-key="nav-faq">Hỏi đáp</a>
+            <div class="flex items-center">
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors" data-lang-key="navFeatures">Tính năng</a>
+                    <a href="#supported-formats" class="text-gray-600 hover:text-blue-600 transition-colors" data-lang-key="navFormats">Định dạng</a>
+                    <a href="#faq" class="text-gray-600 hover:text-blue-600 transition-colors" data-lang-key="navFaq">FAQ</a>
+                </nav>
 
-                <!-- Download Dropdown -->
-                <div class="nav-item-dropdown">
-                    <button class="nav-dropdown-btn">
-                        <span data-key="nav-download">Tải ngay</span>
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" />
-                        </svg>
-                    </button>
-                    <div class="nav-dropdown-content">
-                        <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
-                            data-key="nav-download-moneybay">Tải MoneyBay</a>
-                        <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank"
-                            data-key="nav-download-qrbay">Tải QRBay</a>
+                <div class="hidden md:flex items-center border-l border-gray-200 ml-6 pl-6 space-x-4">
+                    <div class="relative">
+                        <button id="lang-switcher-button" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 7 7.502 7 8.5c0 .998-.488 2.77-1.756 3.179a6.012 6.012 0 01-1.912-2.706zM10 4a6 6 0 100 12 6 6 0 000-12zm-5.668 4.027c-.244.702-.435 1.516-.543 2.473a6.013 6.013 0 010-4.946c.108.957.299 1.77.543 2.473zM15.668 11.973c.244-.702.435-1.516.543-2.473a6.013 6.013 0 010 4.946c-.108-.957-.299-1.77-.543-2.473zM12.756 5.321a6.012 6.012 0 011.912 2.706c-1.268-.409-1.756-2.181-1.756-3.179 0-.998.488-2.77 1.756-3.179a6.012 6.012 0 01-1.912 2.706z" clip-rule="evenodd" /></svg>
+                            <span id="current-lang-desktop">VI</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="lang-switcher-dropdown" class="hidden absolute right-0 mt-2 py-1 w-20 bg-white rounded-md shadow-lg border border-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="vi">VI</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="en">EN</a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="language-toggle">
-                    <button class="lang-btn active" data-lang="vi">VI</button>
-                    <button class="lang-btn" data-lang="en">EN</button>
-                    <button class="lang-btn" data-lang="ja">JP</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 data-key="hero-title">QRBay<br>Quét & Tạo mã QR Nhanh chóng</h1>
-            <p data-key="hero-subtitle">Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử dụng. Trợ thủ
-                đắc lực cho mọi nhu cầu hàng ngày của bạn.</p>
-            <div class="hero-buttons">
-                <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="btn btn-primary"
-                    data-key="hero-download-appstore">Tải từ App Store</a>
-            </div>
-            <img src="assets/images/banner_qrbay_1200x750.png" alt="QRBay App Interface" class="hero-image">
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="section-headline">
-            <h2 data-key="features-title">Trọn bộ công cụ QR trong tay bạn</h2>
-            <p data-key="features-subtitle">Từ quét mã siêu tốc đến tạo mã QR cá nhân hóa, QRBay đáp ứng mọi nhu cầu của
-                bạn một cách hoàn hảo.</p>
-        </div>
-        <div class="bento-grid">
-            <!-- Feature 1 -->
-            <div class="bento-card">
-                <div class="bento-icon">⚡️</div>
-                <h3 data-key="feature-1-title">Quét nhanh & chính xác</h3>
-                <p data-key="feature-1-desc">Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong
-                    điều kiện thiếu sáng.</p>
-            </div>
-            <!-- Feature 2 -->
-            <div class="bento-card">
-                <div class="bento-icon">🔍</div>
-                <h3 data-key="feature-2-title">Tra cứu giá sản phẩm</h3>
-                <p data-key="feature-2-desc">Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định
-                    mua sắm thông minh.</p>
-            </div>
-            <!-- Feature 3 -->
-            <div class="bento-card">
-                <div class="bento-icon">🎨</div>
-                <h3 data-key="feature-3-title">Tạo & Tùy chỉnh QR</h3>
-                <p data-key="feature-3-desc">Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo
-                    phong cách của bạn.</p>
-            </div>
-            <!-- Feature 4 -->
-            <div class="bento-card">
-                <div class="bento-icon">📂</div>
-                <h3 data-key="feature-4-title">Quản lý lịch sử</h3>
-                <p data-key="feature-4-desc">Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp
-                    và truy cập lại khi cần.</p>
-            </div>
-            <!-- Feature 5 -->
-            <div class="bento-card">
-                <div class="bento-icon">📑</div>
-                <h3 data-key="feature-5-title">Quét hàng loạt</h3>
-                <p data-key="feature-5-desc">Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một
-                    lúc trong một lần quét.</p>
-            </div>
-            <!-- Feature 6 -->
-            <div class="bento-card">
-                <div class="bento-icon">📤</div>
-                <h3 data-key="feature-6-title">Xuất & Chia sẻ</h3>
-                <p data-key="feature-6-desc">Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR
-                    của bạn lên mạng xã hội.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Supported Formats Section -->
-    <section id="formats" class="formats">
-        <div class="section-headline">
-            <h2 data-key="formats-title">Hỗ trợ mọi định dạng phổ biến</h2>
-            <p data-key="formats-subtitle">QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.
-            </p>
-        </div>
-        <div class="format-grid">
-            <div class="format-item">QRCode</div>
-            <div class="format-item">Data Matrix</div>
-            <div class="format-item">Aztec</div>
-            <div class="format-item">PDF 417</div>
-            <div class="format-item">EAN-13</div>
-            <div class="format-item">EAN-8</div>
-            <div class="format-item">UPC-A</div>
-            <div class="format-item">UPC-E</div>
-            <div class="format-item">Code 128</div>
-            <div class="format-item">Code 93</div>
-            <div class="format-item">Code 39</div>
-            <div class="format-item">Codabar</div>
-            <div class="format-item">ITF</div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="faq">
-        <div class="section-headline">
-            <h2 data-key="faq-title">Câu hỏi thường gặp</h2>
-            <p data-key="faq-subtitle">Tìm câu trả lời cho các câu hỏi phổ biến nhất về QRBay.</p>
-        </div>
-        <div class="faq-container">
-            <!-- FAQ 1 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-1-q">Làm thế nào để quét mã QR?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-1-a">
-                    Mở ứng dụng QRBay và hướng camera vào mã QR mà bạn muốn quét. Ứng dụng sẽ tự động nhận diện và quét
-                    mã.
-                </div>
-            </div>
-            <!-- FAQ 2 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-2-q">Làm sao để quét thẻ căn cước công dân?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-2-a">
-                    QRBay hỗ trợ quét thông tin từ thẻ căn cước công dân và bằng lái xe một cách nhanh chóng và chính
-                    xác.
-                </div>
-            </div>
-            <!-- FAQ 3 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-3-q">Tra cứu thông tin sản phẩm như thế nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-3-a">
-                    Sau khi quét mã vạch, bạn có thể sử dụng chức năng tra cứu nhanh để tìm thông tin sản phẩm trên
-                    Google, Bing hoặc Amazon.
-                </div>
-            </div>
-            <!-- FAQ 4 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-4-q">Ứng dụng hỗ trợ định dạng nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-4-a">
-                    QRBay hỗ trợ: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix,
-                    AZTec, PDF 417, Codabar.
-                </div>
-            </div>
-            <!-- FAQ 5 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-5-q">Tại sao không quét được mã?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-5-a">
-                    Hãy chắc chắn rằng mã có đủ ánh sáng và không bị mờ. Kiểm tra camera của bạn.
-                </div>
-            </div>
-            <!-- FAQ 6 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-6-q">Làm cách nào để chia sẻ kết quả?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-6-a">
-                    Bạn có thể lưu vào thư viện hoặc chia sẻ trực tiếp qua email, tin nhắn hoặc mạng xã hội.
-                </div>
-            </div>
-            <!-- FAQ 7 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-7-q">Có hỗ trợ quét offline không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-7-a">
-                    Có, QRBay hỗ trợ quét offline. Tuy nhiên cần internet để truy cập liên kết online.
-                </div>
-            </div>
-            <!-- FAQ 8 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-8-q">Sử dụng trong lớp học được không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-8-a">
-                    Có, giáo viên có thể tạo mã QR cho bài tập và học sinh quét để truy cập nhanh chóng.
-                </div>
-            </div>
-            <!-- FAQ 9 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-9-q">Có thu thập dữ liệu cá nhân không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-9-a">
-                    QRBay cam kết bảo vệ quyền riêng tư. Dữ liệu chỉ được lưu trên thiết bị của bạn.
-                </div>
-            </div>
-            <!-- FAQ 10 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-10-q">Cập nhật ứng dụng như thế nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-10-a">
-                    Cập nhật qua App Store hoặc Google Play Store.
-                </div>
-            </div>
-            <!-- FAQ 11 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-11-q">Hỗ trợ ngôn ngữ nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-11-a">
-                    QRBay hỗ trợ 18 ngôn ngữ bao gồm Tiếng Việt, Anh, Nhật, v.v.
-                </div>
-            </div>
-            <!-- FAQ 12 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-12-q">Có thể tạo mã QR không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-12-a">
-                    Có, bạn có thể tạo mã QR từ văn bản, URL, liên hệ và nhiều hơn nữa.
-                </div>
-            </div>
-            <!-- FAQ 13 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-13-q">Quét từ thư viện ảnh được không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-13-a">
-                    Có, chọn "Quét từ Thư Viện" để quét mã QR từ ảnh có sẵn.
-                </div>
-            </div>
-            <!-- FAQ 14 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-14-q">Tạo mã QR tùy chỉnh được không?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-14-a">
-                    Có, bạn có thể tùy chỉnh màu sắc và logo cho mã QR.
-                </div>
-            </div>
-            <!-- FAQ 15 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-15-q">Quản lý lịch sử như thế nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-15-a">
-                    Xem và quản lý lịch sử trong phần "Lịch Sử" của ứng dụng.
-                </div>
-            </div>
-            <!-- FAQ 16 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-16-q">Chia sẻ lên mạng xã hội?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-16-a">
-                    Có, dễ dàng chia sẻ qua nút chia sẻ trong chi tiết mã QR.
-                </div>
-            </div>
-            <!-- FAQ 17 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-17-q">Quét hàng loạt như thế nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-17-a">
-                    Chọn chế độ quét hàng loạt để quét nhiều mã liên tục.
-                </div>
-            </div>
-            <!-- FAQ 18 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-18-q">Xuất dữ liệu định dạng nào?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-18-a">
-                    Xuất ra CSV, văn bản hoặc hình ảnh.
-                </div>
-            </div>
-            <!-- FAQ 19 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span data-key="faq-19-q">Liên hệ hỗ trợ?</span>
-                    <svg class="faq-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path d="M1 1L6 6L11 1" stroke="#86868b" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="faq-answer" data-key="faq-19-a">
-                    Liên hệ qua email vutaso.com@gmail.com hoặc Facebook.
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div style="margin-bottom: 32px;">
-            <p style="font-size: 14px; color: #86868b; margin-bottom: 16px; font-weight: 500;"
-                data-key="footer-connect">Kết nối với chúng tôi</p>
-            <div class="social-links-grid">
-                <a href="https://www.facebook.com/qrbayapp" target="_blank" rel="noopener noreferrer"
-                    class="social-link-card" title="QRBay on Facebook">
-                    <img src="assets/images/facebook.png" alt="Facebook">
-                    <span>Facebook</span>
+                <a href="https://apps.apple.com/app/qrbay/id6499323043" class="hidden md:inline-block ml-6 bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition-all" data-lang-key="navDownload">
+                    Tải ứng dụng
                 </a>
-                <a href="https://tiktok.com/@moneybay.app" target="_blank" rel="noopener noreferrer"
-                    class="social-link-card" title="VUTASO on TikTok">
-                    <img src="assets/images/tiktok.png" alt="TikTok">
-                    <span>TikTok</span>
-                </a>
-                <!-- <a href="https://www.facebook.com/groups/qrbay" target="_blank" rel="noopener noreferrer"
-                    class="social-link-card" title="QRBay Community">
-                    <img src="assets/images/teamwork.png" alt="Groups">
-                    <span data-key="footer-community">Cộng đồng</span>
-                </a> -->
-                <a href="https://www.facebook.com/messages/t/qrbayapp" target="_blank" rel="noopener noreferrer"
-                    class="social-link-card" title="QRBay Support">
-                    <img src="assets/images/customer-support.png" alt="Support">
-                    <span data-key="footer-support">Hỗ trợ</span>
-                </a>
+
+                <button id="mobile-menu-button" class="md:hidden ml-4 text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
             </div>
         </div>
-
-        <div
-            style="margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;">
-            <a href="mailto:vutaso.com@gmail.com" class="footer-link-button" data-key="footer-email">Email</a>
-            <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
-                rel="noopener noreferrer" class="footer-link-button" data-key="footer-download-moneybay">Tải
-                MoneyBay</a>
-            <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
-                class="footer-link-button" data-key="footer-download-qrbay">Tải QRBay</a>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4 border-t border-gray-200">
         </div>
+    </header>
 
-        <p data-key="footer-copyright">&copy; 2025 VUTASO. All Rights Reserved.</p>
-        <p style="margin-top: 8px;" data-key="footer-tagline">Sản phẩm được tạo ra với ❤️ tại Việt Nam.</p>
+    <main>
+       <section class="relative pt-32 pb-20 md:pt-48 md:pb-32 text-center overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto reveal">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight" data-lang-key="heroTitle">
+                    QRBay
+                </h1>
+                
+                <div class="mt-8 mb-6">
+                    <div class="typing-demo bg-black/95 rounded-xl p-6 max-w-2xl mx-auto">
+                        <div class="flex items-center mb-4">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-left font-mono text-sm space-y-2">
+                            <div class="demo-line command-line" id="line1">
+                                <span class="text-gray-400">></span> <span id="typing-text-1"></span><span class="cursor-blink">|</span>
+                            </div>
+                            <div class="demo-line result-line" id="line2">
+                                <span class="text-gray-400">$</span> <span id="typing-text-2"></span><span class="cursor-blink">|</span>
+                            </div>
+                            <div class="demo-line command-line" id="line3">
+                                <span class="text-gray-400">></span> <span id="typing-text-3"></span><span class="cursor-blink">|</span>
+                            </div>
+                            <div class="demo-line info-line" id="line4">
+                                <span class="text-gray-400">$</span> <span id="typing-text-4"></span><span class="cursor-blink">|</span>
+                            </div>
+                            <div class="demo-line result-line" id="line5">
+                                <span class="text-gray-400">></span> <span id="typing-text-5"></span><span class="cursor-blink">|</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-6 text-lg md:text-xl text-slate-600 max-w-2xl mx-auto" data-lang-key="heroSubtitle">
+                    Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử dụng. Trợ thủ đắc lực cho mọi nhu cầu hàng ngày của bạn.
+                </p>
+                
+                <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="cta-button w-full sm:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white font-semibold px-6 py-4 rounded-lg shadow-lg">
+                        <img src="assets/images/apple-logo.png" alt="Apple Logo" class="w-6 h-6">
+                        <span data-lang-key="downloadAppStore">Tải từ App Store</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-16 md:mt-24 reveal">
+                <div class="relative max-w-4xl mx-auto">
+                    <img src="assets/images/banner_qrbay_1200x750.png" 
+                         alt="Ứng dụng quét mã QR và mã vạch QRBay"
+                         class="relative rounded-2xl shadow-2xl border border-gray-200">
+                </div>
+            </div>
+      </div>
+    </section>
+
+        <section id="features" class="py-20 md:py-32 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="featuresTitle">Trọn bộ công cụ QR trong tay bạn</h2>
+                    <p class="mt-4 text-slate-600" data-lang-key="featuresSubtitle">
+                        Từ quét mã siêu tốc đến tạo mã QR cá nhân hóa, QRBay đáp ứng mọi nhu cầu của bạn một cách hoàn hảo.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-blue-100 text-blue-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature1Title">Quét nhanh & chính xác</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature1Desc">Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong điều kiện thiếu sáng.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-green-100 text-green-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature2Title">Tra cứu giá sản phẩm</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature2Desc">Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định mua sắm thông minh.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-purple-100 text-purple-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature3Title">Tạo & Tùy chỉnh QR</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature3Desc">Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo phong cách của bạn.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                        <div class="bg-yellow-100 text-yellow-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature4Title">Quản lý lịch sử</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature4Desc">Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp và truy cập lại khi cần.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-pink-100 text-pink-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10m16-5H4" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature5Title">Quét hàng loạt</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature5Desc">Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một lúc trong một lần quét.</p>
+                    </div>
+                    <div class="feature-card reveal bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl">
+                         <div class="bg-indigo-100 text-indigo-600 rounded-lg w-12 h-12 flex items-center justify-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        </div>
+                        <h3 class="mt-6 text-xl font-bold text-slate-900" data-lang-key="feature6Title">Xuất & Chia sẻ</h3>
+                        <p class="mt-2 text-slate-600" data-lang-key="feature6Desc">Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR của bạn lên mạng xã hội.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="supported-formats" class="py-20 md:py-32 overflow-hidden bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="formatsTitle">Hỗ trợ mọi định dạng phổ biến</h2>
+                    <p class="mt-4 text-slate-600" data-lang-key="formatsSubtitle">
+                        QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.
+                    </p>
+                </div>
+                <div class="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-w-4xl mx-auto text-center reveal">
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">QRCode</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Data Matrix</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Aztec</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">PDF 417</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">EAN-13</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">EAN-8</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">UPC-A</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">UPC-E</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Code 128</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Code 93</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Code 39</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">Codabar</div>
+                    <div class="p-4 bg-gray-100 rounded-lg font-mono">ITF</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="faq" class="py-20 md:py-28 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="faqTitle">Câu Hỏi Thường Gặp</h2>
+                    <p class="mt-4 text-slate-600" data-lang-key="faqSubtitle">
+                        Tìm câu trả lời cho các câu hỏi phổ biến nhất về QRBay.
+                    </p>
+                </div>
+
+                <div class="mt-16 max-w-3xl mx-auto space-y-4 reveal">
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq1q">Làm thế nào để quét mã QR?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq1a">Mở ứng dụng QRBay và hướng camera vào mã QR mà bạn muốn quét. Ứng dụng sẽ tự động nhận diện và quét mã. Đảm bảo rằng mã QR được chiếu sáng đầy đủ và không bị che khuất.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq2q">Làm sao để quét thẻ căn cước công dân và bằng lái xe?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq2a">QRBay hỗ trợ quét thông tin từ thẻ căn cước công dân và bằng lái xe một cách nhanh chóng và chính xác. Để quét, bạn hướng camera vào thẻ CCCD hoặc bằng lái xe có chứa mã QR code để bắt đầu quá trình quét và hiện kết quả.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq3q">Làm thế nào để tra cứu thông tin sản phẩm và giá cả hàng hóa đã quét?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq3a">Sau khi quét mã vạch sản phẩm bằng QRBay, bạn có thể sử dụng chức năng tra cứu nhanh để tìm thông tin sản phẩm và giá cả trên Google, Bing hoặc Amazon. Chỉ cần nhấn vào nút "Tra Cứu" để tìm kiếm thông tin một cách nhanh chóng và chính xác.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq4q">Ứng dụng hỗ trợ các định dạng mã nào?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq4a">QRBay hỗ trợ nhiều định dạng mã bao gồm: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix, AZTec, PDF 417, và Codabar.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq5q">Tại sao ứng dụng không thể quét mã?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq5a">Hãy chắc chắn rằng mã đang được quét có đủ ánh sáng và không bị mờ. Kiểm tra xem camera có hoạt động bình thường không. Đôi khi, mã vạch bị hỏng hoặc không hợp lệ cũng có thể gây ra vấn đề.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq6q">Làm cách nào để lưu và chia sẻ kết quả quét?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq6a">Sau khi quét mã, bạn có thể lưu kết quả vào thư viện của ứng dụng hoặc chia sẻ trực tiếp qua email, tin nhắn hoặc các ứng dụng mạng xã hội khác. Tính năng chia sẻ có thể được tìm thấy ở góc trên bên phải của màn hình kết quả quét.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq7q">QRBay có hỗ trợ quét offline không?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq7a">Có, QRBay hỗ trợ quét mã QR và mã vạch ngay cả khi không có kết nối internet. Tuy nhiên, để truy cập vào nội dung trực tuyến liên kết với mã, bạn sẽ cần kết nối internet.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq8q">Làm thế nào để sử dụng QRBay trong lớp học?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq8a">QRBay có thể được sử dụng trong lớp học để tạo và quét mã QR cho các bài tập, tài liệu tham khảo, và kiểm tra trực tuyến. Giáo viên có thể tạo mã QR cho các liên kết học tập và học sinh có thể quét để truy cập nhanh chóng. Điều này giúp tối ưu hóa thời gian và tạo sự hứng thú trong học tập.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq9q">QRBay có thu thập dữ liệu cá nhân không?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq9a">QRBay cam kết bảo vệ sự riêng tư của người dùng. Ứng dụng không thu thập hoặc lưu trữ bất kỳ dữ liệu cá nhân nào mà không có sự đồng ý của bạn. Dữ liệu quét chỉ được lưu trữ trên thiết bị của bạn trừ khi bạn chọn chia sẻ nó ra bên ngoài.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq10q">Làm sao để cập nhật ứng dụng QRBay?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq10a">Bạn có thể cập nhật ứng dụng QRBay thông qua cửa hàng ứng dụng của thiết bị (Google Play Store cho Android và App Store cho iOS). Chúng tôi khuyến khích bạn luôn giữ ứng dụng ở phiên bản mới nhất để trải nghiệm các tính năng và cải tiến mới nhất.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq11q">Ứng dụng có hỗ trợ ngôn ngữ khác không?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq11a">QRBay hỗ trợ nhiều ngôn ngữ để phục vụ người dùng toàn cầu. Bạn có thể thay đổi ngôn ngữ trong phần cài đặt của thiết bị để phù hợp với nhu cầu sử dụng của mình. QRBay hỗ trợ lên đến 18 ngôn ngữ, bao gồm: Tiếng Anh, Tiếng Việt, Tiếng Indonesia, Tiếng Trung, Tiếng Thái, Tiếng Hàn, Tiếng Nhật, Tiếng Pháp, Tiếng Đức, Tiếng Tây Ban Nha, Tiếng Ba Lan, Tiếng Thổ Nhĩ Kỳ, Tiếng Nga, Tiếng Bồ Đào Nha, Tiếng Ý, Tiếng Hà Lan, Tiếng Ả Rập, và Tiếng Ấn Độ.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq12q">Tôi có thể tạo mã QR từ QRBay không?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq12a">Có, QRBay cho phép người dùng tạo mã QR từ văn bản, liên kết URL, thông tin liên hệ, và nhiều hơn nữa. Bạn chỉ cần chọn loại mã cần tạo, nhập thông tin cần thiết, và QRBay sẽ tạo mã QR cho bạn để sử dụng hoặc chia sẻ.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq13q">Làm thế nào để quét mã QR từ thư viện ảnh?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq13a">QRBay cho phép bạn quét mã QR trực tiếp từ thư viện ảnh trên thiết bị của bạn. Chọn tùy chọn "Quét từ Thư Viện" trong ứng dụng và chọn hình ảnh có chứa mã QR mà bạn muốn quét.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq14q">Tôi có thể tạo mã QR và mã vạch tùy chỉnh không?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq14a">Có, QRBay cung cấp chức năng tạo mã QR và mã vạch với thiết kế và thông tin tùy chỉnh. Bạn có thể nhập nội dung bạn muốn mã hóa và chọn tùy chỉnh thiết kế theo sở thích cá nhân.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq15q">Làm thế nào để quản lý lịch sử quét và tạo mã?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq15a">Ứng dụng QRBay lưu lại lịch sử quét và tạo mã của bạn để bạn có thể dễ dàng truy cập và quản lý. Bạn có thể tìm thấy lịch sử trong phần "Lịch Sử" của ứng dụng và thực hiện các thao tác như xem, chia sẻ, hoặc xóa.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq16q">Làm sao để chia sẻ mã QR trên mạng xã hội?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq16a">Bạn có thể dễ dàng chia sẻ mã QR đã quét hoặc tạo ra trên các nền tảng mạng xã hội như Facebook, Twitter, Instagram và nhiều hơn nữa chỉ với một vài lần chạm. Tính năng chia sẻ có sẵn trong phần chi tiết mã QR.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq17q">QRBay hỗ trợ quét hàng loạt như thế nào?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq17a">Với tính năng quét hàng loạt của QRBay, bạn có thể quét nhiều mã QR và mã vạch cùng một lúc, giúp tiết kiệm thời gian và tăng hiệu suất. Chọn chế độ quét hàng loạt và hướng camera vào các mã để bắt đầu quét.</p>
+                    </details>
+                    <details class="group p-6 bg-white rounded-lg cursor-pointer">
+                        <summary class="flex items-center justify-between font-semibold text-slate-900">
+                            <span data-lang-key="faq18q">Tôi có thể xuất dữ liệu quét dưới dạng nào?</span>
+                            <svg class="w-5 h-5 transform group-open:-rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </summary>
+                        <p class="mt-4 text-slate-600" data-lang-key="faq18a">QRBay cho phép bạn xuất dữ liệu quét sang các định dạng như CSV, văn bản hoặc hình ảnh để dễ dàng phân tích và chia sẻ. Tùy chọn xuất dữ liệu có sẵn trong phần lịch sử quét của ứng dụng.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="py-20 md:py-32 text-center bg-white">
+            <div class="container mx-auto px-6 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900" data-lang-key="ctaTitle">
+                    Trải nghiệm trình quét QR mạnh mẽ nhất ngay hôm nay!
+                </h2>
+                <p class="mt-4 text-slate-600 max-w-xl mx-auto" data-lang-key="ctaSubtitle">
+                    Tải QRBay miễn phí và khám phá sự tiện lợi trong từng lần quét.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="cta-button w-full sm:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white font-semibold px-6 py-4 rounded-lg shadow-lg">
+                        <img src="assets/images/apple-logo.png" alt="Apple Logo" class="w-6 h-6">
+                        <span data-lang-key="ctaAppStore">Tải từ App Store</span>
+                    </a>
+                </div>
+            </div>
+        </section> 
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-200">
+        <div class="container mx-auto px-6 py-10 text-center text-slate-500">
+            <div class="mb-4">
+                <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm">
+                     <a href="mailto:vutaso.com@gmail.com" class="hover:text-blue-600 transition-colors" data-lang-key="footerEmail">Email</a>
+                     <span class="hidden sm:inline">•</span>
+                     <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="hover:text-blue-600 transition-colors">App Store</a>
+                     <span class="hidden sm:inline">•</span>
+                      <a href="https://vutaso.com/qrbay/privacy" target="_blank" class="hover:text-blue-600 transition-colors">Privacy</a>
+                      <span class="hidden sm:inline">•</span>
+                      <a href="https://vutaso.com/qrbay/terms" target="_blank" class="hover:text-blue-600 transition-colors">Terms</a>
+                </div>
+            </div>
+            
+            <p>&copy; 2025 QRBay. All Rights Reserved.</p>
+            <p class="text-sm mt-2" data-lang-key="footerTagline">Một sản phẩm được tạo ra với ❤️ để đơn giản hóa cuộc sống của bạn.</p>
+        </div>
     </footer>
 
-    <script src="qrbay-translations.js"></script>
     <script>
-        // FAQ Accordion
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', () => {
-                const item = question.parentElement;
-                item.classList.toggle('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const nav = document.querySelector('header nav');
+            mobileMenu.innerHTML = nav.innerHTML;
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
             });
-        });
 
-        // Hamburger Menu
-        const hamburger = document.querySelector('.hamburger-menu');
-        const navLinks = document.querySelector('.nav-links');
-        const navLinksItems = document.querySelectorAll('.nav-links a');
+            // Reveal on Scroll
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            revealElements.forEach(el => revealObserver.observe(el));
 
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
+            // Translations
+            const translations = {
+                vi: {
+                    pageTitle: "QRBay – Quét & Tạo mã QR Nhanh chóng",
+                    navFeatures: "Tính năng",
+                    navFormats: "Định dạng",
+                    navFaq: "FAQ",
+                    navDownload: "Tải ứng dụng",
+                    heroTitle: "Quét & Tạo mã QR dễ dàng hơn bao giờ hết với <span style='color: #3b82f6;'>QRBay</span>",
+                    heroSubtitle: "Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử dụng. Trợ thủ đắc lực cho mọi nhu cầu hàng ngày của bạn.",
+                    downloadAppStore: "Tải từ App Store",
+                    featuresTitle: "Trọn bộ công cụ QR trong tay bạn",
+                    featuresSubtitle: "Từ quét mã siêu tốc đến tạo mã QR cá nhân hóa, QRBay đáp ứng mọi nhu cầu của bạn một cách hoàn hảo.",
+                    feature1Title: "Quét nhanh & chính xác",
+                    feature1Desc: "Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong điều kiện thiếu sáng.",
+                    feature2Title: "Tra cứu giá sản phẩm",
+                    feature2Desc: "Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định mua sắm thông minh.",
+                    feature3Title: "Tạo & Tùy chỉnh QR",
+                    feature3Desc: "Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo phong cách của bạn.",
+                    feature4Title: "Quản lý lịch sử",
+                    feature4Desc: "Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp và truy cập lại khi cần.",
+                    feature5Title: "Quét hàng loạt",
+                    feature5Desc: "Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một lúc trong một lần quét.",
+                    feature6Title: "Xuất & Chia sẻ",
+                    feature6Desc: "Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR của bạn lên mạng xã hội.",
+                    formatsTitle: "Hỗ trợ mọi định dạng phổ biến",
+                    formatsSubtitle: "QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.",
+                    faqTitle: "Câu Hỏi Thường Gặp",
+                    faqSubtitle: "Tìm câu trả lời cho các câu hỏi phổ biến nhất về QRBay.",
+                    faq1q: "Làm thế nào để quét mã QR?",
+                    faq1a: "Mở ứng dụng QRBay và hướng camera vào mã QR mà bạn muốn quét. Ứng dụng sẽ tự động nhận diện và quét mã. Đảm bảo rằng mã QR được chiếu sáng đầy đủ và không bị che khuất.",
+                    faq2q: "Làm sao để quét thẻ căn cước công dân và bằng lái xe?",
+                    faq2a: "QRBay hỗ trợ quét thông tin từ thẻ căn cước công dân và bằng lái xe một cách nhanh chóng và chính xác. Để quét, bạn hướng camera vào thẻ CCCD hoặc bằng lái xe có chứa mã QR code để bắt đầu quá trình quét và hiện kết quả.",
+                    faq3q: "Làm thế nào để tra cứu thông tin sản phẩm và giá cả hàng hóa đã quét?",
+                    faq3a: "Sau khi quét mã vạch sản phẩm bằng QRBay, bạn có thể sử dụng chức năng tra cứu nhanh để tìm thông tin sản phẩm và giá cả trên Google, Bing hoặc Amazon. Chỉ cần nhấn vào nút \"Tra Cứu\" để tìm kiếm thông tin một cách nhanh chóng và chính xác.",
+                    faq4q: "Ứng dụng hỗ trợ các định dạng mã nào?",
+                    faq4a: "QRBay hỗ trợ nhiều định dạng mã bao gồm: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix, AZTec, PDF 417, và Codabar.",
+                    faq5q: "Tại sao ứng dụng không thể quét mã?",
+                    faq5a: "Hãy chắc chắn rằng mã đang được quét có đủ ánh sáng và không bị mờ. Kiểm tra xem camera có hoạt động bình thường không. Đôi khi, mã vạch bị hỏng hoặc không hợp lệ cũng có thể gây ra vấn đề.",
+                    faq6q: "Làm cách nào để lưu và chia sẻ kết quả quét?",
+                    faq6a: "Sau khi quét mã, bạn có thể lưu kết quả vào thư viện của ứng dụng hoặc chia sẻ trực tiếp qua email, tin nhắn hoặc các ứng dụng mạng xã hội khác. Tính năng chia sẻ có thể được tìm thấy ở góc trên bên phải của màn hình kết quả quét.",
+                    faq7q: "QRBay có hỗ trợ quét offline không?",
+                    faq7a: "Có, QRBay hỗ trợ quét mã QR và mã vạch ngay cả khi không có kết nối internet. Tuy nhiên, để truy cập vào nội dung trực tuyến liên kết với mã, bạn sẽ cần kết nối internet.",
+                    faq8q: "Làm thế nào để sử dụng QRBay trong lớp học?",
+                    faq8a: "QRBay có thể được sử dụng trong lớp học để tạo và quét mã QR cho các bài tập, tài liệu tham khảo, và kiểm tra trực tuyến. Giáo viên có thể tạo mã QR cho các liên kết học tập và học sinh có thể quét để truy cập nhanh chóng. Điều này giúp tối ưu hóa thời gian và tạo sự hứng thú trong học tập.",
+                    faq9q: "QRBay có thu thập dữ liệu cá nhân không?",
+                    faq9a: "QRBay cam kết bảo vệ sự riêng tư của người dùng. Ứng dụng không thu thập hoặc lưu trữ bất kỳ dữ liệu cá nhân nào mà không có sự đồng ý của bạn. Dữ liệu quét chỉ được lưu trữ trên thiết bị của bạn trừ khi bạn chọn chia sẻ nó ra bên ngoài.",
+                    faq10q: "Làm sao để cập nhật ứng dụng QRBay?",
+                    faq10a: "Bạn có thể cập nhật ứng dụng QRBay thông qua cửa hàng ứng dụng của thiết bị (Google Play Store cho Android và App Store cho iOS). Chúng tôi khuyến khích bạn luôn giữ ứng dụng ở phiên bản mới nhất để trải nghiệm các tính năng và cải tiến mới nhất.",
+                    faq11q: "Ứng dụng có hỗ trợ ngôn ngữ khác không?",
+                    faq11a: "QRBay hỗ trợ nhiều ngôn ngữ để phục vụ người dùng toàn cầu. Bạn có thể thay đổi ngôn ngữ trong phần cài đặt của thiết bị để phù hợp với nhu cầu sử dụng của mình. QRBay hỗ trợ lên đến 18 ngôn ngữ, bao gồm: Tiếng Anh, Tiếng Việt, Tiếng Indonesia, Tiếng Trung, Tiếng Thái, Tiếng Hàn, Tiếng Nhật, Tiếng Pháp, Tiếng Đức, Tiếng Tây Ban Nha, Tiếng Ba Lan, Tiếng Thổ Nhĩ Kỳ, Tiếng Nga, Tiếng Bồ Đào Nha, Tiếng Ý, Tiếng Hà Lan, Tiếng Ả Rập, và Tiếng Ấn Độ.",
+                    faq12q: "Tôi có thể tạo mã QR từ QRBay không?",
+                    faq12a: "Có, QRBay cho phép người dùng tạo mã QR từ văn bản, liên kết URL, thông tin liên hệ, và nhiều hơn nữa. Bạn chỉ cần chọn loại mã cần tạo, nhập thông tin cần thiết, và QRBay sẽ tạo mã QR cho bạn để sử dụng hoặc chia sẻ.",
+                    faq13q: "Làm thế nào để quét mã QR từ thư viện ảnh?",
+                    faq13a: "QRBay cho phép bạn quét mã QR trực tiếp từ thư viện ảnh trên thiết bị của bạn. Chọn tùy chọn \"Quét từ Thư Viện\" trong ứng dụng và chọn hình ảnh có chứa mã QR mà bạn muốn quét.",
+                    faq14q: "Tôi có thể tạo mã QR và mã vạch tùy chỉnh không?",
+                    faq14a: "Có, QRBay cung cấp chức năng tạo mã QR và mã vạch với thiết kế và thông tin tùy chỉnh. Bạn có thể nhập nội dung bạn muốn mã hóa và chọn tùy chỉnh thiết kế theo sở thích cá nhân.",
+                    faq15q: "Làm thế nào để quản lý lịch sử quét và tạo mã?",
+                    faq15a: "Ứng dụng QRBay lưu lại lịch sử quét và tạo mã của bạn để bạn có thể dễ dàng truy cập và quản lý. Bạn có thể tìm thấy lịch sử trong phần \"Lịch Sử\" của ứng dụng và thực hiện các thao tác như xem, chia sẻ, hoặc xóa.",
+                    faq16q: "Làm sao để chia sẻ mã QR trên mạng xã hội?",
+                    faq16a: "Bạn có thể dễ dàng chia sẻ mã QR đã quét hoặc tạo ra trên các nền tảng mạng xã hội như Facebook, Twitter, Instagram và nhiều hơn nữa chỉ với một vài lần chạm. Tính năng chia sẻ có sẵn trong phần chi tiết mã QR.",
+                    faq17q: "QRBay hỗ trợ quét hàng loạt như thế nào?",
+                    faq17a: "Với tính năng quét hàng loạt của QRBay, bạn có thể quét nhiều mã QR và mã vạch cùng một lúc, giúp tiết kiệm thời gian và tăng hiệu suất. Chọn chế độ quét hàng loạt và hướng camera vào các mã để bắt đầu quét.",
+                    faq18q: "Tôi có thể xuất dữ liệu quét dưới dạng nào?",
+                    faq18a: "QRBay cho phép bạn xuất dữ liệu quét sang các định dạng như CSV, văn bản hoặc hình ảnh để dễ dàng phân tích và chia sẻ. Tùy chọn xuất dữ liệu có sẵn trong phần lịch sử quét của ứng dụng.",
+                    faq19q: "Làm sao để liên hệ với chúng tôi để được hỗ trợ thêm?",
+                    faq19a: "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, hãy liên hệ với chúng tôi qua email hoặc Facebook: <ul><li>Email: <a href='mailto:vutaso.com@gmail.com'>vutaso.com@gmail.com</a></li><li>Facebook: <a href='https://www.facebook.com/qrbayapp' target='_blank'>QRBay trên Facebook</a></li><li>Website: <a href='https://vutaso.com'>https://vutaso.com</a></li></ul>",
+                    ctaTitle: "Trải nghiệm trình quét QR mạnh mẽ nhất ngay hôm nay!",
+                    ctaSubtitle: "Tải QRBay miễn phí và khám phá sự tiện lợi trong từng lần quét.",
+                    ctaAppStore: "Tải từ App Store",
+                    footerEmail: "Email",
+                    footerTagline: "Một sản phẩm được tạo ra với ❤️ để đơn giản hóa cuộc sống của bạn."
+                },
+                en: {
+                    pageTitle: "QRBay – Fast QR & Barcode Scanner",
+                    navFeatures: "Features",
+                    navFormats: "Formats",
+                    navFaq: "FAQ",
+                    navDownload: "Download App",
+                    heroTitle: "Scan & Create QR Codes easier than ever with <span style='color: #3b82f6;'>QRBay</span>",
+                    heroSubtitle: "A powerful, fast, and easy-to-use QR/barcode scanning and creation app. Your go-to assistant for all everyday needs.",
+                    downloadAppStore: "Download on the App Store",
+                    featuresTitle: "A Complete QR Toolkit in Your Hands",
+                    featuresSubtitle: "From lightning-fast scanning to personalized QR creation, QRBay perfectly meets all your needs.",
+                    feature1Title: "Fast & Accurate Scanning",
+                    feature1Desc: "Use your camera to scan any QR code and barcode in seconds, even in low light conditions.",
+                    feature2Title: "Product Price Lookup",
+                    feature2Desc: "Scan barcodes at the supermarket to compare prices, read reviews, and make smarter shopping decisions.",
+                    feature3Title: "Create & Customize QRs",
+                    feature3Desc: "Generate QR codes for Wi-Fi, contacts, URLs... and personalize them with colors and logos to match your style.",
+                    feature4Title: "History Management",
+                    feature4Desc: "Automatically saves all your scan and creation history. Easily search, organize, and access it whenever needed.",
+                    feature5Title: "Batch Scanning",
+                    feature5Desc: "Save maximum time by scanning multiple QR codes or barcodes at once in a single session.",
+                    feature6Title: "Export & Share",
+                    feature6Desc: "Easily export history to CSV, text, or image files and share your created QR codes on social media.",
+                    formatsTitle: "Supports All Common Formats",
+                    formatsSubtitle: "QRBay is compatible with almost every type of QR code and barcode you encounter daily.",
+                    faqTitle: "Frequently Asked Questions",
+                    faqSubtitle: "Find answers to the most common questions about QRBay.",
+                    faq1q: "How to scan a QR code?",
+                    faq1a: "Open the QRBay app and point the camera at the QR code you want to scan. The app will automatically recognize and scan the code. Ensure the QR code is well-lit and not obscured.",
+                    faq2q: "How to scan Citizen ID cards and driver's licenses?",
+                    faq2a: "QRBay supports scanning information from Citizen ID cards and driver's licenses quickly and accurately. To scan, point the camera at the QR code on the ID card or driver's license to start the scanning process and display the results.",
+                    faq3q: "How to look up product information and prices of scanned goods?",
+                    faq3a: "After scanning a product barcode with QRBay, you can use the quick lookup function to find product information and prices on Google, Bing, or Amazon. Just press the \"Look Up\" button to search for information quickly and accurately.",
+                    faq4q: "Which code formats does the application support?",
+                    faq4a: "QRBay supports many code formats including: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix, AZTec, PDF 417, and Codabar.",
+                    faq5q: "Why can't the application scan the code?",
+                    faq5a: "Make sure the code being scanned is well-lit and not blurry. Check if the camera is working properly. Sometimes, a damaged or invalid barcode can also cause issues.",
+                    faq6q: "How to save and share scan results?",
+                    faq6a: "After scanning a code, you can save the result to the app's library or share it directly via email, message, or other social media apps. The share feature can be found in the top right corner of the scan result screen.",
+                    faq7q: "Does QRBay support offline scanning?",
+                    faq7a: "Yes, QRBay supports scanning QR codes and barcodes even without an internet connection. However, to access online content linked to the code, you will need an internet connection.",
+                    faq8q: "How to use QRBay in the classroom?",
+                    faq8a: "QRBay can be used in the classroom to create and scan QR codes for assignments, reference materials, and online tests. Teachers can create QR codes for learning links, and students can scan them for quick access. This helps optimize time and create excitement in learning.",
+                    faq9q: "Does QRBay collect personal data?",
+                    faq9a: "QRBay is committed to protecting user privacy. The application does not collect or store any personal data without your consent. Scan data is only stored on your device unless you choose to share it.",
+                    faq10q: "How to update the QRBay app?",
+                    faq10a: "You can update the QRBay app through your device's app store (Google Play Store for Android and App Store for iOS). We encourage you to always keep the app updated to the latest version to experience the newest features and improvements.",
+                    faq11q: "Does the application support other languages?",
+                    faq11a: "QRBay supports multiple languages to serve users globally. You can change the language in your device's settings to suit your needs. QRBay supports up to 18 languages, including: English, Vietnamese, Indonesian, Chinese, Thai, Korean, Japanese, French, German, Spanish, Polish, Turkish, Russian, Portuguese, Italian, Dutch, Arabic, and Hindi.",
+                    faq12q: "Can I create QR codes from QRBay?",
+                    faq12a: "Yes, QRBay allows users to create QR codes from text, URL links, contact information, and more. You just need to select the type of code to create, enter the necessary information, and QRBay will generate the QR code for you to use or share.",
+                    faq13q: "How to scan a QR code from the photo library?",
+                    faq13a: "QRBay allows you to scan QR codes directly from your device's photo library. Select the \"Scan from Library\" option in the app and choose the image containing the QR code you want to scan.",
+                    faq14q: "Can I create custom QR codes and barcodes?",
+                    faq14a: "Yes, QRBay provides the functionality to create QR codes and barcodes with custom designs and information. You can enter the content you want to encode and choose to customize the design according to your personal preferences.",
+                    faq15q: "How to manage scan and creation history?",
+                    faq15a: "The QRBay app saves your scan and creation history for easy access and management. You can find the history in the \"History\" section of the app and perform actions such as viewing, sharing, or deleting.",
+                    faq16q: "How to share a QR code on social media?",
+                    faq16a: "You can easily share scanned or created QR codes on social media platforms like Facebook, Twitter, Instagram, and more with just a few taps. The sharing feature is available in the QR code details section.",
+                    faq17q: "How does QRBay support batch scanning?",
+                    faq17a: "With QRBay's batch scanning feature, you can scan multiple QR codes and barcodes at once, saving time and increasing efficiency. Select batch scanning mode and point the camera at the codes to start scanning.",
+                    faq18q: "In what format can I export the scan data?",
+                    faq18a: "QRBay allows you to export scan data to formats like CSV, text, or image for easy analysis and sharing. The data export option is available in the scan history section of the app.",
+                    faq19q: "How can I contact you for further support?",
+                    faq19a: "If you have any questions or need further assistance, please contact us via email or Facebook: <ul><li>Email: <a href='mailto:vutaso.com@gmail.com'>vutaso.com@gmail.com</a></li><li>Facebook: <a href='https://www.facebook.com/qrbayapp' target='_blank'>QRBay on Facebook</a></li><li>Website: <a href='https://vutaso.com'>https://vutaso.com</a></li></ul>",
+                    ctaTitle: "Experience the most powerful QR scanner today!",
+                    ctaSubtitle: "Download QRBay for free and discover convenience in every scan.",
+                    ctaAppStore: "Download on the App Store",
+                    footerEmail: "Email",
+                    footerTagline: "A product created with ❤️ to simplify your life."
+                }
+            };
+            
+            // Language Switcher Logic
+            const langSwitcherButton = document.getElementById('lang-switcher-button');
+            const langSwitcherDropdown = document.getElementById('lang-switcher-dropdown');
+            const currentLangDesktop = document.getElementById('current-lang-desktop');
+            const allLangLinks = document.querySelectorAll('a[data-lang]');
 
-        // Close mobile menu when clicking a link
-        navLinksItems.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
+            const setLanguage = (lang) => {
+                if (!translations[lang]) return;
+                document.documentElement.lang = lang;
+                currentLangDesktop.textContent = lang.toUpperCase();
+                document.querySelectorAll('[data-lang-key]').forEach(element => {
+                    const key = element.getAttribute('data-lang-key');
+                    if (translations[lang][key]) {
+                        element.innerHTML = translations[lang][key];
+                    }
+                });
+                localStorage.setItem('qrbay-lang', lang);
+                langSwitcherDropdown.classList.add('hidden');
+                if (typeof updateTypingLanguage === 'function') {
+                    updateTypingLanguage(lang);
+                }
+            };
+            
+            langSwitcherButton.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                langSwitcherDropdown.classList.toggle('hidden');
             });
+
+            allLangLinks.forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); setLanguage(link.getAttribute('data-lang')); }));
+            
+            document.addEventListener('click', () => {
+                langSwitcherDropdown.classList.add('hidden');
+});
+
+            const initialLang = localStorage.getItem('qrbay-lang') || (navigator.language.startsWith('vi') ? 'vi' : 'en');
+            setLanguage(initialLang);
         });
+
+        // Typing Animation Logic
+        const typingTextsMultiLang = {
+            vi: [ "QRBay sẵn sàng!", "Đang quét mã WiFi...", "Kết quả: Đã kết nối mạng 'MyHome_5G'", "Đang tạo mã QR cho danh thiếp...", "Hoàn tất: Mã QR cho 'vutaso.com' đã được lưu." ],
+            en: [ "QRBay is ready!", "Scanning WiFi QR Code...", "Result: Connected to network 'MyHome_5G'", "Creating vCard QR Code...", "Success: QR Code for 'vutaso.com' saved." ]
+        };
+        let currentLineIndex = 0, currentCharIndex = 0, isTyping = false, typingTimeout = null, currentLanguage = 'vi';
+        const lineClasses = ['command-line', 'result-line', 'command-line', 'info-line', 'result-line'];
+        function updateTypingLanguage(newLang) { if (typingTimeout) clearTimeout(typingTimeout); currentLanguage = newLang; resetTypingAnimation(); setTimeout(startTypingAnimation, 300); }
+        function typeText() {
+            const typingTexts = typingTextsMultiLang[currentLanguage] || typingTextsMultiLang.vi;
+            if (currentLineIndex >= typingTexts.length) { typingTimeout = setTimeout(() => { resetTypingAnimation(); startTypingAnimation(); }, 3000); return; }
+            const currentText = typingTexts[currentLineIndex], currentElement = document.getElementById(`typing-text-${currentLineIndex + 1}`), currentLine = document.getElementById(`line${currentLineIndex + 1}`);
+            if (!currentElement || !currentLine) return;
+            currentLine.classList.add('show');
+            if (currentCharIndex < currentText.length) { currentElement.textContent = currentText.substring(0, currentCharIndex + 1); currentCharIndex++; typingTimeout = setTimeout(typeText, 70); } 
+            else { typingTimeout = setTimeout(() => { currentLineIndex++; currentCharIndex = 0; typeText(); }, 1200); }
+        }
+        function resetTypingAnimation() {
+            currentLineIndex = 0; currentCharIndex = 0; isTyping = false; if (typingTimeout) clearTimeout(typingTimeout);
+            for (let i = 1; i <= 5; i++) {
+                const line = document.getElementById(`line${i}`), text = document.getElementById(`typing-text-${i}`);
+                if (line && text) { line.classList.remove('show'); text.textContent = ''; }
+            }
+        }
+        function startTypingAnimation() { if (!isTyping) { isTyping = true; typeText(); } }
+        document.addEventListener('DOMContentLoaded', () => { currentLanguage = localStorage.getItem('qrbay-lang') || 'vi'; setTimeout(startTypingAnimation, 2000); });
     </script>
 </body>
-
 </html>
