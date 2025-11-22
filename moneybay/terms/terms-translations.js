@@ -1,6 +1,6 @@
 const translations = {
     vi: {
-        "title": "Điều khoản và Điều kiện - MoneyBay",
+        "title": "Điều khoản và Điều kiện",
         "last-updated": "Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025",
         "intro-text": "Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng ứng dụng quản lý chi tiêu MoneyBay. Việc sử dụng ứng dụng đồng nghĩa với việc bạn đồng ý với tất cả các điều khoản được nêu dưới đây.",
         "interpretation-title": "Giải thích và Định nghĩa",
@@ -79,7 +79,7 @@ const translations = {
         "contact-app": "Qua ứng dụng MoneyBay: Nhiều hơn > Trợ giúp > Liên hệ trợ giúp"
     },
     en: {
-        "title": "Terms and Conditions - MoneyBay",
+        "title": "Terms and Conditions",
         "last-updated": "Last updated: July 12, 2025",
         "intro-text": "Please read these terms and conditions carefully before using the MoneyBay expense management app. By using the app, you agree to all the terms outlined below.",
         "interpretation-title": "Interpretation and Definitions",

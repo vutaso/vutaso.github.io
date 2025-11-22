@@ -1,6 +1,6 @@
 const translations = {
     vi: {
-        "title": "Chính sách Bảo mật - MoneyBay",
+        "title": "Chính sách Bảo mật",
         "last-updated": "Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025",
         "intro-text": "MoneyBay cam kết bảo vệ quyền riêng tư và dữ liệu tài chính của bạn. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn khi sử dụng ứng dụng quản lý chi tiêu MoneyBay.",
         "interpretation-title": "Giải thích và Định nghĩa",
@@ -71,7 +71,7 @@ const translations = {
         "contact-website": "Website: <a href=\"https://vutaso.com\">https://vutaso.com</a>"
     },
     en: {
-        "title": "Privacy Policy - MoneyBay",
+        "title": "Privacy Policy",
         "last-updated": "Last updated: July 12, 2025",
         "intro-text": "MoneyBay is committed to protecting your privacy and financial data. This policy explains how we collect, use, and protect your information when using the MoneyBay expense management app.",
         "interpretation-title": "Interpretation and Definitions",
