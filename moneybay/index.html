@@ -243,6 +243,37 @@
             opacity: 1;
         }
 
+        /* Language Toggle */
+        .language-toggle {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .language-toggle button {
+            background: var(--accent-color, #c21a6c);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 980px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .language-toggle button:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .language-toggle button.active {
+            background: #1d1d1f;
+            opacity: 1;
+        }
+
         /* Desktop Dropdown Menu */
         .nav-dropdown {
             position: relative;
@@ -940,6 +971,12 @@
                 <a href="#export-data" class="mobile-only">Xuất dữ liệu</a>
 
                 <a href="#faq">FAQ</a>
+
+                <!-- Language Toggle -->
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="vi">VI</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -966,8 +1003,8 @@
     <!-- Features -->
     <div class="container">
         <div class="section-headline" id="features">
-            <p class="eyebrow">Tính năng nổi bật</p>
-            <h2>Tất cả trong một ứng dụng</h2>
+            <p class="eyebrow" data-lang-key="featuresEyebrow">Tính năng nổi bật</p>
+            <h2 data-lang-key="featuresTitle">Tất cả trong một ứng dụng</h2>
         </div>
 
         <div class="feature-grid">
@@ -982,8 +1019,8 @@
                         <path d="M10 17l-3 3 3 3" />
                     </svg>
                 </div>
-                <h3>Dễ sử dụng, giao diện trực quan</h3>
-                <p>Thiết kế đơn giản, dễ dàng thao tác ngay lần đầu sử dụng.</p>
+                <h3 data-lang-key="feature1Title">Dễ sử dụng, giao diện trực quan</h3>
+                <p data-lang-key="feature1Desc">Thiết kế đơn giản, dễ dàng thao tác ngay lần đầu sử dụng.</p>
             </div>
 
             <!-- Feature 2: Không cần đăng ký -->
@@ -995,8 +1032,8 @@
                         <circle cx="12" cy="7" r="4" />
                     </svg>
                 </div>
-                <h3>Không cần đăng ký tài khoản</h3>
-                <p>Bạn có thể bắt đầu sử dụng ứng dụng ngay mà không cần tạo tài khoản.</p>
+                <h3 data-lang-key="feature2Title">Không cần đăng ký tài khoản</h3>
+                <p data-lang-key="feature2Desc">Bạn có thể bắt đầu sử dụng ứng dụng ngay mà không cần tạo tài khoản.</p>
             </div>
 
             <!-- Feature 3: Nhập liệu dễ dàng -->
@@ -1008,8 +1045,8 @@
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                 </div>
-                <h3>Nhập liệu dễ dàng</h3>
-                <p>Ghi lại các khoản thu hoặc chi chỉ trong vài giây.</p>
+                <h3 data-lang-key="feature3Title">Nhập liệu dễ dàng</h3>
+                <p data-lang-key="feature3Desc">Ghi lại các khoản thu hoặc chi chỉ trong vài giây.</p>
             </div>
 
             <!-- Feature 4: Báo cáo tài chính -->
@@ -1023,8 +1060,9 @@
                         <path d="M8 17v-3" />
                     </svg>
                 </div>
-                <h3>Tạo báo cáo tài chính</h3>
-                <p>Xem báo cáo chi tiêu theo ngày, tháng, năm. Hiển thị báo cáo trực quan với biểu đồ tròn, biểu đồ cột,
+                <h3 data-lang-key="feature4Title">Tạo báo cáo tài chính</h3>
+                <p data-lang-key="feature4Desc">Xem báo cáo chi tiêu theo ngày, tháng, năm. Hiển thị báo cáo trực quan
+                    với biểu đồ tròn, biểu đồ cột,
                     giúp bạn so sánh các danh mục và từng tháng một cách trực quan.</p>
             </div>
 
@@ -1037,8 +1075,8 @@
                         <circle cx="12" cy="12" r="3" />
                     </svg>
                 </div>
-                <h3>Chế độ màu sắc ứng dụng</h3>
-                <p>Lựa chọn từ nhiều màu chủ đề ứng dụng phong phú.</p>
+                <h3 data-lang-key="feature5Title">Chế độ màu sắc ứng dụng</h3>
+                <p data-lang-key="feature5Desc">Lựa chọn từ nhiều màu chủ đề ứng dụng phong phú.</p>
             </div>
 
             <!-- Feature 6: Xuất CSV -->
@@ -1052,8 +1090,9 @@
                         <line x1="9" y1="15" x2="15" y2="15" />
                     </svg>
                 </div>
-                <h3>Sao lưu và xuất dữ liệu sang CSV, PDF, Excel</h3>
-                <p>Dễ dàng xuất dữ liệu ra file CSV, PDF, Excel để lưu trữ, phân tích chi tiêu hoặc chia sẻ.</p>
+                <h3 data-lang-key="feature6Title">Sao lưu và xuất dữ liệu sang CSV, PDF, Excel</h3>
+                <p data-lang-key="feature6Desc">Dễ dàng xuất dữ liệu ra file CSV, PDF, Excel để lưu trữ, phân tích chi
+                    tiêu hoặc chia sẻ.</p>
             </div>
 
             <!-- Feature 7: Đồng bộ iCloud -->
@@ -1064,8 +1103,9 @@
                         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
                     </svg>
                 </div>
-                <h3>Đồng bộ iCloud</h3>
-                <p>Đồng bộ dữ liệu của bạn trên tất cả các thiết bị iOS thông qua iCloud để đảm bảo rằng bạn luôn có
+                <h3 data-lang-key="feature7Title">Đồng bộ iCloud</h3>
+                <p data-lang-key="feature7Desc">Đồng bộ dữ liệu của bạn trên tất cả các thiết bị iOS thông qua iCloud để
+                    đảm bảo rằng bạn luôn có
                     bản sao dữ liệu mới nhất mọi lúc, mọi nơi.</p>
             </div>
 
@@ -1079,8 +1119,9 @@
                         <path d="M9 10h6" />
                     </svg>
                 </div>
-                <h3>Chat với AI, ghi chép bằng giọng nói</h3>
-                <p>Trợ lý AI thông minh giúp bạn ghi chép thu chi nhanh chóng chỉ bằng giọng nói hoặc chat.</p>
+                <h3 data-lang-key="feature8Title">Chat với AI, ghi chép bằng giọng nói</h3>
+                <p data-lang-key="feature8Desc">Trợ lý AI thông minh giúp bạn ghi chép thu chi nhanh chóng chỉ bằng
+                    giọng nói hoặc chat.</p>
             </div>
 
             <!-- Feature 9: MoneyBay Scanner -->
@@ -1096,8 +1137,9 @@
                         <path d="M12 18v3" />
                     </svg>
                 </div>
-                <h3>Tiện ích "MoneyBay Scanner"</h3>
-                <p>Quét tài liệu, hóa đơn, hợp đồng, danh thiếp, giấy tờ..., xuất file PDF không watermark.</p>
+                <h3 data-lang-key="feature9Title">Tiện ích "MoneyBay Scanner"</h3>
+                <p data-lang-key="feature9Desc">Quét tài liệu, hóa đơn, hợp đồng, danh thiếp, giấy tờ..., xuất file PDF
+                    không watermark.</p>
             </div>
 
             <!-- Feature 10: Danh sách mua sắm -->
@@ -1110,8 +1152,9 @@
                         <path d="M16 10a4 4 0 0 1-8 0" />
                     </svg>
                 </div>
-                <h3>Tiện ích "Danh sách mua sắm"</h3>
-                <p>Hỗ trợ người dùng lập kế hoạch và quản lý hiệu quả các món đồ cần mua, đảm bảo không bỏ sót món
+                <h3 data-lang-key="feature10Title">Tiện ích "Danh sách mua sắm"</h3>
+                <p data-lang-key="feature10Desc">Hỗ trợ người dùng lập kế hoạch và quản lý hiệu quả các món đồ cần mua,
+                    đảm bảo không bỏ sót món
                     đồ nào khi mua sắm.</p>
             </div>
 
@@ -1153,13 +1196,15 @@
             <div class="feature-item">
                 <h4 data-lang-key="aiFeature1Title">Ghi chép chi tiêu qua "chat" - Đơn giản như nhắn tin</h4>
                 <p data-lang-key="aiFeature1Desc">
-                <p>- Buổi trưa đi ăn với đồng nghiệp xong, bạn mở app và gõ nhanh: "Ăn trưa
+                <p data-lang-key="aiFeature1Desc1">- Buổi trưa đi ăn với đồng nghiệp xong, bạn mở app và gõ nhanh: "Ăn
+                    trưa
                     55k". Chiều tan làm ghé siêu mini mua đồ, ngồi trên xe bus bạn nhắn: "Mua sữa tắm và dầu gội 120
                     nghìn". Tối về nhà nhớ ra sáng còn mua cafe, gõ luôn: "Cafe sáng 30k". Tất cả đều được ghi lại trong
                     vài giây, không cần mở form nhập liệu, không cần điền đầy đủ thông tin, không cần chọn danh mục - cứ
                     như đang nhắn tin cho bạn bè vậy.</p>
 
-                <p>- Thậm chí bạn có thể ghi gộp nhiều khoản một lúc: "Hôm nay đổ xăng 150k, mua bún đậu 45k, cafe chiều
+                <p data-lang-key="aiFeature1Desc2">- Thậm chí bạn có thể ghi gộp nhiều khoản một lúc: "Hôm nay đổ xăng
+                    150k, mua bún đậu 45k, cafe chiều
                     25k". Hay ghi chú chi tiết hơn: "Mua quà sinh nhật em 200k ở Shopee". AI hiểu hết và tự động tách
                     từng khoản, ghi rõ số tiền, nội dung. Không còn cảnh quên mất chi tiêu nào vì lười nhập, hay để tồn
                     đống hóa đơn cuối tháng mới ngồi gõ. Mọi thứ được cập nhật ngay tức thì, đúng như cách bạn vẫn dùng
@@ -1192,39 +1237,43 @@
 
         <!-- PDF Scanner Section -->
         <div class="app-showcase" id="scanner">
-            <h2>Tiện ích "Quét hóa đơn và PDF Scanner"</h2>
+            <h2 data-lang-key="scannerSectionTitle">Tiện ích "Quét hóa đơn và PDF Scanner"</h2>
             <div class="feature-item">
                 <h4 data-lang-key="scannerFeature1Title">Tiện ích "Nhập Giao dịch từ Ảnh" - Chụp hóa đơn là xong, không
                     cần gõ
                 </h4>
-                <p data-lang-key="scannerFeature1Desc">- Vừa đi siêu thị về, cầm hóa đơn dài cả mét với hàng chục món
+                <p data-lang-key="scannerFeature1Desc1">- Vừa đi siêu thị về, cầm hóa đơn dài cả mét với hàng chục món
                     đồ. Thay vì ngồi gõ từng khoản mỏi tay, bạn chỉ cần mở app, chụp ảnh hóa đơn một cái. MoneyBay tự
                     động đọc tổng tiền, tên siêu thị, ngày giờ mua hàng và lưu lại giao dịch hoàn chỉnh. Thậm chí với
                     hóa đơn có nhiều món, app có thể tách ra từng khoản chi tiết nếu cần.</p>
 
-                <p>- Thanh toán online trên Shopee, Grab, Momo xong nhận được thông báo kết quả giao dịch? Chụp màn hình
+                <p data-lang-key="scannerFeature1Desc2">- Thanh toán online trên Shopee, Grab, Momo xong nhận được thông
+                    báo kết quả giao dịch? Chụp màn hình
                     lại, vào app chọn ảnh từ thư viện, MoneyBay tự nhận ra số tiền, nội dung giao dịch. Hay check sao kê
                     ngân hàng cuối tháng, thấy nhiều khoản chi chưa ghi vào app? Chụp ảnh lịch sử giao dịch, app tự động
                     đọc và nhập hàng loạt giao dịch cùng lúc, tiết kiệm hàng giờ đồng hồ nhập liệu thủ công.</p>
 
-                <p>- Đặc biệt hữu ích khi công tác, đi du lịch có nhiều hóa đơn cần báo cáo chi phí - ăn uống, taxi,
+                <p data-lang-key="scannerFeature1Desc3">- Đặc biệt hữu ích khi công tác, đi du lịch có nhiều hóa đơn cần
+                    báo cáo chi phí - ăn uống, taxi,
                     khách sạn. Cứ chụp lại từng hóa đơn, về nhà chỉ việc mở app chọn hàng loạt ảnh, để AI xử lý. Không
                     còn cảnh ngồi đối chiếu từng tờ giấy với app, gõ sai số, hay mất hóa đơn rồi không nhớ chi bao
                     nhiêu. Mọi chi tiêu được ghi lại, ngay từ lúc nhận hóa đơn.</p>
             </div>
             <div class="feature-item">
-                <h4 data-lang-key="scannerFeature1Title">Tính năng "PDF Scanner" - Quét mọi giấy tờ bằng điện thoại</h4>
-                <p data-lang-key="scannerFeature1Desc">- Vừa đóng tiền điện nước xong, nhận được hóa đơn giấy? Chỉ cần
+                <h4 data-lang-key="scannerFeature2Title">Tính năng "PDF Scanner" - Quét mọi giấy tờ bằng điện thoại</h4>
+                <p data-lang-key="scannerFeature2Desc1">- Vừa đóng tiền điện nước xong, nhận được hóa đơn giấy? Chỉ cần
                     mở
                     camera lên và chụp, ứng dụng tự động chuyển thành file PDF rõ nét, màu sắc chính xác như bản gốc.
                     Không cần phải tìm máy scan, không cần đến tiệm photo hay văn phòng.</p>
 
-                <p>- Hợp đồng thuê nhà 5 trang? Chụp từng trang, app tự ghép thành một file PDF hoàn chỉnh. Biên lai mua
+                <p data-lang-key="scannerFeature2Desc2">- Hợp đồng thuê nhà 5 trang? Chụp từng trang, app tự ghép thành
+                    một file PDF hoàn chỉnh. Biên lai mua
                     hàng online cần lưu cho bảo hành? Quét luôn, lưu vào app. Giấy khám bệnh, đơn thuốc của bác sĩ? Chụp
                     lại để lần sau tái khám không sợ thất lạc. Thậm chí cả những tờ giấy nhàu nát, bị gấp, chụp nghiêng
                     - công nghệ tự động căn chỉnh, làm thẳng và tăng độ rõ nét.</p>
 
-                <p>- Quan trọng nhất là file PDF xuất ra không có logo, không có chữ "Watermark" che mất nội dung như
+                <p data-lang-key="scannerFeature2Desc3">- Quan trọng nhất là file PDF xuất ra không có logo, không có
+                    chữ "Watermark" che mất nội dung như
                     nhiều app miễn phí khác. Bạn có thể gửi cho công ty, ngân hàng, hoặc lưu trữ lâu dài mà không lo mất
                     chất lượng hay trông không chuyên nghiệp. Mọi giấy tờ quan trọng giờ đây đều được số hóa gọn gàng
                     trong túi, sẵn sàng khi cần.</p>
@@ -1237,23 +1286,25 @@
 
         <!-- Shopping List Section -->
         <div class="app-showcase" id="shopping-list">
-            <h2>Tiện ích "Danh sách mua sắm"</h2>
+            <h2 data-lang-key="shoppingSectionTitle">Tiện ích "Danh sách mua sắm"</h2>
             <div class="feature-item">
-                <h4 data-lang-key="scannerFeature2Title">Lập kế hoạch mua sắm của bạn - Không còn quên đồ hay mua
+                <h4 data-lang-key="shoppingFeatureTitle">Lập kế hoạch mua sắm của bạn - Không còn quên đồ hay mua
                     thừa
                 </h4>
-                <p data-lang-key="scannerFeature2Desc">- Sắp đi siêu thị cuối tuần, bạn vừa nghĩ ra cần mua gì là ghi
+                <p data-lang-key="shoppingFeatureDesc1">- Sắp đi siêu thị cuối tuần, bạn vừa nghĩ ra cần mua gì là ghi
                     luôn
                     vào app: "Mì tôm, giấy ăn, nước tương, thịt ba chỉ". Chiều làm việc nhớ thêm vài thứ, mở app lên gõ
                     tiếp: "Sữa rửa mặt, bột giặt". Không cần note giấy dễ thất lạc, không sợ quên vì danh sách luôn
                     trong điện thoại.</p>
 
-                <p>- Khi đến siêu thị, mở app ra và tick dần từng món đã bỏ vào giỏ. Thịt ba chỉ - tick, mì tôm - tick,
+                <p data-lang-key="shoppingFeatureDesc2">- Khi đến siêu thị, mở app ra và tick dần từng món đã bỏ vào
+                    giỏ. Thịt ba chỉ - tick, mì tôm - tick,
                     nước tương - tick. Rõ ràng món nào đã mua, món nào chưa, không bao giờ bỏ sót hay phải đi vòng lại
                     quầy đã đi qua. Đặc biệt hữu ích khi mua sắm cho cả tháng với hàng chục món, hoặc khi đi chợ mua
                     nguyên liệu nấu tiệc tất niên với danh sách dài.</p>
 
-                <p>- Đang ở nhà nhớ ra thiếu thứ gì, nhắn cho người thân: "Anh ơi nhớ mua thêm mấy món này nhé" và
+                <p data-lang-key="shoppingFeatureDesc3">- Đang ở nhà nhớ ra thiếu thứ gì, nhắn cho người thân: "Anh ơi
+                    nhớ mua thêm mấy món này nhé" và
                     chia sẻ list luôn. Tránh được cảnh đi chợ về mới nhớ quên mua dầu ăn, hoặc mua nhầm loại bột giặt vì
                     không rõ nhà còn hay hết. Mọi thứ được lên kế hoạch rõ ràng, mua đúng món cần thiết, tiết kiệm cả
                     thời gian lẫn tiền bạc.</p>
@@ -1271,19 +1322,22 @@
                 <h4 data-lang-key="limitsFeature1Title">Tính năng "Hạn mức chi" - Kiểm soát ngân sách, không lo vượt quá
                 </h4>
                 <p data-lang-key="limitsFeature1Desc">
-                <p>- Đầu tháng vừa nhận lương, bạn biết mình chỉ nên chi tối đa 3 triệu cho ăn uống. Vào app đặt giới
+                <p data-lang-key="limitsFeature1Desc1">- Đầu tháng vừa nhận lương, bạn biết mình chỉ nên chi tối đa 3
+                    triệu cho ăn uống. Vào app đặt giới
                     hạn
                     luôn: "Ăn uống - 3.000.000đ/tháng". Hay biết mình hay mua sắm quần áo quá tay, đặt hạn mức "Mua sắm
                     - 2.000.000đ/tháng". Từ giờ mỗi lần chi tiêu, app tự động tính xem bạn đã dùng bao nhiêu phần trăm
                     của hạn mức đó.</p>
 
-                <p>- Gần đến ngưỡng hạn mức, bạn nhận được thông báo: "Cảnh báo: Bạn đã chi 2.500.000đ cho ăn uống, còn
+                <p data-lang-key="limitsFeature1Desc2">- Gần đến ngưỡng hạn mức, bạn nhận được thông báo: "Cảnh báo: Bạn
+                    đã chi 2.500.000đ cho ăn uống, còn
                     500k
                     nữa là đến hạn mức". Lúc này bạn biết cần "siết" lại, ăn nhà nhiều hơn, hạn chế gọi đồ ăn. Hoặc tuần
                     cuối tháng, thông báo: "Bạn đã chi 1.800.000đ cho mua sắm, chỉ còn 200k". Bạn tự nhắc mình không nên
                     mua đồ nữa, chờ tháng sau hãy mua.</p>
 
-                <p>- Đặc biệt hữu ích cho những người hay chi tiêu tự do không kiểm soát được, hay những ai muốn tiết
+                <p data-lang-key="limitsFeature1Desc3">- Đặc biệt hữu ích cho những người hay chi tiêu tự do không kiểm
+                    soát được, hay những ai muốn tiết
                     kiệm
                     cho mục tiêu lớn như mua xe, đi du lịch. Thay vì cuối tháng ngồi đếm mới giật mình "sao hết nhiều
                     tiền thế", giờ bạn được cảnh báo sớm, còn thời gian để điều chỉnh. Từ từ, thói quen chi tiêu sẽ được
@@ -1293,17 +1347,20 @@
             <div class="feature-item">
                 <h4 data-lang-key="limitsFeature2Title">Tính năng "Chuyển đổi tiền tệ" - Biết giá thực ngay lập tức</h4>
                 <p data-lang-key="limitsFeature2Desc">
-                <p>- Đang lướt Amazon thấy món đồ giá 29.99 USD, bạn thắc mắc "Vậy bằng bao nhiêu tiền Việt nhỉ?". Mở
+                <p data-lang-key="limitsFeature2Desc1">- Đang lướt Amazon thấy món đồ giá 29.99 USD, bạn thắc mắc "Vậy
+                    bằng bao nhiêu tiền Việt nhỉ?". Mở
                     công
                     cụ chuyển đổi trong app, gõ 29.99 USD, kết quả hiện ngay: khoảng 740.000đ. Quyết định mua hay không
                     trong vài giây mà không cần mở Google, không cần tính nhẩm với tỷ giá mơ hồ.</p>
 
-                <p>- Chuẩn bị đi du lịch Thái Lan, bạn thấy khách sạn giá 1,500 Baht/đêm. Chuyển đổi nhanh: tương đương
+                <p data-lang-key="limitsFeature2Desc2">- Chuẩn bị đi du lịch Thái Lan, bạn thấy khách sạn giá 1,500
+                    Baht/đêm. Chuyển đổi nhanh: tương đương
                     1.100.000đ, phù hợp ngân sách. Hay đang ở Singapore, thấy món ăn 12 SGD, check ngay bằng 220.000đ,
                     quyết định ăn luôn hay tìm quán khác. Đặc biệt hữu ích khi nhận tiền từ người thân ở nước ngoài - ví
                     dụ nhận 500 USD, muốn biết thực tế bằng bao nhiêu VND để lên kế hoạch chi tiêu.</p>
 
-                <p>- Tỷ giá được cập nhật liên tục theo thị trường thực tế, không cần lo lỗi thời hay sai lệch. Hỗ trợ
+                <p data-lang-key="limitsFeature2Desc3">- Tỷ giá được cập nhật liên tục theo thị trường thực tế, không
+                    cần lo lỗi thời hay sai lệch. Hỗ trợ
                     đầy
                     đủ các đồng tiền phổ biến như USD, EUR, JPY, KRW, THB, SGD... Không phải mở nhiều app, không cần
                     chuyển tab - mọi thứ ngay trong ứng dụng quản lý chi tiêu của bạn, tiện lợi khi cần ghi lại khoản
@@ -1318,15 +1375,17 @@
 
         <!-- Debt Ledger Section -->
         <div class="app-showcase" id="debt-ledger">
-            <h2>Tiện ích "Sổ Nợ" - Nhớ rõ ai nợ ai</h2>
+            <h2 data-lang-key="debtSectionTitle">Tiện ích "Sổ Nợ" - Nhớ rõ ai nợ ai</h2>
             <div class="feature-item">
-                <h4>Quản lý khoản nợ cá nhân</h4>
-                <p>Đi nhậu với bạn bè, cuối buổi bạn đứng ra trả trước 850 nghìn, mỗi người còn nợ bạn 170k. Vào app
+                <h4 data-lang-key="debtFeature1Title">Quản lý khoản nợ cá nhân</h4>
+                <p data-lang-key="debtFeature1Desc1">Đi nhậu với bạn bè, cuối buổi bạn đứng ra trả trước 850 nghìn, mỗi
+                    người còn nợ bạn 170k. Vào app
                     ghi luôn: "Anh A nợ 170k - tiền nhậu 21/11". "Anh B nợ 170k - tiền nhậu 21/11". Tháng sau nhắc nhở,
                     đỡ quên, đỡ ngại ngùng vì không nhớ chính xác số tiền. Họ chuyển khoản là tick đã trả ngay, rõ ràng
                     ai đã trả, ai chưa.</p>
 
-                <p>Ngược lại, bạn vay bạn thân 2 triệu để đóng tiền nhà trọ gấp. Ghi vào app: "Vay chị C 2.000.000đ -
+                <p data-lang-key="debtFeature1Desc2">Ngược lại, bạn vay bạn thân 2 triệu để đóng tiền nhà trọ gấp. Ghi
+                    vào app: "Vay chị C 2.000.000đ -
                     tiền
                     trọ tháng 11". App nhắc nhở định kỳ, tháng sau lương về là bạn nhớ phải trả, giữ được chữ tín. Không
                     còn cảnh quên mất ai đã cho vay, hay nhớ nhầm số tiền, gây khó xử trong quan hệ bạn bè. Mọi khoản
@@ -1335,12 +1394,14 @@
             </div>
 
             <div class="feature-item">
-                <h4>Hộ kinh doanh nhỏ</h4>
-                <p>Bạn mở quán cafe nhỏ, có mấy khách quen thường xuyên "ghi sổ" mua trước trả sau. Chị V hôm qua
+                <h4 data-lang-key="debtFeature2Title">Hộ kinh doanh nhỏ</h4>
+                <p data-lang-key="debtFeature2Desc1">Bạn mở quán cafe nhỏ, có mấy khách quen thường xuyên "ghi sổ" mua
+                    trước trả sau. Chị V hôm qua
                     lấy 3 ly chưa trả, hôm nay lấy thêm 2 ly nữa. Vào app ghi: "Chị V nợ 150k - 5 ly cafe". Cuối tuần
                     chị đến trả tiền, check app biết ngay tổng số tiền, không nhầm lẫn hay thiếu sót.</p>
 
-                <p>Với hộ kinh doanh nhỏ có nhiều khách "mua chịu", tính năng này là cứu cánh, tránh mất tiền oan vì
+                <p data-lang-key="debtFeature2Desc2">Với hộ kinh doanh nhỏ có nhiều khách "mua chịu", tính năng này là
+                    cứu cánh, tránh mất tiền oan vì
                     quên ghi hoặc khách chối. Mọi khoản công nợ đều được lưu lại rõ ràng, minh bạch, giúp bạn quản lý
                     dòng tiền hiệu quả hơn.</p>
             </div>
@@ -1352,22 +1413,25 @@
 
         <!-- Export Data Section -->
         <div class="app-showcase" id="export-data">
-            <h2>Sao lưu và xuất dữ liệu sang CSV, PDF, Excel</h2>
+            <h2 data-lang-key="exportSectionTitle">Sao lưu và xuất dữ liệu sang CSV, PDF, Excel</h2>
             <div class="feature-item">
-                <h4>Xuất dữ liệu để phân tích và báo cáo</h4>
-                <p>- Cuối năm cần làm báo cáo tài chính cá nhân, bạn muốn xem chi tiêu của cả năm dạng bảng để dễ phân
+                <h4 data-lang-key="exportFeature1Title">Xuất dữ liệu để phân tích và báo cáo</h4>
+                <p data-lang-key="exportFeature1Desc1">- Cuối năm cần làm báo cáo tài chính cá nhân, bạn muốn xem chi
+                    tiêu của cả năm dạng bảng để dễ phân
                     tích? Chọn xuất ra Excel, mở file lên có đầy đủ ngày tháng, danh mục, số tiền từng khoản chi. Thoải
                     mái tạo biểu đồ, lọc theo tháng, tính tổng từng loại chi phí bằng công thức Excel quen thuộc.</p>
 
-                <p>- Vợ chồng muốn ngồi lại xem lại chi tiêu gia đình tháng vừa rồi? Xuất file PDF gửi qua app nhắn tin,
+                <p data-lang-key="exportFeature1Desc2">- Vợ chồng muốn ngồi lại xem lại chi tiêu gia đình tháng vừa rồi?
+                    Xuất file PDF gửi qua app nhắn tin,
                     hai người cùng xem và bàn bạc chỗ nào chi nhiều quá, chỗ nào cần cắt giảm. Hay đi làm cần nộp bảng
                     kê chi phí công tác cho công ty? Xuất ra Excel hoặc PDF, gửi mail cho kế toán ngay lập tức, trông
                     chuyên nghiệp và đầy đủ.</p>
             </div>
 
             <div class="feature-item">
-                <h4>Sao lưu dữ liệu</h4>
-                <p>Chuẩn bị đổi điện thoại mới? Xuất toàn bộ dữ liệu ra CSV để sao lưu, không lo mất mát thông tin nhiều
+                <h4 data-lang-key="exportFeature2Title">Sao lưu dữ liệu</h4>
+                <p data-lang-key="exportFeature2Desc">Chuẩn bị đổi điện thoại mới? Xuất toàn bộ dữ liệu ra CSV để sao
+                    lưu, không lo mất mát thông tin nhiều
                     năm đã ghi chép công phu. Hoặc đơn giản là muốn lưu trữ dữ liệu dạng offline, không phụ thuộc vào
                     app - file CSV, Excel có thể mở bằng bất kỳ phần mềm nào, lưu trữ trên Google Drive hoặc máy tính.
                 </p>
@@ -1380,7 +1444,7 @@
 
         <!-- FAQ Section -->
         <div class="section-headline" id="faq" style="padding-top: 80px;">
-            <p class="eyebrow">Câu hỏi thường gặp</p>
+            <p class="eyebrow" data-lang-key="faqTitle">Câu hỏi thường gặp</p>
             <h2>Tìm câu trả lời cho các câu hỏi phổ biến</h2>
         </div>
 
@@ -1588,6 +1652,9 @@
             });
         });
     </script>
+
+    <!-- Language Translation Script -->
+    <script src="moneybay-translations.js"></script>
 </body>
 
 </html>

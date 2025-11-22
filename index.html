@@ -1,33 +1,333 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Quản Lý Chi Tiêu Cá Nhân MoneyBay & App Quét Mã QR Code QRBay | VUTASO</title>
-    <meta name="description" content="Tải miễn phí app quản lý chi tiêu cá nhân MoneyBay và app quét mã QR code QRBay cho iOS. Theo dõi tài chính dễ dàng, quét QR siêu tốc, bảo mật.">
-    <meta name="keywords" content="app quản lý chi tiêu cá nhân, app quét mã qr code, ứng dụng quản lý tài chính, sổ thu chi cá nhân, theo dõi chi tiêu, quét mã QR miễn phí, MoneyBay, QRBay, ứng dụng iOS, quản lý tiền bạc">
-    <meta property="og:title" content="App Quản Lý Chi Tiêu Cá Nhân & App Quét Mã QR Code Tốt Nhất iOS">
-    <meta property="og:description" content="MoneyBay - App quản lý chi tiêu cá nhân #1 và QRBay - App quét mã QR code nhanh nhất. Miễn phí, an toàn, không quảng cáo.">
+    <title>MoneyBay - App Quản Lý Chi Tiêu Cá Nhân với trợ lý AI | Miễn Phí iOS</title>
+    <meta name="description"
+        content="Tải MoneyBay - App quản lý chi tiêu cá nhân miễn phí, dễ dùng nhất cho iOS tại Việt Nam. Ghi chép thu chi bằng giọng nói, trợ lý AI thông minh, báo cáo trực quan, bảo mật tuyệt đối. ⭐️ 4.8/5 - 1200+ đánh giá.">
+    <meta name="keywords"
+        content="moneybay, app quản lý chi tiêu, ứng dụng quản lý chi tiêu cá nhân, quản lý tài chính cá nhân, sổ thu chi điện tử, app ghi chép thu chi, quản lý ngân sách, theo dõi chi tiêu, app tài chính miễn phí, quản lý tiền bạc, expense manager, budget app, personal finance">
+    <meta name="author" content="VUTASO">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="Vietnamese">
+    <meta name="geo.region" content="VN">
+    <meta name="geo.placename" content="Vietnam">
+    <link rel="canonical" href="https://vutaso.com/">
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vutaso.com">
-    <meta property="og:image" content="https://vutaso.com/images/app-preview.jpg">
-    <link rel="icon" href="assets/favicon.ico" type="image/x-icon"/>
+    <meta property="og:url" content="https://vutaso.com/">
+    <meta property="og:site_name" content="VUTASO - MoneyBay & QRBay">
+    <meta property="og:title" content="MoneyBay - App Quản Lý Chi Tiêu Cá Nhân #1 Việt Nam">
+    <meta property="og:description"
+        content="Tải MoneyBay miễn phí - App quản lý chi tiêu với trợ lý AI, ghi chép giọng nói, báo cáo trực quan. ⭐️ 4.8/5 từ 1200+ người dùng.">
+    <meta property="og:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="750">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:locale:alternate" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://vutaso.com/">
+    <meta name="twitter:title" content="MoneyBay - App Quản Lý Chi Tiêu Cá Nhân với trợ lý AI">
+    <meta name="twitter:description"
+        content="Tải MoneyBay miễn phí - App quản lý chi tiêu với trợ lý AI, ghi chép giọng nói, báo cáo trực quan.">
+    <meta name="twitter:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
+
+    <!-- Apple Meta Tags -->
+    <meta name="apple-itunes-app" content="app-id=6737480496">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MoneyBay">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#c21a6c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Structured Data: Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "MoneyBay - App Quản Lý Chi Tiêu Cá Nhân",
-      "operatingSystem": "iOS",
-      "applicationCategory": "BusinessApplication",
-      "description": "App quản lý chi tiêu cá nhân tốt nhất cho iOS. Theo dõi thu nhập, chi tiêu với báo cáo trực quan, an toàn.",
+      "@type": "Organization",
+      "name": "VUTASO",
+      "url": "https://vutaso.com",
+      "logo": "https://vutaso.com/assets/logo_moneybay.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "vutaso.com@gmail.com",
+        "contactType": "Customer Service",
+        "availableLanguage": ["Vietnamese", "English"]
+      },
+      "sameAs": [
+        "https://www.facebook.com/moneybayapp",
+        "https://tiktok.com/@moneybay.app"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: MoneyBay App -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "MoneyBay",
+      "alternateName": "MoneyBay - Quản Lý Chi Tiêu Cá Nhân",
+      "description": "Ứng dụng quản lý chi tiêu cá nhân miễn phí với trợ lý AI thông minh. Ghi chép thu chi bằng giọng nói, báo cáo trực quan, đồng bộ iCloud, xuất CSV. Bảo mật và dễ sử dụng.",
+      "operatingSystem": "iOS 16.0 or later",
+      "applicationCategory": "FinanceApplication",
+      "url": "https://vutaso.com/moneybay/",
+      "downloadUrl": "https://apps.apple.com/app/moneybay-expense-manager/id6737480496",
+      "screenshot": "https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png",
+      "author": {
+        "@type": "Organization",
+        "name": "VUTASO"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "VUTASO"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1200",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "VND"
-      }
+        "priceCurrency": "VND",
+        "availability": "https://schema.org/InStock"
+      },
+      "featureList": [
+        "Ghi chép thu chi bằng giọng nói",
+        "Trợ lý AI thông minh",
+        "Báo cáo tài chính trực quan",
+        "Đồng bộ iCloud tự động",
+        "Xuất dữ liệu CSV",
+        "Quét hóa đơn OCR",
+        "Hạn mức chi tiêu",
+        "Danh sách mua sắm",
+        "Chuyển đổi tiền tệ",
+        "Hoạt động offline"
+      ],
+      "softwareVersion": "1.0",
+      "datePublished": "2025-01-01",
+      "keywords": "quản lý chi tiêu, app tài chính, sổ thu chi, budget app, expense manager"
+    }
+    </script>
+
+    <!-- Structured Data: QRBay App -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "QRBay",
+      "alternateName": "QRBay - Quét Mã QR Code",
+      "description": "Ứng dụng quét và tạo mã QR code nhanh nhất cho iOS. Quét nhiều mã cùng lúc, lưu lịch sử, tạo QR Wi-Fi, URL, danh thiếp. Miễn phí và bảo mật.",
+      "operatingSystem": "iOS 15.0 or later",
+      "applicationCategory": "UtilitiesApplication",
+      "url": "https://vutaso.com/qrbay/",
+      "downloadUrl": "https://apps.apple.com/app/qrbay/id6499323043",
+      "author": {
+        "@type": "Organization",
+        "name": "VUTASO"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "VUTASO"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "VND",
+        "availability": "https://schema.org/InStock"
+      },
+      "featureList": [
+        "Quét QR code và mã vạch nhanh",
+        "Tạo QR code Wi-Fi, URL, danh thiếp",
+        "Quét nhiều mã cùng lúc",
+        "Lưu lịch sử quét",
+        "Xuất và chia sẻ QR code",
+        "Hoàn toàn miễn phí"
+      ],
+      "keywords": "quét qr code, tạo qr code, qr scanner, barcode scanner, qr generator"
+    }
+    </script>
+
+    <!-- Structured Data: BreadcrumbList for MoneyBay -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trang chủ",
+          "item": "https://vutaso.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MoneyBay - Quản lý chi tiêu",
+          "item": "https://vutaso.com/moneybay/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Tính năng nổi bật",
+          "item": "https://vutaso.com/moneybay/#features"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Trợ lý AI thông minh",
+          "item": "https://vutaso.com/moneybay/#ai"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Quét hóa đơn OCR",
+          "item": "https://vutaso.com/moneybay/#scanner"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Danh sách mua sắm",
+          "item": "https://vutaso.com/moneybay/#shopping-list"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Hạn mức chi tiêu",
+          "item": "https://vutaso.com/moneybay/#limits"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "Sổ nợ & cho vay",
+          "item": "https://vutaso.com/moneybay/#debt-ledger"
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "Xuất dữ liệu CSV/PDF",
+          "item": "https://vutaso.com/moneybay/#export-data"
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Tải ứng dụng",
+          "item": "https://vutaso.com/moneybay/#download"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: BreadcrumbList for QRBay -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trang chủ",
+          "item": "https://vutaso.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "QRBay - Quét mã QR",
+          "item": "https://vutaso.com/qrbay/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Quét QR Code nhanh",
+          "item": "https://vutaso.com/qrbay/#qr-scanner"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Tạo mã QR",
+          "item": "https://vutaso.com/qrbay/#qr-generator"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Quét nhiều mã cùng lúc",
+          "item": "https://vutaso.com/qrbay/#batch-scan"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Lưu lịch sử quét",
+          "item": "https://vutaso.com/qrbay/#scan-history"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Tạo QR Wi-Fi",
+          "item": "https://vutaso.com/qrbay/#wifi-qr"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "Xuất và chia sẻ QR",
+          "item": "https://vutaso.com/qrbay/#export-share"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Dữ liệu của tôi có được an toàn không?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An toàn. Chúng tôi không thu thập bất kỳ dữ liệu cá nhân nào. Mọi thông tin chỉ được lưu trữ trên thiết bị hoặc đồng bộ qua iCloud cá nhân của bạn."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ứng dụng có miễn phí không?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cả MoneyBay và QRBay đều cung cấp phiên bản miễn phí với đầy đủ các tính năng cốt lõi. QRBay hoàn toàn miễn phí. MoneyBay có thể có các tính năng nâng cao tùy chọn (Premium) trong tương lai để hỗ trợ chúng tôi phát triển, nhưng các chức năng thiết yếu sẽ luôn miễn phí."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Làm thế nào để xuất dữ liệu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MoneyBay cho phép xuất toàn bộ dữ liệu ra file CSV hoặc PDF, dễ dàng mở bằng Excel hoặc Google Sheets. Ngoài ra, dữ liệu tự động đồng bộ với iCloud."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "App có phiên bản Android không?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hiện tại, ứng dụng được thiết kế và tối ưu cho iOS. Chúng tôi tập trung mang lại trải nghiệm tốt nhất trên iPhone."
+          }
+        }
+      ]
     }
     </script>
     <style>
@@ -36,7 +336,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             background: #f5f5f7;
@@ -46,18 +346,18 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
+
         /* Navigation */
         nav.top-nav {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
-        
+
         nav.top-nav .nav-content {
             max-width: 980px;
             margin: 0 auto;
@@ -67,19 +367,20 @@
             align-items: center;
             height: 44px;
         }
-        
+
         nav.top-nav .logo {
             font-size: 21px;
             font-weight: 600;
             color: #1d1d1f;
             text-decoration: none;
         }
-        
+
         nav.top-nav .nav-links {
             display: flex;
             gap: 32px;
+            align-items: center;
         }
-        
+
         nav.top-nav .nav-links a {
             color: #1d1d1f;
             text-decoration: none;
@@ -88,11 +389,41 @@
             opacity: 0.8;
             transition: opacity 0.3s;
         }
-        
+
         nav.top-nav .nav-links a:hover {
             opacity: 1;
         }
-        
+
+        /* Language Toggle */
+        .language-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .language-toggle button {
+            background: var(--accent-color, #c21a6c);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 980px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .language-toggle button:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .language-toggle button.active {
+            background: #1d1d1f;
+            opacity: 1;
+        }
+
         /* Hero Section */
         .hero {
             background: #000;
@@ -102,7 +433,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .hero::before {
             content: '';
             position: absolute;
@@ -111,10 +442,10 @@
             transform: translateX(-50%);
             width: 200%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(29,29,31,0.4) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle at center, rgba(29, 29, 31, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
             pointer-events: none;
         }
-        
+
         .hero h1 {
             font-size: 56px;
             font-weight: 600;
@@ -124,7 +455,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .hero .subheadline {
             font-size: 28px;
             line-height: 1.14286;
@@ -134,7 +465,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .hero .description {
             font-size: 21px;
             line-height: 1.381;
@@ -144,7 +475,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .hero .cta-buttons {
             display: flex;
             justify-content: center;
@@ -153,7 +484,7 @@
             z-index: 1;
             flex-wrap: wrap;
         }
-        
+
         .hero .cta-buttons a {
             display: inline-block;
             padding: 12px 22px;
@@ -163,38 +494,38 @@
             font-weight: 400;
             transition: all 0.3s;
         }
-        
+
         .hero .cta-buttons .btn-primary {
             background: #0071e3;
             color: #fff;
         }
-        
+
         .hero .cta-buttons .btn-primary:hover {
             background: #0077ed;
         }
-        
+
         .hero .cta-buttons .btn-secondary {
             border: 1px solid #424245;
             color: #f5f5f7;
         }
-        
+
         .hero .cta-buttons .btn-secondary:hover {
             background: #1d1d1f;
         }
-        
+
         /* Container */
         .container {
             max-width: 980px;
             margin: 0 auto;
             padding: 80px 22px;
         }
-        
+
         /* Section Headline */
         .section-headline {
             text-align: center;
             margin-bottom: 60px;
         }
-        
+
         .section-headline .eyebrow {
             font-size: 21px;
             line-height: 1.381;
@@ -202,7 +533,7 @@
             color: #6e6e73;
             margin-bottom: 8px;
         }
-        
+
         .section-headline h2 {
             font-size: 48px;
             line-height: 1.08349;
@@ -210,7 +541,7 @@
             letter-spacing: -0.003em;
             color: #1d1d1f;
         }
-        
+
         /* App Grid */
         .app-grid {
             display: grid;
@@ -218,29 +549,29 @@
             gap: 40px;
             margin-bottom: 80px;
         }
-        
+
         .app-card {
             background: #fff;
             border-radius: 18px;
             padding: 50px 40px;
-            box-shadow: 2px 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .app-card:hover {
-            box-shadow: 2px 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 2px 8px 24px rgba(0, 0, 0, 0.12);
             transform: translateY(-4px);
         }
-        
+
         .app-card .app-icon {
             width: 80px;
             height: 80px;
             border-radius: 18px;
             margin: 0 auto 24px;
             display: block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-        
+
         .app-card h3 {
             font-size: 32px;
             line-height: 1.125;
@@ -250,7 +581,7 @@
             margin-bottom: 8px;
             text-align: center;
         }
-        
+
         .app-card .app-subtitle {
             font-size: 21px;
             line-height: 1.381;
@@ -259,12 +590,12 @@
             margin-bottom: 24px;
             text-align: center;
         }
-        
+
         .app-card .features-list {
             list-style: none;
             margin-bottom: 30px;
         }
-        
+
         .app-card .features-list li {
             font-size: 17px;
             line-height: 1.47059;
@@ -272,18 +603,18 @@
             padding: 10px 0;
             border-bottom: 1px solid #d2d2d7;
         }
-        
+
         .app-card .features-list li:last-child {
             border-bottom: none;
         }
-        
+
         .app-card .app-buttons {
             display: flex;
             gap: 12px;
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
-        
+
         .app-card .app-buttons a {
             flex: 1;
             padding: 12px 20px;
@@ -295,26 +626,26 @@
             transition: all 0.3s;
             min-width: 140px;
         }
-        
+
         .app-card .btn-download {
             background: #0071e3;
             color: #fff;
         }
-        
+
         .app-card .btn-download:hover {
             background: #0077ed;
         }
-        
+
         .app-card .btn-learn-more {
             background: #f5f5f7;
             color: #0071e3;
             border: 1px solid #d2d2d7;
         }
-        
+
         .app-card .btn-learn-more:hover {
             background: #e8e8ed;
         }
-        
+
         .app-card .testimonial {
             background: #f5f5f7;
             border-radius: 12px;
@@ -324,14 +655,14 @@
             color: #1d1d1f;
             font-style: italic;
         }
-        
+
         .app-card .testimonial .author {
             margin-top: 10px;
             font-size: 14px;
             color: #6e6e73;
             font-style: normal;
         }
-        
+
         /* FAQ Section */
         .faq-section {
             background: #fff;
@@ -339,7 +670,7 @@
             padding: 50px 40px;
             margin-bottom: 40px;
         }
-        
+
         .faq-section h2 {
             font-size: 40px;
             line-height: 1.1;
@@ -348,19 +679,19 @@
             color: #1d1d1f;
             margin-bottom: 40px;
         }
-        
+
         .faq-item {
             margin-bottom: 32px;
             padding-bottom: 32px;
             border-bottom: 1px solid #d2d2d7;
         }
-        
+
         .faq-item:last-child {
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
         }
-        
+
         .faq-item h4 {
             font-size: 21px;
             line-height: 1.381;
@@ -368,13 +699,13 @@
             color: #1d1d1f;
             margin-bottom: 12px;
         }
-        
+
         .faq-item p {
             font-size: 17px;
             line-height: 1.47059;
             color: #6e6e73;
         }
-        
+
         /* Footer */
         footer {
             background: #f5f5f7;
@@ -382,161 +713,167 @@
             text-align: center;
             border-top: 1px solid #d2d2d7;
         }
-        
+
         footer .social-links {
             margin-bottom: 20px;
         }
-        
+
         footer .social-links a {
             display: inline-block;
             margin: 0 12px;
             opacity: 0.7;
             transition: opacity 0.3s;
         }
-        
+
         footer .social-links a:hover {
             opacity: 1;
         }
-        
+
         footer .social-links svg {
             width: 24px;
             height: 24px;
             fill: #1d1d1f;
         }
-        
+
         footer p {
             font-size: 12px;
             line-height: 1.33337;
             color: #6e6e73;
         }
-        
+
         footer a {
             color: #0066cc;
             text-decoration: none;
         }
-        
+
         footer a:hover {
             text-decoration: underline;
         }
-        
+
         /* Responsive */
         @media (max-width: 1068px) {
             .hero h1 {
                 font-size: 48px;
             }
-            
+
             .hero .subheadline {
                 font-size: 24px;
             }
-            
+
             .section-headline h2 {
                 font-size: 40px;
             }
         }
-        
+
         @media (max-width: 734px) {
             nav.top-nav .nav-content {
                 padding: 0 16px;
             }
-            
+
             nav.top-nav .nav-links {
                 gap: 20px;
             }
-            
+
             .hero {
                 padding: 50px 16px 70px;
             }
-            
+
             .hero h1 {
                 font-size: 32px;
             }
-            
+
             .hero .subheadline {
                 font-size: 19px;
             }
-            
+
             .hero .description {
                 font-size: 17px;
             }
-            
+
             .hero .cta-buttons {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .hero .cta-buttons a {
                 width: 100%;
                 max-width: 300px;
             }
-            
+
             .container {
                 padding: 50px 16px;
             }
-            
+
             .section-headline h2 {
                 font-size: 32px;
             }
-            
+
             .app-grid {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            
+
             .app-card {
                 padding: 40px 30px;
             }
-            
+
             .app-card h3 {
                 font-size: 28px;
             }
-            
+
             .app-card .app-buttons {
                 flex-direction: column;
             }
-            
+
             .app-card .app-buttons a {
                 width: 100%;
             }
-            
+
             .faq-section {
                 padding: 40px 30px;
             }
-            
+
             .faq-section h2 {
                 font-size: 32px;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="top-nav">
         <div class="nav-content">
             <a href="#" class="logo">VUTASO</a>
             <div class="nav-links">
-                <a href="#moneybay">MoneyBay</a>
-                <a href="#qrbay">QRBay</a>
-                <a href="#faqs">Hỏi đáp</a>
+                <a href="#moneybay" data-key="nav-moneybay">MoneyBay</a>
+                <a href="#qrbay" data-key="nav-qrbay">QRBay</a>
+                <a href="#faqs" data-key="nav-faq">Hỏi đáp</a>
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="vi">VI</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="jp">JP</button>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1>MoneyBay: Quản Lý Chi Tiêu<br>& QRBay: Quét Mã QR Code</h1>
-        <p class="subheadline">Được thiết kế cho iOS</p>
-        <p class="description">Miễn phí. An toàn. Dễ sử dụng.</p>
+        <h1 data-key="hero-title">MoneyBay: Quản Lý Chi Tiêu<br>& QRBay: Quét Mã QR Code</h1>
+        <p class="subheadline" data-key="hero-subtitle">Được thiết kế cho iOS</p>
+        <p class="description" data-key="hero-description">Miễn phí. An toàn. Dễ sử dụng.</p>
         <div class="cta-buttons">
-            <a href="#moneybay" class="btn-primary">Khám phá MoneyBay</a>
-            <a href="#qrbay" class="btn-secondary">Khám phá QRBay</a>
+            <a href="#moneybay" class="btn-primary" data-key="hero-btn-moneybay">Khám phá MoneyBay</a>
+            <a href="#qrbay" class="btn-secondary" data-key="hero-btn-qrbay">Khám phá QRBay</a>
         </div>
     </section>
 
     <!-- App Showcase -->
     <div class="container">
         <div class="section-headline">
-            <p class="eyebrow">Sản phẩm nổi bật</p>
-            <h2>Được thiết kế cho cuộc sống<br>hàng ngày của bạn</h2>
+            <p class="eyebrow" data-key="section-eyebrow">Sản phẩm nổi bật</p>
+            <h2 data-key="section-title">Được thiết kế cho cuộc sống<br>hàng ngày của bạn</h2>
         </div>
 
         <div class="app-grid">
@@ -544,25 +881,33 @@
             <div class="app-card" id="moneybay">
                 <img src="assets/logo_moneybay.png" alt="MoneyBay Logo" class="app-icon">
                 <h3>MoneyBay</h3>
-                <p class="app-subtitle">Quản lý chi tiêu cá nhân thông minh với trợ lý AI</p>
-                
+                <p class="app-subtitle" data-key="moneybay-subtitle">Quản lý chi tiêu cá nhân thông minh với trợ lý AI
+                </p>
+
                 <div class="app-buttons">
-                    <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" class="btn-download" target="_blank">Tải MoneyBay</a>
-                    <a href="https://vutaso.com/moneybay" class="btn-learn-more" target="_blank">Tìm hiểu thêm</a>
+                    <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" class="btn-download"
+                        target="_blank" data-key="moneybay-btn-download">Tải MoneyBay</a>
+                    <a href="https://vutaso.com/moneybay" class="btn-learn-more" target="_blank"
+                        data-key="moneybay-btn-learn">Tìm hiểu thêm</a>
                 </div>
-                
+
                 <ul class="features-list">
-                    <li>Miễn phí, không yêu cầu đăng nhập</li>
-                    <li>Ghi chép thu nhập và chi tiêu nhanh chóng bằng giọng nói hoặc chat với AI</li>
-                    <li>Báo cáo tài chính trực quan với biểu đồ</li>
-                    <li>Dữ liệu an toàn trên thiết bị và iCloud</li>
-                    <li>Xuất dữ liệu CSV dễ dàng</li>
-                    <li>Hoạt động offline, đồng bộ online khi có mạng</li>
-                    <li>Đa dạng các tiện ích như Hạn mức chi, Danh sách mua sắm, Quét hóa đơn và tài liệu, Nhập giao dịch từ hình ảnh, Chia tiền hóa đơn, Chuyển đổi tiền tệ, tính tiền típ...</li>
+                    <li data-key="moneybay-feature-1">Miễn phí, không yêu cầu đăng nhập</li>
+                    <li data-key="moneybay-feature-2">Ghi chép thu nhập và chi tiêu nhanh chóng bằng giọng nói hoặc chat
+                        với AI</li>
+                    <li data-key="moneybay-feature-3">Báo cáo tài chính trực quan với biểu đồ</li>
+                    <li data-key="moneybay-feature-4">Dữ liệu an toàn trên thiết bị và iCloud</li>
+                    <li data-key="moneybay-feature-5">Xuất dữ liệu CSV dễ dàng</li>
+                    <li data-key="moneybay-feature-6">Hoạt động offline, đồng bộ online khi có mạng</li>
+                    <li data-key="moneybay-feature-7">Đa dạng các tiện ích như Hạn mức chi, Danh sách mua sắm, Quét hóa
+                        đơn và tài liệu, Nhập giao
+                        dịch từ hình ảnh, Chia tiền hóa đơn, Chuyển đổi tiền tệ, tính tiền típ...</li>
                 </ul>
                 <div class="testimonial">
-                    "MoneyBay là app quản lý chi tiêu cá nhân đơn giản nhất tôi từng dùng. Giao diện trực quan và nhập liệu cực nhanh."
-                    <div class="author">— Anh Quân Nguyễn, Freelancer</div>
+                    <span data-key="moneybay-testimonial">"MoneyBay là app quản lý chi tiêu cá nhân đơn giản nhất tôi
+                        từng dùng. Giao diện trực quan và nhập
+                        liệu cực nhanh."</span>
+                    <div class="author" data-key="moneybay-testimonial-author">— Anh Quân Nguyễn, Freelancer</div>
                 </div>
             </div>
 
@@ -570,51 +915,63 @@
             <div class="app-card" id="qrbay">
                 <img src="assets/logo_qrbay.png" alt="QRBay Logo" class="app-icon">
                 <h3>QRBay</h3>
-                <p class="app-subtitle">Quét và tạo mã QR siêu tốc</p>
-                
+                <p class="app-subtitle" data-key="qrbay-subtitle">Quét và tạo mã QR siêu tốc</p>
+
                 <div class="app-buttons">
-                    <a href="https://apps.apple.com/app/qrbay/id6499323043" class="btn-download" target="_blank">Tải QRBay</a>
-                    <a href="https://vutaso.com/qrbay/" class="btn-learn-more" target="_blank">Tìm hiểu thêm</a>
+                    <a href="https://apps.apple.com/app/qrbay/id6499323043" class="btn-download" target="_blank"
+                        data-key="qrbay-btn-download">Tải QRBay</a>
+                    <a href="https://vutaso.com/qrbay/" class="btn-learn-more" target="_blank"
+                        data-key="qrbay-btn-learn">Tìm hiểu thêm</a>
                 </div>
-                
+
                 <ul class="features-list">
-                    <li>Quét mã QR code và mã vạch nhanh chóng</li>
-                    <li>Tạo QR code: Wi-Fi, URL, danh thiếp, văn bản</li>
-                    <li>Lưu lịch sử quét và kiểm kê thuận tiện</li>
-                    <li>Miễn phí, không yêu cầu đăng nhập</li>
-                    <li>Bảo mật, không thu thập dữ liệu</li>
-                    <li>Quét nhiều mã QR hoặc mã vạch cùng một lúc</li>
-                    <li>Xuất và chia sẻ mã QR đã tạo</li>
+                    <li data-key="qrbay-feature-1">Quét mã QR code và mã vạch nhanh chóng</li>
+                    <li data-key="qrbay-feature-2">Tạo QR code: Wi-Fi, URL, danh thiếp, văn bản</li>
+                    <li data-key="qrbay-feature-3">Lưu lịch sử quét và kiểm kê thuận tiện</li>
+                    <li data-key="qrbay-feature-4">Miễn phí, không yêu cầu đăng nhập</li>
+                    <li data-key="qrbay-feature-5">Bảo mật, không thu thập dữ liệu</li>
+                    <li data-key="qrbay-feature-6">Quét nhiều mã QR hoặc mã vạch cùng một lúc</li>
+                    <li data-key="qrbay-feature-7">Xuất và chia sẻ mã QR đã tạo</li>
                 </ul>
                 <div class="testimonial">
-                    "QRBay quét mã cực nhanh. Tính năng quét hàng loạt và lưu lịch sử rất tiện cho công việc kiểm kê."
-                    <div class="author">— Chị Ngọc Mai, Chủ cửa hàng</div>
+                    <span data-key="qrbay-testimonial">"QRBay quét mã cực nhanh. Tính năng quét hàng loạt và lưu lịch sử
+                        rất tiện cho công việc kiểm kê."</span>
+                    <div class="author" data-key="qrbay-testimonial-author">— Chị Ngọc Mai, Chủ cửa hàng</div>
                 </div>
             </div>
         </div>
 
         <!-- FAQ Section -->
         <section class="faq-section" id="faqs">
-            <h2>Câu hỏi thường gặp</h2>
-            
+            <h2 data-key="faq-title">Câu hỏi thường gặp</h2>
+
             <div class="faq-item">
-                <h4>Dữ liệu của tôi có được an toàn không?</h4>
-                <p>An toàn. Chúng tôi không thu thập bất kỳ dữ liệu cá nhân nào. Mọi thông tin chỉ được lưu trữ trên thiết bị hoặc đồng bộ qua iCloud cá nhân của bạn.</p>
+                <h4 data-key="faq-q1">Dữ liệu của tôi có được an toàn không?</h4>
+                <p data-key="faq-a1">An toàn. Chúng tôi không thu thập bất kỳ dữ liệu cá nhân nào. Mọi thông tin chỉ
+                    được lưu trữ trên
+                    thiết bị hoặc đồng bộ qua iCloud cá nhân của bạn.</p>
             </div>
-            
+
             <div class="faq-item">
-                <h4>Ứng dụng có miễn phí không?</h4>
-                <p>Cả MoneyBay và QRBay đều cung cấp phiên bản miễn phí với đầy đủ các tính năng cốt lõi. QRBay hoàn toàn miễn phí. MoneyBay có thể có các tính năng nâng cao tùy chọn (Premium) trong tương lai để hỗ trợ chúng tôi phát triển, nhưng các chức năng thiết yếu sẽ luôn miễn phí.</p>
+                <h4 data-key="faq-q2">Ứng dụng có miễn phí không?</h4>
+                <p data-key="faq-a2">Cả MoneyBay và QRBay đều cung cấp phiên bản miễn phí với đầy đủ các tính năng cốt
+                    lõi. QRBay hoàn
+                    toàn miễn phí. MoneyBay có thể có các tính năng nâng cao tùy chọn (Premium) trong tương lai để hỗ
+                    trợ chúng tôi phát triển, nhưng các chức năng thiết yếu sẽ luôn miễn phí.</p>
             </div>
-            
+
             <div class="faq-item">
-                <h4>Làm thế nào để xuất dữ liệu?</h4>
-                <p>MoneyBay cho phép xuất toàn bộ dữ liệu ra file CSV hoặc PDF, dễ dàng mở bằng Excel hoặc Google Sheets. Ngoài ra, dữ liệu tự động đồng bộ với iCloud.</p>
+                <h4 data-key="faq-q3">Làm thế nào để xuất dữ liệu?</h4>
+                <p data-key="faq-a3">MoneyBay cho phép xuất toàn bộ dữ liệu ra file CSV hoặc PDF, dễ dàng mở bằng Excel
+                    hoặc Google
+                    Sheets. Ngoài ra, dữ liệu tự động đồng bộ với iCloud.</p>
             </div>
-            
+
             <div class="faq-item">
-                <h4>App có phiên bản Android không?</h4>
-                <p>Hiện tại, ứng dụng được thiết kế và tối ưu cho iOS. Chúng tôi tập trung mang lại trải nghiệm tốt nhất trên iPhone.</p>
+                <h4 data-key="faq-q4">App có phiên bản Android không?</h4>
+                <p data-key="faq-a4">Hiện tại, ứng dụng được thiết kế và tối ưu cho iOS. Chúng tôi tập trung mang lại
+                    trải nghiệm tốt nhất
+                    trên iPhone.</p>
             </div>
         </section>
     </div>
@@ -624,23 +981,28 @@
         <div class="social-links">
             <a href="https://www.facebook.com/moneybayapp" target="_blank" aria-label="Facebook">
                 <svg viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    <path
+                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
             </a>
             <a href="https://tiktok.com/@moneybay.app" target="_blank" aria-label="TikTok">
                 <svg viewBox="0 0 24 24">
-                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                    <path
+                        d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
                 </svg>
             </a>
         </div>
-        <p>Copyright © 2025 VUTASO. Liên hệ: <a href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></p>
-        <p style="margin-top: 8px;">Make in Vietnam | All Rights Reserved.</p>
+        <p><span data-key="footer-copyright">Copyright © 2025 VUTASO. Liên hệ:</span> <a
+                href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></p>
+        <p style="margin-top: 8px;" data-key="footer-location">Make in Vietnam | All Rights Reserved.</p>
     </footer>
+
+    <script src="index-translations.js"></script>
 
     <script>
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -651,9 +1013,9 @@
                 }
             });
         });
-        
+
         // Lazy load images
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const images = document.querySelectorAll('img[data-src]');
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -665,9 +1027,10 @@
                     }
                 });
             });
-            
+
             images.forEach(img => imageObserver.observe(img));
         });
     </script>
 </body>
+
 </html>
