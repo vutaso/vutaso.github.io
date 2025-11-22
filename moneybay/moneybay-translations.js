@@ -10,7 +10,7 @@ const translations = {
         "navLimits": "Hạn mức chi",
         "navDebtLedger": "Sổ Nợ",
         "navExportData": "Xuất dữ liệu",
-        "navFAQ": "FAQ",
+        "navFAQ": "Câu hỏi thường gặp",
 
         // Hero Section
         "heroTitle": "MoneyBay",
@@ -53,6 +53,12 @@ const translations = {
 
         "feature10Title": "Tiện ích \"Danh sách mua sắm\"",
         "feature10Desc": "Hỗ trợ người dùng lập kế hoạch và quản lý hiệu quả các món đồ cần mua, đảm bảo không bỏ sót món đồ nào khi mua sắm.",
+
+        "feature11Title": "Tiện ích \"Nhập Giao dịch từ Ảnh\"",
+        "feature11Desc": "Nhập ảnh chụp màn hình hóa đơn mua hàng, kết quả thanh toán online, lịch sử giao dịch ngân hàng.",
+
+        "feature12Title": "Tiện ích \"Sổ Nợ\"",
+        "feature12Desc": "Giúp bạn ghi chép, quản lý và theo dõi các khoản vay và cho vay hằng ngày, hữu ích cho cá nhân, hộ kinh doanh nhỏ.",
 
         // AI Section (already has data-lang-key in HTML)
         "aiTitle": "Ghi chép rảnh tay với Trợ lý AI",
@@ -132,31 +138,34 @@ const translations = {
 
         // FAQ Section
         "faqTitle": "Câu hỏi thường gặp",
-        "faqQ1": "MoneyBay có miễn phí không?",
-        "faqA1": "Có, MoneyBay hoàn toàn miễn phí với đầy đủ tính năng cốt lõi. Chúng tôi có thể có thêm tính năng Premium trong tương lai, nhưng các chức năng thiết yếu sẽ luôn miễn phí.",
-        "faqQ2": "Dữ liệu của tôi có an toàn không?",
-        "faqA2": "Rất an toàn. Dữ liệu được lưu trữ trên thiết bị của bạn và đồng bộ qua iCloud cá nhân. Chúng tôi không thu thập hay truy cập dữ liệu tài chính của bạn.",
-        "faqQ3": "Tôi có thể sử dụng trên nhiều thiết bị không?",
-        "faqA3": "Có, dữ liệu tự động đồng bộ giữa các thiết bị iOS của bạn qua iCloud. Đăng nhập cùng Apple ID là được.",
-        "faqQ4": "MoneyBay có hỗ trợ Android không?",
-        "faqA4": "Hiện tại chúng tôi tập trung phát triển cho iOS để mang lại trải nghiệm tốt nhất trên iPhone và iPad. Phiên bản Android có thể được xem xét trong tương lai.",
-        "faqQ5": "Tính năng AI có mất phí không?",
-        "faqA5": "Trợ lý AI hoàn toàn miễn phí với số lượng yêu cầu hợp lý mỗi ngày. Chúng tôi muốn mọi người đều trải nghiệm sức mạnh của AI trong quản lý tài chính.",
-        "faqQ6": "Làm sao để liên hệ hỗ trợ?",
-        "faqA6": "Bạn có thể liên hệ qua email vutaso.com@gmail.com hoặc trực tiếp trong ứng dụng tại Nhiều hơn > Trợ giúp > Liên hệ trợ giúp.",
+        "faqSubtitle": "Tìm câu trả lời cho các câu hỏi phổ biến",
+        "faqQ1": "Làm thế nào để bắt đầu sử dụng MoneyBay?",
+        "faqA1": "Để bắt đầu, bạn chỉ cần tải ứng dụng MoneyBay về thiết bị của mình. Sau khi mở ứng dụng, bạn có thể thêm thu nhập và chi tiêu của mình vào các mục tương ứng. Ứng dụng sẽ tự động tính toán và đưa ra báo cáo tài chính cho bạn.",
+        "faqQ2": "Làm sao để xuất dữ liệu chi tiêu dưới dạng CSV?",
+        "faqA2": "Để xuất dữ liệu chi tiêu, bạn chỉ cần vào phần \"Cài đặt\", chọn \"Sao lưu/Khôi phục dữ liệu\", chọn \"Xuất sang CSV\". Dữ liệu sẽ được xuất dưới dạng file CSV, mà bạn có thể mở trên máy tính hoặc gửi qua email để phân tích thêm.",
+        "faqQ3": "Ứng dụng có hỗ trợ sao lưu dữ liệu không?",
+        "faqA3": "Có, MoneyBay hỗ trợ sao lưu dữ liệu vào đám mây thông qua iCloud. Bạn chỉ cần bật tính năng sao lưu trong phần \"Cài đặt\" của ứng dụng để đảm bảo dữ liệu của bạn được lưu trữ an toàn và có thể phục hồi khi cần thiết.",
+        "faqQ4": "Làm sao để bảo vệ dữ liệu của tôi trong ứng dụng?",
+        "faqA4": "MoneyBay cam kết bảo vệ sự riêng tư của bạn. Dữ liệu của bạn được lưu trữ cục bộ trên thiết bị hoặc trên iCloud cá nhân của bạn và không được chia sẻ với bất kỳ bên thứ ba nào.",
+        "faqQ5": "Tôi có thể liên hệ với đội ngũ hỗ trợ không?",
+        "faqA5": "Chắc chắn rồi! Để được hỗ trợ thêm, bạn có thể liên hệ với chúng tôi qua email hoặc Facebook:",
 
         // Download/CTA Section (already has data-lang-key in HTML)
         "ctaEyebrow": "Sẵn sàng bắt đầu?",
         "ctaTitle": "Bắt đầu quản lý tài chính của bạn ngay hôm nay!",
         "ctaSubtitle": "Tải MoneyBay miễn phí và trải nghiệm phương pháp quản lý chi tiêu thông minh và hiệu quả nhất.",
         "ctaAppStore": "Tải từ App Store",
+        "ctaNote": "Miễn phí trên iOS",
 
         // Footer (already has data-lang-key in HTML)
+        "footerConnect": "Kết nối với chúng tôi",
+        "footerCommunity": "Cộng đồng",
+        "footerSupport": "Hỗ trợ",
         "footerEmail": "Email",
+        "footerDownload": "Tải MoneyBay",
+        "footerPrivacy": "Chính sách",
+        "footerTerms": "Điều khoản",
         "footerTagline": "Một sản phẩm được tạo ra với ❤️ để giúp bạn quản lý tài chính tốt hơn.",
-        "footerPrivacy": "Chính sách bảo mật",
-        "footerTerms": "Điều khoản sử dụng",
-        "footerCopyright": "© 2025 VUTASO. Made in Vietnam với ❤️"
     },
     en: {
         // Navigation
@@ -169,7 +178,7 @@ const translations = {
         "navLimits": "Budget Limits",
         "navDebtLedger": "Debt Ledger",
         "navExportData": "Export Data",
-        "navFAQ": "FAQ",
+        "navFAQ": "Frequently Asked Questions",
 
         // Hero Section
         "heroTitle": "MoneyBay",
@@ -212,6 +221,12 @@ const translations = {
 
         "feature10Title": "\"Shopping List\" utility",
         "feature10Desc": "Help users plan and effectively manage items to buy, ensuring no items are missed when shopping.",
+
+        "feature11Title": "\"Import Transactions from Images\" Utility",
+        "feature11Desc": "Import screenshots of purchase receipts, online payment results, bank transaction history.",
+
+        "feature12Title": "\"Debt Ledger\" Utility",
+        "feature12Desc": "Help you record, manage and track daily loans and borrowings, useful for individuals and small businesses.",
 
         // AI Section
         "aiTitle": "Hands-free recording with AI Assistant",
@@ -291,30 +306,34 @@ const translations = {
 
         // FAQ Section
         "faqTitle": "Frequently Asked Questions",
-        "faqQ1": "Is MoneyBay free?",
-        "faqA1": "Yes, MoneyBay is completely free with all core features. We may add Premium features in the future, but essential functions will always be free.",
-        "faqQ2": "Is my data safe?",
-        "faqA2": "Very safe. Data is stored on your device and synced via your personal iCloud. We don't collect or access your financial data.",
-        "faqQ3": "Can I use on multiple devices?",
-        "faqA3": "Yes, data automatically syncs across your iOS devices via iCloud. Just log in with the same Apple ID.",
-        "faqQ4": "Does MoneyBay support Android?",
-        "faqA4": "Currently we focus on iOS development to deliver the best experience on iPhone and iPad. Android version may be considered in the future.",
-        "faqQ5": "Does AI feature cost money?",
-        "faqA5": "AI assistant is completely free with reasonable daily request limits. We want everyone to experience the power of AI in financial management.",
-        "faqQ6": "How to contact support?",
-        "faqA6": "You can contact via email vutaso.com@gmail.com or directly in the app at More > Help > Contact Support.",
+        "faqSubtitle": "Find answers to common questions",
+        "faqQ1": "How do I start using MoneyBay?",
+        "faqA1": "To get started, simply download the MoneyBay app to your device. After opening the app, you can add your income and expenses to the corresponding categories. The app will automatically calculate and provide financial reports for you.",
+        "faqQ2": "How do I export expense data as CSV?",
+        "faqA2": "To export expense data, just go to \"Settings\", select \"Backup/Restore Data\", choose \"Export to CSV\". The data will be exported as a CSV file, which you can open on your computer or send via email for further analysis.",
+        "faqQ3": "Does the app support data backup?",
+        "faqA3": "Yes, MoneyBay supports data backup to the cloud via iCloud. You just need to enable the backup feature in the app's \"Settings\" to ensure your data is stored safely and can be restored when needed.",
+        "faqQ4": "How do I protect my data in the app?",
+        "faqA4": "MoneyBay is committed to protecting your privacy. Your data is stored locally on your device or on your personal iCloud and is not shared with any third parties.",
+        "faqQ5": "Can I contact the support team?",
+        "faqA5": "Absolutely! For additional support, you can contact us via email or Facebook:",
 
-        // Download Section
-        "downloadEyebrow": "Download",
-        "downloadTitle": "Start smart financial management today",
-        "downloadDesc": "Download MoneyBay for free and experience the most modern way of expense management.",
-        "downloadCTA": "Download on App Store",
-        "downloadNote": "Requires iOS 16.0 or later",
+        // Download/CTA Section (already has data-lang-key in HTML)
+        "ctaEyebrow": "Ready to start?",
+        "ctaTitle": "Start managing your finances today!",
+        "ctaSubtitle": "Download MoneyBay for free and experience the smartest and most efficient expense management method.",
+        "ctaAppStore": "Download on App Store",
+        "ctaNote": "Free on iOS",
 
-        // Footer
-        "footerPrivacy": "Privacy Policy",
-        "footerTerms": "Terms of Service",
-        "footerCopyright": "© 2025 VUTASO. Made in Vietnam with ❤️"
+        // Footer (already has data-lang-key in HTML)
+        "footerConnect": "Connect with us",
+        "footerCommunity": "Community",
+        "footerSupport": "Support",
+        "footerEmail": "Email",
+        "footerDownload": "Download MoneyBay",
+        "footerPrivacy": "Privacy",
+        "footerTerms": "Terms",
+        "footerTagline": "A product made with ❤️ to help you manage your finances better.",
     }
 };
 

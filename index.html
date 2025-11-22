@@ -16,6 +16,20 @@
     <meta name="geo.placename" content="Vietnam">
     <link rel="canonical" href="https://vutaso.com/">
 
+    <!-- Hreflang for multilingual SEO -->
+    <link rel="alternate" hreflang="vi" href="https://vutaso.com/">
+    <link rel="alternate" hreflang="en" href="https://vutaso.com/">
+    <link rel="alternate" hreflang="ja" href="https://vutaso.com/">
+    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/">
+
+    <!-- English Keywords for International Search -->
+    <meta name="keywords-en"
+        content="AI expense tracker, personal finance app, budget manager, expense management, money tracker, AI budget app, voice expense logging, financial tracking app, expense organizer, spending tracker, free expense app, iOS finance app, personal budget planner, expense report app">
+
+    <!-- Japanese Keywords for Japan Search -->
+    <meta name="keywords-ja"
+        content="AI支出管理, 家計簿アプリ, 予算管理, 経費管理アプリ, お金の管理, AI予算アプリ, 音声記録, 財務追跡アプリ, 支出整理, 支出追跡, 無料家計簿アプリ, iOS財務アプリ, 個人予算プランナー, 経費レポート">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://vutaso.com/">
@@ -28,6 +42,7 @@
     <meta property="og:image:height" content="750">
     <meta property="og:locale" content="vi_VN">
     <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -62,7 +77,7 @@
         "@type": "ContactPoint",
         "email": "vutaso.com@gmail.com",
         "contactType": "Customer Service",
-        "availableLanguage": ["Vietnamese", "English"]
+        "availableLanguage": ["Vietnamese", "English", "Japanese"]
       },
       "sameAs": [
         "https://www.facebook.com/moneybayapp",
@@ -119,7 +134,8 @@
       ],
       "softwareVersion": "1.0",
       "datePublished": "2025-01-01",
-      "keywords": "quản lý chi tiêu, app tài chính, sổ thu chi, budget app, expense manager"
+      "inLanguage": ["vi", "en", "ja"],
+      "keywords": "quản lý chi tiêu, app tài chính, sổ thu chi, budget app, expense manager, AI expense tracker, personal finance app, 家計簿アプリ, AI支出管理, 経費管理アプリ"
     }
     </script>
 
@@ -394,6 +410,102 @@
             opacity: 1;
         }
 
+        /* Dropdown Menu */
+        .nav-item-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            background: none;
+            border: none;
+            color: #1d1d1f;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            font-family: inherit;
+        }
+
+        .nav-item-dropdown:hover .nav-dropdown-btn {
+            opacity: 1;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 8px 0;
+            z-index: 1002;
+            margin-top: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #fff;
+        }
+
+        .nav-dropdown-content::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: transparent;
+        }
+
+        .nav-item-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .nav-dropdown-content a {
+            color: #1d1d1f;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 13px !important;
+            text-align: left;
+            white-space: nowrap;
+            opacity: 1 !important;
+        }
+
+        .nav-dropdown-content a:hover {
+            background-color: #f5f5f7;
+            color: #0071e3;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
         /* Language Toggle */
         .language-toggle {
             display: flex;
@@ -422,6 +534,165 @@
         .language-toggle button.active {
             background: #1d1d1f;
             opacity: 1;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .hamburger-menu span {
+            width: 100%;
+            height: 2px;
+            background: #1d1d1f;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                display: flex;
+            }
+
+            nav.top-nav .nav-links {
+                position: fixed;
+                top: 44px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                padding: 20px 22px;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            nav.top-nav .nav-links.active {
+                max-height: 1000px;
+                opacity: 1;
+            }
+
+            nav.top-nav .nav-links a {
+                padding: 12px 0;
+                font-size: 14px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            nav.top-nav .nav-links a:last-child {
+                border-bottom: none;
+            }
+
+            .language-toggle {
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                justify-content: center;
+            }
+
+            /* Mobile Dropdown */
+            .nav-item-dropdown {
+                width: 100%;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .nav-dropdown-btn {
+                width: 100%;
+                padding: 12px 0;
+                font-size: 14px;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-dropdown-content {
+                position: static;
+                transform: none;
+                width: 100%;
+                min-width: auto;
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin: 0;
+                display: none;
+                text-align: center;
+            }
+
+            /* Show on tap (hover state on mobile) */
+            .nav-item-dropdown:hover .nav-dropdown-content,
+            .nav-item-dropdown:active .nav-dropdown-content {
+                display: block;
+                animation: none;
+            }
+
+            .nav-dropdown-content::before,
+            .nav-dropdown-content::after {
+                display: none;
+            }
+
+            .nav-dropdown-content a {
+                padding: 10px 0;
+                color: #666;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                text-align: center;
+            }
+
+            .nav-dropdown-content a:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* Scroll offset for anchor links (to avoid being hidden by sticky nav) */
+        section[id],
+        .section-headline[id],
+        .container[id] {
+            scroll-margin-top: 60px;
+        }
+
+        /* Larger offset for app cards to show logo properly */
+        .app-card[id] {
+            scroll-margin-top: 55px;
+        }
+
+        /* Mobile: Increase scroll offset for better visibility and spacing */
+        @media (max-width: 768px) {
+
+            section[id],
+            .section-headline[id],
+            .container[id] {
+                scroll-margin-top: 60px;
+            }
+
+            /* Even larger offset for app cards on mobile */
+            .app-card[id] {
+                scroll-margin-top: 60px;
+            }
         }
 
         /* Hero Section */
@@ -714,25 +985,52 @@
             border-top: 1px solid #d2d2d7;
         }
 
-        footer .social-links {
-            margin-bottom: 20px;
+        .social-links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        footer .social-links a {
-            display: inline-block;
-            margin: 0 12px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
+        .social-link-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: #fff;
+            border: 1px solid #d2d2d7;
+            border-radius: 12px;
+            min-width: 100px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        footer .social-links a:hover {
-            opacity: 1;
+        .social-link-card:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        footer .social-links svg {
-            width: 24px;
-            height: 24px;
-            fill: #1d1d1f;
+        .social-link-card img {
+            width: 32px;
+            height: 32px;
+            transition: transform 0.3s;
+        }
+
+        .social-link-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .social-link-card span {
+            font-size: 12px;
+            line-height: 1.33337;
+            color: #1d1d1f;
+            font-weight: 500;
         }
 
         footer p {
@@ -748,6 +1046,28 @@
 
         footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Footer Link Buttons */
+        .footer-link-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            line-height: 1.42857;
+            font-weight: 400;
+            color: #1d1d1f !important;
+            background: #fff;
+            border: 1px solid #d2d2d7;
+            border-radius: 980px;
+            text-decoration: none !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-link-button:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         /* Responsive */
@@ -845,10 +1165,35 @@
     <nav class="top-nav">
         <div class="nav-content">
             <a href="#" class="logo">VUTASO</a>
+
+            <!-- Hamburger Menu Button (Mobile) -->
+            <button class="hamburger-menu" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <div class="nav-links">
                 <a href="#moneybay" data-key="nav-moneybay">MoneyBay</a>
                 <a href="#qrbay" data-key="nav-qrbay">QRBay</a>
                 <a href="#faqs" data-key="nav-faq">Hỏi đáp</a>
+
+                <!-- Download Dropdown -->
+                <div class="nav-item-dropdown">
+                    <button class="nav-dropdown-btn">
+                        <span data-key="nav-download">Tải ngay</span>
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" />
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown-content">
+                        <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
+                            data-key="nav-download-moneybay">Tải MoneyBay</a>
+                        <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank"
+                            data-key="nav-download-qrbay">Tải QRBay</a>
+                    </div>
+                </div>
+
                 <div class="language-toggle">
                     <button class="lang-btn active" data-lang="vi">VI</button>
                     <button class="lang-btn" data-lang="en">EN</button>
@@ -978,23 +1323,45 @@
 
     <!-- Footer -->
     <footer>
-        <div class="social-links">
-            <a href="https://www.facebook.com/moneybayapp" target="_blank" aria-label="Facebook">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-            </a>
-            <a href="https://tiktok.com/@moneybay.app" target="_blank" aria-label="TikTok">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
-                </svg>
-            </a>
+        <div style="margin-bottom: 32px;">
+            <p style="font-size: 14px; color: #86868b; margin-bottom: 16px; font-weight: 500;"
+                data-key="footer-connect">Kết nối với chúng tôi</p>
+            <div class="social-links-grid">
+                <a href="https://www.facebook.com/moneybayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO on Facebook">
+                    <img src="moneybay/assets/images/facebook.png" alt="Facebook">
+                    <span>Facebook</span>
+                </a>
+                <a href="https://tiktok.com/@moneybay.app" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO on TikTok">
+                    <img src="moneybay/assets/images/tiktok.png" alt="TikTok">
+                    <span>TikTok</span>
+                </a>
+                <a href="https://www.facebook.com/groups/moneybay" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO Community">
+                    <img src="moneybay/assets/images/teamwork.png" alt="Groups">
+                    <span data-key="footer-community">Cộng đồng</span>
+                </a>
+                <a href="https://www.facebook.com/messages/t/moneybayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO Support">
+                    <img src="moneybay/assets/images/customer.png" alt="Support">
+                    <span data-key="footer-support">Hỗ trợ</span>
+                </a>
+            </div>
         </div>
-        <p><span data-key="footer-copyright">Copyright © 2025 VUTASO. Liên hệ:</span> <a
-                href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></p>
-        <p style="margin-top: 8px;" data-key="footer-location">Make in Vietnam | All Rights Reserved.</p>
+
+        <div
+            style="margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;">
+            <a href="mailto:vutaso.com@gmail.com" class="footer-link-button" data-key="footer-email">Email</a>
+            <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
+                rel="noopener noreferrer" class="footer-link-button" data-key="footer-download-moneybay">Tải
+                MoneyBay</a>
+            <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
+                class="footer-link-button" data-key="footer-download-qrbay">Tải QRBay</a>
+        </div>
+
+        <p data-key="footer-copyright">&copy; 2025 VUTASO. All Rights Reserved.</p>
+        <p style="margin-top: 8px;" data-key="footer-tagline">Sản phẩm được tạo ra với ❤️ tại Việt Nam.</p>
     </footer>
 
     <script src="index-translations.js"></script>
@@ -1013,6 +1380,34 @@
                 }
             });
         });
+
+        // Hamburger Menu Toggle
+        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (hamburgerMenu) {
+            hamburgerMenu.addEventListener('click', function () {
+                this.classList.toggle('active');
+
+                // Dynamically set max-height based on content
+                if (navLinks.classList.contains('active')) {
+                    navLinks.style.maxHeight = '0';
+                    navLinks.classList.remove('active');
+                } else {
+                    navLinks.classList.add('active');
+                    navLinks.style.maxHeight = navLinks.scrollHeight + 'px';
+                }
+            });
+
+            // Close menu when clicking on a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function () {
+                    hamburgerMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    navLinks.style.maxHeight = '0';
+                });
+            });
+        }
 
         // Lazy load images
         document.addEventListener("DOMContentLoaded", function () {

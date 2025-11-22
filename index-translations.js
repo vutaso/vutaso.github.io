@@ -4,6 +4,9 @@ const translations = {
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "Hỏi đáp",
+        "nav-download": "Tải ngay",
+        "nav-download-moneybay": "Tải MoneyBay",
+        "nav-download-qrbay": "Tải QRBay",
 
         // Hero Section
         "hero-title": "MoneyBay: Quản Lý Chi Tiêu<br>& QRBay: Quét Mã QR Code",
@@ -56,14 +59,23 @@ const translations = {
         "faq-a4": "Hiện tại, ứng dụng được thiết kế và tối ưu cho iOS. Chúng tôi tập trung mang lại trải nghiệm tốt nhất trên iPhone.",
 
         // Footer
-        "footer-copyright": "Copyright © 2025 VUTASO. Liên hệ:",
-        "footer-location": "Make in Vietnam | All Rights Reserved."
+        "footer-connect": "Kết nối với chúng tôi",
+        "footer-community": "Cộng đồng",
+        "footer-support": "Hỗ trợ",
+        "footer-email": "Email",
+        "footer-download-moneybay": "Tải MoneyBay",
+        "footer-download-qrbay": "Tải QRBay",
+        "footer-copyright": "© 2025 VUTASO. Bảo lưu mọi quyền.",
+        "footer-tagline": "Sản phẩm được tạo ra với ❤️ tại Việt Nam."
     },
     en: {
         // Navigation
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "FAQ",
+        "nav-download": "Download",
+        "nav-download-moneybay": "Download MoneyBay",
+        "nav-download-qrbay": "Download QRBay",
 
         // Hero Section
         "hero-title": "MoneyBay: Expense Manager<br>& QRBay: QR Code Scanner",
@@ -116,14 +128,23 @@ const translations = {
         "faq-a4": "Currently, the app is designed and optimized for iOS. We focus on delivering the best experience on iPhone.",
 
         // Footer
-        "footer-copyright": "Copyright © 2025 VUTASO. Contact:",
-        "footer-location": "Made in Vietnam | All Rights Reserved."
+        "footer-connect": "Connect with us",
+        "footer-community": "Community",
+        "footer-support": "Support",
+        "footer-email": "Email",
+        "footer-download-moneybay": "Download MoneyBay",
+        "footer-download-qrbay": "Download QRBay",
+        "footer-copyright": "© 2025 VUTASO. All Rights Reserved.",
+        "footer-tagline": "Product made with ❤️ in Vietnam."
     },
     jp: {
         // Navigation
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "よくある質問",
+        "nav-download": "ダウンロード",
+        "nav-download-moneybay": "MoneyBayをダウンロード",
+        "nav-download-qrbay": "QRBayをダウンロード",
 
         // Hero Section
         "hero-title": "MoneyBay: 家計簿アプリ<br>& QRBay: QRコードスキャナー",
@@ -176,8 +197,14 @@ const translations = {
         "faq-a4": "現在、このアプリはiOS向けに設計・最適化されています。iPhoneで最高の体験を提供することに注力しています。",
 
         // Footer
-        "footer-copyright": "Copyright © 2025 VUTASO. お問い合わせ:",
-        "footer-location": "Made in Vietnam | All Rights Reserved."
+        "footer-connect": "私たちとつながる",
+        "footer-community": "コミュニティ",
+        "footer-support": "サポート",
+        "footer-email": "メール",
+        "footer-download-moneybay": "MoneyBayをダウンロード",
+        "footer-download-qrbay": "QRBayをダウンロード",
+        "footer-copyright": "© 2025 VUTASO. 全著作権所有。",
+        "footer-tagline": "ベトナムで❤️を込めて作られた製品。"
     }
 };
 
