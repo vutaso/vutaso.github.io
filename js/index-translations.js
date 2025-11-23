@@ -1,6 +1,7 @@
 const translations = {
     vi: {
         // Navigation
+        "nav-products": "Sản phẩm",
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "Hỏi đáp",
@@ -70,6 +71,7 @@ const translations = {
     },
     en: {
         // Navigation
+        "nav-products": "Products",
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "FAQ",
@@ -139,6 +141,7 @@ const translations = {
     },
     jp: {
         // Navigation
+        "nav-products": "製品",
         "nav-moneybay": "MoneyBay",
         "nav-qrbay": "QRBay",
         "nav-faq": "よくある質問",
@@ -208,53 +211,7 @@ const translations = {
     }
 };
 
-function switchLanguage(lang) {
-    document.querySelectorAll('[data-key]').forEach(element => {
-        const key = element.getAttribute('data-key');
-        if (translations[lang] && translations[lang][key]) {
-            element.innerHTML = translations[lang][key];
-        }
-    });
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('data-lang') === lang) {
-            btn.classList.add('active');
-        }
-    });
-
-    document.documentElement.lang = lang;
-    localStorage.setItem('vutaso-home-lang', lang);
-}
-
-document.querySelectorAll('.lang-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        const lang = button.getAttribute('data-lang');
-        switchLanguage(lang);
-    });
+// Initialize translation system
+document.addEventListener('DOMContentLoaded', () => {
+    initTranslationSystem(translations, 'vutaso-home-lang');
 });
-
-// Auto-detect language
-const detectUserLanguage = () => {
-    const savedLang = localStorage.getItem('vutaso-home-lang');
-    if (savedLang && (savedLang === 'vi' || savedLang === 'en' || savedLang === 'jp')) {
-        return savedLang;
-    }
-
-    const browserLang = navigator.language || navigator.userLanguage;
-    const langLower = browserLang ? browserLang.toLowerCase() : '';
-
-    if (langLower.startsWith('vi')) {
-        return 'vi'; // Vietnamese
-    }
-
-    if (langLower.startsWith('ja')) {
-        return 'jp'; // Japanese
-    }
-
-    return 'en'; // Default: English
-};
-
-// Initialize with detected language
-const initialLang = detectUserLanguage();
-switchLanguage(initialLang);

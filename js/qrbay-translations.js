@@ -12,6 +12,7 @@ const translations = {
         "hero-title": "QRBay<br>Quét & Tạo mã QR Nhanh chóng",
         "hero-subtitle": "Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử dụng. Trợ thủ đắc lực cho mọi nhu cầu hàng ngày của bạn.",
         "hero-download-appstore": "Tải từ App Store",
+        "learn-more": "Tìm hiểu thêm",
 
         // Features Section
         "features-title": "Trọn bộ công cụ QR trong tay bạn",
@@ -40,6 +41,7 @@ const translations = {
         "formats-subtitle": "QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.",
 
         // FAQ Section
+        "faq-eyebrow": "Câu hỏi thường gặp",
         "faq-title": "Câu hỏi thường gặp",
         "faq-subtitle": "Tìm câu trả lời cho các câu hỏi phổ biến nhất về QRBay.",
 
@@ -123,6 +125,7 @@ const translations = {
         "hero-title": "QRBay<br>Fast QR & Barcode Scanner",
         "hero-subtitle": "A powerful, fast, and easy-to-use QR/barcode scanning and creation app. Your go-to assistant for all everyday needs.",
         "hero-download-appstore": "Download on App Store",
+        "learn-more": "Learn more",
 
         // Features Section
         "features-title": "A Complete QR Toolkit in Your Hands",
@@ -151,6 +154,7 @@ const translations = {
         "formats-subtitle": "QRBay is compatible with almost every type of QR code and barcode you encounter daily.",
 
         // FAQ Section
+        "faq-eyebrow": "FAQ",
         "faq-title": "Frequently Asked Questions",
         "faq-subtitle": "Find answers to the most common questions about QRBay.",
 
@@ -234,6 +238,7 @@ const translations = {
         "hero-title": "QRBay<br>QRコード＆バーコードを高速スキャン",
         "hero-subtitle": "強力で高速、そして使いやすいQR/バーコードスキャンおよび作成アプリ。毎日のあらゆるニーズに対応する頼れるアシスタント。",
         "hero-download-appstore": "App Storeからダウンロード",
+        "learn-more": "詳細を見る",
 
         // Features Section
         "features-title": "完全なQRツールキットをあなたの手に",
@@ -262,6 +267,7 @@ const translations = {
         "formats-subtitle": "QRBayは、日常的に遭遇するほぼすべての種類のQRコードとバーコードに対応しています。",
 
         // FAQ Section
+        "faq-eyebrow": "よくある質問",
         "faq-title": "よくある質問",
         "faq-subtitle": "QRBayに関する最も一般的な質問への回答を見つけてください。",
 
@@ -272,61 +278,61 @@ const translations = {
         // So for JP, I should probably just use English or hide it? 
         // The best approach is to use English for JP FAQs for now to avoid bad translations.
         "faq-1-q": "QRコードをスキャンするには？",
-        "faq-1-a": "Open the QRBay app and point the camera at the QR code you want to scan. The app will automatically recognize and scan the code.",
+        "faq-1-a": "QRBayアプリを開き、スキャンしたいQRコードにカメラを向けます。アプリが自動的にコードを認識してスキャンします。",
 
         "faq-2-q": "身分証明書や運転免許証をスキャンするには？",
-        "faq-2-a": "QRBay supports scanning information from Citizen ID cards and driver's licenses quickly and accurately.",
+        "faq-2-a": "QRBayは、身分証明書や運転免許証からの情報を迅速かつ正確にスキャンすることをサポートしています。",
 
         "faq-3-q": "スキャンした商品の情報や価格を調べるには？",
-        "faq-3-a": "After scanning a product barcode, you can use the quick lookup function to find product information and prices on Google, Bing, or Amazon.",
+        "faq-3-a": "商品バーコードをスキャンした後、クイック検索機能を使用して、Google、Bing、またはAmazonで商品情報や価格を検索できます。",
 
         "faq-4-q": "どのコード形式をサポートしていますか？",
-        "faq-4-a": "QRBay supports: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E, ITF, Data Matrix, AZTec, PDF 417, and Codabar.",
+        "faq-4-a": "QRBayは、QRCode、Code 39、Code 93、Code 128、EAN-8、EAN-13、UPC-A、UPC-E、ITF、Data Matrix、AZTec、PDF 417、Codabarをサポートしています。",
 
         "faq-5-q": "なぜコードをスキャンできないのですか？",
-        "faq-5-a": "Make sure the code is well-lit and not blurry. Check if the camera is working properly.",
+        "faq-5-a": "コードが十分に照らされており、ぼやけていないことを確認してください。カメラが正常に動作しているか確認してください。",
 
         "faq-6-q": "スキャン結果を保存・共有するには？",
-        "faq-6-a": "You can save results to the library or share directly via email, message, or social media.",
+        "faq-6-a": "結果をライブラリに保存したり、メール、メッセージ、SNSで直接共有したりできます。",
 
         "faq-7-q": "オフラインスキャンに対応していますか？",
-        "faq-7-a": "Yes, QRBay supports scanning offline. However, internet is needed for online content.",
+        "faq-7-a": "はい、QRBayはオフラインでのスキャンをサポートしています。ただし、オンラインコンテンツへのアクセスにはインターネットが必要です。",
 
         "faq-8-q": "教室でQRBayを使用するには？",
-        "faq-8-a": "QRBay can be used for assignments, reference materials, and online tests.",
+        "faq-8-a": "QRBayは、課題、参考資料、オンラインテストに使用できます。",
 
         "faq-9-q": "個人データを収集しますか？",
-        "faq-9-a": "QRBay does not collect personal data without consent. Data is stored on your device.",
+        "faq-9-a": "QRBayは、同意なしに個人データを収集することはありません。データはお使いのデバイスに保存されます。",
 
         "faq-10-q": "アプリを更新するには？",
-        "faq-10-a": "Update via Google Play Store or App Store.",
+        "faq-10-a": "Google PlayストアまたはApp Store経由で更新してください。",
 
         "faq-11-q": "他の言語をサポートしていますか？",
-        "faq-11-a": "QRBay supports up to 18 languages.",
+        "faq-11-a": "QRBayは最大18言語をサポートしています。",
 
         "faq-12-q": "QRコードを作成できますか？",
-        "faq-12-a": "Yes, create QR codes from text, URL, contacts, and more.",
+        "faq-12-a": "はい、テキスト、URL、連絡先などからQRコードを作成できます。",
 
         "faq-13-q": "フォトライブラリからスキャンするには？",
-        "faq-13-a": "Select 'Scan from Library' and choose the image.",
+        "faq-13-a": "「ライブラリからスキャン」を選択し、画像を選んでください。",
 
         "faq-14-q": "カスタムQRコードを作成できますか？",
-        "faq-14-a": "Yes, customize designs with colors and logos.",
+        "faq-14-a": "はい、色やロゴを使ってデザインをカスタマイズできます。",
 
         "faq-15-q": "履歴を管理するには？",
-        "faq-15-a": "Find history in the 'History' section to view, share, or delete.",
+        "faq-15-a": "「履歴」セクションで履歴を見つけ、表示、共有、または削除できます。",
 
         "faq-16-q": "SNSで共有するには？",
-        "faq-16-a": "Share via the share button in details.",
+        "faq-16-a": "詳細画面の共有ボタンから共有できます。",
 
         "faq-17-q": "一括スキャンはどう機能しますか？",
-        "faq-17-a": "Select batch mode to scan multiple codes at once.",
+        "faq-17-a": "一括モードを選択して、複数のコードを一度にスキャンします。",
 
         "faq-18-q": "データのエクスポート形式は？",
-        "faq-18-a": "Export to CSV, text, or image.",
+        "faq-18-a": "CSV、テキスト、または画像にエクスポートできます。",
 
         "faq-19-q": "サポートへの連絡方法は？",
-        "faq-19-a": "Contact us via email or Facebook.",
+        "faq-19-a": "メールまたはFacebookでお問い合わせください。",
 
         // Footer
         "footer-connect": "SNSで接続",
@@ -340,67 +346,7 @@ const translations = {
     }
 };
 
-function updateContent(lang) {
-    if (!translations[lang]) return;
-
-    document.querySelectorAll('[data-key]').forEach(element => {
-        const key = element.getAttribute('data-key');
-        if (translations[lang][key]) {
-            if (element.tagName === 'INPUT' && element.type === 'placeholder') {
-                element.placeholder = translations[lang][key];
-            } else {
-                element.innerHTML = translations[lang][key];
-            }
-        }
-    });
-
-    // Update active button state
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        if (btn.getAttribute('data-lang') === lang) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
-
-    // Save preference
-    localStorage.setItem('vutaso-home-lang', lang);
-
-    // Update html lang attribute
-    document.documentElement.lang = lang;
-}
-
-// Auto-detect language
-const detectUserLanguage = () => {
-    const savedLang = localStorage.getItem('vutaso-home-lang');
-    if (savedLang && (savedLang === 'vi' || savedLang === 'en' || savedLang === 'jp')) {
-        return savedLang;
-    }
-
-    const browserLang = navigator.language || navigator.userLanguage;
-    const langLower = browserLang ? browserLang.toLowerCase() : '';
-
-    if (langLower.startsWith('vi')) {
-        return 'vi'; // Vietnamese
-    }
-
-    if (langLower.startsWith('ja')) {
-        return 'jp'; // Japanese
-    }
-
-    return 'en'; // Default: English
-};
-
-// Initialize
+// Initialize translation system
 document.addEventListener('DOMContentLoaded', () => {
-    const initialLang = detectUserLanguage();
-    updateContent(initialLang);
-
-    // Add click handlers
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const lang = btn.getAttribute('data-lang');
-            updateContent(lang);
-        });
-    });
+    initTranslationSystem(translations, 'vutaso-home-lang');
 });

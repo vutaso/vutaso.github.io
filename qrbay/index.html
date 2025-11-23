@@ -131,26 +131,12 @@
                 <span></span>
             </button>
             <div class="nav-links">
+                <!-- Download Dropdown -->
+                <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
+                    data-key="nav-download">Tải ngay</a>
                 <a href="#features" data-key="nav-features">Tính năng</a>
                 <a href="#formats" data-key="nav-formats">Định dạng</a>
                 <a href="#faq" data-key="nav-faq">Hỏi đáp</a>
-
-                <!-- Download Dropdown -->
-                <div class="nav-dropdown">
-                    <a href="#download" class="nav-dropdown-toggle" data-key="nav-download">
-                        Tải ngay
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" class="dropdown-arrow">
-                            <path d="M1 1l4 4 4-4" />
-                        </svg>
-                    </a>
-                    <div class="nav-dropdown-menu">
-                        <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
-                            data-key="nav-download-moneybay">Tải MoneyBay</a>
-                        <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank"
-                            data-key="nav-download-qrbay">Tải QRBay</a>
-                    </div>
-                </div>
-
                 <div class="language-toggle">
                     <button class="lang-btn active" data-lang="vi">VI</button>
                     <button class="lang-btn" data-lang="en">EN</button>
@@ -512,7 +498,8 @@
     <script src="../general/common.js"></script>
 
     <!-- Language Translation Script -->
-    <script src="qrbay-translations.js"></script>
+    <script src="../general/translation-manager.js"></script>
+    <script src="../js/qrbay-translations.js"></script>
 </body>
 
 </html>

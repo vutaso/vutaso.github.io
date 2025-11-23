@@ -7,10 +7,27 @@
  */
 function initTranslationSystem(translations, storageKey) {
     function switchLanguage(lang) {
+        // Handle elements with data-key (Privacy/Terms pages)
         document.querySelectorAll('[data-key]').forEach(element => {
             const key = element.getAttribute('data-key');
             if (translations[lang] && translations[lang][key]) {
-                element.innerHTML = translations[lang][key];
+                if (element.tagName === 'INPUT' && element.type === 'placeholder') {
+                    element.placeholder = translations[lang][key];
+                } else {
+                    element.innerHTML = translations[lang][key];
+                }
+            }
+        });
+
+        // Handle elements with data-lang-key (MoneyBay/QRBay pages)
+        document.querySelectorAll('[data-lang-key]').forEach(element => {
+            const key = element.getAttribute('data-lang-key');
+            if (translations[lang] && translations[lang][key]) {
+                if (element.tagName === 'INPUT' && element.type === 'placeholder') {
+                    element.placeholder = translations[lang][key];
+                } else {
+                    element.innerHTML = translations[lang][key];
+                }
             }
         });
 
@@ -35,13 +52,19 @@ function initTranslationSystem(translations, storageKey) {
     // Auto-detect language
     const detectUserLanguage = () => {
         const savedLang = localStorage.getItem(storageKey);
-        if (savedLang && (savedLang === 'vi' || savedLang === 'en')) {
+        if (savedLang && (savedLang === 'vi' || savedLang === 'en' || savedLang === 'jp')) {
             return savedLang;
         }
 
         const browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang && browserLang.toLowerCase().startsWith('vi')) {
+        const langLower = browserLang ? browserLang.toLowerCase() : '';
+
+        if (langLower.startsWith('vi')) {
             return 'vi';
+        }
+
+        if (langLower.startsWith('ja')) {
+            return 'jp';
         }
 
         return 'en';
