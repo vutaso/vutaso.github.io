@@ -437,7 +437,8 @@ nav.top-nav .nav-links a:hover {
 
     /* Show on tap (hover state on mobile) */
     .nav-item-dropdown:hover .nav-dropdown-content,
-    .nav-item-dropdown:active .nav-dropdown-content {
+    .nav-item-dropdown:active .nav-dropdown-content,
+    .nav-item-dropdown.active .nav-dropdown-content {
         display: block;
         animation: none;
     }
@@ -972,6 +973,7 @@ section[id],
 
 .app-card .btn-download:hover {
     background: #0077ed;
+    color: #fff;
 }
 
 .app-card .btn-learn-more {
@@ -1500,7 +1502,7 @@ footer a:hover {
 
 .definition-term {
     font-weight: 600;
-    color: #191b1c;
+    color: #0071e3;
 }
 
 /* Privacy/Terms Page Responsive */

@@ -61,3 +61,24 @@ document.querySelectorAll('.faq-question').forEach(button => {
         }
     });
 });
+
+// Mobile Dropdown Toggle
+document.querySelectorAll('.nav-dropdown-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+        // Only apply on mobile where hover doesn't work well
+        if (window.innerWidth <= 768) {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent bubbling
+            const dropdown = this.closest('.nav-item-dropdown');
+
+            // Close other dropdowns
+            document.querySelectorAll('.nav-item-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('active');
+                }
+            });
+
+            dropdown.classList.toggle('active');
+        }
+    });
+});
