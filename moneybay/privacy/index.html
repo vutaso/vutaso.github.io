@@ -16,109 +16,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Link to shared CSS -->
+    <link rel="stylesheet" href="../../general/style.css">
+
     <style>
-        /* Apple-inspired Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
-            line-height: 1.47059;
-            font-size: 17px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Navigation */
-        nav.top-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        nav.top-nav .nav-content {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 0 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 44px;
-        }
-
-        nav.top-nav .logo {
-            font-size: 21px;
-            font-weight: 600;
-            color: #1d1d1f;
-            text-decoration: none;
-        }
-
-        nav.top-nav .nav-links {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-
-        nav.top-nav .nav-links a {
-            color: #1d1d1f;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        nav.top-nav .nav-links a:hover {
-            opacity: 1;
-        }
-
-        /* Language Toggle */
-        .language-toggle {
-            display: flex;
-            gap: 8px;
-        }
-
-        .language-toggle button {
-            background: var(--accent-color, #c21a6c);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            cursor: pointer;
-            border-radius: 980px;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-
-        .language-toggle button:hover {
-            opacity: 1;
-            transform: scale(1.05);
-        }
-
-        .language-toggle button.active {
-            background: #1d1d1f;
-            opacity: 1;
-        }
-
-        /* Container */
+        /* Privacy Page Custom Styles */
         .container {
             max-width: 730px;
             margin: 0 auto;
             padding: 60px 22px 80px;
         }
 
-        /* Typography - Apple Style */
         h1 {
             font-size: 56px;
             font-weight: 600;
@@ -165,10 +73,6 @@
         }
 
         p {
-            font-size: 17px;
-            line-height: 1.47059;
-            font-weight: 400;
-            color: #1d1d1f;
             margin-bottom: 20px;
         }
 
@@ -179,9 +83,6 @@
         }
 
         ul li {
-            font-size: 17px;
-            line-height: 1.47059;
-            color: #1d1d1f;
             margin-bottom: 12px;
             padding-left: 20px;
             position: relative;
@@ -191,39 +92,24 @@
             content: "•";
             position: absolute;
             left: 0;
-            color: #c21a6c;
+            color: #0071e3;
             font-weight: 600;
-        }
-
-        ul li strong {
-            font-weight: 600;
-            color: #1d1d1f;
-        }
-
-        a {
-            color: #0066cc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            color: #0077ed;
         }
 
         /* Highlight Box */
         .highlight {
             background-color: #f5f5f7;
             padding: 24px;
-            border-left: 4px solid #c21a6c;
+            border-left: 4px solid #0071e3;
             border-radius: 12px;
             margin: 30px 0;
         }
 
-        .highlight p {
+        .highlight p:last-child {
             margin-bottom: 0;
         }
 
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 768px) {
             h1 {
                 font-size: 40px;
@@ -237,30 +123,12 @@
                 font-size: 21px;
             }
 
-            h4 {
-                font-size: 17px;
-            }
-
             .container {
                 padding: 40px 22px 60px;
             }
-
-            nav.top-nav .nav-links {
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 32px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
         }
     </style>
+
 </head>
 
 <body>
