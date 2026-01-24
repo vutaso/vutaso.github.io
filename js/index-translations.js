@@ -10,7 +10,7 @@ const translations = {
         "nav-download-qrbay": "Tải QRBay",
 
         // Hero Section
-        "hero-title": "MoneyBay: Quản Lý Chi Tiêu<br>& QRBay: Quét Mã QR Code",
+        "hero-title": "MoneyBay: Quản Lý Chi Tiêu",
         "hero-subtitle": "Được thiết kế cho iOS",
         "hero-description": "Miễn phí. An toàn. Dễ sử dụng.",
         "hero-btn-moneybay": "Khám phá MoneyBay",
@@ -80,7 +80,7 @@ const translations = {
         "nav-download-qrbay": "Download QRBay",
 
         // Hero Section
-        "hero-title": "MoneyBay: Expense Manager<br>& QRBay: QR Code Scanner",
+        "hero-title": "MoneyBay: Expense Manager",
         "hero-subtitle": "Designed for iOS",
         "hero-description": "Free. Secure. Easy to use.",
         "hero-btn-moneybay": "Explore MoneyBay",
@@ -150,7 +150,7 @@ const translations = {
         "nav-download-qrbay": "QRBayをダウンロード",
 
         // Hero Section
-        "hero-title": "MoneyBay: 家計簿アプリ<br>& QRBay: QRコードスキャナー",
+        "hero-title": "MoneyBay: 家計簿アプリ",
         "hero-subtitle": "iOS向けに設計",
         "hero-description": "無料・安全・使いやすい",
         "hero-btn-moneybay": "MoneyBayを見る",
