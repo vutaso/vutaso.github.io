@@ -49,25 +49,14 @@ function initTranslationSystem(translations, storageKey) {
         });
     });
 
-    // Auto-detect language
+    // Auto-detect language - Default to Vietnamese
     const detectUserLanguage = () => {
         const savedLang = localStorage.getItem(storageKey);
         if (savedLang && (savedLang === 'vi' || savedLang === 'en' || savedLang === 'jp')) {
             return savedLang;
         }
-
-        const browserLang = navigator.language || navigator.userLanguage;
-        const langLower = browserLang ? browserLang.toLowerCase() : '';
-
-        if (langLower.startsWith('vi')) {
-            return 'vi';
-        }
-
-        if (langLower.startsWith('ja')) {
-            return 'jp';
-        }
-
-        return 'en';
+        // Always default to Vietnamese
+        return 'vi';
     };
 
     // Initialize with detected language
