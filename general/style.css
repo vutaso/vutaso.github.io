@@ -1016,10 +1016,10 @@ section[id],
     gap: 12px;
     margin-bottom: 30px;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .app-card .app-buttons a {
-    flex: 1;
     padding: 12px 22px;
     border-radius: 980px;
     text-decoration: none;
@@ -1354,10 +1354,13 @@ footer a:hover {
 
     .app-card .app-buttons {
         flex-direction: column;
+        align-items: center;
     }
 
     .app-card .app-buttons a {
         width: 100%;
+        text-align: center;
+        justify-content: center;
     }
 
     .faq-section {
