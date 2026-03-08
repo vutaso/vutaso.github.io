@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRBay - Quét & Tạo mã QR Nhanh chóng | Miễn Phí iOS</title>
+    <meta name="description"
+        content="QRBay – Ứng dụng quét mã QR và mã vạch nhanh, chính xác. Tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Hỗ trợ đa ngôn ngữ, miễn phí.">
+    <meta name="keywords"
+        content="quét mã qr, tạo mã qr, app quét mã vạch, QRBay, quét giá sản phẩm, quét qr wifi, tạo qr liên hệ, ứng dụng qr code, app qr miễn phí, qr scanner, barcode scanner, qr code reader">
+    <meta name="author" content="VUTASO">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="Vietnamese">
+    <meta name="geo.region" content="VN">
+    <meta name="geo.placename" content="Vietnam">
+    <link rel="canonical" href="https://vutaso.com/qrbay/">
+
+    <!-- Hreflang for multilingual SEO -->
+    <link rel="alternate" hreflang="vi" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="en" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="ja" href="https://vutaso.com/qrbay/">
+    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/qrbay/">
+
+    <!-- English Keywords for International Search -->
+    <meta name="keywords-en"
+        content="QR code scanner, barcode scanner, QR code reader, create QR code, QR generator, free QR app, fast QR scanner, iOS QR scanner, barcode reader, price scanner, wifi QR code, contact QR, inventory scanner, batch scanning">
+
+    <!-- Japanese Keywords for Japan Search -->
+    <meta name="keywords-ja"
+        content="QRコードリーダー, バーコードスキャナー, QRコード作成, QRコード生成, 無料QRアプリ, 高速スキャン, iPhone QRコード, バーコードリーダー, 価格スキャナー, Wi-Fi QRコード, 連絡先QR, 在庫スキャナー, 一括スキャン">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vutaso.com/qrbay/">
+    <meta property="og:site_name" content="VUTASO - QRBay">
+    <meta property="og:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
+    <meta property="og:description"
+        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta property="og:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="750">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://vutaso.com/qrbay/">
+    <meta name="twitter:title" content="QRBay – Quét & Tạo mã QR Nhanh chóng, Miễn phí">
+    <meta name="twitter:description"
+        content="Quét mọi loại mã QR và mã vạch, tạo mã QR tùy chỉnh, quản lý lịch sử, quét hàng loạt. Đơn giản, mạnh mẽ, miễn phí.">
+    <meta name="twitter:image" content="https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png">
+
+    <!-- Apple Meta Tags -->
+    <meta name="apple-itunes-app" content="app-id=6499323043">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="QRBay">
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#0071e3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" href="assets/images/favicon_qrbay.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "VUTASO",
+      "url": "https://vutaso.com",
+      "logo": "https://vutaso.com/assets/logo_moneybay.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "vutaso.com@gmail.com",
+        "contactType": "Customer Service",
+        "availableLanguage": ["Vietnamese", "English", "Japanese"]
+      },
+      "sameAs": [
+        "https://www.facebook.com/qrbayapp"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: QRBay App -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "QRBay",
+      "alternateName": "QRBay - QR & Barcode Scanner",
+      "description": "Ứng dụng quét mã QR và mã vạch nhanh chóng, chính xác. Hỗ trợ tạo mã QR, quét hàng loạt, xuất dữ liệu CSV. Miễn phí và bảo mật.",
+      "operatingSystem": "iOS 14.0 or later",
+      "applicationCategory": "UtilitiesApplication",
+      "url": "https://vutaso.com/qrbay/",
+      "downloadUrl": "https://apps.apple.com/app/qrbay/id6499323043",
+      "screenshot": "https://vutaso.com/qrbay/assets/images/banner_qrbay_1200x750.png",
+      "featureList": "Fast QR Scanning, Barcode Reader, Batch Scanning, QR Code Generator, History Management, CSV Export",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "500"
+      },
+      "inLanguage": ["vi", "en", "ja"],
+      "keywords": "QR scanner, barcode reader, create QR code, quét mã QR, tạo mã QR, QRコードリーダー"
+    }
+    </script>
+
+    <link rel="stylesheet" href="../general/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="#" class="logo">QRBay
+            </a>
+            <button class="hamburger-menu" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links">
+                <!-- Download Dropdown -->
+                <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
+                    data-key="nav-download">Tải ngay</a>
+                <a href="#features" data-key="nav-features">Tính năng</a>
+                <a href="#formats" data-key="nav-formats">Định dạng</a>
+                <a href="#faq" data-key="nav-faq">Hỏi đáp</a>
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="vi">VI</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ja">JP</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 data-key="hero-title">QRBay<br>Quét & Tạo mã QR Nhanh chóng</h1>
+        <p class="subheadline" data-key="hero-subtitle">Ứng dụng quét và tạo mã QR/mã vạch mạnh mẽ, nhanh chóng và dễ sử
+            dụng.</p>
+        <!-- <p class="description" data-key="hero-desc">Trợ thủ đắc lực cho mọi nhu cầu hàng ngày của bạn.</p> -->
+        <div class="cta-buttons">
+            <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" class="btn-primary"
+                data-key="hero-download-appstore">Tải từ App Store</a>
+            <a href="#features" class="btn-secondary" data-key="learn-more">Tìm hiểu thêm</a>
+        </div>
+    </section>
+
+    <!-- Hero Image -->
+    <div class="hero-image">
+        <img src="assets/images/banner_qrbay_1200x750.png" alt="QRBay App Interface">
+    </div>
+
+    <!-- Features -->
+    <div class="container">
+        <div class="section-headline" id="features">
+            <p class="eyebrow" data-key="features-eyebrow">Tính năng</p>
+            <h2 data-key="features-title">Trọn bộ công cụ QR trong tay bạn</h2>
+        </div>
+
+        <div class="feature-grid">
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="icon">⚡️</div>
+                <h3 data-key="feature-1-title">Quét nhanh & chính xác</h3>
+                <p data-key="feature-1-desc">Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong
+                    điều kiện thiếu sáng.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="icon">🔍</div>
+                <h3 data-key="feature-2-title">Tra cứu giá sản phẩm</h3>
+                <p data-key="feature-2-desc">Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định
+                    mua sắm thông minh.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="icon">🎨</div>
+                <h3 data-key="feature-3-title">Tạo & Tùy chỉnh QR</h3>
+                <p data-key="feature-3-desc">Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo
+                    phong cách của bạn.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="icon">📂</div>
+                <h3 data-key="feature-4-title">Quản lý lịch sử</h3>
+                <p data-key="feature-4-desc">Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp
+                    và truy cập lại khi cần.</p>
+            </div>
+            <!-- Feature 5 -->
+            <div class="feature-card">
+                <div class="icon">📑</div>
+                <h3 data-key="feature-5-title">Quét hàng loạt</h3>
+                <p data-key="feature-5-desc">Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một
+                    lúc trong một lần quét.</p>
+            </div>
+            <!-- Feature 6 -->
+            <div class="feature-card">
+                <div class="icon">📤</div>
+                <h3 data-key="feature-6-title">Xuất & Chia sẻ</h3>
+                <p data-key="feature-6-desc">Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR
+                    của bạn lên mạng xã hội.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supported Formats Section -->
+    <section id="formats" class="formats">
+        <div class="section-headline">
+            <h2 data-key="formats-title">Hỗ trợ mọi định dạng phổ biến</h2>
+            <p data-key="formats-subtitle">QRBay tương thích với hầu hết các loại mã QR và mã vạch bạn gặp hàng ngày.
+            </p>
+        </div>
+        <div class="format-grid">
+            <div class="format-item">QRCode</div>
+            <div class="format-item">Data Matrix</div>
+            <div class="format-item">Aztec</div>
+            <div class="format-item">PDF 417</div>
+            <div class="format-item">EAN-13</div>
+            <div class="format-item">EAN-8</div>
+            <div class="format-item">UPC-A</div>
+            <div class="format-item">UPC-E</div>
+            <div class="format-item">Code 128</div>
+            <div class="format-item">Code 93</div>
+            <div class="format-item">Code 39</div>
+            <div class="format-item">Codabar</div>
+            <div class="format-item">ITF</div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="container">
+        <div class="section-headline" id="faq" style="padding-top: 80px;">
+            <p class="eyebrow" data-key="faq-eyebrow">Câu hỏi thường gặp</p>
+            <h2 data-key="faq-title">Tìm câu trả lời cho các câu hỏi phổ biến</h2>
+        </div>
+
+        <div class="faq-section">
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-1-q">Làm thế nào để quét mã QR?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-1-a">Mở ứng dụng QRBay và hướng camera vào mã QR mà bạn muốn quét. Ứng dụng sẽ tự
+                        động nhận diện và quét mã.</p>
+                </div>
+            </div>
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-2-q">Làm sao để quét thẻ căn cước công dân?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-2-a">QRBay hỗ trợ quét thông tin từ thẻ căn cước công dân và bằng lái xe một cách
+                        nhanh chóng và chính xác.</p>
+                </div>
+            </div>
+            <!-- FAQ 3 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-3-q">Tra cứu thông tin sản phẩm như thế nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-3-a">Sau khi quét mã vạch, bạn có thể sử dụng chức năng tra cứu nhanh để tìm thông
+                        tin sản phẩm trên Google, Bing hoặc Amazon.</p>
+                </div>
+            </div>
+            <!-- FAQ 4 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-4-q">Ứng dụng hỗ trợ định dạng nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-4-a">QRBay hỗ trợ: QRCode, Code 39, Code 93, Code 128, EAN-8, EAN-13, UPC-A, UPC-E,
+                        ITF, Data Matrix, AZTec, PDF 417, Codabar.</p>
+                </div>
+            </div>
+            <!-- FAQ 5 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-5-q">Tại sao không quét được mã?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-5-a">Hãy chắc chắn rằng mã có đủ ánh sáng và không bị mờ. Kiểm tra camera của bạn.
+                    </p>
+                </div>
+            </div>
+            <!-- FAQ 6 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-6-q">Làm cách nào để chia sẻ kết quả?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-6-a">Sau khi quét mã, bạn có thể dễ dàng chia sẻ kết quả qua các ứng dụng khác như
+                        Messenger, Email, hoặc lưu vào ảnh.</p>
+                </div>
+            </div>
+            <!-- FAQ 7 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-7-q">Có hỗ trợ quét offline không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-7-a">Có, QRBay hỗ trợ quét offline. Tuy nhiên cần internet để truy cập liên kết
+                        online.</p>
+                </div>
+            </div>
+            <!-- FAQ 8 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-8-q">Sử dụng trong lớp học được không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-8-a">Có, giáo viên có thể tạo mã QR cho bài tập và học sinh quét để truy cập nhanh
+                        chóng.</p>
+                </div>
+            </div>
+            <!-- FAQ 9 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-9-q">Có thu thập dữ liệu cá nhân không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-9-a">QRBay cam kết bảo vệ quyền riêng tư. Dữ liệu chỉ được lưu trên thiết bị của
+                        bạn.</p>
+                </div>
+            </div>
+            <!-- FAQ 10 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-10-q">Cập nhật ứng dụng như thế nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-10-a">Cập nhật qua App Store hoặc Google Play Store.</p>
+                </div>
+            </div>
+            <!-- FAQ 11 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-11-q">Hỗ trợ ngôn ngữ nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-11-a">QRBay hỗ trợ 18 ngôn ngữ bao gồm Tiếng Việt, Anh, Nhật, v.v.</p>
+                </div>
+            </div>
+            <!-- FAQ 12 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-12-q">Có thể tạo mã QR không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-12-a">Có, bạn có thể tạo mã QR từ văn bản, URL, liên hệ và nhiều hơn nữa.</p>
+                </div>
+            </div>
+            <!-- FAQ 13 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-13-q">Quét từ thư viện ảnh được không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-13-a">Có, chọn "Quét từ Thư Viện" để quét mã QR từ ảnh có sẵn.</p>
+                </div>
+            </div>
+            <!-- FAQ 14 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-14-q">Tạo mã QR tùy chỉnh được không?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-14-a">Có, bạn có thể tùy chỉnh màu sắc và logo cho mã QR.</p>
+                </div>
+            </div>
+            <!-- FAQ 15 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-15-q">Quản lý lịch sử như thế nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-15-a">Xem và quản lý lịch sử trong phần "Lịch Sử" của ứng dụng.</p>
+                </div>
+            </div>
+            <!-- FAQ 16 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-16-q">Chia sẻ lên mạng xã hội?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-16-a">Có, dễ dàng chia sẻ qua nút chia sẻ trong chi tiết mã QR.</p>
+                </div>
+            </div>
+            <!-- FAQ 17 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-17-q">Quét hàng loạt như thế nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-17-a">Chọn chế độ quét hàng loạt để quét nhiều mã liên tục.</p>
+                </div>
+            </div>
+            <!-- FAQ 18 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-18-q">Xuất dữ liệu định dạng nào?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-18-a">Xuất ra CSV, văn bản hoặc hình ảnh.</p>
+                </div>
+            </div>
+            <!-- FAQ 19 -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-key="faq-19-q">Liên hệ hỗ trợ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-key="faq-19-a">Liên hệ qua email vutaso.com@gmail.com hoặc Facebook.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom: 32px;">
+            <p style="font-size: 14px; color: #86868b; margin-bottom: 16px; font-weight: 500;"
+                data-key="footer-connect">Kết nối với chúng tôi</p>
+            <div class="social-links-grid">
+                <a href="https://www.facebook.com/qrbayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay on Facebook">
+                    <img src="assets/images/facebook.png" alt="Facebook">
+                    <span>Facebook</span>
+                </a>
+                <a href="https://tiktok.com/@moneybay.app" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="VUTASO on TikTok">
+                    <img src="assets/images/tiktok.png" alt="TikTok">
+                    <span>TikTok</span>
+                </a>
+                <!-- <a href="https://www.facebook.com/groups/qrbay" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay Community">
+                    <img src="assets/images/teamwork.png" alt="Groups">
+                    <span data-key="footer-community">Cộng đồng</span>
+                </a> -->
+                <a href="https://www.facebook.com/messages/t/qrbayapp" target="_blank" rel="noopener noreferrer"
+                    class="social-link-card" title="QRBay Support">
+                    <img src="assets/images/customer-support.png" alt="Support">
+                    <span data-key="footer-support">Hỗ trợ</span>
+                </a>
+            </div>
+        </div>
+
+        <div
+            style="margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;">
+            <a href="mailto:vutaso.com@gmail.com" class="footer-link-button" data-key="footer-email">Email</a>
+            <a href="https://apps.apple.com/app/moneybay-expense-manager/id6737480496" target="_blank"
+                rel="noopener noreferrer" class="footer-link-button" data-key="footer-download-moneybay">Tải
+                MoneyBay</a>
+            <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank" rel="noopener noreferrer"
+                class="footer-link-button" data-key="footer-download-qrbay">Tải QRBay</a>
+        </div>
+
+        <p data-key="footer-copyright">&copy; 2025 VUTASO. All Rights Reserved.</p>
+        <p style="margin-top: 8px;" data-key="footer-tagline">Sản phẩm được tạo ra với ❤️ tại Việt Nam.</p>
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="../general/common.js"></script>
+
+    <!-- Language Translation Script -->
+    <script src="../general/translation-manager.js"></script>
+    <script src="../js/qrbay-translations.js"></script>
+</body>
+
+</html>

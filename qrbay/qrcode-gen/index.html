@@ -1,74 +1,621 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QRBay - Free QR Code Generator & Barcode Reader</title>
+<html lang="vi">
 
-    <!-- Meta Description -->
-    <meta name="description" content="Generate your own QR codes for free with QRBay. Customize colors, sizes, and download or share your QR codes easily. QRBay also offers a powerful QR code scanner and barcode reader app available on the App Store.">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRBay - Tạo mã QR Code miễn phí</title>
 
-    <!-- Meta Keywords -->
-    <meta name="keywords" content="QRBay, QR code generator, free QR code, QR scanner, barcode reader, QR code maker, customize QR code, QR code download, QR code share, QRBay app, QRBay barcode reader">
+  <!-- Meta Description -->
+  <meta name="description"
+    content="Tạo mã QR Code miễn phí với QRBay. Tùy chỉnh màu sắc, kích thước và tải về hoặc chia sẻ mã QR dễ dàng. QRBay cũng cung cấp ứng dụng quét mã QR & mã vạch trên App Store.">
 
-    <!-- Meta Robots -->
-    <meta name="robots" content="index, follow">
+  <!-- Meta Keywords -->
+  <meta name="keywords"
+    content="QRBay, tạo mã QR, QR code miễn phí, quét mã QR, đọc mã vạch, tạo QR code, tùy chỉnh QR, tải QR code, chia sẻ QR code, QRBay app">
 
-    <!-- Open Graph Meta Tags (For Social Media Sharing) -->
-    <meta property="og:title" content="QRBay - Free QR Code Generator & Barcode Reader">
-    <meta property="og:description" content="Generate your own QR codes for free with QRBay. Customize colors, sizes, and download or share your QR codes easily. QRBay also offers a powerful QR code scanner and barcode reader app available on the App Store.">
-    <meta property="og:url" content="https://qrbay.net">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://qrbay.net/assets/images/qrbay-thumbnail.png">
+  <!-- Meta Robots -->
+  <meta name="robots" content="index, follow">
 
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="QRBay - Free QR Code Generator & Barcode Reader">
-    <meta name="twitter:description" content="Generate your own QR codes for free with QRBay. Customize colors, sizes, and download or share your QR codes easily. QRBay also offers a powerful QR code scanner and barcode reader app available on the App Store.">
-    <meta name="twitter:image" content="https://qrbay.net/assets/images/qrbay-thumbnail.png">
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="QRBay - Tạo mã QR Code miễn phí">
+  <meta property="og:description"
+    content="Tạo mã QR Code miễn phí với QRBay. Tùy chỉnh màu sắc, kích thước và tải về hoặc chia sẻ mã QR dễ dàng.">
+  <meta property="og:url" content="https://vutaso.com/qrbay/qrcode-gen/">
+  <meta property="og:type" content="website">
 
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  </head>
-  <body>
-    <section>
-      <h1 class="title">QRBay - CREATE YOUR QR CODE FOR FREE</h1>
-      <div class="row">
-        <input type="color" class="light color-picker" value="#FFFFFF" />
-        <input type="color" class="dark color-picker" />
-        <select class="sizes dropdown">
-          <option value="100">100x100</option>
-          <option value="200">200x200</option>
-          <option value="300">300x300</option>
-          <option selected value="400">400x400</option>
-          <option value="500">500x500</option>
-          <option value="600">600x600</option>
-          <option value="700">700x700</option>
-          <option value="800">800x800</option>
-          <option value="900">900x900</option>
-          <option value="1000">1000x1000</option>
-        </select>
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="QRBay - Tạo mã QR Code miễn phí">
+  <meta name="twitter:description"
+    content="Tạo mã QR Code miễn phí với QRBay. Tùy chỉnh màu sắc, kích thước và tải về hoặc chia sẻ mã QR dễ dàng.">
+
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon_qrbay.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #060B14;
+      --bg-2: #0A1020;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --primary: #FF6B00;
+      --primary-light: #FF8C33;
+      --accent: #FFB800;
+      --success: #00D68F;
+      --text: #E8EEF8;
+      --text-muted: #6B7A99;
+      --border: rgba(255, 107, 0, 0.15);
+      --border-bright: rgba(255, 107, 0, 0.4);
+      --glass: rgba(255, 255, 255, 0.04);
+      --gradient: linear-gradient(135deg, #FF6B00, #FFB800);
+      --gradient-soft: linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(255, 184, 0, 0.1));
+      --glow: 0 0 40px rgba(255, 107, 0, 0.35);
+      --glow-sm: 0 0 20px rgba(255, 107, 0, 0.25);
+      --radius: 16px;
+      --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* === Background orbs === */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-orb.a {
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 107, 0, 0.08);
+      top: -150px;
+      left: -100px;
+    }
+
+    .bg-orb.b {
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 184, 0, 0.06);
+      bottom: -100px;
+      right: -100px;
+    }
+
+    /* === Main container === */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* === Header === */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .logo-row svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h1.title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    h1.title span {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* === Card === */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      margin-bottom: 20px;
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary-light);
+      margin-bottom: 14px;
+    }
+
+    /* === Input === */
+    .qr-text {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      outline: none;
+      transition: var(--trans);
+    }
+
+    .qr-text::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .qr-text:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(255, 107, 0, 0.15);
+    }
+
+    /* === Controls row === */
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .ctrl-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ctrl-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .color-picker {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: var(--trans);
+      background: transparent;
+      padding: 3px;
+    }
+
+    .color-picker:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-1px);
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 7px;
+    }
+
+    .dropdown {
+      width: 100%;
+      height: 42px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
+      transition: var(--trans);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .dropdown:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-1px);
+    }
+
+    .dropdown option {
+      background: #0A1020;
+      color: var(--text);
+    }
+
+    /* === QR Code display === */
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 0 auto;
+      box-shadow: 0 8px 40px rgba(255, 107, 0, 0.1), inset 0 0 0 1px rgba(255, 107, 0, 0.1);
+      transition: var(--trans);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-code-container::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      padding: 1px;
+      background: var(--gradient);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .qr-code-container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 60px rgba(255, 107, 0, 0.15);
+    }
+
+    #qr-code img,
+    #qr-code canvas {
+      max-width: 100% !important;
+      max-height: 100% !important;
+      border-radius: 8px;
+    }
+
+    /* === Action buttons === */
+    .action-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: var(--trans);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 107, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* === App promo banner === */
+    .app-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--gradient-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      transition: var(--trans);
+    }
+
+    .app-banner:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+    }
+
+    .app-banner-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+
+    .app-banner-info {
+      flex: 1;
+    }
+
+    .app-banner-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .app-banner-sub {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .app-banner-btn {
+      padding: 8px 14px;
+      background: var(--gradient);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: var(--trans);
+    }
+
+    .app-banner-btn:hover {
+      box-shadow: 0 4px 16px rgba(255, 107, 0, 0.3);
+    }
+
+    /* === Footer === */
+    .footer {
+      text-align: center;
+      padding: 20px 0 0;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    .footer .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 12px auto;
+    }
+
+    .footer .made-in {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 512px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .qr-code-container {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .action-container {
+        flex-direction: column;
+      }
+
+      .controls-row {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background effects -->
+  <div class="bg-orb a"></div>
+  <div class="bg-orb b"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-row">
+        <svg viewBox="0 0 34 34" fill="none">
+          <circle cx="17" cy="17" r="15.5" stroke="url(#gl)" stroke-width="1.8" />
+          <path d="M9 22 L9 17 L14 11 L17 16 L20 11 L25 17 L25 22" stroke="url(#gl)" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M12 22 L22 22" stroke="#FFB800" stroke-width="1.8" stroke-linecap="round" />
+          <defs>
+            <linearGradient id="gl" x1="0" y1="0" x2="34" y2="34">
+              <stop stop-color="#FF6B00" />
+              <stop offset="1" stop-color="#FFB800" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">QRBay</span>
       </div>
+      <h1 class="title">Tạo mã <span>QR Code</span> miễn phí</h1>
+      <p class="subtitle">Tùy chỉnh màu sắc, kích thước — tải về hoặc chia sẻ ngay</p>
+    </div>
 
-      <input type="text" placeholder="Enter text or URL for QR code" class="qr-text enhanced-input" />
+    <!-- App promo -->
+    <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" rel="noopener noreferrer"
+      class="app-banner">
+      <div class="app-banner-icon">📱</div>
+      <div class="app-banner-info">
+        <div class="app-banner-title">Tải app QRBay trên App Store</div>
+        <div class="app-banner-sub">Quét mã QR & mã vạch siêu nhanh · Miễn phí</div>
+      </div>
+      <div class="app-banner-btn">Tải về</div>
+    </a>
 
+    <!-- Input card -->
+    <div class="card">
+      <div class="card-label">Nội dung mã QR</div>
+      <input type="text" placeholder="Nhập văn bản hoặc URL để tạo mã QR..." class="qr-text" />
+
+      <div class="controls-row">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Màu nền</span>
+          <input type="color" class="light color-picker" value="#FFFFFF" />
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Màu mã QR</span>
+          <input type="color" class="dark color-picker" value="#000000" />
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Kích thước</span>
+          <select class="sizes dropdown">
+            <option value="100">100px</option>
+            <option value="200">200px</option>
+            <option value="300">300px</option>
+            <option selected value="400">400px</option>
+            <option value="500">500px</option>
+            <option value="600">600px</option>
+            <option value="700">700px</option>
+            <option value="800">800px</option>
+            <option value="900">900px</option>
+            <option value="1000">1000px</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Code output -->
+    <div class="card">
+      <div class="card-label">Mã QR của bạn</div>
       <div id="qr-code" class="qr-code-container"></div>
+
       <div class="action-container">
-        <a href="#" download="QRCode" class="download btn">
-          <span>Download</span>
-          <img src="./assets/icons/download.svg" alt="Download icon" />
+        <a href="#" download="QRCode" class="download btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Tải về</span>
         </a>
-        <button class="btn share-btn">
-          <span>Share</span>
-          <img src="./assets/icons/share.svg" alt="Share icon" />
+        <button class="btn btn-secondary share-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          <span>Chia sẻ</span>
         </button>
       </div>
-      <footer class="footer">
-        <p>‘QR Code’ is a registered trademark of DENSO WAVE INCORPORATED</p>
-        <p>&copy; 2024 <a href="https://qrbay.net" target="_blank">qrbay.net</a> | <a href="https://apps.apple.com/app/qrbay/id6499323043" target="_blank">Download QRBay App</a></p>
-      </footer>
-    </section>
-    <script defer src="main.js"></script>
-  </body>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>'QR Code' is a registered trademark of DENSO WAVE INCORPORATED</p>
+      <div class="divider"></div>
+      <p>&copy; 2025 <a href="https://vutaso.com/qrbay/" target="_blank">QRBay</a> · Một sản phẩm của <a
+          href="https://vutaso.com" target="_blank">VUTASO</a></p>
+      <p class="made-in">Được làm với ❤️ tại Việt Nam 🇻🇳</p>
+    </div>
+  </div>
+
+  <script defer src="main.js"></script>
+</body>
+
 </html>
