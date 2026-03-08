@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều khoản và Điều kiện — VUTASO</title>
+    <meta name="description"
+        content="Điều khoản và điều kiện sử dụng các ứng dụng MoneyBay và QRBay do VUTASO phát triển.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://vutaso.com/terms/">
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060B14;
+            --bg-2: #0A1020;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --primary: #2B7FFF;
+            --primary-light: #5B9FFF;
+            --accent: #00E5FF;
+            --orange: #FF6B00;
+            --orange-light: #FF9B44;
+            --success: #00D68F;
+            --text: #E8EEF8;
+            --text-muted: #6B7A99;
+            --border: rgba(43, 127, 255, 0.15);
+            --border-bright: rgba(43, 127, 255, 0.4);
+            --glass: rgba(255, 255, 255, 0.04);
+            --gradient: linear-gradient(135deg, #2B7FFF, #00E5FF);
+            --gradient-orange: linear-gradient(135deg, #FF6B00, #FFB347);
+            --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color var(--trans);
+        }
+
+        a:hover {
+            color: var(--accent);
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-orb.a {
+            width: 500px;
+            height: 500px;
+            background: rgba(43, 127, 255, 0.08);
+            top: -150px;
+            left: -100px;
+        }
+
+        .bg-orb.b {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 229, 255, 0.05);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(6, 11, 20, 0.9);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 6%;
+        }
+
+        .nav-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.15rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: var(--trans);
+            text-decoration: none;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: var(--glass);
+            border-color: var(--border);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .last-updated {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .apps-badge {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .app-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .app-tag.blue {
+            background: rgba(43, 127, 255, 0.12);
+            border: 1px solid rgba(43, 127, 255, 0.25);
+            color: var(--primary-light);
+        }
+
+        .app-tag.orange {
+            background: rgba(255, 107, 0, 0.12);
+            border: 1px solid rgba(255, 107, 0, 0.25);
+            color: var(--orange-light);
+        }
+
+        .app-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .app-dot.blue {
+            background: var(--primary);
+        }
+
+        .app-dot.orange {
+            background: var(--orange);
+        }
+
+        .highlight {
+            background: rgba(43, 127, 255, 0.08);
+            border-left: 3px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 18px 20px;
+            margin-bottom: 32px;
+            font-size: 0.92rem;
+            color: rgba(232, 238, 248, 0.85);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 24px 0 10px;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: rgba(232, 238, 248, 0.8);
+            font-size: 0.92rem;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 18px;
+            padding-left: 0;
+        }
+
+        ul li {
+            position: relative;
+            padding: 8px 0 8px 22px;
+            font-size: 0.88rem;
+            color: rgba(232, 238, 248, 0.8);
+            border-bottom: 1px solid rgba(43, 127, 255, 0.06);
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gradient);
+        }
+
+        ul li strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .definition-list {
+            margin-bottom: 20px;
+        }
+
+        .definition-item {
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+            color: rgba(232, 238, 248, 0.8);
+        }
+
+        .definition-term {
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .warning-box {
+            background: rgba(255, 91, 91, 0.08);
+            border-left: 3px solid #FF5B5B;
+            border-radius: 0 12px 12px 0;
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+
+        .warning-box p {
+            color: #FF9B9B;
+            margin: 0;
+        }
+
+        .success-box {
+            background: rgba(0, 214, 143, 0.08);
+            border-left: 3px solid var(--success);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+
+        .success-box p {
+            color: #5AEBC0;
+            margin: 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .footer p {
+            margin: 4px 0;
+        }
+
+        .footer .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            margin: 12px auto;
+        }
+
+        .footer .made-in {
+            font-size: 0.68rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 16px 60px;
+            }
+
+            h2 {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-orb a"></div>
+    <div class="bg-orb b"></div>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="https://vutaso.com" class="logo">VUTASO</a>
+            <div class="nav-links">
+                <a href="../privacy/" class="nav-link">Bảo mật</a>
+                <a href="../terms/" class="nav-link active">Điều khoản</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Điều khoản và <span>Điều kiện</span></h1>
+            <p class="last-updated">📋 Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025</p>
+            <div class="apps-badge">
+                <span class="app-tag blue"><span class="app-dot blue"></span> MoneyBay</span>
+                <span class="app-tag orange"><span class="app-dot orange"></span> QRBay</span>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <p style="margin:0">Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng các ứng dụng
+                <strong>MoneyBay</strong> (quản lý chi tiêu) và <strong>QRBay</strong> (quét mã QR & mã vạch).
+                Việc sử dụng ứng dụng đồng nghĩa với việc bạn đồng ý với tất cả các điều khoản được nêu dưới đây.
+            </p>
+        </div>
+
+        <h2>Giải thích và Định nghĩa</h2>
+        <h3>Giải thích</h3>
+        <p>Các từ có chữ cái đầu viết hoa sẽ có nghĩa như được định nghĩa dưới các điều kiện sau. Các định nghĩa sau đây
+            sẽ có cùng ý nghĩa bất kể chúng xuất hiện ở dạng số ít hay số nhiều.</p>
+
+        <h3>Định nghĩa</h3>
+        <p>Cho mục đích của các Điều khoản và Điều kiện này:</p>
+
+        <div class="definition-list">
+            <div class="definition-item">
+                <span class="definition-term">Ứng dụng</span>: Phần mềm MoneyBay (quản lý chi tiêu) và QRBay (quét mã QR
+                &
+                mã vạch) được cung cấp bởi VUTASO, có thể tải xuống và cài đặt trên bất kỳ thiết bị điện tử nào.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Công ty</span>: VUTASO (cũng được gọi là "Chúng tôi", "Của chúng tôi" hoặc
+                "Chúng ta" trong các Điều khoản này).
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Quốc gia</span>: Việt Nam.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Thiết bị</span>: Bất kỳ thiết bị nào có thể truy cập và sử dụng ứng dụng
+                như
+                điện thoại thông minh, máy tính bảng, hoặc máy tính.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Dữ liệu tài chính</span>: Thông tin về thu nhập, chi tiêu, ngân sách, mục
+                tiêu
+                tài chính và các giao dịch tài chính mà bạn nhập vào ứng dụng MoneyBay.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Dữ liệu quét mã</span>: Thông tin về mã QR, mã vạch đã quét và mã QR tùy
+                chỉnh
+                mà bạn tạo trong ứng dụng QRBay.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Dịch vụ</span>: Các ứng dụng MoneyBay, QRBay và tất cả các tính năng, chức
+                năng
+                liên quan.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Điều khoản và Điều kiện</span>: Các Điều khoản và Điều kiện này tạo thành
+                toàn
+                bộ thỏa thuận giữa Bạn và Công ty về việc sử dụng Dịch vụ.
+            </div>
+            <div class="definition-item">
+                <span class="definition-term">Bạn</span>: Cá nhân truy cập hoặc sử dụng ứng dụng MoneyBay hoặc QRBay,
+                hoặc
+                công ty, tổ chức pháp nhân khác mà cá nhân đó đại diện khi sử dụng ứng dụng.
+            </div>
+        </div>
+
+        <h2>Xác nhận và Chấp thuận</h2>
+        <p>Các Điều khoản và Điều kiện này điều chỉnh việc sử dụng các ứng dụng MoneyBay và QRBay, tạo thành thỏa thuận
+            pháp lý giữa Bạn và Công ty. Việc truy cập và sử dụng ứng dụng phụ thuộc vào sự chấp nhận và tuân thủ đầy đủ
+            các Điều khoản này.</p>
+
+        <div class="warning-box">
+            <p>Nếu Bạn không đồng ý với bất kỳ phần nào của các Điều khoản và Điều kiện này, Bạn không được phép truy
+                cập
+                hoặc sử dụng các ứng dụng MoneyBay và QRBay.</p>
+        </div>
+
+        <p>Việc sử dụng ứng dụng cũng phụ thuộc vào sự chấp nhận và tuân thủ <a href="../privacy/">Chính sách Bảo
+                mật</a>
+            của Công ty. Chúng tôi khuyến khích bạn đọc kỹ Chính sách Bảo mật trước khi sử dụng ứng dụng.</p>
+
+        <h2>Tài khoản Người dùng</h2>
+        <p>Khi tạo tài khoản, bạn phải cung cấp thông tin chính xác, đầy đủ và cập nhật. Bạn có trách nhiệm:</p>
+        <ul>
+            <li>Bảo mật thông tin đăng nhập tài khoản của mình</li>
+            <li>Thông báo ngay cho chúng tôi về bất kỳ việc sử dụng trái phép nào</li>
+            <li>Đảm bảo tính chính xác của dữ liệu bạn nhập vào ứng dụng</li>
+            <li>Tuân thủ tất cả các điều khoản khi sử dụng tài khoản</li>
+        </ul>
+
+        <h2>Sử dụng Chấp nhận được</h2>
+        <p>Bạn đồng ý sử dụng các ứng dụng chỉ cho các mục đích hợp pháp và theo cách không vi phạm quyền của bất kỳ bên
+            thứ ba nào. Bạn không được:</p>
+        <ul>
+            <li>Sử dụng ứng dụng cho bất kỳ mục đích bất hợp pháp hoặc trái phép nào</li>
+            <li>Cố gắng truy cập trái phép vào hệ thống hoặc dữ liệu của ứng dụng</li>
+            <li>Tải lên hoặc truyền tải virus, mã độc hại hoặc nội dung có hại khác</li>
+            <li>Sao chép, sửa đổi, phân phối hoặc tạo ra các tác phẩm phái sinh từ ứng dụng</li>
+            <li>Sử dụng ứng dụng để theo dõi hoặc thu thập thông tin về người dùng khác</li>
+        </ul>
+
+        <h2>Dữ liệu Người dùng</h2>
+        <div class="success-box">
+            <p>VUTASO cam kết bảo vệ dữ liệu của bạn với các biện pháp bảo mật cao nhất. Dữ liệu được mã hóa và lưu trữ
+                an toàn.</p>
+        </div>
+        <p>Bạn hiểu và đồng ý rằng:</p>
+        <ul>
+            <li>Bạn chịu trách nhiệm về tính chính xác của dữ liệu bạn nhập vào ứng dụng</li>
+            <li>MoneyBay không cung cấp tư vấn tài chính chuyên nghiệp — các báo cáo chỉ mang tính chất tham khảo</li>
+            <li>QRBay không chịu trách nhiệm về nội dung của mã QR hoặc mã vạch mà bạn quét</li>
+            <li>Bạn nên tham khảo ý kiến chuyên gia cho các quyết định quan trọng</li>
+        </ul>
+
+        <h2>Đăng ký và Thanh toán</h2>
+        <p>VUTASO cung cấp cả phiên bản miễn phí và trả phí cho các ứng dụng. Đối với các tính năng trả phí:</p>
+        <ul>
+            <li>Phí đăng ký được tính theo gói vĩnh viễn (một lần duy nhất)</li>
+        </ul>
+
+        <h2>Quyền Sở hữu Trí tuệ</h2>
+        <p>Các ứng dụng MoneyBay, QRBay và tất cả nội dung, tính năng, chức năng (bao gồm nhưng không giới hạn ở thông
+            tin, phần mềm, văn bản, hình ảnh, thiết kế) thuộc sở hữu của VUTASO và được bảo vệ bởi luật bản quyền, nhãn
+            hiệu và các luật sở hữu trí tuệ khác.</p>
+
+        <h2>Liên kết đến Trang web của Bên thứ ba</h2>
+        <p>Các ứng dụng có thể chứa liên kết đến các trang web hoặc dịch vụ của bên thứ ba không thuộc sở hữu hoặc kiểm
+            soát của VUTASO.</p>
+        <p>VUTASO không có quyền kiểm soát và không chịu trách nhiệm về nội dung, chính sách bảo mật hoặc thực tiễn của
+            bất
+            kỳ trang web hoặc dịch vụ nào của bên thứ ba.</p>
+
+        <h2>Chấm dứt</h2>
+        <p>Chúng tôi có thể chấm dứt hoặc đình chỉ tài khoản của bạn ngay lập tức, mà không cần thông báo trước hoặc
+            chịu
+            trách nhiệm pháp lý.</p>
+        <p>Sau khi chấm dứt, quyền sử dụng ứng dụng của bạn sẽ ngừng ngay lập tức.</p>
+
+        <h2>Giới hạn Trách nhiệm</h2>
+        <p>Trong mọi trường hợp, VUTASO sẽ không chịu trách nhiệm về bất kỳ thiệt hại nào đặc biệt, ngẫu nhiên, gián
+            tiếp, hoặc hậu quả.</p>
+
+        <h2>Thay đổi Điều khoản</h2>
+        <p>Chúng tôi có quyền sửa đổi các Điều khoản này bất kỳ lúc nào.</p>
+        <p>Tiếp tục sử dụng ứng dụng đồng nghĩa với việc bạn chấp nhận các điều khoản mới.</p>
+
+        <h2>Liên hệ với chúng tôi</h2>
+        <p>Nếu bạn có bất kỳ câu hỏi nào về các Điều khoản và Điều kiện này, vui lòng liên hệ:</p>
+        <ul>
+            <li>Email: <a href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></li>
+            <li>Website: <a href="https://vutaso.com">https://vutaso.com</a></li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 <a href="https://vutaso.com">VUTASO.com</a></p>
+        <div class="divider"></div>
+        <p class="made-in">Được làm với ❤️ tại Việt Nam 🇻🇳</p>
+    </div>
+</body>
+
+</html>

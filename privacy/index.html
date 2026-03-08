@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chính sách Bảo mật — VUTASO</title>
+    <meta name="description"
+        content="Chính sách bảo mật VUTASO — Cam kết bảo vệ quyền riêng tư và dữ liệu của bạn khi sử dụng MoneyBay và QRBay.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://vutaso.com/privacy/">
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060B14;
+            --bg-2: #0A1020;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --primary: #2B7FFF;
+            --primary-light: #5B9FFF;
+            --accent: #00E5FF;
+            --orange: #FF6B00;
+            --orange-light: #FF9B44;
+            --success: #00D68F;
+            --text: #E8EEF8;
+            --text-muted: #6B7A99;
+            --border: rgba(43, 127, 255, 0.15);
+            --border-bright: rgba(43, 127, 255, 0.4);
+            --glass: rgba(255, 255, 255, 0.04);
+            --gradient: linear-gradient(135deg, #2B7FFF, #00E5FF);
+            --gradient-orange: linear-gradient(135deg, #FF6B00, #FFB347);
+            --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color var(--trans);
+        }
+
+        a:hover {
+            color: var(--accent);
+        }
+
+        /* === Background orbs === */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-orb.a {
+            width: 500px;
+            height: 500px;
+            background: rgba(43, 127, 255, 0.08);
+            top: -150px;
+            left: -100px;
+        }
+
+        .bg-orb.b {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 229, 255, 0.05);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* === Nav === */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(6, 11, 20, 0.9);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 6%;
+        }
+
+        .nav-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.15rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: var(--trans);
+            text-decoration: none;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: var(--glass);
+            border-color: var(--border);
+        }
+
+        /* === Container === */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* === Header === */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .last-updated {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* === Apps badge === */
+        .apps-badge {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .app-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .app-tag.blue {
+            background: rgba(43, 127, 255, 0.12);
+            border: 1px solid rgba(43, 127, 255, 0.25);
+            color: var(--primary-light);
+        }
+
+        .app-tag.orange {
+            background: rgba(255, 107, 0, 0.12);
+            border: 1px solid rgba(255, 107, 0, 0.25);
+            color: var(--orange-light);
+        }
+
+        .app-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .app-dot.blue {
+            background: var(--primary);
+        }
+
+        .app-dot.orange {
+            background: var(--orange);
+        }
+
+        /* === Content === */
+        .highlight {
+            background: rgba(43, 127, 255, 0.08);
+            border-left: 3px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            padding: 18px 20px;
+            margin-bottom: 32px;
+            font-size: 0.92rem;
+            color: rgba(232, 238, 248, 0.85);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 24px 0 10px;
+            color: var(--text);
+        }
+
+        h4 {
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin: 18px 0 8px;
+            color: var(--primary-light);
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: rgba(232, 238, 248, 0.8);
+            font-size: 0.92rem;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 18px;
+            padding-left: 0;
+        }
+
+        ul li {
+            position: relative;
+            padding: 8px 0 8px 22px;
+            font-size: 0.88rem;
+            color: rgba(232, 238, 248, 0.8);
+            border-bottom: 1px solid rgba(43, 127, 255, 0.06);
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gradient);
+        }
+
+        ul li strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .warning-box {
+            background: rgba(255, 91, 91, 0.08);
+            border-left: 3px solid #FF5B5B;
+            border-radius: 0 12px 12px 0;
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+
+        .warning-box p {
+            color: #FF9B9B;
+            margin: 0;
+        }
+
+        .success-box {
+            background: rgba(0, 214, 143, 0.08);
+            border-left: 3px solid var(--success);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+
+        .success-box p {
+            color: #5AEBC0;
+            margin: 0;
+        }
+
+        /* === Footer === */
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .footer p {
+            margin: 4px 0;
+        }
+
+        .footer .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            margin: 12px auto;
+        }
+
+        .footer .made-in {
+            font-size: 0.68rem;
+            opacity: 0.7;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 16px 60px;
+            }
+
+            h2 {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-orb a"></div>
+    <div class="bg-orb b"></div>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="https://vutaso.com" class="logo">VUTASO</a>
+            <div class="nav-links">
+                <a href="../privacy/" class="nav-link active">Bảo mật</a>
+                <a href="../terms/" class="nav-link">Điều khoản</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Chính sách <span>Bảo mật</span></h1>
+            <p class="last-updated">🔒 Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025</p>
+            <div class="apps-badge">
+                <span class="app-tag blue"><span class="app-dot blue"></span> MoneyBay</span>
+                <span class="app-tag orange"><span class="app-dot orange"></span> QRBay</span>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <p style="margin:0">VUTASO cam kết bảo vệ quyền riêng tư và dữ liệu của bạn. Chính sách này giải thích cách
+                chúng tôi
+                thu thập, sử dụng và bảo vệ thông tin của bạn khi sử dụng các ứng dụng <strong>MoneyBay</strong> (quản
+                lý chi tiêu)
+                và <strong>QRBay</strong> (quét mã QR & mã vạch).</p>
+        </div>
+
+        <h2>Giải thích và Định nghĩa</h2>
+        <h3>Giải thích</h3>
+        <p>Các từ viết hoa đầu tiên sẽ có nghĩa như được định nghĩa dưới các điều kiện sau. Các định nghĩa sau đây sẽ có
+            cùng ý nghĩa bất kể chúng xuất hiện ở dạng số ít hay số nhiều.</p>
+
+        <h3>Định nghĩa</h3>
+        <p>Cho mục đích của Chính sách Bảo mật này:</p>
+        <ul>
+            <li><strong>Tài khoản:</strong> Tài khoản duy nhất được tạo để bạn truy cập vào ứng dụng MoneyBay hoặc
+                QRBay.</li>
+            <li><strong>Ứng dụng:</strong> Chỉ các ứng dụng phần mềm MoneyBay (quản lý chi tiêu) và QRBay (quét mã QR &
+                mã vạch) do VUTASO cung cấp.</li>
+            <li><strong>Công ty:</strong> VUTASO (cũng được gọi là "Chúng tôi", "Của chúng tôi" hoặc "Chúng ta" trong
+                Chính sách Bảo mật này).</li>
+            <li><strong>Quốc gia:</strong> Việt Nam.</li>
+            <li><strong>Thiết bị:</strong> Bất kỳ thiết bị nào có thể truy cập ứng dụng như máy tính, điện thoại thông
+                minh hoặc máy tính bảng.</li>
+            <li><strong>Dữ liệu tài chính:</strong> Thông tin về thu nhập, chi tiêu, ngân sách và các giao dịch tài
+                chính mà bạn nhập vào ứng dụng MoneyBay.</li>
+            <li><strong>Dữ liệu quét mã:</strong> Thông tin về các mã QR và mã vạch mà bạn đã quét qua ứng dụng QRBay,
+                bao gồm nội dung mã và lịch sử quét.</li>
+            <li><strong>Dữ liệu cá nhân:</strong> Bất kỳ thông tin nào có liên quan đến một cá nhân được xác định hoặc
+                có thể xác định được.</li>
+            <li><strong>Dịch vụ:</strong> Các ứng dụng MoneyBay và QRBay.</li>
+            <li><strong>Nhà cung cấp dịch vụ:</strong> Bất kỳ cá nhân tự nhiên hoặc pháp nhân nào xử lý dữ liệu thay mặt
+                cho Công ty.</li>
+            <li><strong>Dữ liệu sử dụng:</strong> Dữ liệu được thu thập tự động, được tạo ra bởi việc sử dụng ứng dụng
+                hoặc từ cơ sở hạ tầng ứng dụng.</li>
+            <li><strong>Bạn:</strong> Cá nhân truy cập hoặc sử dụng ứng dụng MoneyBay hoặc QRBay.</li>
+        </ul>
+
+        <h2>Thu thập và Sử dụng Dữ liệu</h2>
+        <h3>Loại Dữ liệu Thu thập</h3>
+
+        <h4>Dữ liệu tài chính (MoneyBay)</h4>
+        <p>MoneyBay thu thập và xử lý dữ liệu tài chính mà bạn nhập để cung cấp dịch vụ quản lý chi tiêu:</p>
+        <ul>
+            <li>Thông tin thu nhập và nguồn thu nhập</li>
+            <li>Chi tiết các khoản chi tiêu và danh mục chi tiêu</li>
+            <li>Ngân sách và mục tiêu tài chính</li>
+            <li>Ghi chú và mô tả giao dịch</li>
+            <li>Hình ảnh hóa đơn và biên lai (nếu bạn tải lên)</li>
+        </ul>
+
+        <h4>Dữ liệu quét mã (QRBay)</h4>
+        <p>QRBay thu thập và xử lý dữ liệu liên quan đến việc quét mã:</p>
+        <ul>
+            <li>Nội dung mã QR và mã vạch đã quét</li>
+            <li>Lịch sử quét mã</li>
+            <li>Mã QR tùy chỉnh mà bạn tạo</li>
+            <li>Thông tin sản phẩm tra cứu qua mã vạch</li>
+        </ul>
+
+        <h4>Thông tin thu thập khi sử dụng ứng dụng</h4>
+        <p>Khi sử dụng các ứng dụng của chúng tôi, chúng tôi có thể thu thập các thông tin sau (với sự cho phép của
+            bạn):</p>
+        <ul>
+            <li>Hình ảnh từ thư viện ảnh hoặc camera (để chụp hóa đơn trong MoneyBay hoặc quét mã trong QRBay)</li>
+        </ul>
+
+        <h3>Sử dụng Dữ liệu</h3>
+        <p>VUTASO sử dụng dữ liệu đã thu thập cho các mục đích khác nhau:</p>
+        <ul>
+            <li>Cung cấp và duy trì các ứng dụng MoneyBay và QRBay</li>
+            <li>Quản lý tài khoản của bạn như một người dùng ứng dụng</li>
+            <li>Cung cấp các tính năng quản lý chi tiêu, phân tích tài chính (MoneyBay) và quét mã, tạo QR (QRBay)</li>
+            <li>Liên lạc với bạn về cập nhật ứng dụng, thông báo bảo mật hoặc thông tin hành chính khác</li>
+            <li>Cung cấp hỗ trợ khách hàng</li>
+            <li>Cải thiện ứng dụng và phát triển tính năng mới</li>
+            <li>Phát hiện, ngăn chặn và giải quyết các vấn đề kỹ thuật</li>
+            <li>Tạo báo cáo và thống kê sử dụng (được ẩn danh hóa)</li>
+        </ul>
+
+        <h2>Bảo mật Dữ liệu</h2>
+        <p>Bảo mật dữ liệu của bạn là ưu tiên hàng đầu của chúng tôi:</p>
+        <ul>
+            <li><strong>Mã hóa:</strong> Tất cả dữ liệu được mã hóa khi lưu trữ và truyền tải</li>
+            <li><strong>Lưu trữ cục bộ:</strong> Dữ liệu chủ yếu được lưu trữ cục bộ trên thiết bị của bạn</li>
+            <li><strong>Không chia sẻ dữ liệu:</strong> Chúng tôi không bao giờ chia sẻ thông tin cá nhân của bạn với
+                bên thứ ba</li>
+            <li><strong>Cập nhật bảo mật thường xuyên:</strong> Ứng dụng được cập nhật định kỳ để vá lỗ hổng bảo mật
+            </li>
+        </ul>
+
+        <h2>Quyền của người dùng</h2>
+        <p>Bạn có các quyền sau đối với dữ liệu cá nhân của mình:</p>
+        <ul>
+            <li><strong>Quyền truy cập:</strong> Yêu cầu được biết dữ liệu nào của bạn đang được xử lý</li>
+            <li><strong>Quyền sửa đổi:</strong> Cập nhật hoặc chỉnh sửa thông tin cá nhân không chính xác</li>
+            <li><strong>Quyền xóa:</strong> Yêu cầu xóa tài khoản và dữ liệu liên quan</li>
+            <li><strong>Quyền xuất dữ liệu:</strong> Nhận bản sao dữ liệu của bạn ở định dạng có thể đọc được</li>
+        </ul>
+
+        <h2>Sao lưu và Khôi phục Dữ liệu</h2>
+        <p>Các ứng dụng VUTASO cung cấp tính năng sao lưu dữ liệu:</p>
+        <ul>
+            <li>Sao lưu tự động lên iCloud</li>
+            <li>Khôi phục dữ liệu khi thay đổi thiết bị</li>
+            <li>Xuất dữ liệu thành file CSV hoặc PDF (MoneyBay)</li>
+        </ul>
+
+        <h2>Thay đổi Chính sách Bảo mật</h2>
+        <p>Chúng tôi có thể cập nhật Chính sách Bảo mật này theo thời gian. Chúng tôi sẽ thông báo cho bạn về bất kỳ
+            thay
+            đổi nào bằng cách đăng Chính sách Bảo mật mới trên ứng dụng và cập nhật ngày "cập nhật lần cuối".</p>
+
+        <h2>Liên hệ với chúng tôi</h2>
+        <p>Nếu bạn có bất kỳ câu hỏi nào về Chính sách Bảo mật này hoặc muốn thực hiện quyền của mình đối với dữ liệu cá
+            nhân, vui lòng liên hệ:</p>
+        <ul>
+            <li>Email: <a href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></li>
+            <li>Website: <a href="https://vutaso.com">https://vutaso.com</a></li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 <a href="https://vutaso.com">VUTASO.com</a></p>
+        <div class="divider"></div>
+        <p class="made-in">Được làm với ❤️ tại Việt Nam 🇻🇳</p>
+    </div>
+</body>
+
+</html>
