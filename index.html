@@ -4,26 +4,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VUTASO — MoneyBay & QRBay | Ứng dụng iOS cho cuộc sống hiện đại</title>
+  <title>VUTASO — App Sổ Thu Chi & Quản Lý Chi Tiêu MoneyBay | Quét Mã QR QRBay</title>
   <meta name="description"
-    content="VUTASO phát triển ứng dụng MoneyBay (quản lý chi tiêu AI) và QRBay (quét mã QR & mã vạch) — miễn phí trên iOS.">
+    content="MoneyBay — App sổ thu chi, quản lý chi tiêu cá nhân thông minh với AI. Ghi chép thu chi bằng giọng nói, quét hóa đơn, báo cáo biểu đồ, sổ nợ, đồng bộ iCloud. QRBay — Quét mã QR & mã vạch miễn phí trên iOS.">
   <meta name="keywords"
-    content="vutaso, moneybay, qrbay, quản lý chi tiêu, quét mã QR, quét mã vạch, ứng dụng iOS, app miễn phí">
+    content="sổ thu chi, quản lý chi tiêu, app quản lý chi tiêu, app chi tiêu, ghi chép thu chi, theo dõi chi tiêu, quản lý tài chính cá nhân, app tài chính, sổ chi tiêu, ứng dụng quản lý chi tiêu, MoneyBay, moneybay, app sổ nợ, quản lý ngân sách, app ghi chép chi tiêu, phần mềm quản lý chi tiêu, vutaso, qrbay, quét mã QR, quét mã vạch, ứng dụng iOS, app miễn phí, expense tracker, money management">
   <meta name="author" content="VUTASO">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#060B14">
   <link rel="canonical" href="https://vutaso.com/">
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
 
+  <!-- Alternate domains (giúp Google liên kết tất cả domain về cùng 1 site) -->
+  <link rel="alternate" href="https://moneybay.app" hreflang="vi">
+  <link rel="alternate" href="https://moneybay.vn" hreflang="vi">
+  <link rel="alternate" href="https://sothuchi.id.vn" hreflang="vi">
+
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://vutaso.com/">
   <meta property="og:site_name" content="VUTASO">
-  <meta property="og:title" content="VUTASO — MoneyBay & QRBay">
+  <meta property="og:title" content="VUTASO — App Sổ Thu Chi & Quản Lý Chi Tiêu MoneyBay | Quét QR QRBay">
   <meta property="og:description"
-    content="Ứng dụng iOS cho cuộc sống hiện đại. Quản lý chi tiêu AI & Quét mã QR thông minh.">
+    content="MoneyBay — Ứng dụng sổ thu chi, quản lý chi tiêu cá nhân miễn phí với trợ lý AI. QRBay — Quét mã QR & mã vạch thông minh.">
   <meta property="og:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
   <meta property="og:locale" content="vi_VN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VUTASO — App Sổ Thu Chi & Quản Lý Chi Tiêu MoneyBay">
+  <meta name="twitter:description" content="MoneyBay — Ứng dụng sổ thu chi, quản lý chi tiêu cá nhân miễn phí với trợ lý AI. QRBay — Quét mã QR & mã vạch thông minh.">
+  <meta name="twitter:image" content="https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png">
+
+  <!-- JSON-LD: WebSite (giúp Google nhận diện website + hiển thị sitelinks) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "VUTASO",
+    "alternateName": ["Vu Taso", "vutaso.com", "moneybay.app", "moneybay.vn", "sothuchi.id.vn"],
+    "url": "https://vutaso.com",
+    "description": "VUTASO phát triển ứng dụng MoneyBay (quản lý chi tiêu AI) và QRBay (quét mã QR & mã vạch) — miễn phí trên iOS.",
+    "inLanguage": ["vi", "en"],
+    "publisher": {
+      "@type": "Organization",
+      "name": "VUTASO",
+      "url": "https://vutaso.com"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD: Organization (thông tin thương hiệu, logo, liên kết mạng xã hội) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "VUTASO",
+    "url": "https://vutaso.com",
+    "logo": "https://vutaso.com/assets/favicon.ico",
+    "image": "https://vutaso.com/moneybay/assets/images/banner_moneybay_1200x750.png",
+    "description": "Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và hiệu quả.",
+    "foundingDate": "2024",
+    "founder": {
+      "@type": "Person",
+      "name": "VUTASO"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "VN"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "vutaso.com@gmail.com",
+      "contactType": "customer support",
+      "availableLanguage": ["Vietnamese", "English"]
+    },
+    "sameAs": [
+      "https://moneybay.app",
+      "https://moneybay.vn",
+      "https://sothuchi.id.vn",
+      "https://www.facebook.com/moneybayapp",
+      "https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi",
+      "https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi"
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: SiteNavigationElement (định nghĩa các trang con → Google Sitelinks) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SiteNavigationElement",
+        "name": "MoneyBay",
+        "description": "Ứng dụng quản lý chi tiêu thông minh với trợ lý AI, ghi chép bằng giọng nói, báo cáo trực quan.",
+        "url": "https://vutaso.com/moneybay/"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "QRBay",
+        "description": "Quét mọi mã QR & mã vạch trong vài giây. Tra cứu giá sản phẩm, tạo QR tùy chỉnh.",
+        "url": "https://vutaso.com/qrbay/"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "Blog",
+        "description": "Blog VUTASO — Chia sẻ kiến thức, hướng dẫn sử dụng ứng dụng và tin tức mới nhất.",
+        "url": "https://blog.vutaso.com"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "Chính sách Bảo mật",
+        "description": "Chính sách bảo mật VUTASO — Cam kết bảo vệ quyền riêng tư và dữ liệu của bạn.",
+        "url": "https://vutaso.com/privacy/"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "Điều khoản sử dụng",
+        "description": "Điều khoản và điều kiện sử dụng các ứng dụng MoneyBay và QRBay.",
+        "url": "https://vutaso.com/terms/"
+      }
+    ]
+  }
+  </script>
 
   <style>
     /* ============================================================
@@ -1265,6 +1370,46 @@
         max-width: 100%;
       }
     }
+
+    /* ============================================================
+       LANGUAGE TOGGLE
+       ============================================================ */
+    .lang-toggle {
+      display: flex;
+      gap: 4px;
+      margin-right: 8px;
+    }
+
+    .lang-btn {
+      padding: 5px 10px;
+      border-radius: 99px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all var(--trans);
+      cursor: none;
+    }
+
+    .lang-btn:hover {
+      border-color: var(--border-bright);
+      color: var(--text);
+    }
+
+    .lang-btn.active {
+      background: var(--gradient);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    @media(max-width:768px) {
+      .lang-btn {
+        cursor: pointer;
+      }
+    }
   </style>
 </head>
 
@@ -1284,10 +1429,14 @@
 
   <!-- MOBILE MENU -->
   <div class="mob-menu" id="mob">
-    <a href="#products" onclick="closeMob()">Sản phẩm</a>
-    <a href="#why" onclick="closeMob()">Tại sao VUTASO</a>
+    <a href="#products" onclick="closeMob()" data-i18n="nav_products">Sản phẩm</a>
+    <a href="#why" onclick="closeMob()" data-i18n="nav_why">Tại sao VUTASO</a>
     <a href="#faq" onclick="closeMob()">FAQ</a>
     <a href="https://blog.vutaso.com" target="_blank" onclick="closeMob()">Blog</a>
+    <div class="lang-toggle" style="margin-top:12px">
+      <button class="lang-btn" data-lang="vi" onclick="switchLang('vi');closeMob()">VI</button>
+      <button class="lang-btn" data-lang="en" onclick="switchLang('en');closeMob()">EN</button>
+    </div>
   </div>
 
   <!-- NAVBAR -->
@@ -1296,13 +1445,17 @@
       <span class="n-logo-text">VUTASO</span>
     </a>
     <div class="n-links">
-      <a href="#products">Sản phẩm</a>
-      <a href="#why">Tại sao VUTASO</a>
+      <a href="#products" data-i18n="nav_products">Sản phẩm</a>
+      <a href="#why" data-i18n="nav_why">Tại sao VUTASO</a>
       <a href="#faq">FAQ</a>
       <a href="https://blog.vutaso.com" target="_blank">Blog</a>
     </div>
     <div class="n-right">
-      <a href="#cta" class="btn-nav">Tải App</a>
+      <div class="lang-toggle">
+        <button class="lang-btn" data-lang="vi" onclick="switchLang('vi')">VI</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
+      </div>
+      <a href="#cta" class="btn-nav" data-i18n="nav_download">Tải App</a>
       <button class="ham" id="ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
     </div>
   </nav>
@@ -1317,19 +1470,19 @@
     <div class="hero-orb orb3"></div>
 
     <div class="hero-content">
-      <div class="hero-badge"><span class="badge-dot"></span> Ứng dụng iOS — Miễn phí</div>
-      <h1 class="hero-title">Ứng dụng cho cuộc sống<br><span class="gtext">hiện đại</span></h1>
-      <p class="hero-sub">Hai sản phẩm — một hệ sinh thái. <strong>MoneyBay</strong> giúp bạn làm chủ tài chính
+      <div class="hero-badge" data-i18n="hero_badge"><span class="badge-dot"></span> Ứng dụng iOS — Miễn phí</div>
+      <h1 class="hero-title" data-i18n="hero_title">Ứng dụng cho cuộc sống<br><span class="gtext">hiện đại</span></h1>
+      <p class="hero-sub" data-i18n="hero_sub">Hai sản phẩm — một hệ sinh thái. <strong>MoneyBay</strong> giúp bạn làm chủ tài chính
         với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.</p>
       <div class="hero-btns">
-        <a href="https://vutaso.com/moneybay/" class="btn-main" onclick="addRipple(event)">💰 Khám phá MoneyBay</a>
-        <a href="https://vutaso.com/qrbay/" class="btn-main-orange" onclick="addRipple(event)">📱 Khám phá QRBay</a>
+        <a href="https://vutaso.com/moneybay/" class="btn-main" onclick="addRipple(event)" data-i18n="hero_btn_mb">💰 Khám phá MoneyBay</a>
+        <a href="https://vutaso.com/qrbay/" class="btn-main-orange" onclick="addRipple(event)" data-i18n="hero_btn_qr">📱 Khám phá QRBay</a>
       </div>
       <div class="hero-stats">
-        <div class="hstat"><span class="hstat-icon">📱</span><strong>2</strong> sản phẩm iOS</div>
-        <div class="hstat"><span class="hstat-icon">⭐</span><strong>4.9</strong> đánh giá</div>
-        <div class="hstat"><span class="hstat-icon">👥</span><strong>10K+</strong> người dùng</div>
-        <div class="hstat"><span class="hstat-icon">🆓</span><strong>Miễn phí</strong></div>
+        <div class="hstat" data-i18n="hero_stat1"><span class="hstat-icon">📱</span><strong>2</strong> sản phẩm iOS</div>
+        <div class="hstat" data-i18n="hero_stat2"><span class="hstat-icon">⭐</span><strong>4.9</strong> đánh giá</div>
+        <div class="hstat" data-i18n="hero_stat3"><span class="hstat-icon">👥</span><strong>10K+</strong> người dùng</div>
+        <div class="hstat" data-i18n="hero_stat4"><span class="hstat-icon">🆓</span><strong>Miễn phí</strong></div>
       </div>
     </div>
   </section>
@@ -1338,8 +1491,8 @@
        PRODUCTS
        ============================================================ -->
   <section id="products">
-    <p class="sec-label rev" data-delay="0">SẢN PHẨM</p>
-    <h2 class="sec-title rev" data-delay="0.1">Được thiết kế cho <span class="gtext">cuộc sống</span> của bạn</h2>
+    <p class="sec-label rev" data-delay="0" data-i18n="prod_label">SẢN PHẨM</p>
+    <h2 class="sec-title rev" data-delay="0.1" data-i18n="prod_title">Được thiết kế cho <span class="gtext">cuộc sống</span> của bạn</h2>
 
     <div class="prod-grid">
       <!-- MoneyBay -->
@@ -1347,20 +1500,20 @@
         <div class="prod-glow"></div>
         <div class="prod-icon"><img src="assets/logo_moneybay.png" alt="MoneyBay"></div>
         <h3>MoneyBay</h3>
-        <p class="tagline">Quản lý chi tiêu cá nhân thông minh với trợ lý AI. Ghi chép bằng giọng nói, báo cáo trực
+        <p class="tagline" data-i18n="mb_tagline">Quản lý chi tiêu cá nhân thông minh với trợ lý AI. Ghi chép bằng giọng nói, báo cáo trực
           quan, đồng bộ iCloud.</p>
         <div class="chip-row">
-          <span class="chip">🤖 Trợ lý AI</span>
-          <span class="chip">🎙️ Giọng nói</span>
-          <span class="chip">📊 Biểu đồ</span>
-          <span class="chip">📸 Quét hóa đơn</span>
+          <span class="chip" data-i18n="mb_chip1">🤖 Trợ lý AI</span>
+          <span class="chip" data-i18n="mb_chip2">🎙️ Giọng nói</span>
+          <span class="chip" data-i18n="mb_chip3">📊 Biểu đồ</span>
+          <span class="chip" data-i18n="mb_chip4">📸 Quét hóa đơn</span>
           <span class="chip">☁️ iCloud</span>
-          <span class="chip">📒 Sổ Nợ</span>
+          <span class="chip" data-i18n="mb_chip6">📒 Sổ Nợ</span>
         </div>
         <div class="prod-btns">
           <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
-            class="btn-prod btn-prod-fill" onclick="addRipple(event)">Tải MoneyBay</a>
-          <a href="https://vutaso.com/moneybay/" class="btn-prod btn-prod-ghost">Tìm hiểu thêm →</a>
+            class="btn-prod btn-prod-fill" onclick="addRipple(event)" data-i18n="mb_dl">Tải MoneyBay</a>
+          <a href="https://vutaso.com/moneybay/" class="btn-prod btn-prod-ghost" data-i18n="prod_more">Tìm hiểu thêm →</a>
         </div>
       </div>
 
@@ -1369,20 +1522,20 @@
         <div class="prod-glow"></div>
         <div class="prod-icon"><img src="assets/logo_qrbay.png" alt="QRBay"></div>
         <h3>QRBay</h3>
-        <p class="tagline">Quét mọi mã QR & mã vạch trong vài giây. Tra cứu giá sản phẩm, tạo QR tùy chỉnh — hỗ trợ
+        <p class="tagline" data-i18n="qr_tagline">Quét mọi mã QR & mã vạch trong vài giây. Tra cứu giá sản phẩm, tạo QR tùy chỉnh — hỗ trợ
           13+ định dạng.</p>
         <div class="chip-row">
-          <span class="chip">⚡ Quét nhanh</span>
-          <span class="chip">🔍 Tra giá</span>
-          <span class="chip">🎨 Tạo QR</span>
-          <span class="chip">📑 Quét hàng loạt</span>
-          <span class="chip">📂 Lịch sử</span>
-          <span class="chip">📤 Xuất & Chia sẻ</span>
+          <span class="chip" data-i18n="qr_chip1">⚡ Quét nhanh</span>
+          <span class="chip" data-i18n="qr_chip2">🔍 Tra giá</span>
+          <span class="chip" data-i18n="qr_chip3">🎨 Tạo QR</span>
+          <span class="chip" data-i18n="qr_chip4">📑 Quét hàng loạt</span>
+          <span class="chip" data-i18n="qr_chip5">📂 Lịch sử</span>
+          <span class="chip" data-i18n="qr_chip6">📤 Xuất & Chia sẻ</span>
         </div>
         <div class="prod-btns">
           <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" class="btn-prod btn-prod-fill"
-            onclick="addRipple(event)">Tải QRBay</a>
-          <a href="https://vutaso.com/qrbay/" class="btn-prod btn-prod-ghost">Tìm hiểu thêm →</a>
+            onclick="addRipple(event)" data-i18n="qr_dl">Tải QRBay</a>
+          <a href="https://vutaso.com/qrbay/" class="btn-prod btn-prod-ghost" data-i18n="prod_more">Tìm hiểu thêm →</a>
         </div>
       </div>
     </div>
@@ -1395,19 +1548,19 @@
     <div class="stats-row">
       <div class="stat-item rev">
         <div class="stat-num">2</div>
-        <div class="stat-label">Sản phẩm iOS</div>
+        <div class="stat-label" data-i18n="stat1">Sản phẩm iOS</div>
       </div>
       <div class="stat-item rev">
         <div class="stat-num">10K+</div>
-        <div class="stat-label">Người dùng</div>
+        <div class="stat-label" data-i18n="stat2">Người dùng</div>
       </div>
       <div class="stat-item rev">
         <div class="stat-num">4.9 ⭐</div>
-        <div class="stat-label">Đánh giá App Store</div>
+        <div class="stat-label" data-i18n="stat3">Đánh giá App Store</div>
       </div>
       <div class="stat-item rev">
         <div class="stat-num">100%</div>
-        <div class="stat-label">Miễn phí</div>
+        <div class="stat-label" data-i18n="stat4">Miễn phí</div>
       </div>
     </div>
   </section>
@@ -1416,38 +1569,38 @@
        WHY
        ============================================================ -->
   <section id="why">
-    <p class="sec-label rev">TẠI SAO CHỌN VUTASO</p>
-    <h2 class="sec-title rev">Được xây dựng với <span class="gtext-orange">tâm huyết</span></h2>
+    <p class="sec-label rev" data-i18n="why_label">TẠI SAO CHỌN VUTASO</p>
+    <h2 class="sec-title rev" data-i18n="why_title">Được xây dựng với <span class="gtext-orange">tâm huyết</span></h2>
     <div class="why-grid">
       <div class="why-card rev">
         <div class="why-ic">🔒</div>
-        <h4>An toàn & Bảo mật</h4>
-        <p>Dữ liệu lưu trên thiết bị & iCloud cá nhân. Không thu thập thông tin người dùng.</p>
+        <h4 data-i18n="why1_t">An toàn & Bảo mật</h4>
+        <p data-i18n="why1_d">Dữ liệu lưu trên thiết bị & iCloud cá nhân. Không thu thập thông tin người dùng.</p>
       </div>
       <div class="why-card rev">
         <div class="why-ic">⚡</div>
-        <h4>Nhanh & Mượt mà</h4>
-        <p>Tối ưu hiệu năng, khởi động trong tích tắc. Giao diện trực quan, dùng ngay không cần hướng dẫn.</p>
+        <h4 data-i18n="why2_t">Nhanh & Mượt mà</h4>
+        <p data-i18n="why2_d">Tối ưu hiệu năng, khởi động trong tích tắc. Giao diện trực quan, dùng ngay không cần hướng dẫn.</p>
       </div>
       <div class="why-card rev">
         <div class="why-ic">🇻🇳</div>
-        <h4>Made in Việt Nam</h4>
-        <p>Thiết kế riêng cho người Việt — hỗ trợ tiếng Việt, lịch Âm, đồng VND & nhiều hơn.</p>
+        <h4 data-i18n="why3_t">Made in Việt Nam</h4>
+        <p data-i18n="why3_d">Thiết kế riêng cho người Việt — hỗ trợ tiếng Việt, lịch Âm, đồng VND & nhiều hơn.</p>
       </div>
       <div class="why-card rev">
         <div class="why-ic">🎨</div>
-        <h4>Thiết kế tinh tế</h4>
-        <p>UI hiện đại theo phong cách Apple. Trải nghiệm mượt trên iPhone & iPad.</p>
+        <h4 data-i18n="why4_t">Thiết kế tinh tế</h4>
+        <p data-i18n="why4_d">UI hiện đại theo phong cách Apple. Trải nghiệm mượt trên iPhone & iPad.</p>
       </div>
       <div class="why-card rev">
         <div class="why-ic">🆓</div>
-        <h4>Miễn phí</h4>
-        <p>Toàn bộ tính năng cốt lõi hoàn toàn miễn phí.</p>
+        <h4 data-i18n="why5_t">Miễn phí</h4>
+        <p data-i18n="why5_d">Toàn bộ tính năng cốt lõi hoàn toàn miễn phí.</p>
       </div>
       <div class="why-card rev">
         <div class="why-ic">🔄</div>
-        <h4>Cập nhật liên tục</h4>
-        <p>Tính năng mới được bổ sung thường xuyên dựa trên phản hồi cộng đồng.</p>
+        <h4 data-i18n="why6_t">Cập nhật liên tục</h4>
+        <p data-i18n="why6_d">Tính năng mới được bổ sung thường xuyên dựa trên phản hồi cộng đồng.</p>
       </div>
     </div>
   </section>
@@ -1456,40 +1609,40 @@
        FAQ
        ============================================================ -->
   <section id="faq">
-    <p class="sec-label rev">HỎI ĐÁP</p>
-    <h2 class="sec-title rev">Câu hỏi <span class="gtext">thường gặp</span></h2>
+    <p class="sec-label rev" data-i18n="faq_label">HỎI ĐÁP</p>
+    <h2 class="sec-title rev" data-i18n="faq_title">Câu hỏi <span class="gtext">thường gặp</span></h2>
     <div class="faq-wrap">
-      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)">Ứng dụng có miễn phí không?<span
+      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)" data-i18n="faq1_q">Ứng dụng có miễn phí không?<span
             class="faq-icon">+</span></button>
         <div class="faq-a">
-          <p>Cả MoneyBay và QRBay đều miễn phí với đầy đủ tính năng cốt lõi. MoneyBay có gói Pro để mở khóa tính năng
+          <p data-i18n="faq1_a">Cả MoneyBay và QRBay đều miễn phí với đầy đủ tính năng cốt lõi. MoneyBay có gói Pro để mở khóa tính năng
             nâng cao.</p>
         </div>
       </div>
-      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)">Dữ liệu có an toàn không?<span
+      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)" data-i18n="faq2_q">Dữ liệu có an toàn không?<span
             class="faq-icon">+</span></button>
         <div class="faq-a">
-          <p>Hoàn toàn an toàn. Dữ liệu chỉ lưu trên thiết bị và iCloud cá nhân. Chúng tôi không thu thập bất kỳ thông
+          <p data-i18n="faq2_a">Hoàn toàn an toàn. Dữ liệu chỉ lưu trên thiết bị và iCloud cá nhân. Chúng tôi không thu thập bất kỳ thông
             tin nào.</p>
         </div>
       </div>
-      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)">Có hỗ trợ Android không?<span
+      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)" data-i18n="faq3_q">Có hỗ trợ Android không?<span
             class="faq-icon">+</span></button>
         <div class="faq-a">
-          <p>Hiện tại ứng dụng được tối ưu cho iOS. Phiên bản Android đang được cân nhắc phát triển trong tương lai.</p>
+          <p data-i18n="faq3_a">Hiện tại ứng dụng được tối ưu cho iOS. Phiên bản Android đang được cân nhắc phát triển trong tương lai.</p>
         </div>
       </div>
-      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)">MoneyBay có tính năng gì nổi bật?<span
+      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)" data-i18n="faq4_q">MoneyBay có tính năng gì nổi bật?<span
             class="faq-icon">+</span></button>
         <div class="faq-a">
-          <p>Ghi chép thu chi bằng giọng nói & chat AI, quét hóa đơn tự động, báo cáo biểu đồ, sổ nợ, hạn mức chi, đồng
+          <p data-i18n="faq4_a">Ghi chép thu chi bằng giọng nói & chat AI, quét hóa đơn tự động, báo cáo biểu đồ, sổ nợ, hạn mức chi, đồng
             bộ iCloud và nhiều tiện ích khác.</p>
         </div>
       </div>
-      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)">QRBay hỗ trợ những loại mã nào?<span
+      <div class="faq-item rev"><button class="faq-q" onclick="toggleFaq(this)" data-i18n="faq5_q">QRBay hỗ trợ những loại mã nào?<span
             class="faq-icon">+</span></button>
         <div class="faq-a">
-          <p>QRBay hỗ trợ 10+ định dạng: QR Code, Data Matrix, Aztec, PDF 417, EAN‑13, EAN‑8, UPC‑A, UPC‑E, Code 128,
+          <p data-i18n="faq5_a">QRBay hỗ trợ 10+ định dạng: QR Code, Data Matrix, Aztec, PDF 417, EAN‑13, EAN‑8, UPC‑A, UPC‑E, Code 128,
             Code 93, Code 39, Codabar và ITF.</p>
         </div>
       </div>
@@ -1502,13 +1655,13 @@
   <section id="cta">
     <div class="cta-orb a"></div>
     <div class="cta-orb b"></div>
-    <h2 class="cta-title rev">Bắt đầu ngay hôm nay</h2>
-    <p class="cta-sub rev">Tải miễn phí và trải nghiệm ứng dụng iOS tốt nhất cho cuộc sống hiện đại.</p>
+    <h2 class="cta-title rev" data-i18n="cta_title">Bắt đầu ngay hôm nay</h2>
+    <p class="cta-sub rev" data-i18n="cta_sub">Tải miễn phí và trải nghiệm ứng dụng iOS tốt nhất cho cuộc sống hiện đại.</p>
     <div class="cta-btns rev">
       <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
-        class="btn-main" onclick="addRipple(event)">💰 Tải MoneyBay</a>
+        class="btn-main" onclick="addRipple(event)" data-i18n="cta_mb">💰 Tải MoneyBay</a>
       <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" class="btn-main-orange"
-        onclick="addRipple(event)">📱 Tải QRBay</a>
+        onclick="addRipple(event)" data-i18n="cta_qr">📱 Tải QRBay</a>
     </div>
   </section>
 
@@ -1519,29 +1672,29 @@
     <div class="ft-grid">
       <div class="ft-brand">
         <h4>VUTASO</h4>
-        <p>Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và hiệu quả.</p>
+        <p data-i18n="ft_desc">Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và hiệu quả.</p>
       </div>
       <div class="ft-col">
-        <h5>Sản phẩm</h5>
+        <h5 data-i18n="ft_products">Sản phẩm</h5>
         <a href="https://vutaso.com/moneybay/">MoneyBay</a>
         <a href="https://vutaso.com/qrbay/">QRBay</a>
         <a href="https://blog.vutaso.com" target="_blank">Blog</a>
       </div>
       <div class="ft-col">
-        <h5>Tải App</h5>
-        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank">Tải
+        <h5 data-i18n="ft_download">Tải App</h5>
+        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank" data-i18n="ft_dl_mb">Tải
           MoneyBay</a>
-        <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank">Tải QRBay</a>
+        <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" data-i18n="ft_dl_qr">Tải QRBay</a>
       </div>
       <div class="ft-col">
-        <h5>Hỗ trợ</h5>
-        <a href="https://vutaso.com/privacy/" target="_blank">Chính sách bảo mật</a>
-        <a href="https://vutaso.com/terms/" target="_blank">Điều khoản sử dụng</a>
+        <h5 data-i18n="ft_support">Hỗ trợ</h5>
+        <a href="https://vutaso.com/privacy/" target="_blank" data-i18n="ft_privacy">Chính sách bảo mật</a>
+        <a href="https://vutaso.com/terms/" target="_blank" data-i18n="ft_terms">Điều khoản sử dụng</a>
         <a href="https://www.facebook.com/moneybayapp" target="_blank">Facebook</a>
         <a href="mailto:vutaso.com@gmail.com">Email</a>
       </div>
     </div>
-    <div class="ft-bottom">&copy; 2025 VUTASO. Được tạo ra với ❤️ tại Việt Nam</div>
+    <div class="ft-bottom" data-i18n="ft_bottom">&copy; 2025 VUTASO. Được tạo ra với ❤️ tại Việt Nam</div>
   </footer>
 
   <!-- ============================================================
@@ -1692,6 +1845,142 @@
         btn.querySelector('.faq-icon').textContent = '−';
       }
     }
+
+    /* ==================== I18N — MULTI LANGUAGE ==================== */
+    const I18N = {
+      vi: {
+        nav_products: 'Sản phẩm',
+        nav_why: 'Tại sao VUTASO',
+        nav_download: 'Tải App',
+        hero_badge: '<span class="badge-dot"></span> Ứng dụng iOS — Miễn phí',
+        hero_title: 'Ứng dụng cho cuộc sống<br><span class="gtext">hiện đại</span>',
+        hero_sub: 'Hai sản phẩm — một hệ sinh thái. <strong>MoneyBay</strong> giúp bạn làm chủ tài chính với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.',
+        hero_btn_mb: '💰 Khám phá MoneyBay',
+        hero_btn_qr: '📱 Khám phá QRBay',
+        hero_stat1: '<span class="hstat-icon">📱</span><strong>2</strong> sản phẩm iOS',
+        hero_stat2: '<span class="hstat-icon">⭐</span><strong>4.9</strong> đánh giá',
+        hero_stat3: '<span class="hstat-icon">👥</span><strong>10K+</strong> người dùng',
+        hero_stat4: '<span class="hstat-icon">🆓</span><strong>Miễn phí</strong>',
+        prod_label: 'SẢN PHẨM',
+        prod_title: 'Được thiết kế cho <span class="gtext">cuộc sống</span> của bạn',
+        mb_tagline: 'Quản lý chi tiêu cá nhân thông minh với trợ lý AI. Ghi chép bằng giọng nói, báo cáo trực quan, đồng bộ iCloud.',
+        mb_chip1: '🤖 Trợ lý AI', mb_chip2: '🎙️ Giọng nói', mb_chip3: '📊 Biểu đồ',
+        mb_chip4: '📸 Quét hóa đơn', mb_chip6: '📒 Sổ Nợ',
+        mb_dl: 'Tải MoneyBay', prod_more: 'Tìm hiểu thêm →',
+        qr_tagline: 'Quét mọi mã QR & mã vạch trong vài giây. Tra cứu giá sản phẩm, tạo QR tùy chỉnh — hỗ trợ 13+ định dạng.',
+        qr_chip1: '⚡ Quét nhanh', qr_chip2: '🔍 Tra giá', qr_chip3: '🎨 Tạo QR',
+        qr_chip4: '📑 Quét hàng loạt', qr_chip5: '📂 Lịch sử', qr_chip6: '📤 Xuất & Chia sẻ',
+        qr_dl: 'Tải QRBay',
+        stat1: 'Sản phẩm iOS', stat2: 'Người dùng', stat3: 'Đánh giá App Store', stat4: 'Miễn phí',
+        why_label: 'TẠI SAO CHỌN VUTASO',
+        why_title: 'Được xây dựng với <span class="gtext-orange">tâm huyết</span>',
+        why1_t: 'An toàn & Bảo mật', why1_d: 'Dữ liệu lưu trên thiết bị & iCloud cá nhân. Không thu thập thông tin người dùng.',
+        why2_t: 'Nhanh & Mượt mà', why2_d: 'Tối ưu hiệu năng, khởi động trong tích tắc. Giao diện trực quan, dùng ngay không cần hướng dẫn.',
+        why3_t: 'Made in Việt Nam', why3_d: 'Thiết kế riêng cho người Việt — hỗ trợ tiếng Việt, lịch Âm, đồng VND & nhiều hơn.',
+        why4_t: 'Thiết kế tinh tế', why4_d: 'UI hiện đại theo phong cách Apple. Trải nghiệm mượt trên iPhone & iPad.',
+        why5_t: 'Miễn phí', why5_d: 'Toàn bộ tính năng cốt lõi hoàn toàn miễn phí.',
+        why6_t: 'Cập nhật liên tục', why6_d: 'Tính năng mới được bổ sung thường xuyên dựa trên phản hồi cộng đồng.',
+        faq_label: 'HỎI ĐÁP',
+        faq_title: 'Câu hỏi <span class="gtext">thường gặp</span>',
+        faq1_q: 'Ứng dụng có miễn phí không?<span class="faq-icon">+</span>',
+        faq1_a: 'Cả MoneyBay và QRBay đều miễn phí với đầy đủ tính năng cốt lõi. MoneyBay có gói Pro để mở khóa tính năng nâng cao.',
+        faq2_q: 'Dữ liệu có an toàn không?<span class="faq-icon">+</span>',
+        faq2_a: 'Hoàn toàn an toàn. Dữ liệu chỉ lưu trên thiết bị và iCloud cá nhân. Chúng tôi không thu thập bất kỳ thông tin nào.',
+        faq3_q: 'Có hỗ trợ Android không?<span class="faq-icon">+</span>',
+        faq3_a: 'Hiện tại ứng dụng được tối ưu cho iOS. Phiên bản Android đang được cân nhắc phát triển trong tương lai.',
+        faq4_q: 'MoneyBay có tính năng gì nổi bật?<span class="faq-icon">+</span>',
+        faq4_a: 'Ghi chép thu chi bằng giọng nói & chat AI, quét hóa đơn tự động, báo cáo biểu đồ, sổ nợ, hạn mức chi, đồng bộ iCloud và nhiều tiện ích khác.',
+        faq5_q: 'QRBay hỗ trợ những loại mã nào?<span class="faq-icon">+</span>',
+        faq5_a: 'QRBay hỗ trợ 10+ định dạng: QR Code, Data Matrix, Aztec, PDF 417, EAN‑13, EAN‑8, UPC‑A, UPC‑E, Code 128, Code 93, Code 39, Codabar và ITF.',
+        cta_title: 'Bắt đầu ngay hôm nay',
+        cta_sub: 'Tải miễn phí và trải nghiệm ứng dụng iOS tốt nhất cho cuộc sống hiện đại.',
+        cta_mb: '💰 Tải MoneyBay', cta_qr: '📱 Tải QRBay',
+        ft_desc: 'Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và hiệu quả.',
+        ft_products: 'Sản phẩm', ft_download: 'Tải App', ft_support: 'Hỗ trợ',
+        ft_dl_mb: 'Tải MoneyBay', ft_dl_qr: 'Tải QRBay',
+        ft_privacy: 'Chính sách bảo mật', ft_terms: 'Điều khoản sử dụng',
+        ft_bottom: '&copy; 2025 VUTASO. Được tạo ra với ❤️ tại Việt Nam'
+      },
+      en: {
+        nav_products: 'Products',
+        nav_why: 'Why VUTASO',
+        nav_download: 'Download',
+        hero_badge: '<span class="badge-dot"></span> iOS Apps — Free',
+        hero_title: 'Apps for<br><span class="gtext">modern life</span>',
+        hero_sub: 'Two products — one ecosystem. <strong>MoneyBay</strong> helps you master your finances with AI. <strong>QRBay</strong> turns your camera into a powerful code scanner.',
+        hero_btn_mb: '💰 Explore MoneyBay',
+        hero_btn_qr: '📱 Explore QRBay',
+        hero_stat1: '<span class="hstat-icon">📱</span><strong>2</strong> iOS Products',
+        hero_stat2: '<span class="hstat-icon">⭐</span><strong>4.9</strong> Rating',
+        hero_stat3: '<span class="hstat-icon">👥</span><strong>10K+</strong> Users',
+        hero_stat4: '<span class="hstat-icon">🆓</span><strong>Free</strong>',
+        prod_label: 'PRODUCTS',
+        prod_title: 'Designed for <span class="gtext">your life</span>',
+        mb_tagline: 'Smart personal expense manager with AI assistant. Voice input, visual reports, iCloud sync.',
+        mb_chip1: '🤖 AI Assistant', mb_chip2: '🎙️ Voice', mb_chip3: '📊 Charts',
+        mb_chip4: '📸 Receipt Scan', mb_chip6: '📒 Debt Book',
+        mb_dl: 'Get MoneyBay', prod_more: 'Learn more →',
+        qr_tagline: 'Scan any QR & barcode in seconds. Look up product prices, create custom QR codes — 13+ formats supported.',
+        qr_chip1: '⚡ Fast Scan', qr_chip2: '🔍 Price Lookup', qr_chip3: '🎨 Create QR',
+        qr_chip4: '📑 Batch Scan', qr_chip5: '📂 History', qr_chip6: '📤 Export & Share',
+        qr_dl: 'Get QRBay',
+        stat1: 'iOS Products', stat2: 'Users', stat3: 'App Store Rating', stat4: 'Free',
+        why_label: 'WHY VUTASO',
+        why_title: 'Built with <span class="gtext-orange">passion</span>',
+        why1_t: 'Safe & Secure', why1_d: 'Data stored on your device & personal iCloud. No user data collection.',
+        why2_t: 'Fast & Smooth', why2_d: 'Optimized performance, instant launch. Intuitive UI, no learning curve needed.',
+        why3_t: 'Made in Vietnam', why3_d: 'Designed for Vietnamese users — supporting Vietnamese, Lunar calendar, VND & more.',
+        why4_t: 'Elegant Design', why4_d: 'Modern Apple-style UI. Smooth experience on iPhone & iPad.',
+        why5_t: 'Free', why5_d: 'All core features are completely free.',
+        why6_t: 'Regular Updates', why6_d: 'New features added frequently based on community feedback.',
+        faq_label: 'FAQ',
+        faq_title: 'Frequently <span class="gtext">Asked Questions</span>',
+        faq1_q: 'Are the apps free?<span class="faq-icon">+</span>',
+        faq1_a: 'Both MoneyBay and QRBay are free with full core features. MoneyBay has a Pro plan for advanced features.',
+        faq2_q: 'Is my data safe?<span class="faq-icon">+</span>',
+        faq2_a: 'Absolutely safe. Data is stored only on your device and personal iCloud. We don\'t collect any information.',
+        faq3_q: 'Is Android supported?<span class="faq-icon">+</span>',
+        faq3_a: 'Currently optimized for iOS. An Android version is being considered for future development.',
+        faq4_q: 'What are MoneyBay\'s key features?<span class="faq-icon">+</span>',
+        faq4_a: 'Voice & AI chat expense tracking, auto receipt scanning, chart reports, debt book, spending limits, iCloud sync and many more.',
+        faq5_q: 'What code formats does QRBay support?<span class="faq-icon">+</span>',
+        faq5_a: 'QRBay supports 10+ formats: QR Code, Data Matrix, Aztec, PDF 417, EAN‑13, EAN‑8, UPC‑A, UPC‑E, Code 128, Code 93, Code 39, Codabar and ITF.',
+        cta_title: 'Get started today',
+        cta_sub: 'Download free and experience the best iOS apps for modern life.',
+        cta_mb: '💰 Get MoneyBay', cta_qr: '📱 Get QRBay',
+        ft_desc: 'Developing mobile apps that help users manage daily life smartly and efficiently.',
+        ft_products: 'Products', ft_download: 'Download', ft_support: 'Support',
+        ft_dl_mb: 'Get MoneyBay', ft_dl_qr: 'Get QRBay',
+        ft_privacy: 'Privacy Policy', ft_terms: 'Terms of Service',
+        ft_bottom: '&copy; 2025 VUTASO. Made with ❤️ in Vietnam'
+      }
+    };
+
+    function switchLang(lang) {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (I18N[lang] && I18N[lang][key]) {
+          el.innerHTML = I18N[lang][key];
+        }
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+      document.documentElement.lang = lang;
+      localStorage.setItem('vutaso-lang', lang);
+    }
+
+    // Auto-detect: saved preference → browser language → default vi
+    (function initLang() {
+      const saved = localStorage.getItem('vutaso-lang');
+      if (saved && (saved === 'vi' || saved === 'en')) {
+        switchLang(saved);
+        return;
+      }
+      const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      const lang = browserLang.startsWith('vi') ? 'vi' : 'en';
+      switchLang(lang);
+    })();
   </script>
 </body>
 

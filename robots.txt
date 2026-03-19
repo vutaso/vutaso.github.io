@@ -1,0 +1,11 @@
+# robots.txt — VUTASO
+# https://vutaso.com
+
+User-agent: *
+Allow: /
+Disallow: /ui_old/
+Disallow: /moneybay/ui_old/
+Disallow: /qrbay/ui_old/
+
+# Sitemap
+Sitemap: https://vutaso.com/sitemap.xml

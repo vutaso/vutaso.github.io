@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Trang chủ VUTASO -->
+  <url>
+    <loc>https://vutaso.com/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- MoneyBay - Sổ Thu Chi -->
+  <url>
+    <loc>https://vutaso.com/moneybay/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- QRBay - Quét Mã QR -->
+  <url>
+    <loc>https://vutaso.com/qrbay/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- QRBay - QR Code Generator -->
+  <url>
+    <loc>https://vutaso.com/qrbay/qrcode-gen/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Chính sách Bảo mật -->
+  <url>
+    <loc>https://vutaso.com/privacy/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Điều khoản sử dụng -->
+  <url>
+    <loc>https://vutaso.com/terms/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- MoneyBay Privacy (legacy) -->
+  <url>
+    <loc>https://vutaso.com/moneybay/privacy/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- MoneyBay Terms (legacy) -->
+  <url>
+    <loc>https://vutaso.com/moneybay/terms/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
