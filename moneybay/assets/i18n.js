@@ -269,14 +269,14 @@ const MB_I18N = {
 // Typewriter phrases per language
 const MB_TW = {
   vi: [
-    'Sổ Thu Chi Thông Minh',
+    'MoneyBay - Sổ Thu Chi Thông Minh',
     'Ghi chép bằng Giọng nói',
     'Trợ lý AI Tài chính',
     'Báo cáo Biểu đồ',
     'Đồng bộ iCloud'
   ],
   en: [
-    'Smart Expense Tracker',
+    'MoneyBay - Smart Expense Tracker',
     'Voice-powered Recording',
     'AI Finance Assistant',
     'Visual Chart Reports',
