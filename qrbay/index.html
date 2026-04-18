@@ -31,7 +31,8 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="QRBay — App Quét Mã QR Code & Mã Vạch Miễn Phí">
-    <meta name="twitter:description" content="App quét mã QR code & mã vạch nhanh nhất. Quét QR, tra giá, tạo QR code tùy chỉnh. Hỗ trợ 13+ định dạng.">
+    <meta name="twitter:description"
+        content="App quét mã QR code & mã vạch nhanh nhất. Quét QR, tra giá, tạo QR code tùy chỉnh. Hỗ trợ 13+ định dạng.">
     <meta name="twitter:image" content="https://vutaso.com/assets/logo_qrbay.png">
 
     <!-- JSON-LD: SoftwareApplication (Rich Result cho app trên Google) -->
@@ -257,83 +258,7 @@
             background: rgba(255, 184, 0, 0.07);
         }
 
-        /* ============================================================
-   LOADING
-   ============================================================ */
-        #loading {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 999999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            transition: opacity 0.7s ease, visibility 0.7s ease;
-        }
 
-        #loading.out {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none
-        }
-
-        #lc {
-            position: absolute;
-            inset: 0
-        }
-
-        #l-logo {
-            width: 88px;
-            height: 88px;
-            filter: drop-shadow(0 0 24px var(--primary));
-        }
-
-        #l-logo path,
-        #l-logo circle {
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: draw 1.3s ease forwards;
-        }
-
-        @keyframes draw {
-            to {
-                stroke-dashoffset: 0
-            }
-        }
-
-        #l-name {
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 3px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        #l-track {
-            width: 180px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 99px;
-            overflow: hidden;
-        }
-
-        #l-bar {
-            height: 100%;
-            width: 0;
-            background: var(--gradient);
-            border-radius: 99px;
-            transition: width 0.04s linear;
-        }
-
-        #l-pct {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            letter-spacing: 1px
-        }
 
         /* ============================================================
    NAVBAR
@@ -2532,19 +2457,7 @@
     <div id="cur-dot"></div>
     <div id="cur-ring"></div>
 
-    <!-- ============================================================
-     LOADING
-     ============================================================ -->
-    <div id="loading">
-        <canvas id="lc"></canvas>
-        <img id="l-logo" src="assets/images/QRBay_Logo.png" alt="QRBay Logo"
-            style="width:200px;height:200px;border-radius:20%;">
-        <div id="l-name">QRBay</div>
-        <div id="l-track">
-            <div id="l-bar"></div>
-        </div>
-        <div id="l-pct">0%</div>
-    </div>
+
 
     <!-- ============================================================
      NAVBAR
@@ -3711,66 +3624,8 @@
     </footer>
 
     <script>
-        /* ============================================================
-           LOADING SCREEN
-           ============================================================ */
-        (function () {
-            const canvas = document.getElementById('lc');
-            const ctx = canvas.getContext('2d');
-            let pts = [], raf;
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            for (let i = 0; i < 70; i++) {
-                pts.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: Math.random() * 1.8 + 0.4,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    a: Math.random() * 0.4 + 0.15
-                });
-            }
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                pts.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,107,0,${p.a})`;
-                    ctx.fill();
-                    p.x += p.vx; p.y += p.vy;
-                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                });
-                raf = requestAnimationFrame(draw);
-            }
-            draw();
-
-            /* Progress bar */
-            const bar = document.getElementById('l-bar');
-            const pct = document.getElementById('l-pct');
-            let prog = 0;
-            const iv = setInterval(() => {
-                prog += Math.random() * 9 + 3;
-                if (prog >= 100) {
-                    prog = 100;
-                    clearInterval(iv);
-                    setTimeout(() => {
-                        cancelAnimationFrame(raf);
-                        document.getElementById('loading').classList.add('out');
-                        startHero();
-                    }, 280);
-                }
-                bar.style.width = prog + '%';
-                pct.textContent = Math.floor(prog) + '%';
-            }, 55);
-        })();
+        /* Start hero immediately (no loading screen) */
+        startHero();
 
         /* ============================================================
            HERO CANVAS PARTICLES
