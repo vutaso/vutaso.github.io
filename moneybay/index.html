@@ -2102,6 +2102,10 @@
         display: flex
       }
 
+      .n-right .lang-toggle {
+        display: none
+      }
+
       .ft-top {
         grid-template-columns: 1fr 1fr
       }
@@ -2207,6 +2211,7 @@
       <div class="lang-toggle">
         <button class="lang-btn" data-lang="vi" onclick="switchLang('vi')">VI</button>
         <button class="lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" data-lang="jp" onclick="switchLang('jp')">JP</button>
       </div>
       <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
         rel="noopener noreferrer" style="text-decoration:none"><button class="btn-nav" onclick="addRipple(event,this)"
@@ -2227,6 +2232,7 @@
     <div class="lang-toggle" style="margin-top:12px">
       <button class="lang-btn" data-lang="vi" onclick="switchLang('vi');closeM()">VI</button>
       <button class="lang-btn" data-lang="en" onclick="switchLang('en');closeM()">EN</button>
+      <button class="lang-btn" data-lang="jp" onclick="switchLang('jp');closeM()">JP</button>
     </div>
     <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
       rel="noopener noreferrer" style="text-decoration:none"><button class="btn-nav"
@@ -2278,7 +2284,7 @@
       <!-- Floating card top left -->
       <div class="fc fc1">
         <div class="fc-label" data-i18n="fc1_label">Tiết kiệm tháng này</div>
-        <div class="fc-val" style="color:var(--success)">+8.200.000 ₫</div>
+        <div class="fc-val" style="color:var(--success)" data-i18n="fc1_val">+8.200.000 ₫</div>
       </div>
       <!-- Floating card bottom right -->
       <div class="fc fc2">
@@ -2294,26 +2300,26 @@
             <div class="ph-top">
               <div>
                 <div class="ph-greeting" data-i18n="ph_greeting">Xin chào 👋</div>
-                <div class="ph-name">Tuấn Anh</div>
+                <div class="ph-name" data-i18n="ph_name">Tuấn Anh</div>
               </div>
-              <div class="ph-avatar">TA</div>
+              <div class="ph-avatar" data-i18n="ph_avatar">TA</div>
             </div>
             <div class="ph-balance-card">
               <div class="ph-bl-label" data-i18n="ph_balance">Số dư hiện tại</div>
-              <div class="ph-bl-num" id="ph-bal">52.400.000 ₫</div>
+              <div class="ph-bl-num" id="ph-bal" data-i18n="ph_bal_num">52.400.000 ₫</div>
               <div class="ph-bl-change" data-i18n="ph_change">▲ +12% so với tháng trước</div>
             </div>
             <div class="ph-row">
               <div class="ph-mini">
-                <div class="ph-mini-val up">+24.5tr</div>
+                <div class="ph-mini-val up" data-i18n="ph_income_val">+24.5tr</div>
                 <div class="ph-mini-label" data-i18n="ph_income">Thu nhập</div>
               </div>
               <div class="ph-mini">
-                <div class="ph-mini-val dn">-16.1tr</div>
+                <div class="ph-mini-val dn" data-i18n="ph_expense_val">-16.1tr</div>
                 <div class="ph-mini-label" data-i18n="ph_expense">Chi tiêu</div>
               </div>
               <div class="ph-mini">
-                <div class="ph-mini-val" style="color:var(--warning)">8.4tr</div>
+                <div class="ph-mini-val" style="color:var(--warning)" data-i18n="ph_saving_val">8.4tr</div>
                 <div class="ph-mini-label" data-i18n="ph_saving">Tiết kiệm</div>
               </div>
             </div>
@@ -2325,7 +2331,7 @@
                   <div class="ph-txn-n" data-i18n="ph_txn1">Lương tháng 3</div>
                   <div class="ph-txn-d">01/03</div>
                 </div>
-                <div class="ph-txn-a" style="color:var(--success)">+20tr</div>
+                <div class="ph-txn-a" style="color:var(--success)" data-i18n="ph_txn1_val">+20tr</div>
               </div>
               <div class="ph-txn">
                 <div class="ph-txn-ic" style="background:rgba(255,91,91,0.2);color:var(--danger)">↓</div>
@@ -2333,7 +2339,7 @@
                   <div class="ph-txn-n" data-i18n="ph_txn2">Shopee - Mua sắm</div>
                   <div class="ph-txn-d">02/03</div>
                 </div>
-                <div class="ph-txn-a" style="color:var(--danger)">-650k</div>
+                <div class="ph-txn-a" style="color:var(--danger)" data-i18n="ph_txn2_val">-650k</div>
               </div>
               <div class="ph-txn">
                 <div class="ph-txn-ic" style="background:rgba(43,127,255,0.2);color:var(--primary-light)">↓</div>
@@ -2341,7 +2347,7 @@
                   <div class="ph-txn-n" data-i18n="ph_txn3">Grab - Di chuyển</div>
                   <div class="ph-txn-d">02/03</div>
                 </div>
-                <div class="ph-txn-a" style="color:var(--danger)">-85k</div>
+                <div class="ph-txn-a" style="color:var(--danger)" data-i18n="ph_txn3_val">-85k</div>
               </div>
             </div>
           </div>
@@ -2907,7 +2913,7 @@
       <!-- Free -->
       <div class="price-card rev fz" data-delay="0">
         <div class="pname" data-i18n="pr_free">Miễn phí</div>
-        <div class="pprice gtext">0 ₫</div>
+        <div class="pprice gtext" data-i18n="pr_free_price">0 ₫</div>
         <div class="pperiod" data-i18n="pr_forever">mãi mãi</div>
         <div class="pfeats">
           <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
@@ -2963,7 +2969,7 @@
       <div class="price-card pop rev fz" data-delay="150">
         <div class="pop-tag" data-i18n="pr_pop">✦ Phổ biến nhất</div>
         <div class="pname" data-i18n="pr_lifetime">Trọn đời</div>
-        <div class="pprice gtext" id="pp">499.000 ₫</div>
+        <div class="pprice gtext" id="pp" data-i18n="pr_pro_price">499.000 ₫</div>
         <div class="pperiod" id="pperiod" data-i18n="pr_once">một lần duy nhất</div>
         <div class="pfeats">
           <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
@@ -3057,7 +3063,7 @@
             đẹp và đơn giản,
             mình dùng được ngay từ lần đầu."</div>
           <div class="rev-auth">
-            <div class="rev-av">NH</div>
+            <div class="rev-av" data-i18n="rv1_av">NH</div>
             <div>
               <div class="rev-name" data-i18n="rv1_name">Nguyễn Hương</div>
               <div class="rev-role" data-i18n="rv1_role">Kỹ sư, Hà Nội</div>
@@ -3071,7 +3077,7 @@
             cà phê 35k' là
             app tự nhập vào. Tiết kiệm thời gian ghê!"</div>
           <div class="rev-auth">
-            <div class="rev-av" style="background:linear-gradient(135deg,#7B61FF,#2B7FFF)">TM</div>
+            <div class="rev-av" style="background:linear-gradient(135deg,#7B61FF,#2B7FFF)" data-i18n="rv2_av">TM</div>
             <div>
               <div class="rev-name" data-i18n="rv2_name">Trần Minh</div>
               <div class="rev-role" data-i18n="rv2_role">Designer, TP.HCM</div>
@@ -3085,7 +3091,7 @@
             nhiêu, khi nào trả
             rất rõ ràng. Không cần excel nữa rồi!"</div>
           <div class="rev-auth">
-            <div class="rev-av" style="background:linear-gradient(135deg,#00D68F,#00E5FF)">LT</div>
+            <div class="rev-av" style="background:linear-gradient(135deg,#00D68F,#00E5FF)" data-i18n="rv3_av">LT</div>
             <div>
               <div class="rev-name" data-i18n="rv3_name">Lê Thảo</div>
               <div class="rev-role" data-i18n="rv3_role">Chủ shop online, Đà Nẵng</div>
@@ -3099,7 +3105,7 @@
             nhiều nhất vào đâu
             mỗi tháng để điều chỉnh."</div>
           <div class="rev-auth">
-            <div class="rev-av" style="background:linear-gradient(135deg,#FFB800,#FF5B5B)">PK</div>
+            <div class="rev-av" style="background:linear-gradient(135deg,#FFB800,#FF5B5B)" data-i18n="rv4_av">PK</div>
             <div>
               <div class="rev-name" data-i18n="rv4_name">Phạm Khoa</div>
               <div class="rev-role" data-i18n="rv4_role">Kế toán, Hà Nội</div>
@@ -3113,7 +3119,7 @@
             dùng để scan giấy
             tờ hàng ngày, tiện hơn app scan riêng."</div>
           <div class="rev-auth">
-            <div class="rev-av" style="background:linear-gradient(135deg,#2B7FFF,#7B61FF)">VL</div>
+            <div class="rev-av" style="background:linear-gradient(135deg,#2B7FFF,#7B61FF)" data-i18n="rv5_av">VL</div>
             <div>
               <div class="rev-name" data-i18n="rv5_name">Vũ Linh</div>
               <div class="rev-role" data-i18n="rv5_role">Nhân viên văn phòng, HCM</div>

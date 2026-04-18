@@ -55,9 +55,11 @@ function initTranslationSystem(translations, storageKey) {
         if (savedLang && (savedLang === 'vi' || savedLang === 'en' || savedLang === 'jp')) {
             return savedLang;
         }
-        // Detect browser language: Vietnamese → vi, otherwise → en
+        // Detect browser language: English → en, Japanese → jp, default → vi
         const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-        return browserLang.startsWith('vi') ? 'vi' : 'en';
+        if (browserLang.startsWith('en')) return 'en';
+        if (browserLang.startsWith('ja')) return 'jp';
+        return 'vi';
     };
 
     // Initialize with detected language

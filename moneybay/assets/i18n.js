@@ -24,6 +24,8 @@ const MB_I18N = {
     fc2_label: 'Báo cáo sẵn sàng',
     // Phone UI
     ph_greeting: 'Xin chào 👋',
+    ph_name: 'Tuấn Anh',
+    ph_avatar: 'TA',
     ph_balance: 'Số dư hiện tại',
     ph_change: '▲ +12% so với tháng trước',
     ph_income: 'Thu nhập',
@@ -32,6 +34,17 @@ const MB_I18N = {
     ph_txn1: 'Lương tháng 3',
     ph_txn2: 'Shopee - Mua sắm',
     ph_txn3: 'Grab - Di chuyển',
+    // Currency amounts
+    fc1_val: '+8.200.000 ₫',
+    ph_bal_num: '52.400.000 ₫',
+    ph_income_val: '+24.5tr',
+    ph_expense_val: '-16.1tr',
+    ph_saving_val: '8.4tr',
+    ph_txn1_val: '+20tr',
+    ph_txn2_val: '-650k',
+    ph_txn3_val: '-85k',
+    pr_free_price: '0 ₫',
+    pr_pro_price: '499.000 ₫',
 
     // Features
     feat_label: 'Tính năng cốt lõi',
@@ -98,15 +111,15 @@ const MB_I18N = {
     rv_label: 'Đánh giá',
     rv_title: 'Người dùng nói gì về<br><span class="gtext">MoneyBay?</span>',
     rv1: '"Cái hay nhất là không cần đăng ký. Mở app lên là dùng luôn. Giao diện cực đẹp và đơn giản, mình dùng được ngay từ lần đầu."',
-    rv1_name: 'Nguyễn Hương', rv1_role: 'Kỹ sư, Hà Nội',
+    rv1_av: 'NH', rv1_name: 'Nguyễn Hương', rv1_role: 'Kỹ sư, Hà Nội',
     rv2: '"Tính năng chat AI ghi chép bằng giọng nói quá xịn. Mình chỉ nói \'vừa uống cà phê 35k\' là app tự nhập vào. Tiết kiệm thời gian ghê!"',
-    rv2_name: 'Trần Minh', rv2_role: 'Designer, TP.HCM',
+    rv2_av: 'TM', rv2_name: 'Trần Minh', rv2_role: 'Designer, TP.HCM',
     rv3: '"Tiện ích Sổ Nợ rất hữu ích cho shop nhỏ của mình. Theo dõi ai nợ bao nhiêu, khi nào trả rất rõ ràng. Không cần excel nữa rồi!"',
-    rv3_name: 'Lê Thảo', rv3_role: 'Chủ shop online, Đà Nẵng',
+    rv3_av: 'LT', rv3_name: 'Lê Thảo', rv3_role: 'Chủ shop online, Đà Nẵng',
     rv4: '"Báo cáo biểu đồ rất đẹp và trực quan. Mình thấy ngay mình đang tốn tiền nhiều nhất vào đâu mỗi tháng để điều chỉnh."',
-    rv4_name: 'Phạm Khoa', rv4_role: 'Kế toán, Hà Nội',
+    rv4_av: 'PK', rv4_name: 'Phạm Khoa', rv4_role: 'Kế toán, Hà Nội',
     rv5: '"MoneyBay Scanner quét hóa đơn rất nhanh, xuất PDF không watermark. Mình dùng để scan giấy tờ hàng ngày, tiện hơn app scan riêng."',
-    rv5_name: 'Vũ Linh', rv5_role: 'Nhân viên văn phòng, HCM',
+    rv5_av: 'VL', rv5_name: 'Vũ Linh', rv5_role: 'Nhân viên văn phòng, HCM',
 
     // FAQ
     faq_title: 'Câu hỏi <span class="gtext">thường gặp</span>',
@@ -155,6 +168,8 @@ const MB_I18N = {
     fc2_label: 'Report ready',
     // Phone UI
     ph_greeting: 'Hello 👋',
+    ph_name: 'Alex',
+    ph_avatar: 'A',
     ph_balance: 'Current balance',
     ph_change: '▲ +12% from last month',
     ph_income: 'Income',
@@ -163,6 +178,17 @@ const MB_I18N = {
     ph_txn1: 'March Salary',
     ph_txn2: 'Shopee - Shopping',
     ph_txn3: 'Grab - Transport',
+    // Currency amounts
+    fc1_val: '+$340',
+    ph_bal_num: '$2,180',
+    ph_income_val: '+$1,020',
+    ph_expense_val: '-$670',
+    ph_saving_val: '$350',
+    ph_txn1_val: '+$830',
+    ph_txn2_val: '-$27',
+    ph_txn3_val: '-$3.5',
+    pr_free_price: '$0',
+    pr_pro_price: '$19.99',
 
     // Features
     feat_label: 'Core Features',
@@ -229,15 +255,15 @@ const MB_I18N = {
     rv_label: 'Reviews',
     rv_title: 'What users say about<br><span class="gtext">MoneyBay?</span>',
     rv1: '"The best part is no sign-up needed. Open the app and start using it. The interface is beautiful and simple, I got it right from the first time."',
-    rv1_name: 'Nguyễn Hương', rv1_role: 'Engineer, Hanoi',
-    rv2: '"The AI voice recording feature is amazing. I just said \'just had coffee 35k\' and the app auto-entered it. Saves so much time!"',
-    rv2_name: 'Trần Minh', rv2_role: 'Designer, HCMC',
-    rv3: '"The Debt Book utility is very useful for my small shop. Tracking who owes how much and when they\'ll pay is very clear. No more excel!"',
-    rv3_name: 'Lê Thảo', rv3_role: 'Online shop owner, Da Nang',
+    rv1_av: 'JC', rv1_name: 'Jessica Chen', rv1_role: 'Engineer, New York',
+    rv2: '"The AI voice recording feature is amazing. I just said \'coffee $5\' and the app auto-entered it. Saves so much time!"',
+    rv2_av: 'MT', rv2_name: 'Michael Taylor', rv2_role: 'Designer, San Francisco',
+    rv3: '"The Debt Book utility is very useful for my small shop. Tracking who owes how much and when they\'ll pay is very clear. No more Excel!"',
+    rv3_av: 'SW', rv3_name: 'Sarah Wilson', rv3_role: 'Shop owner, Chicago',
     rv4: '"The chart reports are beautiful and intuitive. I can see right away where I\'m spending the most each month to adjust."',
-    rv4_name: 'Phạm Khoa', rv4_role: 'Accountant, Hanoi',
-    rv5: '"MoneyBay Scanner scans receipts super fast, exports PDF without watermark. I use it to scan documents daily, more convenient than a separate scan app."',
-    rv5_name: 'Vũ Linh', rv5_role: 'Office worker, HCMC',
+    rv4_av: 'DL', rv4_name: 'David Lee', rv4_role: 'Accountant, Boston',
+    rv5: '"MoneyBay Scanner scans receipts super fast, exports PDF without watermark. I use it to scan documents daily."',
+    rv5_av: 'ER', rv5_name: 'Emily Roberts', rv5_role: 'Office worker, LA',
 
     // FAQ
     faq_title: 'Frequently <span class="gtext">Asked Questions</span>',
@@ -263,24 +289,175 @@ const MB_I18N = {
     ft_s1: 'Help', ft_s2: 'Pricing', ft_s3: 'Privacy Policy', ft_s4: 'Terms of Service', ft_s5: 'Contact',
     ft_made: 'Made with ❤️ in Vietnam 🇻🇳',
     ft_by: 'A product of'
+  },
+  jp: {
+    // Navbar
+    nav_feat: '機能',
+    nav_widgets: 'ユーティリティ',
+    nav_how: '使い方',
+    nav_pricing: '料金',
+    nav_dl: '無料ダウンロード',
+
+    // Hero
+    hero_badge: 'iOSアプリ — 登録不要',
+    hero_sub: 'スマートな個人家計管理。数秒で入力、ビジュアルレポート、AIチャット — すべてが美しくシンプルなアプリに。',
+    hero_btn_dl: '⬇ 無料ダウンロード',
+    hero_btn_feat: '機能を見る',
+    hero_stat1: '<span class="hstat-icon">⭐</span><strong>4.9</strong> App Store',
+    hero_stat2: '<span class="hstat-icon">🚫</span>登録不要',
+    hero_stat3: '<span class="hstat-icon">🔒</span>100%セキュア',
+
+    // Floating cards
+    fc1_label: '今月の貯蓄',
+    fc2_label: 'レポート準備完了',
+    // Phone UI
+    ph_greeting: 'こんにちは 👋',
+    ph_name: 'ゆうき',
+    ph_avatar: 'Y',
+    ph_balance: '現在の残高',
+    ph_change: '▲ 先月比+12%',
+    ph_income: '収入',
+    ph_expense: '支出',
+    ph_saving: '貯蓄',
+    ph_txn1: '3月の給料',
+    ph_txn2: 'ショッピング',
+    ph_txn3: 'タクシー',
+    // Currency amounts
+    fc1_val: '+¥50,000',
+    ph_bal_num: '¥320,000',
+    ph_income_val: '+¥150K',
+    ph_expense_val: '-¥98K',
+    ph_saving_val: '¥52K',
+    ph_txn1_val: '+¥120K',
+    ph_txn2_val: '-¥4,000',
+    ph_txn3_val: '-¥520',
+    pr_free_price: '¥0',
+    pr_pro_price: '¥2,980',
+
+    // Features
+    feat_label: 'コア機能',
+    feat_title: 'あなたの財務を<br><span class="gtext">マスターするために</span>',
+    feat_sub: 'ミニマルデザイン、直感的な操作 — 登録不要ですぐに始められます。',
+    f1_tag: 'UX', f1_title: '使いやすい直感的インターフェース', f1_desc: 'シンプルなデザインで、初めてでも簡単に使えます。ガイド不要、学習不要。',
+    f2_tag: '即座に', f2_title: 'アカウント登録不要', f2_desc: 'アカウントを作成せずにすぐに使い始められます。アプリを開いて即開始。',
+    f3_tag: '数秒', f3_title: '簡単データ入力', f3_desc: '収入や支出をわずか数秒で記録。スピードと利便性に最適化された入力画面。',
+    f4_tag: '分析', f4_title: 'ビジュアル財務レポート', f4_desc: '日別、月別、年別レポート。円グラフ＆棒グラフでカテゴリーや月を視覚的に比較。',
+    f5_tag: 'カスタマイズ', f5_title: 'アプリカラーテーマ', f5_desc: '豊富なカラーテーマから選択。お好みに合わせてインターフェースをカスタマイズ。',
+    f6_tag: 'エクスポート', f6_title: 'バックアップ＆CSV/PDF/Excelエクスポート', f6_desc: 'CSV、PDF、Excelファイルに簡単エクスポート。保存、分析、共有に。',
+    f7_tag: 'iOS', f7_title: 'iCloud同期', f7_desc: 'iCloudですべてのiOSデバイス間でデータを同期。いつでもどこでも最新データ。',
+    f8_tag: 'AI', f8_title: 'AIチャット＆音声入力', f8_desc: 'スマートAIアシスタントが音声やチャットで素早く記録をサポート。',
+    f9_tag: 'カレンダー', f9_title: '月間カレンダー表示', f9_desc: 'カレンダー表示で日ごとの収支を確認。月間の財務状況を一目で把握。',
+
+    // Widgets
+    wid_label: '拡張ユーティリティ',
+    wid_title: 'MoneyBayの<br><span class="gtext">ユニークなエコシステム</span>',
+    wid_sub: '家計管理だけでなく、日常生活を便利にするユーティリティも統合。',
+    wid_badge: 'ユーティリティ',
+    w1_name: 'MoneyBayスキャナー', w1_desc: '書類、請求書、契約書、名刺をスキャン。透かしなしの高品質PDF出力。',
+    w2_name: '買い物リスト', w2_desc: '買い物の計画と管理を効率的に。買い忘れを防止。',
+    w3_name: '画像から取引入力', w3_desc: 'レシート写真、オンライン決済結果、銀行取引履歴を自動認識して入力。',
+    w4_name: '借金帳', w4_desc: '日々の貸し借りを記録・管理・追跡。個人や小規模ビジネスに便利。',
+    w5_name: '支出制限', w5_desc: 'カテゴリーごとに支出制限を設定。予算超過時にアラート通知。',
+    w6_name: 'AIチャット', w6_desc: 'スマートAIアシスタントが音声やメッセージで支出を記録。自然に話すだけ。',
+    w7_name: '通貨換算', w7_desc: 'リアルタイムで国際通貨を換算。世界中の主要通貨に対応。',
+    w8_name: '割り勘', w8_desc: 'グループ食事や旅行の請求書を均等または割合で分割。素早く公平に。',
+    w9_name: '利息計算', w9_desc: '貯蓄利息、期間別複利を計算。賢い財務判断をサポート。',
+    w10_name: 'チップ計算', w10_desc: 'カスタムパーセンテージでチップを素早く計算。グループ分割にも対応。',
+    w11_name: '旧暦カレンダー', w11_desc: '旧暦、吉時、日替わり名言、年間の祝日。いつでも便利に参照。',
+    w12_name: '本日の金価格', w12_desc: 'SJC金、金リング、世界の金価格をリアルタイム更新。毎日の価格変動を追跡。',
+
+    // How it works
+    how_label: '始めましょう',
+    how_title: 'たった<br><span class="gtext">3つの簡単ステップ</span>',
+    how_sub: '複雑さなし。登録不要。わずか30秒で開始。',
+    s1_t: 'アプリをダウンロード', s1_d: 'App StoreからMoneyBayを入手。無料、アカウント不要、すぐに使用開始。',
+    s2_t: '収支を記録', s2_d: '収入や支出を数秒で入力。音声＆AIでさらに素早く記録。',
+    s3_t: 'レポートを確認', s3_d: '日/月/年別のビジュアルレポート。美しく明確なグラフ。いつでもファイルエクスポート。',
+
+    // Stats
+    st1: 'ダウンロード数', st2: 'App Store評価', st3: '統合ユーティリティ', st4: 'ユーザー満足度',
+
+    // Pricing
+    pr_label: '料金プラン',
+    pr_title: '無料で始めて、<br><span class="gtext">必要な時にアップグレード</span>',
+    pr_toggle: '永久アップグレード割引 <span class="ybadge">-30%</span>',
+    pr_free: '無料', pr_forever: '永久に',
+    pf1: '無制限の収支入力', pf2: '基本レポート', pf3: '登録不要', pf4: 'iCloud同期',
+    pf5: '支出制限/予算の作成', pf6: '複数ウォレット', pf7: '旧暦カレンダー', pf8: '借金帳',
+    pf9: '買い物リスト作成', pf10: '割り勘', pf11: '本日の金価格', pf12: '広告あり',
+    pf13: 'AIチャット', pf14: 'PDF/Excelエクスポート',
+    pr_free_btn: '無料で始める',
+    pr_pop: '✦ 最も人気', pr_lifetime: '永久', pr_once: '一回限りの支払い',
+    pp1: '無料版の全機能', pp2: 'すべての広告を削除', pp3: 'AIチャット＆音声',
+    pp4: 'CSV/PDF/Excelエクスポート', pp5: '無制限の支出制限/予算',
+    pp6: '無制限のウォレット', pp7: '無制限のレシート＆書類スキャン',
+    pp8: 'すべての拡張ユーティリティ', pp9: '高度なグラフ', pp10: '月額料金なし',
+    pp11: '永久無料アップデート', pp12: '優先サポート', pp13: 'ベータ機能アクセス',
+    pr_pro_btn: '今すぐProにアップグレード',
+
+    // Reviews
+    rv_label: 'レビュー',
+    rv_title: 'ユーザーの声<br><span class="gtext">MoneyBay</span>',
+    rv1: '「最高なのは登録不要なこと。アプリを開いてすぐに使える。インターフェースが美しくシンプルで、初めてから使いこなせました。」',
+    rv1_av: 'あ', rv1_name: '山田 あかり', rv1_role: 'エンジニア、東京',
+    rv2: '「AI音声録音機能が素晴らしい。「コーヒー500円」と言うだけで自動入力。時間の節約がすごい！」',
+    rv2_av: 'ゆ', rv2_name: '佐藤 ゆうた', rv2_role: 'デザイナー、大阪',
+    rv3: '「借金帳ユーティリティは私の小さなショップにとても便利。誰がいくら借りているか、いつ返すかが明確。もうExcel不要！」',
+    rv3_av: 'み', rv3_name: '鈴木 みく', rv3_role: 'ショップオーナー、福岡',
+    rv4: '「グラフレポートが美しく直感的。毎月どこに一番お金を使っているかすぐにわかります。」',
+    rv4_av: 'た', rv4_name: '田中 たくみ', rv4_role: '会計士、名古屋',
+    rv5: '「MoneyBayスキャナーはレシートを超高速スキャン、透かしなしPDF出力。毎日の書類スキャンに使っています。」',
+    rv5_av: 'な', rv5_name: '渡辺 なお', rv5_role: '会社員、横浜',
+
+    // FAQ
+    faq_title: 'よくある<span class="gtext">質問</span>',
+    fq1_q: 'MoneyBayは本当にアカウント登録不要ですか？', fq1_a: 'はい！アプリをダウンロードして開くだけで、すぐに家計の記録を始められます。メール、パスワード、個人情報は一切不要です。',
+    fq2_q: 'データは安全に保存されますか？', fq2_a: 'データはデバイスに直接保存され、iCloudで同期できます（あなただけがアクセス可能）。当社のサーバーに個人の財務データを保存することはありません。',
+    fq3_q: 'iCloud同期はどのように機能しますか？', fq3_a: 'iCloud同期を有効にすると（Proプラン）、iPhone、iPad、Macなどすべてのデバイスで個人のiCloudアカウントを通じてデータが自動同期されます。',
+    fq4_q: 'どのエクスポート形式が利用できますか？', fq4_a: 'ProプランはCSV（Excel、Google Sheetsで開ける）、PDF（印刷または保存）、Excel（.xlsx）へのエクスポートに対応。カテゴリーとメモ付きの完全な取引履歴をエクスポート。',
+    fq5_q: 'AIチャットと音声録音はどのように機能しますか？', fq5_a: '「ラーメン800円」や「今日給料15万円もらった」のように話すか入力するだけで、AIが自動的に金額、カテゴリー、メモを分析して取引を作成します。',
+
+    // Download CTA
+    dl_title: '今日から始めよう —<br><span class="gtext">完全無料</span>',
+    dl_sub: '登録不要。ダウンロードして、アプリを開いて、支出を記録 — シンプルです。10,000人以上のユーザーが信頼。',
+    dl_store: '<small>ダウンロード</small><strong>App Store</strong>',
+    dl_qr: 'スキャンしてダウンロード',
+
+    // Footer
+    ft_tag: 'iOS向けスマート家計管理アプリ。登録不要、今日から始めましょう。',
+    ft_feat: '機能',
+    ft_f1: '収支入力', ft_f2: 'ウォレット', ft_f3: 'グラフレポート', ft_f4: 'AIチャット', ft_f5: 'iCloud同期', ft_f6: 'データエクスポート',
+    ft_wid: 'ユーティリティ',
+    ft_w1: '書類スキャナー', ft_w2: '買い物リスト', ft_w3: '画像から入力', ft_w4: '支出制限', ft_w5: '借金帳', ft_w6: '旧暦カレンダー', ft_w7: '割り勘', ft_w8: '通貨換算', ft_w9: '本日の金価格',
+    ft_support: 'サポート',
+    ft_s1: 'ヘルプ', ft_s2: '料金', ft_s3: 'プライバシーポリシー', ft_s4: '利用規約', ft_s5: 'お問い合わせ',
+    ft_made: 'ベトナム 🇻🇳 で❤️を込めて作りました',
+    ft_by: '製品提供'
   }
 };
 
 // Typewriter phrases per language
 const MB_TW = {
   vi: [
-    'MoneyBay - Sổ Thu Chi Thông Minh',
+    'Ghi chép 3 giây. Kiểm soát cả tháng.',
     'Ghi chép bằng Giọng nói',
     'Trợ lý AI Tài chính',
     'Báo cáo Biểu đồ',
     'Đồng bộ iCloud'
   ],
   en: [
-    'MoneyBay - Smart Expense Tracker',
+    '3-Second Entry. Month-long Control.',
     'Voice-powered Recording',
     'AI Finance Assistant',
     'Visual Chart Reports',
     'iCloud Sync'
+  ],
+  jp: [
+    '3秒で記録。1ヶ月をコントロール。',
+    '音声で簡単記録',
+    'AI財務アシスタント',
+    'ビジュアルレポート',
+    'iCloud同期'
   ]
 };
 
@@ -310,11 +487,12 @@ function switchLang(lang) {
 // Auto-detect: saved preference → browser language → default vi
 (function initLang() {
   const saved = localStorage.getItem('vutaso-lang');
-  if (saved && (saved === 'vi' || saved === 'en')) {
+  if (saved && (saved === 'vi' || saved === 'en' || saved === 'jp')) {
     switchLang(saved);
     return;
   }
   const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-  const lang = browserLang.startsWith('vi') ? 'vi' : 'en';
-  switchLang(lang);
+  if (browserLang.startsWith('en')) { switchLang('en'); return; }
+  if (browserLang.startsWith('ja')) { switchLang('jp'); return; }
+  switchLang('vi');
 })();
