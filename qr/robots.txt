@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /qr/
+
+Sitemap: https://vutaso.com/qr/sitemap.xml

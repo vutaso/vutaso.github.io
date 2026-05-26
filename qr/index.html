@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free QR Code Generator — Create Custom QR Codes Online</title>
+  <meta name="description" content="Free online QR code generator. Create custom QR codes for URL, WiFi, vCard, email, SMS, location, social media, crypto and more. Download PNG, SVG, JPEG, PDF.">
+  <meta name="keywords" content="QR code generator, free QR code, custom QR, WiFi QR, vCard QR, batch QR">
+  <meta name="author" content="Free QR Generator">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vutaso.com/qr/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Free QR Code Generator">
+  <meta property="og:description" content="Create beautiful custom QR codes for free. 12 types, full styling, batch mode, multi-format export.">
+  <meta property="og:url" content="https://vutaso.com/qr/">
+  <meta property="og:site_name" content="Free QR Generator">
+  <meta property="og:image" content="https://vutaso.com/qr/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Free QR Code Generator — Create custom QR codes online">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free QR Code Generator">
+  <meta name="twitter:description" content="Create beautiful custom QR codes for free. 12 types, full styling, batch mode.">
+  <meta name="twitter:image" content="https://vutaso.com/qr/assets/img/og-image.png">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preload" href="assets/css/fonts.css" as="style">
+  <link rel="preload" href="assets/css/style.css" as="style">
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/themes/nano.min.css" integrity="sha384-SRANiKMn1qiS+patt9oWTeWFqP5oFuhjbXHHTCPna4PcFzD/As8zRVH3+mmjwgDy" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Free QR Code Generator",
+    "description": "Create custom QR codes online for free with 12 types, full styling, and multi-format export.",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this QR code generator really free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free plan includes all features with a small watermark. Pro removes watermark and unlocks higher resolution." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data safe?",
+        "acceptedAnswer": { "@type": "Answer", "text": "All QR generation happens in your browser. Your data is never sent to our servers." }
+      },
+      {
+        "@type": "Question",
+        "name": "What file formats can I download?",
+        "acceptedAnswer": { "@type": "Answer", "text": "PNG, SVG, JPEG, and PDF. Frame templates are included in PNG, JPEG, and PDF exports." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header__inner container">
+      <a href="./" class="logo" aria-label="Free QR Generator home">
+        <img src="assets/img/logo.svg" alt="" width="180" height="32" class="logo__img">
+      </a>
+      <nav class="header__nav">
+        <a href="pricing.html" data-i18n="nav.pricing">Pricing</a>
+        <a href="contact.html" data-i18n="nav.contact">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <span id="pro-badge" class="pro-badge" hidden>PRO</span>
+        <button type="button" id="pro-upgrade" class="btn btn--pro btn--sm">
+          <i class="fa-solid fa-crown" aria-hidden="true"></i>
+          <span data-i18n="pro.upgrade">Upgrade Pro</span>
+        </button>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn lang-btn--active" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" class="lang-btn" data-lang="vi" aria-pressed="false">VI</button>
+        </div>
+        <button type="button" id="batch-toggle" class="btn btn--ghost btn--sm" aria-pressed="false">
+          <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+          <span data-i18n="nav.batch">Batch Mode</span>
+        </button>
+        <button type="button" id="theme-toggle" class="btn btn--icon" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="main container">
+    <!-- Templates Marketplace -->
+    <section class="template-marketplace panel" id="template-marketplace" aria-label="QR code templates">
+      <div class="template-marketplace__head">
+        <div>
+          <h2 class="template-marketplace__title" data-i18n="templates.title">Templates</h2>
+          <p class="template-marketplace__subtitle" data-i18n="templates.subtitle">Pick a ready-made design — customize content in one click.</p>
+        </div>
+        <div class="template-marketplace__actions">
+          <input type="search" id="template-search" class="input input--sm template-search" data-i18n-placeholder="templates.search" placeholder="Search templates…" autocomplete="off">
+          <button type="button" id="template-marketplace-toggle" class="btn btn--ghost btn--sm" aria-expanded="true" data-i18n="templates.hide">Hide</button>
+        </div>
+      </div>
+      <div id="template-marketplace-body">
+        <div id="template-categories" class="template-categories"></div>
+        <p id="template-count" class="template-count"></p>
+        <div id="template-grid" class="template-grid"></div>
+      </div>
+    </section>
+
+    <!-- Single QR Mode -->
+    <div id="single-mode" class="app-grid">
+      <!-- Column 1: Type Selector -->
+      <aside class="panel panel--types" aria-label="QR code type selector">
+        <h2 class="panel__title" data-i18n="panel.qrType">QR Type</h2>
+        <nav id="type-selector" class="type-grid" role="tablist" aria-label="Select QR code type"></nav>
+        <aside class="ad-slot ad-slot--sidebar" aria-label="Advertisement">
+          <span class="ad-slot__label">Ad</span>
+          <p class="ad-slot__placeholder">Ad space — configure in site.config.js</p>
+        </aside>
+      </aside>
+
+      <!-- Column 2: Form + Customizer -->
+      <section class="panel panel--form" aria-label="QR code content and customization">
+        <div id="form-section">
+          <h2 class="panel__title" id="form-title">Content</h2>
+          <div id="form-errors" class="form-errors" hidden role="alert"></div>
+          <form id="qr-form" class="qr-form" novalidate></form>
+        </div>
+
+        <div class="customizer">
+          <h2 class="panel__title" data-i18n="panel.customize">Customize</h2>
+
+          <!-- Preset Themes -->
+          <div class="customizer__section">
+            <label class="field-label" data-i18n="panel.presetThemes">Preset Themes</label>
+            <div id="theme-presets" class="theme-grid"></div>
+          </div>
+
+          <!-- Custom Themes -->
+          <div class="customizer__section">
+            <label class="field-label" data-i18n="panel.customThemes">My Themes</label>
+            <div class="custom-theme-save-row">
+              <input type="text" id="custom-theme-name" class="input input--sm" data-i18n-placeholder="customTheme.namePlaceholder" placeholder="Theme name" maxlength="30">
+              <button type="button" id="custom-theme-save" class="btn btn--secondary btn--sm" data-i18n="customTheme.save">Save current</button>
+            </div>
+            <div id="custom-theme-presets" class="theme-grid custom-theme-grid"></div>
+            <p id="custom-theme-empty" class="field-hint" data-i18n="customTheme.empty" hidden>No saved themes yet.</p>
+          </div>
+
+          <!-- Frame Templates -->
+          <div class="customizer__section">
+            <label class="field-label" data-i18n="panel.frameTemplate">Frame Template</label>
+            <div id="frame-presets" class="frame-grid"></div>
+          </div>
+
+          <!-- Style Accordion -->
+          <div class="accordion" id="style-accordion">
+            <details class="accordion__item" open>
+              <summary class="accordion__header" data-i18n="accordion.dots">Dot &amp; Corner Styles</summary>
+              <div class="accordion__body">
+                <label class="field-label field-label--sm">Quick Style Combos</label>
+                <div id="style-combo-grid" class="style-combo-grid"></div>
+
+                <label class="field-label field-label--sm">Dot Style</label>
+                <div id="dot-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Dot style"></div>
+
+                <label class="field-label field-label--sm">Corner Square</label>
+                <div id="corner-square-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Corner square style"></div>
+
+                <label class="field-label field-label--sm">Corner Dot</label>
+                <div id="corner-dot-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Corner dot style"></div>
+              </div>
+            </details>
+
+            <details class="accordion__item" open>
+              <summary class="accordion__header" data-i18n="accordion.colors">Colors</summary>
+              <div class="accordion__body">
+                <div class="field-row">
+                  <label>Color Mode</label>
+                  <div class="radio-group" role="radiogroup" aria-label="Color mode">
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="solid" checked> Solid</label>
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="linear"> Linear</label>
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="radial"> Radial</label>
+                  </div>
+                </div>
+                <div class="color-pickers">
+                  <div class="color-picker-wrap">
+                    <label>Foreground</label>
+                    <div id="fg-color-picker"></div>
+                  </div>
+                  <div class="color-picker-wrap" id="fg-color2-wrap" hidden>
+                    <label>Foreground 2</label>
+                    <div id="fg-color2-picker"></div>
+                  </div>
+                  <div class="color-picker-wrap">
+                    <label>Background</label>
+                    <div id="bg-color-picker"></div>
+                  </div>
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="transparent-bg">
+                  Transparent background
+                </label>
+                <div class="field-row">
+                  <label>Background Mode</label>
+                  <div class="radio-group" role="radiogroup">
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="solid" checked> Solid</label>
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="linear"> Linear</label>
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="radial"> Radial</label>
+                  </div>
+                </div>
+                <div class="color-pickers">
+                  <div class="color-picker-wrap" id="bg-color2-wrap" hidden>
+                    <label>Background 2</label>
+                    <div id="bg-color2-picker"></div>
+                  </div>
+                </div>
+                <div class="field-row" id="bg-gradient-rotation-wrap" hidden>
+                  <label for="bg-gradient-rotation">BG Gradient Angle <span id="bg-gradient-rotation-val">45°</span></label>
+                  <input type="range" id="bg-gradient-rotation" min="0" max="360" value="45" step="5" class="range">
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="unified-colors" checked>
+                  Same color for dots &amp; corners
+                </label>
+                <div id="corner-colors-wrap" class="color-pickers" hidden>
+                  <div class="color-picker-wrap">
+                    <label>Corner Square Color</label>
+                    <div id="corner-square-color-picker"></div>
+                  </div>
+                  <div class="color-picker-wrap">
+                    <label>Corner Dot Color</label>
+                    <div id="corner-dot-color-picker"></div>
+                  </div>
+                </div>
+                <div class="field-row" id="gradient-rotation-wrap" hidden>
+                  <label for="gradient-rotation">Dot Gradient Angle <span id="gradient-rotation-val">0°</span></label>
+                  <input type="range" id="gradient-rotation" min="0" max="360" value="0" step="5" class="range">
+                </div>
+              </div>
+            </details>
+
+            <details class="accordion__item">
+              <summary class="accordion__header" data-i18n="accordion.frame">Frame &amp; Label</summary>
+              <div class="accordion__body">
+                <div class="field-row" id="custom-frame-label-wrap" hidden>
+                  <label for="custom-frame-label">Custom Label Text</label>
+                  <input type="text" id="custom-frame-label" class="input" placeholder="Scan Me" maxlength="40">
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="use-custom-frame-colors">
+                  Custom frame colors
+                </label>
+                <div id="frame-colors-wrap" class="color-pickers" hidden>
+                  <div class="color-picker-wrap">
+                    <label>Frame Border</label>
+                    <div id="frame-border-picker"></div>
+                  </div>
+                  <div class="color-picker-wrap">
+                    <label>Frame Background</label>
+                    <div id="frame-bg-picker"></div>
+                  </div>
+                  <div class="color-picker-wrap">
+                    <label>Label Color</label>
+                    <div id="frame-label-picker"></div>
+                  </div>
+                </div>
+                <div id="frame-banner-gradient-wrap" class="frame-banner-gradient" hidden>
+                  <label class="field-label field-label--sm" data-i18n="frame.bannerGradient">Banner Gradient</label>
+                  <div class="color-pickers">
+                    <div class="color-picker-wrap">
+                      <label data-i18n="frame.bannerFrom">Gradient Start</label>
+                      <div id="frame-banner-from-picker"></div>
+                    </div>
+                    <div class="color-picker-wrap">
+                      <label data-i18n="frame.bannerTo">Gradient End</label>
+                      <div id="frame-banner-to-picker"></div>
+                    </div>
+                  </div>
+                  <div class="banner-gradient-preview" id="banner-gradient-preview" aria-hidden="true"></div>
+                </div>
+              </div>
+            </details>
+
+            <details class="accordion__item">
+              <summary class="accordion__header" data-i18n="accordion.logo">Logo</summary>
+              <div class="accordion__body">
+                <div class="field-row">
+                  <label for="logo-upload">Upload Logo</label>
+                  <input type="file" id="logo-upload" accept="image/*" class="file-input">
+                </div>
+                <div class="field-row">
+                  <label for="logo-size">Logo Size <span id="logo-size-val">40%</span></label>
+                  <input type="range" id="logo-size" min="10" max="50" value="40" class="range">
+                </div>
+                <div class="field-row">
+                  <label for="logo-margin">Logo Margin <span id="logo-margin-val">5px</span></label>
+                  <input type="range" id="logo-margin" min="0" max="20" value="5" class="range">
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="logo-hide-bg" checked>
+                  Hide dots behind logo
+                </label>
+                <button type="button" id="logo-remove" class="btn btn--ghost btn--sm" hidden>Remove Logo</button>
+              </div>
+            </details>
+
+            <details class="accordion__item">
+              <summary class="accordion__header" data-i18n="accordion.size">Size &amp; Quality</summary>
+              <div class="accordion__body">
+                <div class="field-row">
+                  <label for="qr-size">QR Size <span id="qr-size-val">300px</span></label>
+                  <input type="range" id="qr-size" min="200" max="600" value="300" step="10" class="range">
+                  <small id="qr-size-limit" class="field-hint"></small>
+                </div>
+                <div class="field-row">
+                  <label for="qr-margin">Margin <span id="qr-margin-val">1</span></label>
+                  <input type="range" id="qr-margin" min="0" max="4" value="1" class="range">
+                </div>
+                <div class="field-row">
+                  <label for="error-correction">Error Correction</label>
+                  <select id="error-correction" class="select">
+                    <option value="L">L — Low (7%)</option>
+                    <option value="M" selected>M — Medium (15%)</option>
+                    <option value="Q">Q — Quartile (25%)</option>
+                    <option value="H">H — High (30%)</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <details class="accordion__item">
+              <summary class="accordion__header" data-i18n="accordion.presets">Design Presets</summary>
+              <div class="accordion__body">
+                <div class="preset-actions">
+                  <button type="button" id="style-save" class="btn btn--secondary btn--sm">
+                    <i class="fa-solid fa-download" aria-hidden="true"></i> Save Style JSON
+                  </button>
+                  <label class="btn btn--secondary btn--sm file-btn">
+                    <i class="fa-solid fa-upload" aria-hidden="true"></i> Load Style
+                    <input type="file" id="style-load" accept=".json,application/json" hidden>
+                  </label>
+                  <button type="button" id="style-reset" class="btn btn--ghost btn--sm">
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset
+                  </button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- Column 3: Preview + Export -->
+      <aside class="panel panel--preview" aria-label="QR code preview and export">
+        <h2 class="panel__title" data-i18n="panel.preview">Preview</h2>
+        <div id="qr-frame" class="qr-frame qr-frame--none">
+          <div id="qr-preview" class="qr-preview" aria-live="polite" aria-label="QR code preview"></div>
+          <p id="frame-label" class="frame-label" hidden>Scan Me</p>
+        </div>
+
+        <div class="export-section">
+          <h3 class="export-section__title" data-i18n="export.download">Download</h3>
+          <div class="export-grid">
+            <button type="button" class="btn btn--export" data-export="png" data-scale="1">
+              <i class="fa-solid fa-download" aria-hidden="true"></i> PNG
+            </button>
+            <button type="button" class="btn btn--export" data-export="png" data-scale="2">
+              <i class="fa-solid fa-download" aria-hidden="true"></i> PNG 2×
+            </button>
+            <button type="button" class="btn btn--export" data-export="png" data-scale="3">
+              <i class="fa-solid fa-download" aria-hidden="true"></i> PNG 3×
+            </button>
+            <button type="button" class="btn btn--export" data-export="svg">
+              <i class="fa-solid fa-file-code" aria-hidden="true"></i> SVG
+            </button>
+            <button type="button" class="btn btn--export" data-export="jpeg">
+              <i class="fa-solid fa-image" aria-hidden="true"></i> JPEG
+            </button>
+            <button type="button" class="btn btn--export" data-export="pdf">
+              <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> PDF
+            </button>
+          </div>
+          <div class="export-actions">
+            <button type="button" id="copy-btn" class="btn btn--secondary">
+              <i class="fa-solid fa-copy" aria-hidden="true"></i> <span data-i18n="export.copy">Copy Image</span>
+            </button>
+            <button type="button" id="share-btn" class="btn btn--secondary">
+              <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> <span data-i18n="export.share">Share</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="encoded-data">
+          <label for="encoded-output" class="field-label" data-i18n="export.encoded">Encoded Data</label>
+          <textarea id="encoded-output" class="textarea textarea--sm" readonly rows="3"></textarea>
+        </div>
+
+        <div class="scan-tips-panel">
+          <h3 class="scan-tips-panel__title" data-i18n="tips.title">Scan quality</h3>
+          <ul id="scan-tips" class="scan-tips-list"></ul>
+        </div>
+
+        <div class="history-panel">
+          <div class="history-panel__header">
+            <h3 data-i18n="history.title">Recent</h3>
+            <button type="button" id="history-clear" class="btn btn--ghost btn--sm" data-i18n="history.clear">Clear</button>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Batch Mode -->
+    <div id="batch-mode" class="batch-panel" hidden>
+      <div class="batch-header">
+        <h2 class="panel__title" data-i18n="batch.title">Batch QR Generator</h2>
+        <p class="batch-desc" data-i18n="batch.desc" data-i18n-max="100">Enter CSV data with columns: type, data, label. Max 100 rows.</p>
+      </div>
+
+      <div class="batch-editor">
+        <label for="batch-csv" class="field-label" data-i18n="batch.csv">CSV Data</label>
+        <textarea id="batch-csv" class="textarea" rows="8" placeholder="type,data,label
+url,https://example.com,Example Site
+text,Hello World,Greeting
+wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
+        <div class="batch-actions">
+          <button type="button" id="batch-parse" class="btn btn--primary">
+            <i class="fa-solid fa-table" aria-hidden="true"></i> <span data-i18n="batch.parse">Generate Preview</span>
+          </button>
+          <button type="button" id="batch-download-png" class="btn btn--secondary" disabled>
+            <i class="fa-solid fa-file-zipper" aria-hidden="true"></i> <span data-i18n="batch.zipPng">Download ZIP (PNG)</span>
+          </button>
+          <button type="button" id="batch-download-svg" class="btn btn--secondary" disabled>
+            <i class="fa-solid fa-file-zipper" aria-hidden="true"></i> <span data-i18n="batch.zipSvg">Download ZIP (SVG)</span>
+          </button>
+        </div>
+        <div id="batch-progress" class="batch-progress" hidden>
+          <div class="batch-progress__track"><div id="batch-progress-bar" class="batch-progress__bar"></div></div>
+          <span id="batch-progress-label" class="batch-progress__label"></span>
+        </div>
+      </div>
+
+      <div id="batch-preview" class="batch-preview" aria-live="polite"></div>
+    </div>
+
+    <!-- Use Cases -->
+    <section class="landing-section" id="use-cases" aria-labelledby="usecases-heading">
+      <h2 id="usecases-heading" class="landing-section__title" data-i18n="usecases.title">Use Cases</h2>
+      <p class="landing-section__subtitle" data-i18n="usecases.subtitle">Create QR codes for every scenario — free and instant.</p>
+      <div id="usecases-grid" class="usecases-grid"></div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="landing-section landing-section--faq" id="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="landing-section__title" data-i18n="faq.title">Frequently Asked Questions</h2>
+      <div id="faq-list" class="faq-list"></div>
+    </section>
+  </main>
+
+  <!-- Pro license modal -->
+  <div id="pro-modal" class="modal" hidden role="dialog" aria-labelledby="pro-modal-title">
+    <div class="modal__content">
+      <button type="button" id="pro-modal-close" class="modal__close" aria-label="Close">&times;</button>
+      <h2 id="pro-modal-title" data-i18n="pro.modal.title">Upgrade to Pro</h2>
+      <p data-i18n="pro.modal.desc">Remove watermark, export up to 1000px, batch 500 rows.</p>
+      <input type="text" id="pro-license-input" class="input" data-i18n-placeholder="pro.modal.placeholder" placeholder="Enter license key">
+      <div class="modal__actions">
+        <a href="pricing.html" class="btn btn--ghost" data-i18n="pro.modal.pricing">View pricing</a>
+        <button type="button" id="pro-activate" class="btn btn--primary" data-i18n="pro.modal.activate">Activate</button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="ad-slot ad-slot--footer container" aria-label="Advertisement">
+    <span class="ad-slot__label">Ad</span>
+    <p class="ad-slot__placeholder">Footer ad space</p>
+  </aside>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/img/logo.svg" alt="" width="140" height="28" class="logo__img">
+        <p class="footer__tagline" data-i18n="footer.tagline">Create beautiful QR codes for free. No signup required. 100% client-side — your data never leaves your browser.</p>
+      </div>
+      <div class="footer__links">
+        <h3 data-i18n="footer.types">Supported QR Types</h3>
+        <ul>
+          <li>URL &amp; Website</li>
+          <li>WiFi Network</li>
+          <li>vCard Contact</li>
+          <li>Email &amp; SMS</li>
+          <li>Location &amp; Social Media</li>
+          <li>Crypto &amp; App Store</li>
+        </ul>
+      </div>
+      <div class="footer__links">
+        <h3 data-i18n="footer.features">Features</h3>
+        <ul>
+          <li>Custom colors &amp; gradients</li>
+          <li>Logo embedding</li>
+          <li>PNG, SVG, JPEG, PDF export</li>
+          <li>Batch generation</li>
+          <li>Dark mode</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <nav class="footer__legal" aria-label="Legal">
+        <a href="pricing.html">Pricing</a>
+        <span aria-hidden="true">·</span>
+        <a href="contact.html">Contact</a>
+        <span aria-hidden="true">·</span>
+        <a href="privacy.html">Privacy Policy</a>
+        <span aria-hidden="true">·</span>
+        <a href="terms.html">Terms of Service</a>
+      </nav>
+      <p>&copy; 2026 Free QR Generator. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Cookie consent -->
+  <div id="cookie-banner" class="cookie-banner" hidden role="dialog" aria-label="Cookie consent">
+    <p><span data-i18n="cookie.text">We use optional analytics cookies to improve the service.</span> <a href="privacy.html" data-i18n="cookie.privacy">Privacy Policy</a></p>
+    <div class="cookie-banner__actions">
+      <button type="button" id="cookie-decline" class="btn btn--ghost btn--sm" data-i18n="cookie.decline">Decline</button>
+      <button type="button" id="cookie-accept" class="btn btn--primary btn--sm" data-i18n="cookie.accept">Accept</button>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- CDN Libraries (pinned versions + SRI) -->
+  <script src="https://unpkg.com/qr-code-styling@1.6.2/lib/qr-code-styling.js" integrity="sha384-u3n0PN8HUUcaub7a5d68gqMjgBCHV21A3oVBEoJ3pDgYteaeztYfTy5oE/Zjjxsg" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha384-PlRSzpewlarQuj5alIadXwjNUX+2eNMKwr0f07ShWYLy8B6TjEbm7ZlcN/ScSbwy" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/pickr.min.js" integrity="sha384-wSWLqRWLpvgym6F54BYkfFQGV7k1d670FZV25mzYCxDGWMiLlIb2mOm38NQtlRV8" crossorigin="anonymous"></script>
+
+  <script src="site.config.js"></script>
+  <script src="assets/js/types.js" defer></script>
+  <script src="assets/js/brand-logos.js" defer></script>
+  <script src="assets/js/templates.js" defer></script>
+  <script src="assets/js/validation.js" defer></script>
+  <script src="assets/js/customizer.js" defer></script>
+  <script src="assets/js/frame-renderer.js" defer></script>
+  <script src="assets/js/exporter.js" defer></script>
+  <script src="assets/js/batch.js" defer></script>
+  <script src="assets/js/pro.js" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
+  <script src="assets/js/analytics.js" defer></script>
+  <script src="assets/js/history.js" defer></script>
+  <script src="assets/js/scan-tips.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+
+  <script>
+    (function () {
+      if (localStorage.getItem('open-pro') === '1') {
+        localStorage.removeItem('open-pro');
+        document.addEventListener('DOMContentLoaded', function () {
+          setTimeout(function () { document.getElementById('pro-upgrade')?.click(); }, 500);
+        });
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      if (typeof QRCodeStyling === 'undefined') {
+        var main = document.getElementById('main-content');
+        if (main) {
+          main.innerHTML = '<div class="panel" style="text-align:center;padding:48px;margin:24px auto;max-width:520px;"><h2>Unable to load app</h2><p style="color:var(--text-muted);margin:16px 0;">Required libraries failed to load. Check your internet connection and refresh the page.</p><button type="button" class="btn btn--primary" onclick="location.reload()">Refresh</button></div>';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
