@@ -310,13 +310,21 @@ const I18n = (() => {
   }
 
   function t(key, vars) {
-    let str = (messages[lang] && messages[lang][key]) || messages.en[key] || key;
+    if (!key) return null;
+    let str = (messages[lang] && messages[lang][key]) || messages.en[key];
+    if (str == null) return null;
     if (vars) {
       Object.entries(vars).forEach(([k, v]) => {
         str = str.replace(`{${k}}`, v);
       });
     }
     return str;
+  }
+
+  function labelKey(el) {
+    const shortKey = el.dataset.i18nShort;
+    if (shortKey && window.matchMedia('(max-width: 768px)').matches) return shortKey;
+    return el.dataset.i18n;
   }
 
   function errorMsg(code) {
@@ -341,20 +349,28 @@ const I18n = (() => {
     lang = stored || browser;
     document.documentElement.lang = lang;
     apply();
+    const navMq = window.matchMedia('(max-width: 768px)');
+    if (typeof navMq.addEventListener === 'function') {
+      navMq.addEventListener('change', apply);
+    } else if (typeof navMq.addListener === 'function') {
+      navMq.addListener(apply);
+    }
   }
 
   function apply() {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.dataset.i18n;
+      const key = el.dataset.i18nShort ? labelKey(el) : el.dataset.i18n;
       const vars = {};
       if (el.dataset.i18nMax) vars.max = el.dataset.i18nMax;
-      el.textContent = t(key, Object.keys(vars).length ? vars : undefined);
+      const translated = t(key, Object.keys(vars).length ? vars : undefined);
+      if (translated != null) el.textContent = translated;
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
     });
     document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
-      el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+      const label = t(el.dataset.i18nAriaLabel);
+      if (label != null) el.setAttribute('aria-label', label);
     });
     renderUseCases();
     renderFaq();

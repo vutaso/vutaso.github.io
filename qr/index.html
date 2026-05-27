@@ -84,13 +84,11 @@
       <nav class="header__nav" aria-label="Apps">
         <a class="header__app-link header__app-link--moneybay" href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank" rel="noopener noreferrer" data-i18n-aria-label="nav.moneybay" aria-label="Tải MoneyBay">
           <i class="fa-brands fa-apple" aria-hidden="true"></i>
-          <span class="header__app-link-text header__app-link-text--full" data-i18n="nav.moneybay">Tải MoneyBay</span>
-          <span class="header__app-link-text header__app-link-text--short" data-i18n="nav.moneybayShort">MoneyBay</span>
+          <span class="header__app-link-text" data-i18n="nav.moneybay" data-i18n-short="nav.moneybayShort">Tải MoneyBay</span>
         </a>
         <a class="header__app-link header__app-link--qrbay" href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" rel="noopener noreferrer" data-i18n-aria-label="nav.qrbay" aria-label="Tải QRBay">
           <i class="fa-brands fa-apple" aria-hidden="true"></i>
-          <span class="header__app-link-text header__app-link-text--full" data-i18n="nav.qrbay">Tải QRBay</span>
-          <span class="header__app-link-text header__app-link-text--short" data-i18n="nav.qrbayShort">QRBay</span>
+          <span class="header__app-link-text" data-i18n="nav.qrbay" data-i18n-short="nav.qrbayShort">Tải QRBay</span>
         </a>
       </nav>
       <div class="header__actions">
@@ -426,7 +424,10 @@
             <i class="fa-solid fa-magnifying-glass template-search-wrap__icon" aria-hidden="true"></i>
             <input type="search" id="template-search" class="input input--sm template-search" data-i18n-placeholder="templates.search" placeholder="Search templates…" autocomplete="off">
           </label>
-          <button type="button" id="template-marketplace-toggle" class="btn btn--ghost btn--sm" aria-expanded="true" data-i18n="templates.hide">Hide</button>
+          <button type="button" id="template-marketplace-toggle" class="btn btn--ghost btn--sm" aria-expanded="true">
+            <span class="template-toggle-label template-toggle-label--hide" data-i18n="templates.hide">Hide</span>
+            <span class="template-toggle-label template-toggle-label--show" data-i18n="templates.show" hidden>Show templates</span>
+          </button>
         </div>
       </div>
       <div id="template-marketplace-body">
@@ -436,7 +437,10 @@
         </div>
         <div id="template-grid" class="template-grid"></div>
         <div class="template-marketplace__footer">
-          <button type="button" id="template-grid-expand" class="btn btn--ghost btn--sm template-expand-btn" aria-expanded="false" data-i18n="templates.showAll">Show all templates</button>
+          <button type="button" id="template-grid-expand" class="btn btn--ghost btn--sm template-expand-btn" aria-expanded="false">
+            <span class="template-expand-label template-expand-label--more" data-i18n="templates.showAll">Show all templates</span>
+            <span class="template-expand-label template-expand-label--less" data-i18n="templates.showLess" hidden>Show less</span>
+          </button>
         </div>
       </div>
     </section>

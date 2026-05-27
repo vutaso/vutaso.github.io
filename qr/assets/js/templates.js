@@ -16,15 +16,36 @@ const QRTemplates = (() => {
     { id: 'realestate', icon: 'fa-house' }
   ];
 
-  /** Font Awesome 6 — brand logos live in fa-brands, not fa-solid */
-  const BRAND_ICONS = new Set([
-    'fa-linkedin', 'fa-instagram', 'fa-tiktok', 'fa-youtube',
-    'fa-facebook', 'fa-whatsapp', 'fa-telegram', 'fa-x-twitter'
-  ]);
+  /** Social brand icons — SVG from QRBrandLogos (reliable on GitHub Pages; FA brands CDN can fail) */
+  const FA_TO_BRAND = {
+    'fa-linkedin': 'linkedin',
+    'fa-instagram': 'instagram',
+    'fa-tiktok': 'tiktok',
+    'fa-youtube': 'youtube',
+    'fa-facebook': 'facebook',
+    'fa-whatsapp': 'whatsapp',
+    'fa-telegram': 'telegram',
+    'fa-x-twitter': 'x'
+  };
+
+  const BRAND_ICONS = new Set(Object.keys(FA_TO_BRAND));
 
   function iconClass(icon) {
     const family = BRAND_ICONS.has(icon) ? 'fa-brands' : 'fa-solid';
     return `${family} ${icon}`;
+  }
+
+  function templateIconMarkup(icon) {
+    const brandId = FA_TO_BRAND[icon];
+    if (brandId && typeof QRBrandLogos !== 'undefined' && QRBrandLogos.DATA_URI[brandId]) {
+      return `<img class="template-card__brand-img" src="${QRBrandLogos.DATA_URI[brandId]}" alt="" width="28" height="28" loading="lazy" decoding="async">`;
+    }
+    return `<i class="${iconClass(icon)}"></i>`;
+  }
+
+  function tr(key, vars) {
+    if (typeof I18n === 'undefined') return null;
+    return I18n.t(key, vars);
   }
 
   function st(fg, bg, opts = {}) {
@@ -405,8 +426,9 @@ const QRTemplates = (() => {
     if (!container) return;
     const items = filtered();
     const countEl = document.getElementById('template-count');
-    if (countEl && typeof I18n !== 'undefined') {
-      countEl.textContent = I18n.t('templates.count', { count: items.length });
+    if (countEl) {
+      const countLabel = tr('templates.count', { count: items.length });
+      if (countLabel != null) countEl.textContent = countLabel;
     }
 
     if (!items.length) {
@@ -425,7 +447,7 @@ const QRTemplates = (() => {
         data-template-id="${t.id}" title="${escapeHtml(getName(t))}"
         style="--card-accent:${accent}">
         <span class="template-card__icon-wrap" aria-hidden="true">
-          <i class="${iconClass(t.icon)}"></i>
+          ${templateIconMarkup(t.icon)}
         </span>
         <span class="template-card__body">
           <span class="template-card__name">${escapeHtml(getName(t))}</span>
@@ -461,12 +483,7 @@ const QRTemplates = (() => {
     const marketplace = document.getElementById('template-marketplace');
     const expandBtn = document.getElementById('template-grid-expand');
     if (marketplace) marketplace.classList.toggle('template-marketplace--expanded', expanded);
-    if (expandBtn) {
-      expandBtn.setAttribute('aria-expanded', String(expanded));
-      if (typeof I18n !== 'undefined') {
-        expandBtn.textContent = expanded ? I18n.t('templates.showLess') : I18n.t('templates.showAll');
-      }
-    }
+    if (expandBtn) expandBtn.setAttribute('aria-expanded', String(expanded));
   }
 
   function init(onApply) {
@@ -496,9 +513,8 @@ const QRTemplates = (() => {
         const hidden = body.hidden;
         body.hidden = !hidden;
         toggle.setAttribute('aria-expanded', String(hidden));
-        if (typeof I18n !== 'undefined') {
-          toggle.textContent = hidden ? I18n.t('templates.hide') : I18n.t('templates.show');
-        }
+        const section = document.getElementById('template-marketplace');
+        if (section) section.classList.toggle('template-marketplace--collapsed', !hidden);
       });
     }
 

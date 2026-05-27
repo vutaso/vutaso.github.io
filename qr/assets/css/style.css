@@ -164,10 +164,6 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 4px 16px rgba(234, 88, 12, 0.45);
 }
 
-.header__app-link-text--short {
-  display: none;
-}
-
 .logo { display: flex; align-items: center; color: var(--text); text-decoration: none; flex-shrink: 0; }
 .logo:hover { text-decoration: none; color: var(--text); }
 .logo__img { height: 28px; width: auto; display: block; }
@@ -1326,13 +1322,6 @@ a:hover { text-decoration: underline; }
     min-height: 36px;
   }
 
-  .header__app-link-text--full {
-    display: none;
-  }
-
-  .header__app-link-text--short {
-    display: inline;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1395,6 +1384,35 @@ a:hover { text-decoration: underline; }
 .template-expand-btn {
   width: 100%;
   max-width: 320px;
+}
+
+.template-expand-label--less,
+.template-toggle-label--show {
+  display: none;
+}
+
+.template-marketplace--expanded .template-expand-label--more {
+  display: none;
+}
+
+.template-marketplace--expanded .template-expand-label--less {
+  display: inline;
+}
+
+.template-marketplace--collapsed .template-toggle-label--hide {
+  display: none;
+}
+
+.template-marketplace--collapsed .template-toggle-label--show {
+  display: inline;
+}
+
+.template-card__brand-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: block;
+  object-fit: cover;
 }
 
 .template-marketplace__head {
