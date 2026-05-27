@@ -321,10 +321,25 @@ const I18n = (() => {
     return str;
   }
 
+  const NAV_APP_LABELS = [
+    { id: 'nav-label-moneybay', full: 'nav.moneybay', short: 'nav.moneybayShort' },
+    { id: 'nav-label-qrbay', full: 'nav.qrbay', short: 'nav.qrbayShort' }
+  ];
+
   function labelKey(el) {
-    const shortKey = el.dataset.i18nShort;
+    const shortKey = el.getAttribute('data-i18n-short');
     if (shortKey && window.matchMedia('(max-width: 768px)').matches) return shortKey;
-    return el.dataset.i18n;
+    return el.getAttribute('data-i18n');
+  }
+
+  function applyHeaderNav() {
+    const mobile = window.matchMedia('(max-width: 768px)').matches;
+    NAV_APP_LABELS.forEach(({ id, full, short }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const text = t(mobile ? short : full);
+      if (text != null) el.textContent = text;
+    });
   }
 
   function errorMsg(code) {
@@ -358,18 +373,22 @@ const I18n = (() => {
   }
 
   function apply() {
+    applyHeaderNav();
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.dataset.i18nShort ? labelKey(el) : el.dataset.i18n;
+      const key = el.getAttribute('data-i18n');
+      if (key == null) return;
+      const resolvedKey = el.hasAttribute('data-i18n-short') ? labelKey(el) : key;
       const vars = {};
       if (el.dataset.i18nMax) vars.max = el.dataset.i18nMax;
-      const translated = t(key, Object.keys(vars).length ? vars : undefined);
+      const translated = t(resolvedKey, Object.keys(vars).length ? vars : undefined);
       if (translated != null) el.textContent = translated;
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-      el.placeholder = t(el.dataset.i18nPlaceholder);
+      const ph = t(el.getAttribute('data-i18n-placeholder'));
+      if (ph != null) el.placeholder = ph;
     });
-    document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
-      const label = t(el.dataset.i18nAriaLabel);
+    document.querySelectorAll('[data-qr-aria]').forEach((el) => {
+      const label = t(el.getAttribute('data-qr-aria'));
       if (label != null) el.setAttribute('aria-label', label);
     });
     renderUseCases();
