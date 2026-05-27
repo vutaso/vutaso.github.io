@@ -23,6 +23,7 @@ const QRValidation = (() => {
 
   function validate(typeId, formData) {
     const errors = {};
+    const warnings = {};
     const type = getTypeById(typeId);
 
     type.fields.forEach((field) => {
@@ -72,6 +73,9 @@ const QRValidation = (() => {
       } else {
         if (ios && !isValidUrl(ios)) errors.iosUrl = 'invalid_url';
         if (android && !isValidUrl(android)) errors.androidUrl = 'invalid_url';
+        if (ios && android && !errors.iosUrl && !errors.androidUrl) {
+          warnings._form = 'appstore_dual';
+        }
       }
     }
 
@@ -88,6 +92,7 @@ const QRValidation = (() => {
     return {
       valid: Object.keys(errors).length === 0,
       errors,
+      warnings,
       encoded: encoded || ''
     };
   }

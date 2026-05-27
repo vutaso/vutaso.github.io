@@ -5,24 +5,26 @@ window.SITE = {
   url: 'https://vutaso.com/qr',
   basePath: '/qr',
   name: 'Free QR Generator',
-  email: 'contact@vutaso.com',
+  email: 'vutaso.com@gmail.com',
   year: 2026,
 
-  batchMaxRows: 100,
-  batchMaxRowsPro: 500,
+  /** Batch CSV — practical upper bound (browser memory) */
+  maxBatchRows: 10000,
+  /** Max QR export dimension (px) */
+  maxQrSize: 2048,
 
   pro: {
-    enabled: true,
-    watermarkFree: true,
-    watermarkText: 'vutaso.com/qr',
-    freeMaxSize: 600,
-    proMaxSize: 1000,
-    licenseKeys: ['PRO-DEMO-2026', 'PRO-VIP-2026']
+    enabled: false,
+    watermarkFree: false,
+    watermarkText: '',
+    freeMaxSize: 2048,
+    proMaxSize: 2048,
+    licenseKeys: []
   },
 
   ads: {
-    enabled: true,
-    hideForPro: true,
+    enabled: false,
+    hideForPro: false,
     slots: {
       sidebar: '',
       footer: ''
@@ -34,10 +36,5 @@ window.SITE = {
     plausibleDomain: 'vutaso.com',
     scriptUrl: 'https://plausible.io/js/script.js',
     ga4Id: ''
-  },
-
-  contact: {
-    formspreeId: '',
-    responseTime: '24 hours'
   }
 };

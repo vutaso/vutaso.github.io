@@ -3,9 +3,13 @@
  */
 const QRBatch = (() => {
   let parsedRows = [];
+  let previewGeneration = 0;
+  let zipAbortController = null;
 
   function getMaxRows() {
-    return typeof QRPro !== 'undefined' ? QRPro.getMaxBatchRows() : ((window.SITE && SITE.batchMaxRows) || 100);
+    return typeof QRPro !== 'undefined'
+      ? QRPro.getMaxBatchRows()
+      : ((window.SITE && (SITE.maxBatchRows || SITE.batchMaxRows)) || 10000);
   }
 
   function parseCSV(text) {
@@ -17,7 +21,7 @@ const QRBatch = (() => {
     let truncated = false;
 
     const firstLine = lines[0].toLowerCase();
-    const hasHeader = firstLine.includes('type') && firstLine.includes('data');
+    const hasHeader = firstLine.includes('type') && (firstLine.includes('data') || firstLine.includes('platform'));
     if (hasHeader) startIdx = 1;
 
     const dataLines = lines.length - startIdx;
@@ -32,16 +36,30 @@ const QRBatch = (() => {
       if (cols.length < 2) continue;
 
       const type = cols[0].trim().toLowerCase();
-      const data = cols[1].trim();
-      const label = cols[2] ? cols[2].trim() : `qr-${i}`;
+      let data;
+      let label;
+      let extra = {};
+
+      if (type === 'social' && cols.length >= 4) {
+        extra.platform = cols[1].trim().toLowerCase();
+        data = cols[2].trim();
+        label = cols[3] ? cols[3].trim() : `qr-${i}`;
+      } else if (type === 'sms' && cols.length >= 3) {
+        data = cols[1].trim();
+        extra.message = cols[2].trim();
+        label = cols.length >= 4 ? cols[3].trim() : `qr-${i}`;
+      } else {
+        data = cols[1].trim();
+        label = cols[2] ? cols[2].trim() : `qr-${i}`;
+      }
 
       if (!data) continue;
       if (!QR_TYPES.some(t => t.id === type)) continue;
 
-      const encoded = parseBatchRow(type, data);
+      const encoded = parseBatchRow(type, data, extra);
       if (!encoded || !encoded.trim()) continue;
 
-      rows.push({ type, data, encoded, label, index: i });
+      rows.push({ type, data, encoded, label, index: i, extra });
     }
 
     return { rows, truncated, total: dataLines };
@@ -73,12 +91,19 @@ const QRBatch = (() => {
   }
 
   function renderPreview(container, result) {
+    const gen = ++previewGeneration;
     const { rows, truncated } = result;
-    container.innerHTML = '';
+
+    container.replaceChildren();
     parsedRows = rows;
 
     if (rows.length === 0) {
-      container.innerHTML = '<p class="batch-empty">No valid rows found. Check your CSV format.</p>';
+      const empty = document.createElement('p');
+      empty.className = 'batch-empty';
+      empty.textContent = typeof I18n !== 'undefined'
+        ? I18n.t('batch.empty')
+        : 'No valid rows found. Check your CSV format.';
+      container.appendChild(empty);
       return;
     }
 
@@ -100,17 +125,18 @@ const QRBatch = (() => {
       card.innerHTML = `
         <div class="batch-card__preview" id="batch-qr-${idx}"></div>
         <div class="batch-card__info">
-          <span class="batch-card__type">${row.type}</span>
+          <span class="batch-card__type">${escapeHtml(row.type)}</span>
           <span class="batch-card__label" title="${escapeHtml(row.label)}">${escapeHtml(row.label)}</span>
         </div>
       `;
       grid.appendChild(card);
 
       requestAnimationFrame(() => {
+        if (gen !== previewGeneration) return;
         const previewEl = document.getElementById(`batch-qr-${idx}`);
         if (!previewEl) return;
+        previewEl.replaceChildren();
         const qr = QRCustomizer.createInstance(row.encoded, { width: 150, height: 150 });
-        previewEl.innerHTML = '';
         qr.append(previewEl);
       });
     });
@@ -118,29 +144,47 @@ const QRBatch = (() => {
     container.appendChild(grid);
   }
 
+  function cancelDownload() {
+    if (zipAbortController) {
+      zipAbortController.abort();
+      zipAbortController = null;
+    }
+  }
+
   async function downloadZip(format = 'png', onProgress) {
     if (parsedRows.length === 0) return;
+
+    cancelDownload();
+    zipAbortController = new AbortController();
+    const { signal } = zipAbortController;
 
     const zip = new JSZip();
     const ext = format === 'svg' ? 'svg' : 'png';
     const total = parsedRows.length;
-
     const usedNames = new Map();
 
-    for (let i = 0; i < parsedRows.length; i++) {
-      const row = parsedRows[i];
-      const qr = QRCustomizer.createInstance(row.encoded, { width: 400, height: 400 });
-      const blob = await QRExporter.exportBatchItem(qr, format);
-      const base = sanitizeFilename(row.label) || 'qrcode';
-      const count = usedNames.get(base) || 0;
-      usedNames.set(base, count + 1);
-      const filename = (count ? `${base}-${count + 1}` : base) + '.' + ext;
-      zip.file(filename, blob);
-      if (onProgress) onProgress(i + 1, total);
-    }
+    try {
+      for (let i = 0; i < parsedRows.length; i++) {
+        if (signal.aborted) throw new DOMException('Batch export cancelled', 'AbortError');
 
-    const content = await zip.generateAsync({ type: 'blob' });
-    saveAs(content, `qr-batch-${new Date().toISOString().slice(0, 10)}.zip`);
+        const row = parsedRows[i];
+        const qr = QRCustomizer.createInstance(row.encoded, { width: 400, height: 400 });
+        const blob = await QRExporter.exportBatchItem(qr, format);
+        const base = sanitizeFilename(row.label) || 'qrcode';
+        const count = usedNames.get(base) || 0;
+        usedNames.set(base, count + 1);
+        const filename = (count ? `${base}-${count + 1}` : base) + '.' + ext;
+        zip.file(filename, blob);
+        if (onProgress) onProgress(i + 1, total);
+      }
+
+      if (signal.aborted) throw new DOMException('Batch export cancelled', 'AbortError');
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, `qr-batch-${new Date().toISOString().slice(0, 10)}.zip`);
+    } finally {
+      zipAbortController = null;
+    }
   }
 
   function sanitizeFilename(name) {
@@ -161,6 +205,7 @@ const QRBatch = (() => {
     parseCSV,
     renderPreview,
     downloadZip,
+    cancelDownload,
     getParsedRows,
     getMaxRows
   };

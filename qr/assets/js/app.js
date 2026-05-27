@@ -8,19 +8,38 @@
     typeId: 'url',
     formData: {},
     batchMode: false,
-    validation: { valid: true, errors: {} }
+    validation: { valid: true, errors: {}, warnings: {} }
   };
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
 
+  const TOAST_ICONS = {
+    success: 'fa-circle-check',
+    error: 'fa-circle-exclamation',
+    info: 'fa-circle-info'
+  };
+
+  const TOAST_DURATION = { success: 3200, error: 5200, info: 4200 };
+
   function showToast(message, type = 'success') {
     const toast = $('#toast');
-    toast.textContent = message;
-    toast.className = `toast toast--${type}`;
+    if (!toast) return;
+
+    const safeType = TOAST_ICONS[type] ? type : 'success';
+    const textEl = toast.querySelector('.toast__text');
+    const iconEl = toast.querySelector('.toast__icon');
+
+    if (textEl) textEl.textContent = message;
+    else toast.textContent = message;
+
+    if (iconEl) iconEl.className = `toast__icon fa-solid ${TOAST_ICONS[safeType]}`;
+
+    toast.className = `toast toast--${safeType}`;
     toast.hidden = false;
+
     clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(() => { toast.hidden = true; }, 3000);
+    showToast._timer = setTimeout(() => { toast.hidden = true; }, TOAST_DURATION[safeType] || 3200);
   }
 
   function typeLabel(type) {
@@ -87,7 +106,7 @@
       btn.dataset.type = type.id;
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', type.id === state.typeId);
-      btn.innerHTML = `<i class="fa-solid ${type.icon}" aria-hidden="true"></i><span>${typeLabel(type)}</span>`;
+      btn.innerHTML = `<i class="fa-solid ${escapeAttr(type.icon)}" aria-hidden="true"></i><span>${escapeHtml(typeLabel(type))}</span>`;
       btn.addEventListener('click', () => selectType(type.id));
       nav.appendChild(btn);
     });
@@ -125,27 +144,30 @@
       group.className = 'form-group';
       group.dataset.field = field.name;
 
+      const fieldName = escapeAttr(field.name);
+      const fieldId = `field-${fieldName}`;
+
       if (field.type === 'checkbox') {
         group.innerHTML = `
           <label class="checkbox-label">
-            <input type="checkbox" name="${field.name}" ${state.formData[field.name] ? 'checked' : ''}>
-            ${field.label}
+            <input type="checkbox" name="${fieldName}" ${state.formData[field.name] ? 'checked' : ''}>
+            ${escapeHtml(field.label)}
           </label>`;
       } else {
         const req = field.required ? ' <span class="required">*</span>' : '';
-        group.innerHTML = `<label for="field-${field.name}">${field.label}${req}</label>`;
+        group.innerHTML = `<label for="${fieldId}">${escapeHtml(field.label)}${req}</label>`;
 
         if (field.type === 'select') {
           const opts = field.options.map(o =>
-            `<option value="${o.value}" ${state.formData[field.name] === o.value ? 'selected' : ''}>${o.label}</option>`
+            `<option value="${escapeAttr(o.value)}" ${state.formData[field.name] === o.value ? 'selected' : ''}>${escapeHtml(o.label)}</option>`
           ).join('');
-          group.innerHTML += `<select id="field-${field.name}" name="${field.name}" class="select">${opts}</select>`;
+          group.innerHTML += `<select id="${fieldId}" name="${fieldName}" class="select">${opts}</select>`;
         } else if (field.type === 'textarea') {
-          group.innerHTML += `<textarea id="field-${field.name}" name="${field.name}" class="textarea" placeholder="${field.placeholder || ''}" rows="3">${escapeHtml(state.formData[field.name] || '')}</textarea>`;
+          group.innerHTML += `<textarea id="${fieldId}" name="${fieldName}" class="textarea" placeholder="${escapeAttr(field.placeholder || '')}" rows="3">${escapeHtml(state.formData[field.name] || '')}</textarea>`;
         } else {
-          group.innerHTML += `<input id="field-${field.name}" name="${field.name}" type="${field.type}" class="input" placeholder="${field.placeholder || ''}" value="${escapeAttr(state.formData[field.name] || '')}">`;
+          group.innerHTML += `<input id="${fieldId}" name="${fieldName}" type="${escapeAttr(field.type)}" class="input" placeholder="${escapeAttr(field.placeholder || '')}" value="${escapeAttr(state.formData[field.name] || '')}">`;
         }
-        group.innerHTML += `<span class="field-error" id="error-${field.name}" role="alert"></span>`;
+        group.innerHTML += `<span class="field-error" id="error-${fieldName}" role="alert"></span>`;
       }
 
       form.appendChild(group);
@@ -204,6 +226,17 @@
       }
     }
 
+    const warnBanner = $('#form-warnings');
+    const warnings = state.validation.warnings || {};
+    if (warnBanner) {
+      if (warnings._form && valid) {
+        warnBanner.hidden = false;
+        warnBanner.textContent = I18n.warningMsg(warnings._form);
+      } else {
+        warnBanner.hidden = true;
+      }
+    }
+
     const exportBtns = $$('[data-export], #copy-btn, #share-btn');
     exportBtns.forEach((btn) => {
       btn.disabled = !valid;
@@ -211,6 +244,7 @@
     });
 
     $('#qr-preview').classList.toggle('qr-preview--invalid', !valid);
+    if (state._updateMobileCta) state._updateMobileCta();
   }
 
   let historyAddTimer = null;
@@ -230,7 +264,10 @@
       historyAddTimer = setTimeout(() => {
         const last = QRHistory.load()[0];
         if (!last || last.encoded !== encoded || last.typeId !== typeId) {
-          QRHistory.add({ typeId, formData: formSnapshot, encoded });
+          const styleSnapshot = typeof QRCustomizer.getStyleSnapshot === 'function'
+            ? QRCustomizer.getStyleSnapshot()
+            : null;
+          QRHistory.add({ typeId, formData: formSnapshot, encoded, style: styleSnapshot });
         }
       }, 800);
     } else {
@@ -313,9 +350,9 @@
       reader.onload = (ev) => {
         try {
           QRCustomizer.importStyleJSON(ev.target.result);
-          showToast('Style loaded!');
+          showToast(I18n.t('toast.styleLoaded'));
         } catch {
-          showToast('Invalid style file', 'error');
+          showToast(I18n.t('toast.styleInvalid'), 'error');
         }
       };
       reader.readAsText(file);
@@ -324,7 +361,7 @@
 
     $('#style-reset').addEventListener('click', () => {
       QRCustomizer.resetStyle();
-      showToast('Style reset');
+      showToast(I18n.t('toast.styleReset'));
     });
 
     $('#custom-theme-save').addEventListener('click', () => {
@@ -424,7 +461,7 @@
 
         try {
           if (format === 'png') await QRExporter.downloadPNG(qr, scale);
-          else if (format === 'svg') QRExporter.downloadSVG(qr);
+          else if (format === 'svg') await QRExporter.downloadSVG(qr);
           else if (format === 'jpeg') await QRExporter.downloadJPEG(qr);
           else if (format === 'pdf') await QRExporter.downloadPDF(qr, typeLabel(getTypeById(state.typeId)) + ' QR');
           showToast(I18n.t('toast.download'));
@@ -449,9 +486,9 @@
     $('#share-btn').addEventListener('click', async () => {
       if (!requireValid()) return;
       try {
-        await QRExporter.shareQR(QRCustomizer.getQRInstance());
-        showToast(I18n.t('toast.share'));
-        QRAnalytics.track('export', { format: 'share' });
+        const result = await QRExporter.shareQR(QRCustomizer.getQRInstance());
+        showToast(result === 'clipboard' ? I18n.t('toast.shareClipboard') : I18n.t('toast.share'));
+        QRAnalytics.track('export', { format: result === 'clipboard' ? 'share_clipboard' : 'share' });
       } catch (err) {
         if (err.name !== 'AbortError') showToast(I18n.t('toast.exportFail'), 'error');
       }
@@ -476,10 +513,46 @@
     if (wrap) wrap.hidden = true;
   }
 
+  function updateBatchLimitUI() {
+    const desc = document.querySelector('.batch-desc');
+    if (desc) desc.textContent = I18n.t('batch.desc');
+  }
+
+  function initMobileStickyCta() {
+    const bar = $('#mobile-sticky-cta');
+    const btn = $('#mobile-download-png');
+    if (!bar || !btn) return;
+
+    const mq = window.matchMedia('(max-width: 768px)');
+
+    function updateBar() {
+      const show = mq.matches && !state.batchMode;
+      bar.hidden = !show;
+      document.body.classList.toggle('mobile-cta-active', show);
+      const exportBtn = document.querySelector('[data-export="png"][data-scale="1"]');
+      btn.disabled = !!(exportBtn && exportBtn.disabled);
+    }
+
+    btn.addEventListener('click', () => {
+      const exportBtn = document.querySelector('[data-export="png"][data-scale="1"]');
+      if (exportBtn && !exportBtn.disabled) exportBtn.click();
+    });
+
+    mq.addEventListener('change', updateBar);
+    document.addEventListener('i18n:change', updateBar);
+    state._updateMobileCta = updateBar;
+    updateBar();
+  }
+
   function initBatchMode() {
     const batchToggle = $('#batch-toggle');
     const singleMode = $('#single-mode');
     const batchMode = $('#batch-mode');
+    const batchCancel = $('#batch-cancel');
+
+    updateBatchLimitUI();
+    document.addEventListener('pro:change', updateBatchLimitUI);
+    document.addEventListener('i18n:change', updateBatchLimitUI);
 
     batchToggle.addEventListener('click', () => {
       state.batchMode = !state.batchMode;
@@ -487,6 +560,7 @@
       singleMode.hidden = state.batchMode;
       batchMode.hidden = !state.batchMode;
       batchToggle.classList.toggle('btn--active', state.batchMode);
+      if (state._updateMobileCta) state._updateMobileCta();
       QRAnalytics.track('toggle_batch', { enabled: state.batchMode });
     });
 
@@ -500,7 +574,7 @@
 
       const msg = result.rows.length
         ? (result.truncated ? I18n.t('batch.truncated', { max: QRBatch.getMaxRows() }) : `✓ ${result.rows.length} QR`)
-        : I18n.errorMsg('empty_payload');
+        : I18n.t('batch.empty');
       showToast(msg, result.rows.length ? 'success' : 'error');
       QRAnalytics.track('batch_parse', { count: result.rows.length });
     });
@@ -511,15 +585,21 @@
 
       $('#batch-download-png').disabled = true;
       $('#batch-download-svg').disabled = true;
+      if (batchCancel) batchCancel.hidden = false;
 
       try {
         await QRBatch.downloadZip(format, setBatchProgress);
         showToast(I18n.t('toast.download'));
         QRAnalytics.track('batch_export', { format, count: rows.length });
       } catch (err) {
-        showToast(I18n.t('toast.exportFail') + ': ' + err.message, 'error');
+        if (err.name === 'AbortError') {
+          showToast(I18n.t('batch.cancelled'), 'info');
+        } else {
+          showToast(I18n.t('toast.exportFail') + ': ' + err.message, 'error');
+        }
       } finally {
         hideBatchProgress();
+        if (batchCancel) batchCancel.hidden = true;
         $('#batch-download-png').disabled = false;
         $('#batch-download-svg').disabled = false;
       }
@@ -527,6 +607,7 @@
 
     $('#batch-download-png').addEventListener('click', () => zipDownload('png'));
     $('#batch-download-svg').addEventListener('click', () => zipDownload('svg'));
+    batchCancel?.addEventListener('click', () => QRBatch.cancelDownload());
   }
 
   function applyQRTemplate(templateId) {
@@ -571,40 +652,56 @@
     }
   }
 
+  function initAds() {
+    const enabled = window.SITE?.ads?.enabled === true;
+    document.querySelectorAll('.ad-slot').forEach((el) => {
+      el.hidden = !enabled;
+    });
+  }
+
   /* ── Init ── */
   function init() {
+    initAds();
     I18n.init();
     initTheme();
     initLangToggle();
-    QRAnalytics.initBanner();
+    QRAnalytics.init();
 
     window.__showToast = showToast;
     window.__restoreQR = (item) => {
       if (!item) return;
+      clearTimeout(historyAddTimer);
       state.typeId = item.typeId;
       state.formData = { ...item.formData };
       renderTypeSelector();
       renderForm();
+      if (item.style && typeof QRCustomizer.applyTemplateStyle === 'function') {
+        QRCustomizer.applyTemplateStyle(item.style);
+      }
       updateQR();
       const type = getTypeById(item.typeId);
       $('#form-title').textContent = typeLabel(type) + I18n.t('contentSuffix');
+      showToast(I18n.t('history.restored'));
     };
 
     $('#theme-toggle').addEventListener('click', toggleTheme);
 
     renderTypeSelector();
-    selectType('url');
+    state.typeId = 'url';
+    state.formData = { ...getTypeById('url').defaultData };
+    renderForm();
+    $('#form-title').textContent = typeLabel(getTypeById('url')) + I18n.t('contentSuffix');
 
     bindFormEvents();
     QRCustomizer.initPreviewEl($('#qr-preview'));
     initCustomizerControls();
+    updateQR();
     initTemplates();
     initExport();
     initBatchMode();
+    initMobileStickyCta();
     QRPro.initModal();
     QRHistory.init();
-
-    QRAnalytics.track('page_view');
   }
 
   if (document.readyState === 'loading') {

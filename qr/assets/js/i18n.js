@@ -7,6 +7,10 @@ const I18n = (() => {
   const messages = {
     en: {
       'nav.batch': 'Batch Mode',
+      'nav.moneybay': 'Get MoneyBay',
+      'nav.moneybayShort': 'MoneyBay',
+      'nav.qrbay': 'Get QRBay',
+      'nav.qrbayShort': 'QRBay',
       'nav.lang': 'Language',
       'panel.qrType': 'QR Type',
       'panel.content': 'Content',
@@ -22,14 +26,20 @@ const I18n = (() => {
       'export.copy': 'Copy Image',
       'export.share': 'Share',
       'export.encoded': 'Encoded Data',
+      'export.stickyPng': 'Download PNG',
       'batch.title': 'Batch QR Generator',
-      'batch.desc': 'Enter CSV data with columns: type, data, label. Max {max} rows.',
+      'batch.desc': 'Enter CSV data with columns: type, data, label.',
       'batch.csv': 'CSV Data',
       'batch.parse': 'Generate Preview',
       'batch.zipPng': 'Download ZIP (PNG)',
       'batch.zipSvg': 'Download ZIP (SVG)',
       'batch.progress': 'Generating {current} / {total}…',
       'batch.truncated': 'Only first {max} rows processed.',
+      'batch.empty': 'No valid rows. Check CSV format (see guide below).',
+      'batch.cancel': 'Cancel',
+      'batch.cancelled': 'Batch export cancelled.',
+      'batch.helpTitle': 'CSV format guide',
+      'batch.helpBody': 'type,data,label\nurl,https://example.com,Site\nsocial,instagram,mybrand,Instagram\nwifi,MyWiFi|password|WPA,Office\nvcard,John|Doe|+1234567890|john@example.com,Contact',
       'validation.required': 'This field is required.',
       'validation.invalid_email': 'Enter a valid email address.',
       'validation.invalid_url': 'Enter a valid URL.',
@@ -38,18 +48,19 @@ const I18n = (() => {
       'validation.invalid_lng': 'Longitude must be between -180 and 180.',
       'validation.invalid_address': 'Enter a valid wallet address.',
       'validation.appstore_required': 'Enter at least one store URL.',
+      'validation.appstore_dual': 'Both store links are set. This QR uses the iOS App Store URL. Create a second QR for Google Play if needed.',
       'validation.empty_payload': 'Please fill in the required fields to generate a QR code.',
       'validation.logo_too_large': 'Logo must be under 2 MB.',
       'validation.logo_invalid': 'Please upload an image file.',
       'toast.download': 'Download started!',
       'toast.copy': 'Copied to clipboard!',
       'toast.share': 'Shared successfully!',
+      'toast.shareClipboard': 'Share unavailable — copied image to clipboard instead.',
       'toast.exportFail': 'Export failed',
       'toast.invalid': 'Fix form errors before exporting.',
-      'cookie.text': 'We use optional analytics cookies to improve the service. QR content is never sent to our servers.',
-      'cookie.accept': 'Accept',
-      'cookie.decline': 'Decline',
-      'cookie.privacy': 'Privacy Policy',
+      'toast.styleLoaded': 'Style loaded!',
+      'toast.styleInvalid': 'Invalid style file.',
+      'toast.styleReset': 'Style reset to defaults.',
       'usecases.title': 'Use Cases',
       'usecases.subtitle': 'Create QR codes for every scenario — free and instant.',
       'faq.title': 'Frequently Asked Questions',
@@ -74,9 +85,12 @@ const I18n = (() => {
       'pro.modal.desc': 'Remove watermark, export up to 1000px, batch 500 rows.',
       'pro.modal.placeholder': 'Enter license key',
       'pro.modal.activate': 'Activate',
+      'pro.toastActivated': 'Pro activated!',
       'pro.modal.pricing': 'View pricing',
       'history.title': 'Recent',
       'history.clear': 'Clear',
+      'history.empty': 'No recent QR codes yet.',
+      'history.restored': 'Restored from history.',
       'tips.title': 'Scan quality',
       'tips.logo_ecl': 'Use error correction H or Q when embedding a logo.',
       'tips.gradient_transparent': 'Gradient + transparent background may reduce scan reliability.',
@@ -103,6 +117,8 @@ const I18n = (() => {
       'templates.search': 'Search templates…',
       'templates.hide': 'Hide',
       'templates.show': 'Show templates',
+      'templates.showAll': 'Show all templates',
+      'templates.showLess': 'Show less',
       'templates.empty': 'No templates match your search.',
       'templates.count': '{count} templates',
       'templates.applied': 'Template applied: {name}',
@@ -120,6 +136,10 @@ const I18n = (() => {
     },
     vi: {
       'nav.batch': 'Hàng loạt',
+      'nav.moneybay': 'Tải MoneyBay',
+      'nav.moneybayShort': 'MoneyBay',
+      'nav.qrbay': 'Tải QRBay',
+      'nav.qrbayShort': 'QRBay',
       'nav.lang': 'Ngôn ngữ',
       'panel.qrType': 'Loại QR',
       'panel.content': 'Nội dung',
@@ -135,14 +155,20 @@ const I18n = (() => {
       'export.copy': 'Sao chép ảnh',
       'export.share': 'Chia sẻ',
       'export.encoded': 'Dữ liệu mã hóa',
+      'export.stickyPng': 'Tải PNG',
       'batch.title': 'Tạo QR hàng loạt',
-      'batch.desc': 'Nhập CSV với cột: type, data, label. Tối đa {max} dòng.',
+      'batch.desc': 'Nhập CSV với cột: type, data, label.',
       'batch.csv': 'Dữ liệu CSV',
       'batch.parse': 'Tạo xem trước',
       'batch.zipPng': 'Tải ZIP (PNG)',
       'batch.zipSvg': 'Tải ZIP (SVG)',
       'batch.progress': 'Đang tạo {current} / {total}…',
       'batch.truncated': 'Chỉ xử lý {max} dòng đầu tiên.',
+      'batch.empty': 'Không có dòng hợp lệ. Kiểm tra định dạng CSV (xem hướng dẫn bên dưới).',
+      'batch.cancel': 'Hủy',
+      'batch.cancelled': 'Đã hủy xuất batch.',
+      'batch.helpTitle': 'Hướng dẫn định dạng CSV',
+      'batch.helpBody': 'type,data,label\nurl,https://example.com,Trang\nsocial,instagram,mybrand,Instagram\nwifi,MyWiFi|password|WPA,Văn phòng\nvcard,An|Nguyen|+84901234567|an@example.com,Liên hệ',
       'validation.required': 'Trường này là bắt buộc.',
       'validation.invalid_email': 'Nhập email hợp lệ.',
       'validation.invalid_url': 'Nhập URL hợp lệ.',
@@ -151,18 +177,19 @@ const I18n = (() => {
       'validation.invalid_lng': 'Kinh độ phải từ -180 đến 180.',
       'validation.invalid_address': 'Nhập địa chỉ ví hợp lệ.',
       'validation.appstore_required': 'Nhập ít nhất một URL cửa hàng.',
+      'validation.appstore_dual': 'Đã nhập cả hai link cửa hàng. Mã QR này dùng URL App Store (iOS). Tạo mã QR thứ hai cho Google Play nếu cần.',
       'validation.empty_payload': 'Vui lòng điền các trường bắt buộc để tạo mã QR.',
       'validation.logo_too_large': 'Logo phải nhỏ hơn 2 MB.',
       'validation.logo_invalid': 'Vui lòng tải lên file ảnh.',
       'toast.download': 'Đang tải xuống!',
       'toast.copy': 'Đã sao chép!',
       'toast.share': 'Đã chia sẻ!',
+      'toast.shareClipboard': 'Không chia sẻ được — đã sao chép ảnh vào clipboard.',
       'toast.exportFail': 'Xuất file thất bại',
       'toast.invalid': 'Sửa lỗi form trước khi xuất.',
-      'cookie.text': 'Chúng tôi dùng cookie phân tích tùy chọn để cải thiện dịch vụ. Nội dung QR không bao giờ gửi lên máy chủ.',
-      'cookie.accept': 'Đồng ý',
-      'cookie.decline': 'Từ chối',
-      'cookie.privacy': 'Chính sách bảo mật',
+      'toast.styleLoaded': 'Đã tải style!',
+      'toast.styleInvalid': 'File style không hợp lệ.',
+      'toast.styleReset': 'Đã đặt lại style mặc định.',
       'usecases.title': 'Trường hợp sử dụng',
       'usecases.subtitle': 'Tạo mã QR cho mọi nhu cầu — miễn phí, tức thì.',
       'faq.title': 'Câu hỏi thường gặp',
@@ -187,9 +214,12 @@ const I18n = (() => {
       'pro.modal.desc': 'Bỏ watermark, xuất tới 1000px, batch 500 dòng.',
       'pro.modal.placeholder': 'Nhập license key',
       'pro.modal.activate': 'Kích hoạt',
+      'pro.toastActivated': 'Đã kích hoạt Pro!',
       'pro.modal.pricing': 'Xem bảng giá',
       'history.title': 'Gần đây',
       'history.clear': 'Xóa',
+      'history.empty': 'Chưa có mã QR gần đây.',
+      'history.restored': 'Đã khôi phục từ lịch sử.',
       'tips.title': 'Chất lượng quét',
       'tips.logo_ecl': 'Dùng mức sửa lỗi H hoặc Q khi nhúng logo.',
       'tips.gradient_transparent': 'Gradient + nền trong suốt có thể khó quét.',
@@ -216,6 +246,8 @@ const I18n = (() => {
       'templates.search': 'Tìm mẫu…',
       'templates.hide': 'Ẩn',
       'templates.show': 'Hiện mẫu',
+      'templates.showAll': 'Xem tất cả mẫu',
+      'templates.showLess': 'Thu gọn',
       'templates.empty': 'Không tìm thấy mẫu phù hợp.',
       'templates.count': '{count} mẫu',
       'templates.applied': 'Đã áp mẫu: {name}',
@@ -254,7 +286,7 @@ const I18n = (() => {
 
   const faq = {
     en: [
-      { q: 'Is this QR code generator really free?', a: 'Yes. The free plan includes all QR types and exports with a small watermark. Pro removes the watermark and unlocks higher resolution and batch limits.' },
+      { q: 'Is this QR code generator really free?', a: 'Yes. All QR types, styling, batch mode, and exports are free with no watermark and no signup.' },
       { q: 'Is my data safe?', a: 'All QR generation happens in your browser. Your URLs, WiFi passwords, and contact info are never sent to our servers.' },
       { q: 'What file formats can I download?', a: 'PNG (1×, 2×, 3×), SVG, JPEG, and PDF. Frame templates are included in PNG, JPEG, and PDF exports.' },
       { q: 'Will my QR codes expire?', a: 'No. Static QR codes never expire. The encoded content stays the same forever.' },
@@ -262,7 +294,7 @@ const I18n = (() => {
       { q: 'How does batch mode work?', a: 'Paste CSV with columns type, data, label. Preview all QR codes and download as a ZIP file.' }
     ],
     vi: [
-      { q: 'Công cụ tạo QR này có thật sự miễn phí?', a: 'Có. Gói free gồm đủ loại QR và export có watermark nhỏ. Pro bỏ watermark và mở khóa độ phân giải cao hơn.' },
+      { q: 'Công cụ tạo QR này có thật sự miễn phí?', a: 'Có. Đủ loại QR, tùy chỉnh, batch và export — miễn phí, không watermark, không cần đăng ký.' },
       { q: 'Dữ liệu của tôi có an toàn?', a: 'Mọi thao tác tạo QR diễn ra trên trình duyệt. URL, mật khẩu WiFi, liên hệ không gửi lên máy chủ.' },
       { q: 'Tải được những định dạng nào?', a: 'PNG (1×, 2×, 3×), SVG, JPEG và PDF. Khung QR được gộp vào PNG, JPEG và PDF.' },
       { q: 'Mã QR có hết hạn không?', a: 'Không. Mã QR tĩnh không hết hạn — nội dung mã hóa giữ nguyên vĩnh viễn.' },
@@ -288,6 +320,10 @@ const I18n = (() => {
   }
 
   function errorMsg(code) {
+    return t('validation.' + code) || code;
+  }
+
+  function warningMsg(code) {
     return t('validation.' + code) || code;
   }
 
@@ -317,6 +353,9 @@ const I18n = (() => {
     document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
     });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
+      el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+    });
     renderUseCases();
     renderFaq();
     document.dispatchEvent(new CustomEvent('i18n:change', { detail: { lang } }));
@@ -345,5 +384,5 @@ const I18n = (() => {
     `).join('');
   }
 
-  return { init, setLang, getLang, t, errorMsg, faq, useCases };
+  return { init, setLang, getLang, t, errorMsg, warningMsg, faq, useCases };
 })();

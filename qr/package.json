@@ -1,0 +1,16 @@
+{
+  "name": "vutaso-qr-generator",
+  "private": true,
+  "description": "Free QR code generator at vutaso.com/qr",
+  "scripts": {
+    "test": "node tests/smoke.test.js",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers playwright test",
+    "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers playwright install chromium",
+    "lighthouse:ci": "lhci autorun",
+    "vendor": "bash scripts/vendor-libs.sh"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.49.1"
+  }
+}

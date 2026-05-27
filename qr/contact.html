@@ -3,83 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact — Free QR Generator</title>
-  <meta name="description" content="Contact Free QR Generator for support, Pro licenses, and enterprise inquiries.">
-  <link rel="canonical" href="https://vutaso.com/qr/contact.html">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <title>Redirect — Free QR Generator</title>
+  <link rel="canonical" href="https://vutaso.com/qr/">
+  <meta http-equiv="refresh" content="0; url=./">
+  <script>location.replace('./');</script>
 </head>
 <body>
-  <header class="header">
-    <div class="header__inner container">
-      <a href="./" class="logo"><img src="assets/img/logo.svg" alt="" width="180" height="32" class="logo__img"></a>
-      <nav class="header__nav">
-        <a href="./">Generator</a>
-        <a href="pricing.html">Pricing</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="main container legal-page">
-    <article class="panel legal-content contact-page">
-      <h1>Contact us</h1>
-      <p class="legal-meta">We typically respond within 24 hours.</p>
-
-      <div class="contact-grid">
-        <section>
-          <h2>Email</h2>
-          <p><a href="mailto:contact@vutaso.com">contact@vutaso.com</a></p>
-
-          <h2>Support</h2>
-          <p>Pro users receive priority support. Free users — best effort within 48h.</p>
-
-          <h2>Enterprise</h2>
-          <p>White-label, API access, dynamic QR — <a href="mailto:contact@vutaso.com?subject=Enterprise">email us</a>.</p>
-        </section>
-
-        <section>
-          <h2>Send a message</h2>
-          <form class="contact-form" action="https://formspree.io/f/xplaceholder" method="POST" id="contact-form">
-            <div class="form-group">
-              <label for="name">Name</label>
-              <input type="text" id="name" name="name" class="input" required>
-            </div>
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" class="input" required>
-            </div>
-            <div class="form-group">
-              <label for="subject">Subject</label>
-              <select id="subject" name="subject" class="select">
-                <option>General inquiry</option>
-                <option>Pro license</option>
-                <option>Bug report</option>
-                <option>Enterprise</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" class="textarea" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn--primary">Send message</button>
-          </form>
-          <p class="contact-form__note">Or email directly if the form is unavailable. Set your Formspree ID in <code>site.config.js</code>.</p>
-        </section>
-      </div>
-    </article>
-  </main>
-
-  <footer class="footer">
-    <div class="footer__bottom container">
-      <p>&copy; 2026 Free QR Generator · <a href="./">Home</a> · <a href="privacy.html">Privacy</a></p>
-    </div>
-  </footer>
-  <script src="site.config.js"></script>
-  <script>
-    if (window.SITE && SITE.contact && SITE.contact.formspreeId) {
-      document.getElementById('contact-form').action = 'https://formspree.io/f/' + SITE.contact.formspreeId;
-    }
-  </script>
+  <p><a href="./">Continue to Free QR Generator</a></p>
 </body>
 </html>

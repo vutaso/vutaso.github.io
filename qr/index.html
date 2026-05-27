@@ -8,6 +8,7 @@
   <meta name="keywords" content="QR code generator, free QR code, custom QR, WiFi QR, vCard QR, batch QR">
   <meta name="author" content="Free QR Generator">
   <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0071e3">
   <link rel="canonical" href="https://vutaso.com/qr/">
 
   <!-- Open Graph -->
@@ -31,8 +32,10 @@
   <link rel="preload" href="assets/css/fonts.css" as="style">
   <link rel="preload" href="assets/css/style.css" as="style">
   <link rel="stylesheet" href="assets/css/fonts.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' https://plausible.io; base-uri 'self'; form-action 'self' mailto: https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/themes/nano.min.css" integrity="sha384-SRANiKMn1qiS+patt9oWTeWFqP5oFuhjbXHHTCPna4PcFzD/As8zRVH3+mmjwgDy" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/vendor/pickr.nano.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
 
   <script type="application/ld+json">
@@ -54,7 +57,7 @@
       {
         "@type": "Question",
         "name": "Is this QR code generator really free?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Free plan includes all features with a small watermark. Pro removes watermark and unlocks higher resolution." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. All features are free with no watermark, no signup, and no usage limits in your browser." }
       },
       {
         "@type": "Question",
@@ -75,26 +78,29 @@
 
   <header class="header">
     <div class="header__inner container">
-      <a href="./" class="logo" aria-label="Free QR Generator home">
-        <img src="assets/img/logo.svg" alt="" width="180" height="32" class="logo__img">
+      <a href="https://vutaso.com/" class="logo" aria-label="VUTASO home">
+        <img src="assets/img/logo.svg" alt="VUTASO" width="108" height="32" class="logo__img">
       </a>
-      <nav class="header__nav">
-        <a href="pricing.html" data-i18n="nav.pricing">Pricing</a>
-        <a href="contact.html" data-i18n="nav.contact">Contact</a>
+      <nav class="header__nav" aria-label="Apps">
+        <a class="header__app-link header__app-link--moneybay" href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank" rel="noopener noreferrer" data-i18n-aria-label="nav.moneybay" aria-label="Tải MoneyBay">
+          <i class="fa-brands fa-apple" aria-hidden="true"></i>
+          <span class="header__app-link-text header__app-link-text--full" data-i18n="nav.moneybay">Tải MoneyBay</span>
+          <span class="header__app-link-text header__app-link-text--short" data-i18n="nav.moneybayShort">MoneyBay</span>
+        </a>
+        <a class="header__app-link header__app-link--qrbay" href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" rel="noopener noreferrer" data-i18n-aria-label="nav.qrbay" aria-label="Tải QRBay">
+          <i class="fa-brands fa-apple" aria-hidden="true"></i>
+          <span class="header__app-link-text header__app-link-text--full" data-i18n="nav.qrbay">Tải QRBay</span>
+          <span class="header__app-link-text header__app-link-text--short" data-i18n="nav.qrbayShort">QRBay</span>
+        </a>
       </nav>
       <div class="header__actions">
-        <span id="pro-badge" class="pro-badge" hidden>PRO</span>
-        <button type="button" id="pro-upgrade" class="btn btn--pro btn--sm">
-          <i class="fa-solid fa-crown" aria-hidden="true"></i>
-          <span data-i18n="pro.upgrade">Upgrade Pro</span>
-        </button>
         <div class="lang-switch" role="group" aria-label="Language">
           <button type="button" class="lang-btn lang-btn--active" data-lang="en" aria-pressed="true">EN</button>
           <button type="button" class="lang-btn" data-lang="vi" aria-pressed="false">VI</button>
         </div>
-        <button type="button" id="batch-toggle" class="btn btn--ghost btn--sm" aria-pressed="false">
+        <button type="button" id="batch-toggle" class="btn btn--ghost btn--sm" aria-pressed="false" data-i18n-aria-label="nav.batch" aria-label="Batch Mode">
           <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
-          <span data-i18n="nav.batch">Batch Mode</span>
+          <span class="header__batch-label" data-i18n="nav.batch">Batch Mode</span>
         </button>
         <button type="button" id="theme-toggle" class="btn btn--icon" aria-label="Toggle dark mode">
           <i class="fa-solid fa-moon" aria-hidden="true"></i>
@@ -104,32 +110,13 @@
   </header>
 
   <main id="main-content" class="main container">
-    <!-- Templates Marketplace -->
-    <section class="template-marketplace panel" id="template-marketplace" aria-label="QR code templates">
-      <div class="template-marketplace__head">
-        <div>
-          <h2 class="template-marketplace__title" data-i18n="templates.title">Templates</h2>
-          <p class="template-marketplace__subtitle" data-i18n="templates.subtitle">Pick a ready-made design — customize content in one click.</p>
-        </div>
-        <div class="template-marketplace__actions">
-          <input type="search" id="template-search" class="input input--sm template-search" data-i18n-placeholder="templates.search" placeholder="Search templates…" autocomplete="off">
-          <button type="button" id="template-marketplace-toggle" class="btn btn--ghost btn--sm" aria-expanded="true" data-i18n="templates.hide">Hide</button>
-        </div>
-      </div>
-      <div id="template-marketplace-body">
-        <div id="template-categories" class="template-categories"></div>
-        <p id="template-count" class="template-count"></p>
-        <div id="template-grid" class="template-grid"></div>
-      </div>
-    </section>
-
     <!-- Single QR Mode -->
     <div id="single-mode" class="app-grid">
       <!-- Column 1: Type Selector -->
       <aside class="panel panel--types" aria-label="QR code type selector">
         <h2 class="panel__title" data-i18n="panel.qrType">QR Type</h2>
         <nav id="type-selector" class="type-grid" role="tablist" aria-label="Select QR code type"></nav>
-        <aside class="ad-slot ad-slot--sidebar" aria-label="Advertisement">
+        <aside class="ad-slot ad-slot--sidebar" aria-label="Advertisement" hidden>
           <span class="ad-slot__label">Ad</span>
           <p class="ad-slot__placeholder">Ad space — configure in site.config.js</p>
         </aside>
@@ -140,6 +127,7 @@
         <div id="form-section">
           <h2 class="panel__title" id="form-title">Content</h2>
           <div id="form-errors" class="form-errors" hidden role="alert"></div>
+          <div id="form-warnings" class="form-warnings" hidden role="status"></div>
           <form id="qr-form" class="qr-form" novalidate></form>
         </div>
 
@@ -326,8 +314,8 @@
               <div class="accordion__body">
                 <div class="field-row">
                   <label for="qr-size">QR Size <span id="qr-size-val">300px</span></label>
-                  <input type="range" id="qr-size" min="200" max="600" value="300" step="10" class="range">
-                  <small id="qr-size-limit" class="field-hint"></small>
+                  <input type="range" id="qr-size" min="200" max="2048" value="300" step="10" class="range">
+                  <small id="qr-size-limit" class="field-hint" hidden></small>
                 </div>
                 <div class="field-row">
                   <label for="qr-margin">Margin <span id="qr-margin-val">1</span></label>
@@ -426,19 +414,54 @@
       </aside>
     </div>
 
+    <!-- Templates (one row by default; below editor so QR Type / Content / Preview are primary) -->
+    <section class="template-marketplace panel" id="template-marketplace" aria-label="QR code templates">
+      <div class="template-marketplace__head">
+        <div>
+          <h2 class="template-marketplace__title" data-i18n="templates.title">Templates</h2>
+          <p class="template-marketplace__subtitle" data-i18n="templates.subtitle">Pick a ready-made design — customize content in one click.</p>
+        </div>
+        <div class="template-marketplace__actions">
+          <label class="template-search-wrap">
+            <i class="fa-solid fa-magnifying-glass template-search-wrap__icon" aria-hidden="true"></i>
+            <input type="search" id="template-search" class="input input--sm template-search" data-i18n-placeholder="templates.search" placeholder="Search templates…" autocomplete="off">
+          </label>
+          <button type="button" id="template-marketplace-toggle" class="btn btn--ghost btn--sm" aria-expanded="true" data-i18n="templates.hide">Hide</button>
+        </div>
+      </div>
+      <div id="template-marketplace-body">
+        <div class="template-marketplace__filters">
+          <div id="template-categories" class="template-categories"></div>
+          <p id="template-count" class="template-count"></p>
+        </div>
+        <div id="template-grid" class="template-grid"></div>
+        <div class="template-marketplace__footer">
+          <button type="button" id="template-grid-expand" class="btn btn--ghost btn--sm template-expand-btn" aria-expanded="false" data-i18n="templates.showAll">Show all templates</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Batch Mode -->
     <div id="batch-mode" class="batch-panel" hidden>
       <div class="batch-header">
         <h2 class="panel__title" data-i18n="batch.title">Batch QR Generator</h2>
-        <p class="batch-desc" data-i18n="batch.desc" data-i18n-max="100">Enter CSV data with columns: type, data, label. Max 100 rows.</p>
+        <p class="batch-desc" data-i18n="batch.desc">Enter CSV data with columns: type, data, label.</p>
+        <details class="batch-help">
+          <summary data-i18n="batch.helpTitle">CSV format guide</summary>
+          <pre class="batch-help__code" data-i18n="batch.helpBody">type,data,label
+url,https://example.com,Site
+social,instagram,mybrand,Instagram
+wifi,MyWiFi|password|WPA,Office
+vcard,John|Doe|+1234567890|john@example.com,Contact</pre>
+        </details>
       </div>
 
       <div class="batch-editor">
         <label for="batch-csv" class="field-label" data-i18n="batch.csv">CSV Data</label>
         <textarea id="batch-csv" class="textarea" rows="8" placeholder="type,data,label
 url,https://example.com,Example Site
-text,Hello World,Greeting
-wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
+social,instagram,mybrand,Instagram
+wifi,MyWiFi|password|WPA,Office WiFi"></textarea>
         <div class="batch-actions">
           <button type="button" id="batch-parse" class="btn btn--primary">
             <i class="fa-solid fa-table" aria-hidden="true"></i> <span data-i18n="batch.parse">Generate Preview</span>
@@ -449,6 +472,7 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
           <button type="button" id="batch-download-svg" class="btn btn--secondary" disabled>
             <i class="fa-solid fa-file-zipper" aria-hidden="true"></i> <span data-i18n="batch.zipSvg">Download ZIP (SVG)</span>
           </button>
+          <button type="button" id="batch-cancel" class="btn btn--ghost" hidden data-i18n="batch.cancel">Cancel</button>
         </div>
         <div id="batch-progress" class="batch-progress" hidden>
           <div class="batch-progress__track"><div id="batch-progress-bar" class="batch-progress__bar"></div></div>
@@ -473,21 +497,7 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
     </section>
   </main>
 
-  <!-- Pro license modal -->
-  <div id="pro-modal" class="modal" hidden role="dialog" aria-labelledby="pro-modal-title">
-    <div class="modal__content">
-      <button type="button" id="pro-modal-close" class="modal__close" aria-label="Close">&times;</button>
-      <h2 id="pro-modal-title" data-i18n="pro.modal.title">Upgrade to Pro</h2>
-      <p data-i18n="pro.modal.desc">Remove watermark, export up to 1000px, batch 500 rows.</p>
-      <input type="text" id="pro-license-input" class="input" data-i18n-placeholder="pro.modal.placeholder" placeholder="Enter license key">
-      <div class="modal__actions">
-        <a href="pricing.html" class="btn btn--ghost" data-i18n="pro.modal.pricing">View pricing</a>
-        <button type="button" id="pro-activate" class="btn btn--primary" data-i18n="pro.modal.activate">Activate</button>
-      </div>
-    </div>
-  </div>
-
-  <aside class="ad-slot ad-slot--footer container" aria-label="Advertisement">
+  <aside class="ad-slot ad-slot--footer container" aria-label="Advertisement" hidden>
     <span class="ad-slot__label">Ad</span>
     <p class="ad-slot__placeholder">Footer ad space</p>
   </aside>
@@ -495,7 +505,7 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <img src="assets/img/logo.svg" alt="" width="140" height="28" class="logo__img">
+        <img src="assets/img/logo.svg" alt="VUTASO" width="96" height="28" class="logo__img">
         <p class="footer__tagline" data-i18n="footer.tagline">Create beautiful QR codes for free. No signup required. 100% client-side — your data never leaves your browser.</p>
       </div>
       <div class="footer__links">
@@ -522,10 +532,6 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
     </div>
     <div class="footer__bottom container">
       <nav class="footer__legal" aria-label="Legal">
-        <a href="pricing.html">Pricing</a>
-        <span aria-hidden="true">·</span>
-        <a href="contact.html">Contact</a>
-        <span aria-hidden="true">·</span>
         <a href="privacy.html">Privacy Policy</a>
         <span aria-hidden="true">·</span>
         <a href="terms.html">Terms of Service</a>
@@ -534,24 +540,26 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
     </div>
   </footer>
 
-  <!-- Cookie consent -->
-  <div id="cookie-banner" class="cookie-banner" hidden role="dialog" aria-label="Cookie consent">
-    <p><span data-i18n="cookie.text">We use optional analytics cookies to improve the service.</span> <a href="privacy.html" data-i18n="cookie.privacy">Privacy Policy</a></p>
-    <div class="cookie-banner__actions">
-      <button type="button" id="cookie-decline" class="btn btn--ghost btn--sm" data-i18n="cookie.decline">Decline</button>
-      <button type="button" id="cookie-accept" class="btn btn--primary btn--sm" data-i18n="cookie.accept">Accept</button>
-    </div>
+  <!-- Toast notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <i class="toast__icon fa-solid" aria-hidden="true"></i>
+    <span class="toast__text"></span>
   </div>
 
-  <!-- Toast notification -->
-  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <!-- Mobile sticky download CTA -->
+  <div id="mobile-sticky-cta" class="mobile-sticky-cta" hidden>
+    <button type="button" id="mobile-download-png" class="btn btn--primary mobile-sticky-cta__btn">
+      <i class="fa-solid fa-download" aria-hidden="true"></i>
+      <span data-i18n="export.stickyPng">Download PNG</span>
+    </button>
+  </div>
 
-  <!-- CDN Libraries (pinned versions + SRI) -->
-  <script src="https://unpkg.com/qr-code-styling@1.6.2/lib/qr-code-styling.js" integrity="sha384-u3n0PN8HUUcaub7a5d68gqMjgBCHV21A3oVBEoJ3pDgYteaeztYfTy5oE/Zjjxsg" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha384-PlRSzpewlarQuj5alIadXwjNUX+2eNMKwr0f07ShWYLy8B6TjEbm7ZlcN/ScSbwy" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/pickr.min.js" integrity="sha384-wSWLqRWLpvgym6F54BYkfFQGV7k1d670FZV25mzYCxDGWMiLlIb2mOm38NQtlRV8" crossorigin="anonymous"></script>
+  <!-- Self-hosted libraries (see scripts/vendor-libs.sh) -->
+  <script src="assets/vendor/qr-code-styling.js"></script>
+  <script src="assets/vendor/jspdf.umd.min.js"></script>
+  <script src="assets/vendor/jszip.min.js"></script>
+  <script src="assets/vendor/FileSaver.min.js"></script>
+  <script src="assets/vendor/pickr.min.js"></script>
 
   <script src="site.config.js"></script>
   <script src="assets/js/types.js" defer></script>
@@ -569,16 +577,6 @@ wifi,WIFI:T:WPA;S:MyNetwork;P:password123;;,Home WiFi"></textarea>
   <script src="assets/js/scan-tips.js" defer></script>
   <script src="assets/js/app.js" defer></script>
 
-  <script>
-    (function () {
-      if (localStorage.getItem('open-pro') === '1') {
-        localStorage.removeItem('open-pro');
-        document.addEventListener('DOMContentLoaded', function () {
-          setTimeout(function () { document.getElementById('pro-upgrade')?.click(); }, 500);
-        });
-      }
-    })();
-  </script>
   <script>
     (function () {
       if (typeof QRCodeStyling === 'undefined') {

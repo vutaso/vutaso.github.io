@@ -5,7 +5,7 @@ const FrameRenderer = (() => {
   const FRAME_LAYOUT = {
     none: { pad: 0, labelH: 0 },
     border: { pad: 24, border: 2, borderColor: '#e2e8f0', bg: '#f1f3f9', radius: 12, labelH: 0 },
-    badge: { pad: 28, border: 3, borderColor: '#6366f1', bg: '#eef2ff', radius: 24, labelH: 0 },
+    badge: { pad: 28, border: 3, borderColor: '#0071e3', bg: '#e3f2fd', radius: 24, labelH: 0 },
     scanme: { pad: 24, border: 2, borderColor: '#1a1a2e', bg: '#ffffff', radius: 12, labelH: 44 },
     banner: { pad: 32, bg: 'gradient', radius: 12, labelH: 48, qrPad: 10, qrBg: '#ffffff' },
     social: { pad: 28, border: 2, borderColor: '#e2e8f0', bg: '#ffffff', radius: 20, labelH: 44, shadow: true }
@@ -28,8 +28,8 @@ const FrameRenderer = (() => {
 
   function drawGradientBg(ctx, x, y, w, h, radius) {
     const g = ctx.createLinearGradient(x, y, x + w, y + h);
-    g.addColorStop(0, '#6366f1');
-    g.addColorStop(1, '#4f46e5');
+    g.addColorStop(0, '#0071e3');
+    g.addColorStop(1, '#2196f3');
     roundRect(ctx, x, y, w, h, radius);
     ctx.fillStyle = g;
     ctx.fill();
@@ -55,8 +55,8 @@ const FrameRenderer = (() => {
     const borderColor = frameColors?.border || layout.borderColor || '#e2e8f0';
     const bgColor = frameColors?.background || layout.bg;
     const labelColor = frameColors?.label || (frameId === 'banner' ? '#ffffff' : '#64748b');
-    const bannerFrom = frameColors?.bannerFrom || '#6366f1';
-    const bannerTo = frameColors?.bannerTo || '#4f46e5';
+    const bannerFrom = frameColors?.bannerFrom || '#0071e3';
+    const bannerTo = frameColors?.bannerTo || '#2196f3';
 
     const innerW = qrSize + qrPad * 2;
     const innerH = innerW;

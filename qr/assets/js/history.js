@@ -44,7 +44,12 @@ const QRHistory = (() => {
 
     const list = load();
     if (!list.length) {
-      container.innerHTML = '<p class="history-empty">No recent QR codes yet.</p>';
+      const empty = document.createElement('p');
+      empty.className = 'history-empty';
+      empty.textContent = typeof I18n !== 'undefined'
+        ? I18n.t('history.empty')
+        : 'No recent QR codes yet.';
+      container.replaceChildren(empty);
       return;
     }
 
@@ -56,7 +61,7 @@ const QRHistory = (() => {
       const time = new Date(item.ts).toLocaleDateString();
       return `
         <button type="button" class="history-item" data-index="${i}">
-          <span class="history-item__type">${label}</span>
+          <span class="history-item__type">${escapeHtml(label)}</span>
           <span class="history-item__text">${escapeHtml(preview)}${encLen > 40 ? '…' : ''}</span>
           <span class="history-item__date">${time}</span>
         </button>
@@ -84,6 +89,7 @@ const QRHistory = (() => {
   function init() {
     render();
     document.getElementById('history-clear')?.addEventListener('click', clear);
+    document.addEventListener('i18n:change', render);
   }
 
   return { add, remove, clear, render, init, load };

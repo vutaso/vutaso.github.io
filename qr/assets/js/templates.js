@@ -3,7 +3,7 @@
  */
 const QRTemplates = (() => {
   const CATEGORIES = [
-    { id: 'all', icon: 'fa-grid-2' },
+    { id: 'all', icon: 'fa-table-cells-large' },
     { id: 'business', icon: 'fa-briefcase' },
     { id: 'restaurant', icon: 'fa-utensils' },
     { id: 'social', icon: 'fa-share-nodes' },
@@ -15,6 +15,17 @@ const QRTemplates = (() => {
     { id: 'education', icon: 'fa-graduation-cap' },
     { id: 'realestate', icon: 'fa-house' }
   ];
+
+  /** Font Awesome 6 — brand logos live in fa-brands, not fa-solid */
+  const BRAND_ICONS = new Set([
+    'fa-linkedin', 'fa-instagram', 'fa-tiktok', 'fa-youtube',
+    'fa-facebook', 'fa-whatsapp', 'fa-telegram', 'fa-x-twitter'
+  ]);
+
+  function iconClass(icon) {
+    const family = BRAND_ICONS.has(icon) ? 'fa-brands' : 'fa-solid';
+    return `${family} ${icon}`;
+  }
 
   function st(fg, bg, opts = {}) {
     const frame = opts.frame || 'none';
@@ -55,7 +66,7 @@ const QRTemplates = (() => {
   /** Social brand preset: logo + ECL H + official colors */
   function stBrand(brandId, opts = {}) {
     const p = typeof QRBrandLogos !== 'undefined' ? QRBrandLogos.getPreset(brandId) : null;
-    if (!p) return st('#6366f1', '#ffffff', opts);
+    if (!p) return st('#0071e3', '#ffffff', opts);
     return st(p.fg, p.bg, {
       dots: p.dots,
       cornerSq: p.cornerSq,
@@ -97,11 +108,11 @@ const QRTemplates = (() => {
       name: { en: 'Book Appointment', vi: 'Đặt lịch hẹn' },
       form: { url: 'https://calendly.com/yourname' },
       style: st('#047857', '#ecfdf5', { frame: 'scanme', label: 'Book Now', dots: 'extra-rounded' }) },
-    { id: 'biz-portfolio', cat: 'business', icon: 'fa-briefcase', accent: '#6366f1', type: 'url',
+    { id: 'biz-portfolio', cat: 'business', icon: 'fa-briefcase', accent: '#0071e3', type: 'url',
       name: { en: 'Portfolio', vi: 'Portfolio' },
       form: { url: 'https://portfolio.example.com' },
-      style: st('#4f46e5', '#eef2ff', { frame: 'border', dots: 'classy-rounded', cornerSq: 'square' }) },
-    { id: 'biz-pitch', cat: 'business', icon: 'fa-presentation-screen', accent: '#dc2626', type: 'url',
+      style: st('#005bb5', '#e3f2fd', { frame: 'border', dots: 'classy-rounded', cornerSq: 'square' }) },
+    { id: 'biz-pitch', cat: 'business', icon: 'fa-display', accent: '#dc2626', type: 'url',
       name: { en: 'Pitch Deck', vi: 'Pitch deck' },
       form: { url: 'https://docs.google.com/presentation/d/your-deck' },
       style: st('#b91c1c', '#fef2f2', { frame: 'scanme', label: 'View Deck', dots: 'square' }) },
@@ -213,10 +224,10 @@ const QRTemplates = (() => {
       name: { en: 'Gift Card', vi: 'Thẻ quà tặng' },
       form: { url: 'https://yourshop.com/gift-cards' },
       style: st('#be123c', '#fff1f2', { frame: 'badge', dots: 'extra-rounded' }) },
-    { id: 'ret-pricelist', cat: 'retail', icon: 'fa-list', accent: '#4f46e5', type: 'url',
+    { id: 'ret-pricelist', cat: 'retail', icon: 'fa-list', accent: '#005bb5', type: 'url',
       name: { en: 'Price List PDF', vi: 'Bảng giá PDF' },
       form: { url: 'https://yourshop.com/price-list.pdf' },
-      style: st('#4338ca', '#eef2ff', { frame: 'border', dots: 'classy-rounded' }) },
+      style: st('#0060c4', '#e3f2fd', { frame: 'border', dots: 'classy-rounded' }) },
 
     // Personal
     { id: 'per-vcard', cat: 'personal', icon: 'fa-address-card', accent: '#0d9488', type: 'vcard',
@@ -245,10 +256,10 @@ const QRTemplates = (() => {
       style: st('#334155', '#f8fafc', { frame: 'border', dots: 'classy', cornerSq: 'square' }) },
 
     // Marketing
-    { id: 'mkt-landing', cat: 'marketing', icon: 'fa-rocket', accent: '#6366f1', type: 'url',
+    { id: 'mkt-landing', cat: 'marketing', icon: 'fa-rocket', accent: '#0071e3', type: 'url',
       name: { en: 'Landing Page + UTM', vi: 'Landing page + UTM' },
       form: { url: 'https://yoursite.com/offer', showUtm: true, utm_source: 'qr', utm_medium: 'print', utm_campaign: 'spring2026' },
-      style: st('#4f46e5', '#eef2ff', { frame: 'banner', label: 'Special Offer', banner: true, bannerFrom: '#818cf8', bannerTo: '#6366f1' }) },
+      style: st('#005bb5', '#e3f2fd', { frame: 'banner', label: 'Special Offer', banner: true, bannerFrom: '#2196f3', bannerTo: '#0071e3' }) },
     { id: 'mkt-app', cat: 'marketing', icon: 'fa-mobile-screen', accent: '#000000', type: 'appstore',
       name: { en: 'App Download', vi: 'Tải app' },
       form: { appName: 'My App', iosUrl: 'https://apps.apple.com/app/id123', androidUrl: 'https://play.google.com/store/apps/details?id=com.app' },
@@ -279,7 +290,7 @@ const QRTemplates = (() => {
       name: { en: 'Hotel Check-in', vi: 'Check-in khách sạn' },
       form: { url: 'https://yourhotel.com/checkin' },
       style: st('#0f766e', '#f0fdfa', { frame: 'scanme', label: 'Check In', dots: 'classy' }) },
-    { id: 'hos-roomservice', cat: 'hospitality', icon: 'fa-bell-concierge', accent: '#b45309', type: 'url',
+    { id: 'hos-roomservice', cat: 'hospitality', icon: 'fa-concierge-bell', accent: '#b45309', type: 'url',
       name: { en: 'Room Service Menu', vi: 'Menu room service' },
       form: { url: 'https://yourhotel.com/room-service' },
       style: st('#92400e', '#fef3c7', { frame: 'banner', label: 'Room Service', banner: true, bannerFrom: '#fbbf24', bannerTo: '#d97706' }) },
@@ -301,20 +312,20 @@ const QRTemplates = (() => {
       name: { en: 'Library Catalog', vi: 'Thư viện' },
       form: { url: 'https://library.university.edu/catalog' },
       style: st('#78350f', '#fef3c7', { frame: 'border', dots: 'classy-rounded' }) },
-    { id: 'edu-portal', cat: 'education', icon: 'fa-user-graduate', accent: '#4338ca', type: 'url',
+    { id: 'edu-portal', cat: 'education', icon: 'fa-user-graduate', accent: '#0060c4', type: 'url',
       name: { en: 'Student Portal', vi: 'Cổng sinh viên' },
       form: { url: 'https://portal.university.edu' },
-      style: st('#3730a3', '#eef2ff', { frame: 'scanme', label: 'Student Portal', dots: 'dots' }) },
+      style: st('#004a99', '#e3f2fd', { frame: 'scanme', label: 'Student Portal', dots: 'dots' }) },
 
     // Real estate
     { id: 're-listing', cat: 'realestate', icon: 'fa-house', accent: '#0891b2', type: 'url',
       name: { en: 'Property Listing', vi: 'Bất động sản' },
       form: { url: 'https://yourlisting.com/property/123' },
       style: st('#0e7490', '#ecfeff', { frame: 'scanme', label: 'View Property', dots: 'classy-rounded' }) },
-    { id: 're-tour', cat: 'realestate', icon: 'fa-vr-cardboard', accent: '#6366f1', type: 'url',
+    { id: 're-tour', cat: 'realestate', icon: 'fa-vr-cardboard', accent: '#0071e3', type: 'url',
       name: { en: 'Virtual Tour', vi: 'Tour ảo 360°' },
       form: { url: 'https://matterport.com/your-tour' },
-      style: st('#4f46e5', '#eef2ff', { frame: 'banner', label: 'Virtual Tour', banner: true, bannerFrom: '#818cf8', bannerTo: '#4f46e5' }) },
+      style: st('#005bb5', '#e3f2fd', { frame: 'banner', label: 'Virtual Tour', banner: true, bannerFrom: '#2196f3', bannerTo: '#005bb5' }) },
     { id: 're-openhouse', cat: 'realestate', icon: 'fa-map-location-dot', accent: '#059669', type: 'location',
       name: { en: 'Open House', vi: 'Nhà mở cửa' },
       form: { mode: 'address', address: '123 Oak Street, Springfield' },
@@ -364,12 +375,19 @@ const QRTemplates = (() => {
     return d.innerHTML;
   }
 
+  function escapeAttr(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;');
+  }
+
   function renderCategories(container) {
     if (!container) return;
     container.innerHTML = CATEGORIES.map(c => `
       <button type="button" class="template-cat-btn${c.id === activeCategory ? ' template-cat-btn--active' : ''}"
         data-cat="${c.id}">
-        <i class="fa-solid ${c.icon}" aria-hidden="true"></i>
+        <i class="${iconClass(c.icon)}" aria-hidden="true"></i>
         <span>${escapeHtml(getCategoryLabel(c.id))}</span>
       </button>
     `).join('');
@@ -396,15 +414,30 @@ const QRTemplates = (() => {
       return;
     }
 
-    container.innerHTML = items.map(t => `
-      <button type="button" class="template-card${t.id === activeTemplateId ? ' template-card--active' : ''}"
-        data-template-id="${t.id}" title="${escapeHtml(getName(t))}">
-        <span class="template-card__accent" style="background:${escapeHtml(t.accent)}"></span>
-        <span class="template-card__icon"><i class="fa-solid ${t.icon}" aria-hidden="true"></i></span>
-        <span class="template-card__name">${escapeHtml(getName(t))}</span>
-        <span class="template-card__meta">${escapeHtml(getCategoryLabel(t.cat))} · ${escapeHtml(t.type.toUpperCase())}${t.brandLogo ? ' · <i class="fa-solid fa-image" aria-hidden="true"></i> Logo' : ''}</span>
-      </button>
-    `).join('');
+    container.innerHTML = items.map(t => {
+      const active = t.id === activeTemplateId;
+      const accent = escapeHtml(t.accent || '#0071e3');
+      const brandBadge = t.brandLogo
+        ? '<span class="template-card__badge template-card__badge--brand"><i class="fa-solid fa-image" aria-hidden="true"></i></span>'
+        : '';
+      return `
+      <button type="button" class="template-card${active ? ' template-card--active' : ''}"
+        data-template-id="${t.id}" title="${escapeHtml(getName(t))}"
+        style="--card-accent:${accent}">
+        <span class="template-card__icon-wrap" aria-hidden="true">
+          <i class="${iconClass(t.icon)}"></i>
+        </span>
+        <span class="template-card__body">
+          <span class="template-card__name">${escapeHtml(getName(t))}</span>
+          <span class="template-card__meta">
+            <span class="template-card__cat">${escapeHtml(getCategoryLabel(t.cat))}</span>
+            <span class="template-card__type">${escapeHtml(t.type.toUpperCase())}</span>
+          </span>
+        </span>
+        ${brandBadge}
+        ${active ? '<span class="template-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>' : ''}
+      </button>`;
+    }).join('');
 
     container.querySelectorAll('.template-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -424,13 +457,35 @@ const QRTemplates = (() => {
     renderGrid(document.getElementById('template-grid'));
   }
 
+  function setGridExpanded(expanded) {
+    const marketplace = document.getElementById('template-marketplace');
+    const expandBtn = document.getElementById('template-grid-expand');
+    if (marketplace) marketplace.classList.toggle('template-marketplace--expanded', expanded);
+    if (expandBtn) {
+      expandBtn.setAttribute('aria-expanded', String(expanded));
+      if (typeof I18n !== 'undefined') {
+        expandBtn.textContent = expanded ? I18n.t('templates.showLess') : I18n.t('templates.showAll');
+      }
+    }
+  }
+
   function init(onApply) {
     onApplyCallback = onApply;
     const search = document.getElementById('template-search');
     if (search) {
       search.addEventListener('input', (e) => {
         searchQuery = e.target.value;
+        if (searchQuery.trim()) setGridExpanded(true);
         renderGrid(document.getElementById('template-grid'));
+      });
+    }
+
+    const expandBtn = document.getElementById('template-grid-expand');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', () => {
+        const marketplace = document.getElementById('template-marketplace');
+        const expanded = marketplace && !marketplace.classList.contains('template-marketplace--expanded');
+        setGridExpanded(expanded);
       });
     }
 
@@ -447,7 +502,13 @@ const QRTemplates = (() => {
       });
     }
 
-    document.addEventListener('i18n:change', render);
+    document.addEventListener('i18n:change', () => {
+      render();
+      const marketplace = document.getElementById('template-marketplace');
+      if (marketplace) {
+        setGridExpanded(marketplace.classList.contains('template-marketplace--expanded'));
+      }
+    });
     render();
   }
 

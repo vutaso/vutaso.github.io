@@ -221,10 +221,10 @@ const QR_TYPES = [
       { name: 'androidUrl', label: 'Google Play URL', type: 'url', placeholder: 'https://play.google.com/store/apps/...' }
     ],
     encode(data) {
-      if (data.iosUrl && data.androidUrl) {
-        return data.iosUrl.trim() + '\n' + data.androidUrl.trim();
-      }
-      return (data.iosUrl || data.androidUrl || '').trim();
+      const ios = String(data.iosUrl || '').trim();
+      const android = String(data.androidUrl || '').trim();
+      // One URL per QR — prefer iOS when both are set (see validation warning)
+      return ios || android;
     }
   },
   {
@@ -272,20 +272,63 @@ function encodeQRData(typeId, formData) {
   return type.encode(formData);
 }
 
-function parseBatchRow(typeId, rawData) {
+function parseBatchRow(typeId, rawData, extra = {}) {
   const type = QR_TYPES.find(t => t.id === typeId);
   if (!type) return '';
 
-  if (typeId === 'url') return type.encode({ url: rawData });
-  if (typeId === 'text') return rawData;
-  if (typeId === 'phone') return type.encode({ phone: rawData });
-  if (typeId === 'email') return type.encode({ to: rawData });
-  if (typeId === 'sms') return type.encode({ phone: rawData });
+  const data = String(rawData || '').trim();
+  if (!data) return '';
 
-  // If data looks pre-encoded (wifi:, mailto:, etc.) use as-is
-  if (/^(WIFI:|mailto:|tel:|sms:|geo:|BEGIN:VCARD|https?:|bitcoin:|ethereum:|eth:)/i.test(rawData)) {
-    return rawData;
+  if (typeId === 'url') return type.encode({ url: data });
+  if (typeId === 'text') return data;
+  if (typeId === 'phone') return type.encode({ phone: data });
+  if (typeId === 'email') return type.encode({ to: data });
+  if (typeId === 'sms') return type.encode({ phone: data, message: extra.message || '' });
+
+  if (typeId === 'social') {
+    if (/^https?:\/\//i.test(data)) return data;
+    const platform = (extra.platform || '').trim().toLowerCase();
+    if (platform) return type.encode({ platform, username: data });
+    const colon = data.match(/^([a-z0-9_]+):(.+)$/i);
+    if (colon) return type.encode({ platform: colon[1].toLowerCase(), username: colon[2].trim() });
+    return type.encode({ platform: 'instagram', username: data });
   }
 
-  return rawData;
+  if (typeId === 'wifi') {
+    if (/^WIFI:/i.test(data)) return data;
+    const parts = data.split('|').map((p) => p.trim());
+    return type.encode({
+      ssid: parts[0] || '',
+      password: parts[1] || '',
+      security: parts[2] || 'WPA'
+    });
+  }
+
+  if (typeId === 'vcard') {
+    if (/BEGIN:VCARD/i.test(data)) return data;
+    const parts = data.split('|').map((p) => p.trim());
+    return type.encode({
+      firstName: parts[0] || '',
+      lastName: parts[1] || '',
+      phone: parts[2] || '',
+      email: parts[3] || '',
+      org: parts[4] || ''
+    });
+  }
+
+  if (typeId === 'location') {
+    if (/^geo:/i.test(data)) return data;
+    const parts = data.split('|').map((p) => p.trim());
+    if (parts.length >= 2 && !isNaN(parseFloat(parts[0]))) {
+      return type.encode({ mode: 'coords', lat: parts[0], lng: parts[1] });
+    }
+    return type.encode({ mode: 'address', address: data });
+  }
+
+  // Pre-encoded payloads
+  if (/^(WIFI:|mailto:|tel:|sms:|geo:|BEGIN:VCARD|https?:|bitcoin:|ethereum:|eth:)/i.test(data)) {
+    return data;
+  }
+
+  return data;
 }

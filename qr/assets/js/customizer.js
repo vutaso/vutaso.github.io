@@ -12,7 +12,7 @@ const QRCustomizer = (() => {
     gold: { label: 'Gold', dotsOptions: { type: 'classy', color: '#b8860b' }, cornersSquareOptions: { type: 'square', color: '#8b6914' }, cornersDotOptions: { type: 'square', color: '#daa520' }, backgroundOptions: { color: '#fff8e7' } },
     'dots-minimal': { label: 'Dots', dotsOptions: { type: 'dots', color: '#333333' }, cornersSquareOptions: { type: 'dot', color: '#333333' }, cornersDotOptions: { type: 'dot', color: '#333333' }, backgroundOptions: { color: '#fafafa' } },
     classy: { label: 'Classy', dotsOptions: { type: 'classy-rounded', color: '#1d3557' }, cornersSquareOptions: { type: 'extra-rounded', color: '#457b9d' }, cornersDotOptions: { type: 'dot', color: '#a8dadc' }, backgroundOptions: { color: '#f1faee' } },
-    custom: { label: 'Custom', dotsOptions: { type: 'square', color: '#6366f1' }, cornersSquareOptions: { type: 'square', color: '#6366f1' }, cornersDotOptions: { type: 'square', color: '#6366f1' }, backgroundOptions: { color: '#ffffff' } }
+    custom: { label: 'Custom', dotsOptions: { type: 'square', color: '#0071e3' }, cornersSquareOptions: { type: 'square', color: '#0071e3' }, cornersDotOptions: { type: 'square', color: '#0071e3' }, backgroundOptions: { color: '#ffffff' } }
   };
 
   const FRAMES = {
@@ -71,12 +71,12 @@ const QRCustomizer = (() => {
       backgroundOptions: { color: '#ffffff' },
       imageOptions: { crossOrigin: 'anonymous', margin: 5, imageSize: 0.4, hideBackgroundDots: true },
       image: null,
-      colorMode: 'solid', fgColor2: '#6366f1', gradientRotation: 0,
+      colorMode: 'solid', fgColor2: '#0071e3', gradientRotation: 0,
       unifiedColors: true,
       transparentBg: false, bgColorMode: 'solid', bgColor2: '#e2e8f0', bgGradientRotation: 45,
       activeTheme: 'classic', activeFrame: 'none',
       customFrameLabel: '', useCustomFrameColors: false,
-      frameColors: { border: '#6366f1', background: '#eef2ff', label: '#64748b', bannerFrom: '#6366f1', bannerTo: '#4f46e5' }
+      frameColors: { border: '#0071e3', background: '#e3f2fd', label: '#64748b', bannerFrom: '#0071e3', bannerTo: '#2196f3' }
     };
   }
 
@@ -391,10 +391,10 @@ const QRCustomizer = (() => {
       btn.type = 'button';
       btn.className = 'custom-theme-btn' + (styleOptions.activeTheme === theme.id ? ' custom-theme-btn--active' : '');
       btn.dataset.themeId = theme.id;
-      const swatchColor = theme.style?.dotsOptions?.color || '#6366f1';
+      const swatchColor = theme.style?.dotsOptions?.color || '#0071e3';
       btn.innerHTML = `<span class="theme-btn__swatch"></span><span class="theme-btn__label">${escapeHtml(theme.name)}</span>`;
       const swatch = btn.querySelector('.theme-btn__swatch');
-      swatch.style.background = /^#[0-9a-fA-F]{3,8}$/.test(swatchColor) ? swatchColor : '#6366f1';
+      swatch.style.background = /^#[0-9a-fA-F]{3,8}$/.test(swatchColor) ? swatchColor : '#0071e3';
       btn.addEventListener('click', () => applyCustomTheme(theme.id));
       const del = document.createElement('button');
       del.type = 'button';
@@ -546,7 +546,7 @@ const QRCustomizer = (() => {
       const pickrKey = PICKR_KEYS[key];
       pickrInstances[pickrKey] = Pickr.create({
         el: sel, theme: 'nano', default: defColor,
-        swatches: ['#000', '#fff', '#6366f1', '#ef4444', '#22c55e', '#3b82f6', '#f59e0b', '#ec4899', '#14b8a6'],
+        swatches: ['#000', '#fff', '#0071e3', '#ef4444', '#22c55e', '#2196f3', '#f59e0b', '#ec4899', '#14b8a6'],
         components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true, save: true } }
       }).on('save', (color) => {
         updateStyle(key, color.toHEXA().toString());
@@ -574,6 +574,10 @@ const QRCustomizer = (() => {
     const exportable = { ...styleOptions };
     delete exportable.data;
     return JSON.stringify(exportable, null, 2);
+  }
+
+  function getStyleSnapshot() {
+    return JSON.parse(exportStyleJSON());
   }
 
   function importStyleJSON(json) {
@@ -688,7 +692,7 @@ const QRCustomizer = (() => {
 
   return {
     THEMES, FRAMES, DOT_STYLES, STYLE_COMBOS, initPreviewEl, initPickr, updateData, updateStyle, setStyleOptions,
-    getStyleOptions, applyTheme, applyFrame, setLogo, removeLogo, getQRInstance,
+    getStyleOptions, getStyleSnapshot, applyTheme, applyFrame, setLogo, removeLogo, getQRInstance,
     createInstance, renderThemePresets, renderFramePresets, renderStylePickers, renderCustomThemePresets,
     saveCustomTheme, deleteCustomTheme, applyCustomTheme, render, renderNow,
     exportStyleJSON, importStyleJSON, resetStyle, downloadStylePreset, getFrameLabelText,

@@ -1,0 +1,66 @@
+name: QR CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'qr/**'
+      - '.github/workflows/qr-ci.yml'
+  pull_request:
+    paths:
+      - 'qr/**'
+      - '.github/workflows/qr-ci.yml'
+
+defaults:
+  run:
+    working-directory: qr
+
+jobs:
+  smoke:
+    name: Smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: qr/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: qr/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: .playwright-browsers
+      - run: npm run test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_BROWSERS_PATH: .playwright-browsers
+
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: qr/package-lock.json
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+      - run: npm ci
+      - run: npm run lighthouse:ci
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
