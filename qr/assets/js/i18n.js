@@ -390,8 +390,7 @@ const I18n = (() => {
 
   function init() {
     const stored = localStorage.getItem(LANG_KEY);
-    const browser = (navigator.language || '').startsWith('vi') ? 'vi' : 'en';
-    lang = stored || browser;
+    lang = stored || 'vi';
     document.documentElement.lang = lang;
     apply();
     const navMq = window.matchMedia('(max-width: 768px)');

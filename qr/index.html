@@ -1,7 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function () {
+      var theme = localStorage.getItem('qr-theme');
+      document.documentElement.setAttribute('data-theme', theme || 'light');
+      var lang = localStorage.getItem('qr-lang');
+      if (lang) document.documentElement.lang = lang;
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VUTASO — Tạo mã QR miễn phí</title>
   <meta name="description" content="Tạo mã QR đẹp, miễn phí trên trình duyệt — URL, WiFi, vCard, email, mạng xã hội và hơn 12 loại. Xuất PNG, SVG, JPEG, PDF.">
@@ -94,8 +102,8 @@
       </nav>
       <div class="header__actions">
         <div class="lang-switch" role="group" aria-label="Language">
-          <button type="button" class="lang-btn lang-btn--active" data-lang="en" aria-pressed="true">EN</button>
-          <button type="button" class="lang-btn" data-lang="vi" aria-pressed="false">VI</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+          <button type="button" class="lang-btn lang-btn--active" data-lang="vi" aria-pressed="true">VI</button>
         </div>
         <button type="button" id="batch-toggle" class="btn btn--ghost btn--sm" aria-pressed="false" data-qr-aria="nav.batch" aria-label="Batch Mode">
           <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
@@ -568,11 +576,11 @@ wifi,MyWiFi|password|WPA,Office WiFi"></textarea>
   <script src="assets/js/exporter.js?v=4" defer></script>
   <script src="assets/js/batch.js?v=4" defer></script>
   <script src="assets/js/pro.js?v=4" defer></script>
-  <script src="assets/js/i18n.js?v=5" defer></script>
+  <script src="assets/js/i18n.js?v=6" defer></script>
   <script src="assets/js/analytics.js?v=4" defer></script>
   <script src="assets/js/history.js?v=4" defer></script>
   <script src="assets/js/scan-tips.js?v=4" defer></script>
-  <script src="assets/js/app.js?v=4" defer></script>
+  <script src="assets/js/app.js?v=6" defer></script>
 
   <script>
     (function () {
