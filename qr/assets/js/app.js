@@ -652,16 +652,8 @@
     }
   }
 
-  function initAds() {
-    const enabled = window.SITE?.ads?.enabled === true;
-    document.querySelectorAll('.ad-slot').forEach((el) => {
-      el.hidden = !enabled;
-    });
-  }
-
   /* ── Init ── */
   function init() {
-    initAds();
     I18n.init();
     initTheme();
     initLangToggle();

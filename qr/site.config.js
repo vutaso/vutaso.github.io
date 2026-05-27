@@ -4,11 +4,11 @@
 window.SITE = {
   url: 'https://vutaso.com/qr',
   basePath: '/qr',
-  name: 'Free QR Generator',
+  name: 'VUTASO QR',
   email: 'vutaso.com@gmail.com',
   year: 2026,
   /** Bump when JS/CSS change to bust browser cache on GitHub Pages */
-  assetVersion: 3,
+  assetVersion: 4,
 
   /** Batch CSV — practical upper bound (browser memory) */
   maxBatchRows: 10000,
@@ -22,15 +22,6 @@ window.SITE = {
     freeMaxSize: 2048,
     proMaxSize: 2048,
     licenseKeys: []
-  },
-
-  ads: {
-    enabled: false,
-    hideForPro: false,
-    slots: {
-      sidebar: '',
-      footer: ''
-    }
   },
 
   analytics: {
