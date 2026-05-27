@@ -41,4 +41,23 @@ test.describe('QR Generator', () => {
     const hasLib = await page.evaluate(() => typeof window.QRCodeStyling === 'function');
     expect(hasLib).toBe(true);
   });
+
+  test('uploaded logo keeps preview visible', async ({ page }) => {
+    await page.goto('/');
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64'
+    );
+    await page.locator('#field-url').fill('https://example.com/logo-test');
+    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
+    await page.locator('#logo-upload').setInputFiles({
+      name: 'logo.png',
+      mimeType: 'image/png',
+      buffer: png
+    });
+    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
+    const box = await page.locator('#qr-preview canvas').first().boundingBox();
+    expect(box?.width).toBeGreaterThan(10);
+    expect(box?.height).toBeGreaterThan(10);
+  });
 });

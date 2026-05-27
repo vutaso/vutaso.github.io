@@ -124,6 +124,23 @@ const QRCustomizer = (() => {
     return buildColorOptions(bg, styleOptions.bgColor2 || bg, mode, styleOptions.bgGradientRotation || 0);
   }
 
+  /** crossOrigin on data:/blob: URLs breaks image load in qr-code-styling (blank preview). */
+  function isRemoteImageSrc(src) {
+    return typeof src === 'string' && /^https?:\/\//i.test(src);
+  }
+
+  function buildImageOptions() {
+    const opts = {
+      margin: styleOptions.imageOptions.margin,
+      imageSize: styleOptions.imageOptions.imageSize,
+      hideBackgroundDots: styleOptions.imageOptions.hideBackgroundDots
+    };
+    if (styleOptions.image && isRemoteImageSrc(styleOptions.image)) {
+      opts.crossOrigin = 'anonymous';
+    }
+    return opts;
+  }
+
   function buildConfig(overrides = {}) {
     const config = {
       width: overrides.width ?? styleOptions.width,
@@ -136,15 +153,24 @@ const QRCustomizer = (() => {
       cornersSquareOptions: buildPartOpts('cornersSquareOptions'),
       cornersDotOptions: buildPartOpts('cornersDotOptions'),
       backgroundOptions: buildBackgroundOpts(),
-      imageOptions: {
-        crossOrigin: 'anonymous',
-        margin: styleOptions.imageOptions.margin,
-        imageSize: styleOptions.imageOptions.imageSize,
-        hideBackgroundDots: styleOptions.imageOptions.hideBackgroundDots
-      }
+      imageOptions: buildImageOptions()
     };
     if (styleOptions.image) config.image = styleOptions.image;
     return config;
+  }
+
+  function invalidateQRInstance() {
+    qrInstance = null;
+  }
+
+  function ensureImageDecodes(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      if (isRemoteImageSrc(src)) img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(src);
+      img.onerror = () => reject(new Error('decode_failed'));
+      img.src = src;
+    });
   }
 
   function renderNow() {
@@ -555,8 +581,20 @@ const QRCustomizer = (() => {
     });
   }
 
-  function setLogo(src) { styleOptions.image = src; syncLogoUI(); render(); }
-  function removeLogo() { styleOptions.image = null; syncLogoUI(); render(); }
+  async function setLogo(src) {
+    await ensureImageDecodes(src);
+    styleOptions.image = src;
+    invalidateQRInstance();
+    syncLogoUI();
+    render();
+  }
+
+  function removeLogo() {
+    styleOptions.image = null;
+    invalidateQRInstance();
+    syncLogoUI();
+    render();
+  }
   function getQRInstance() { return qrInstance; }
 
   function createInstance(data, options = {}) {

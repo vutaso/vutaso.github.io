@@ -416,9 +416,15 @@
         return;
       }
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        QRCustomizer.setLogo(ev.target.result);
-        $('#logo-remove').hidden = false;
+      reader.onload = async (ev) => {
+        try {
+          await QRCustomizer.setLogo(ev.target.result);
+          $('#logo-remove').hidden = false;
+        } catch {
+          showToast(I18n.errorMsg('logo_load_failed'), 'error');
+          e.target.value = '';
+          QRCustomizer.removeLogo();
+        }
       };
       reader.readAsDataURL(file);
     });

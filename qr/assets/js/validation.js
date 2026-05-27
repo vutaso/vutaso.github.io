@@ -97,9 +97,17 @@ const QRValidation = (() => {
     };
   }
 
+  const LOGO_MIME_TYPES = new Set([
+    'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp', 'image/svg+xml', 'image/pjpeg'
+  ]);
+  const LOGO_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']);
+
   function validateLogoFile(file) {
     if (!file) return { valid: true };
-    if (!file.type.startsWith('image/')) {
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+    const mimeOk = !file.type || LOGO_MIME_TYPES.has(file.type);
+    const extOk = LOGO_EXTENSIONS.has(ext);
+    if (!mimeOk && !extOk) {
       return { valid: false, error: 'invalid_type' };
     }
     if (file.size > MAX_LOGO_BYTES) {
