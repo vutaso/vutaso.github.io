@@ -20,9 +20,16 @@
     info: 'fa-circle-info'
   };
 
-  const TOAST_DURATION = { success: 3200, error: 5200, info: 4200 };
+  const TOAST_DURATION = { success: 3200, error: 5200, info: 4200, download: 3000 };
 
-  function showToast(message, type = 'success') {
+  function hideToast() {
+    const toast = $('#toast');
+    if (!toast) return;
+    toast.hidden = true;
+    toast.setAttribute('hidden', '');
+  }
+
+  function showToast(message, type = 'success', durationMs) {
     const toast = $('#toast');
     if (!toast) return;
 
@@ -37,9 +44,15 @@
 
     toast.className = `toast toast--${safeType}`;
     toast.hidden = false;
+    toast.removeAttribute('hidden');
 
     clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(() => { toast.hidden = true; }, TOAST_DURATION[safeType] || 3200);
+    const ms = Number(durationMs ?? TOAST_DURATION[safeType] ?? 3200);
+    showToast._timer = setTimeout(hideToast, ms);
+  }
+
+  function showDownloadToast() {
+    showToast(I18n.t('toast.download'), 'success', TOAST_DURATION.download);
   }
 
   function typeLabel(type) {
@@ -339,7 +352,7 @@
 
     $('#style-save').addEventListener('click', () => {
       QRCustomizer.downloadStylePreset();
-      showToast(I18n.t('toast.download'));
+      showDownloadToast();
     });
 
     $('#style-load').addEventListener('change', (e) => {
@@ -469,7 +482,7 @@
           else if (format === 'svg') await QRExporter.downloadSVG(qr);
           else if (format === 'jpeg') await QRExporter.downloadJPEG(qr);
           else if (format === 'pdf') await QRExporter.downloadPDF(qr, typeLabel(getTypeById(state.typeId)) + ' QR');
-          showToast(I18n.t('toast.download'));
+          showDownloadToast();
           QRAnalytics.track('export', { format, scale });
         } catch (err) {
           showToast(I18n.t('toast.exportFail') + ': ' + err.message, 'error');
@@ -594,7 +607,7 @@
 
       try {
         await QRBatch.downloadZip(format, setBatchProgress);
-        showToast(I18n.t('toast.download'));
+        showDownloadToast();
         QRAnalytics.track('batch_export', { format, count: rows.length });
       } catch (err) {
         if (err.name === 'AbortError') {

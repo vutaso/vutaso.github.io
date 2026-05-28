@@ -129,6 +129,16 @@ const QRCustomizer = (() => {
     return typeof src === 'string' && /^https?:\/\//i.test(src);
   }
 
+  function isEmbeddedImageSrc(src) {
+    return typeof src === 'string' && /^(data:|blob:)/i.test(src);
+  }
+
+  function sanitizeImageOptions() {
+    if (styleOptions.image && !isRemoteImageSrc(styleOptions.image)) {
+      delete styleOptions.imageOptions.crossOrigin;
+    }
+  }
+
   function buildImageOptions() {
     const opts = {
       margin: styleOptions.imageOptions.margin,
@@ -173,19 +183,72 @@ const QRCustomizer = (() => {
     });
   }
 
-  function renderNow() {
+  const LOGO_MAX_PX = 512;
+
+  /** Downscale large uploads so qr-code-styling can embed them reliably. */
+  async function normalizeLogoSrc(src) {
+    await ensureImageDecodes(src);
+    if (!isEmbeddedImageSrc(src)) return src;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = Math.max(img.naturalWidth, img.naturalHeight);
+        if (maxSide <= LOGO_MAX_PX) {
+          resolve(src);
+          return;
+        }
+        const scale = LOGO_MAX_PX / maxSide;
+        const w = Math.max(1, Math.round(img.naturalWidth * scale));
+        const h = Math.max(1, Math.round(img.naturalHeight * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(src);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => reject(new Error('decode_failed'));
+      img.src = src;
+    });
+  }
+
+  async function renderNow() {
     if (!container) return;
     container.innerHTML = '';
+    sanitizeImageOptions();
     const config = buildConfig();
-    if (!qrInstance) qrInstance = new QRCodeStyling(config);
-    else qrInstance.update(config);
+    const needsFresh = !!config.image || !qrInstance;
+    if (needsFresh) {
+      qrInstance = new QRCodeStyling(config);
+    } else {
+      qrInstance.update(config);
+    }
     qrInstance.append(container);
+    if (config.image && typeof qrInstance.getRawData === 'function') {
+      try {
+        await qrInstance.getRawData('png');
+      } catch {
+        invalidateQRInstance();
+        qrInstance = new QRCodeStyling(config);
+        qrInstance.append(container);
+        await qrInstance.getRawData('png');
+      }
+    }
     updateFrameDOM();
   }
 
   function render() {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(renderNow, 150);
+    debounceTimer = setTimeout(() => {
+      renderNow().catch(() => {
+        invalidateQRInstance();
+      });
+    }, 150);
   }
 
   function getFrameLabelText() {
@@ -436,7 +499,10 @@ const QRCustomizer = (() => {
       container.appendChild(wrap);
     });
   }
-  function initPreviewEl(el) { container = el; renderNow(); }
+  function initPreviewEl(el) {
+    container = el;
+    renderNow().catch(() => invalidateQRInstance());
+  }
   function updateData(data) { styleOptions.data = data || ' '; render(); }
   function getStyleOptions() { return styleOptions; }
 
@@ -582,11 +648,13 @@ const QRCustomizer = (() => {
   }
 
   async function setLogo(src) {
-    await ensureImageDecodes(src);
-    styleOptions.image = src;
+    const normalized = await normalizeLogoSrc(src);
+    styleOptions.image = normalized;
+    sanitizeImageOptions();
     invalidateQRInstance();
     syncLogoUI();
-    render();
+    clearTimeout(debounceTimer);
+    await renderNow();
   }
 
   function removeLogo() {
@@ -633,6 +701,8 @@ const QRCustomizer = (() => {
       frameColors: { ...def.frameColors, ...(parsed.frameColors || {}) }
     };
     styleOptions.image = parsed.image || null;
+    sanitizeImageOptions();
+    invalidateQRInstance();
     syncUIControls();
     renderCustomThemePresets(document.getElementById('custom-theme-presets'));
     refreshThemeHighlights();
@@ -704,6 +774,8 @@ const QRCustomizer = (() => {
     };
     styleOptions.activeTheme = 'custom';
     styleOptions.image = stylePartial.image || null;
+    sanitizeImageOptions();
+    invalidateQRInstance();
     syncUIControls();
     refreshThemeHighlights();
     refreshFrameHighlights();

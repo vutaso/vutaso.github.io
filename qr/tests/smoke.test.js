@@ -184,6 +184,13 @@ test('brand logo assets exist for social presets', () => {
   if (!brandJs.includes('applyBrand')) throw new Error('brand-logos.js incomplete');
 });
 
+test('customizer strips crossOrigin for embedded logo uploads', () => {
+  const src = read('assets/js/customizer.js');
+  if (!src.includes('sanitizeImageOptions')) throw new Error('sanitizeImageOptions missing');
+  if (!src.includes('normalizeLogoSrc')) throw new Error('normalizeLogoSrc missing');
+  if (!src.includes('isEmbeddedImageSrc')) throw new Error('isEmbeddedImageSrc missing');
+});
+
 test('social templates use stBrand with ECL H and logo', () => {
   const src = read('assets/js/templates.js');
   ['soc-facebook', 'soc-youtube', 'soc-instagram', 'soc-twitter'].forEach((id) => {
