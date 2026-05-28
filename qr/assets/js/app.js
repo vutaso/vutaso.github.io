@@ -322,15 +322,6 @@
       QRCustomizer.syncUIControls();
     });
 
-    $('#use-custom-frame-colors').addEventListener('change', (e) => {
-      QRCustomizer.updateStyle('useCustomFrameColors', e.target.checked);
-      QRCustomizer.syncUIControls();
-    });
-
-    $('#custom-frame-label').addEventListener('input', (e) => {
-      QRCustomizer.updateStyle('customFrameLabel', e.target.value);
-    });
-
     $('#custom-theme-name').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -406,47 +397,6 @@
     });
 
     $('#error-correction').addEventListener('change', (e) => QRCustomizer.updateStyle('qrOptions.errorCorrectionLevel', e.target.value));
-
-    $('#logo-size').addEventListener('input', (e) => {
-      $('#logo-size-val').textContent = e.target.value + '%';
-      QRCustomizer.updateStyle('imageOptions.imageSize', parseInt(e.target.value, 10) / 100);
-    });
-
-    $('#logo-margin').addEventListener('input', (e) => {
-      $('#logo-margin-val').textContent = e.target.value + 'px';
-      QRCustomizer.updateStyle('imageOptions.margin', parseInt(e.target.value, 10));
-    });
-
-    $('#logo-hide-bg').addEventListener('change', (e) => QRCustomizer.updateStyle('imageOptions.hideBackgroundDots', e.target.checked));
-
-    $('#logo-upload').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const check = QRValidation.validateLogoFile(file);
-      if (!check.valid) {
-        showToast(I18n.errorMsg(check.error === 'too_large' ? 'logo_too_large' : 'logo_invalid'), 'error');
-        e.target.value = '';
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        try {
-          await QRCustomizer.setLogo(ev.target.result);
-          $('#logo-remove').hidden = false;
-        } catch {
-          showToast(I18n.errorMsg('logo_load_failed'), 'error');
-          e.target.value = '';
-          QRCustomizer.removeLogo();
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-
-    $('#logo-remove').addEventListener('click', () => {
-      QRCustomizer.removeLogo();
-      $('#logo-upload').value = '';
-      $('#logo-remove').hidden = true;
-    });
 
     QRCustomizer.initPickr();
     QRCustomizer.renderStylePickers();

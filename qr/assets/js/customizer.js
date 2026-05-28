@@ -69,7 +69,7 @@ const QRCustomizer = (() => {
       cornersSquareOptions: { type: 'square', color: '#000000' },
       cornersDotOptions: { type: 'square', color: '#000000' },
       backgroundOptions: { color: '#ffffff' },
-      imageOptions: { crossOrigin: 'anonymous', margin: 5, imageSize: 0.4, hideBackgroundDots: true },
+      imageOptions: { margin: 5, imageSize: 0.4, hideBackgroundDots: true },
       image: null,
       colorMode: 'solid', fgColor2: '#0071e3', gradientRotation: 0,
       unifiedColors: true,
@@ -129,10 +129,6 @@ const QRCustomizer = (() => {
     return typeof src === 'string' && /^https?:\/\//i.test(src);
   }
 
-  function isEmbeddedImageSrc(src) {
-    return typeof src === 'string' && /^(data:|blob:)/i.test(src);
-  }
-
   function sanitizeImageOptions() {
     if (styleOptions.image && !isRemoteImageSrc(styleOptions.image)) {
       delete styleOptions.imageOptions.crossOrigin;
@@ -173,72 +169,50 @@ const QRCustomizer = (() => {
     qrInstance = null;
   }
 
-  function ensureImageDecodes(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      if (isRemoteImageSrc(src)) img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(src);
-      img.onerror = () => reject(new Error('decode_failed'));
-      img.src = src;
-    });
+  /** Warm canvas draw on WebKit; failures must not blank the preview. */
+  async function warmQRRender(instance) {
+    if (!instance || typeof instance.getRawData !== 'function') return;
+    try {
+      await instance.getRawData('png');
+    } catch {
+      /* preview may still be valid without warm-up */
+    }
   }
 
-  const LOGO_MAX_PX = 512;
+  function hasPreviewGraphic(rootEl) {
+    if (!rootEl) return false;
+    const node = rootEl.querySelector('canvas, svg');
+    if (!node) return false;
+    if (node.tagName.toLowerCase() === 'svg') return true;
+    if (node.tagName.toLowerCase() === 'canvas') {
+      const w = Number(node.width || 0);
+      const h = Number(node.height || 0);
+      return w > 0 && h > 0;
+    }
+    return true;
+  }
 
-  /** Downscale large uploads so qr-code-styling can embed them reliably. */
-  async function normalizeLogoSrc(src) {
-    await ensureImageDecodes(src);
-    if (!isEmbeddedImageSrc(src)) return src;
-
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxSide = Math.max(img.naturalWidth, img.naturalHeight);
-        if (maxSide <= LOGO_MAX_PX) {
-          resolve(src);
-          return;
-        }
-        const scale = LOGO_MAX_PX / maxSide;
-        const w = Math.max(1, Math.round(img.naturalWidth * scale));
-        const h = Math.max(1, Math.round(img.naturalHeight * scale));
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(src);
-          return;
-        }
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/png'));
-      };
-      img.onerror = () => reject(new Error('decode_failed'));
-      img.src = src;
-    });
+  function mountQRInstance(config) {
+    container.innerHTML = '';
+    qrInstance = new QRCodeStyling(config);
+    qrInstance.append(container);
+    return qrInstance;
   }
 
   async function renderNow() {
     if (!container) return;
-    container.innerHTML = '';
     sanitizeImageOptions();
     const config = buildConfig();
     const needsFresh = !!config.image || !qrInstance;
     if (needsFresh) {
-      qrInstance = new QRCodeStyling(config);
+      mountQRInstance(config);
     } else {
+      container.innerHTML = '';
       qrInstance.update(config);
+      qrInstance.append(container);
     }
-    qrInstance.append(container);
-    if (config.image && typeof qrInstance.getRawData === 'function') {
-      try {
-        await qrInstance.getRawData('png');
-      } catch {
-        invalidateQRInstance();
-        qrInstance = new QRCodeStyling(config);
-        qrInstance.append(container);
-        await qrInstance.getRawData('png');
-      }
-    }
+    if (config.image) await warmQRRender(qrInstance);
+    if (!hasPreviewGraphic(container)) throw new Error('preview_render_failed');
     updateFrameDOM();
   }
 
@@ -247,6 +221,13 @@ const QRCustomizer = (() => {
     debounceTimer = setTimeout(() => {
       renderNow().catch(() => {
         invalidateQRInstance();
+        if (!container) return;
+        try {
+          mountQRInstance(buildConfig());
+          updateFrameDOM();
+        } catch {
+          container.innerHTML = '';
+        }
       });
     }, 150);
   }
@@ -287,8 +268,6 @@ const QRCustomizer = (() => {
       frameEl.style.removeProperty('--frame-banner-to');
     }
 
-    updateBannerGradientPreview();
-
     const labelText = getFrameLabelText();
     if (labelEl) {
       labelEl.hidden = !labelText;
@@ -300,36 +279,6 @@ const QRCustomizer = (() => {
     const d = document.createElement('div');
     d.textContent = str;
     return d.innerHTML;
-  }
-
-  function syncLogoUI() {
-    const logoRemove = document.getElementById('logo-remove');
-    if (logoRemove) logoRemove.hidden = !styleOptions.image;
-
-    const io = styleOptions.imageOptions || {};
-    const logoSize = document.getElementById('logo-size');
-    const logoSizeVal = document.getElementById('logo-size-val');
-    if (logoSize) {
-      const pct = Math.round((io.imageSize ?? 0.4) * 100);
-      logoSize.value = pct;
-      if (logoSizeVal) logoSizeVal.textContent = pct + '%';
-    }
-    const logoMargin = document.getElementById('logo-margin');
-    const logoMarginVal = document.getElementById('logo-margin-val');
-    if (logoMargin) {
-      const m = io.margin ?? 5;
-      logoMargin.value = m;
-      if (logoMarginVal) logoMarginVal.textContent = m + 'px';
-    }
-    const hideBg = document.getElementById('logo-hide-bg');
-    if (hideBg) hideBg.checked = io.hideBackgroundDots !== false;
-  }
-
-  function updateBannerGradientPreview() {
-    const el = document.getElementById('banner-gradient-preview');
-    if (!el) return;
-    const fc = styleOptions.frameColors;
-    el.style.background = `linear-gradient(135deg, ${fc.bannerFrom}, ${fc.bannerTo})`;
   }
 
   function applyStyleCombo(comboId) {
@@ -527,7 +476,6 @@ const QRCustomizer = (() => {
       || key.startsWith('frameColors.');
     if (frameOnly) {
       updateFrameDOM();
-      if (key !== 'customFrameLabel') syncUIControls();
       return;
     }
     render();
@@ -565,10 +513,8 @@ const QRCustomizer = (() => {
     set('error-correction', styleOptions.qrOptions.errorCorrectionLevel);
     setCheck('transparent-bg', styleOptions.transparentBg);
     setCheck('unified-colors', styleOptions.unifiedColors);
-    setCheck('use-custom-frame-colors', styleOptions.useCustomFrameColors);
     set('gradient-rotation', styleOptions.gradientRotation);
     set('bg-gradient-rotation', styleOptions.bgGradientRotation);
-    set('custom-frame-label', styleOptions.customFrameLabel || '');
 
     syncStylePickerActiveStates();
 
@@ -590,31 +536,19 @@ const QRCustomizer = (() => {
     hide('corner-colors-wrap', styleOptions.unifiedColors);
     hide('gradient-rotation-wrap', styleOptions.colorMode !== 'linear');
     hide('bg-gradient-rotation-wrap', styleOptions.bgColorMode !== 'linear');
-    hide('frame-colors-wrap', !styleOptions.useCustomFrameColors);
-    hide('frame-banner-gradient-wrap', styleOptions.activeFrame !== 'banner');
-    hide('custom-frame-label-wrap', !FRAMES[styleOptions.activeFrame]?.showLabel);
-    updateBannerGradientPreview();
-    syncLogoUI();
 
     const pickrMap = {
       fg: styleOptions.dotsOptions.color, fg2: styleOptions.fgColor2,
       bg: styleOptions.backgroundOptions.color, bg2: styleOptions.bgColor2,
       cornerSq: styleOptions.cornersSquareOptions.color,
-      cornerDot: styleOptions.cornersDotOptions.color,
-      frameBorder: styleOptions.frameColors.border,
-      frameBg: styleOptions.frameColors.background,
-      frameLabel: styleOptions.frameColors.label,
-      frameBannerFrom: styleOptions.frameColors.bannerFrom,
-      frameBannerTo: styleOptions.frameColors.bannerTo
+      cornerDot: styleOptions.cornersDotOptions.color
     };
     Object.entries(pickrMap).forEach(([k, c]) => { if (pickrInstances[k]) pickrInstances[k].setColor(c); });
   }
 
   const PICKR_KEYS = {
     'dotsOptions.color': 'fg', fgColor2: 'fg2', 'backgroundOptions.color': 'bg', bgColor2: 'bg2',
-    'cornersSquareOptions.color': 'cornerSq', 'cornersDotOptions.color': 'cornerDot',
-    'frameColors.border': 'frameBorder', 'frameColors.background': 'frameBg', 'frameColors.label': 'frameLabel',
-    'frameColors.bannerFrom': 'frameBannerFrom', 'frameColors.bannerTo': 'frameBannerTo'
+    'cornersSquareOptions.color': 'cornerSq', 'cornersDotOptions.color': 'cornerDot'
   };
 
   function initPickr() {
@@ -624,12 +558,7 @@ const QRCustomizer = (() => {
       ['#bg-color-picker', 'backgroundOptions.color', styleOptions.backgroundOptions.color],
       ['#bg-color2-picker', 'bgColor2', styleOptions.bgColor2],
       ['#corner-square-color-picker', 'cornersSquareOptions.color', styleOptions.cornersSquareOptions.color],
-      ['#corner-dot-color-picker', 'cornersDotOptions.color', styleOptions.cornersDotOptions.color],
-      ['#frame-border-picker', 'frameColors.border', styleOptions.frameColors.border],
-      ['#frame-bg-picker', 'frameColors.background', styleOptions.frameColors.background],
-      ['#frame-label-picker', 'frameColors.label', styleOptions.frameColors.label],
-      ['#frame-banner-from-picker', 'frameColors.bannerFrom', styleOptions.frameColors.bannerFrom],
-      ['#frame-banner-to-picker', 'frameColors.bannerTo', styleOptions.frameColors.bannerTo]
+      ['#corner-dot-color-picker', 'cornersDotOptions.color', styleOptions.cornersDotOptions.color]
     ];
 
     configs.forEach(([sel, key, defColor]) => {
@@ -647,22 +576,6 @@ const QRCustomizer = (() => {
     });
   }
 
-  async function setLogo(src) {
-    const normalized = await normalizeLogoSrc(src);
-    styleOptions.image = normalized;
-    sanitizeImageOptions();
-    invalidateQRInstance();
-    syncLogoUI();
-    clearTimeout(debounceTimer);
-    await renderNow();
-  }
-
-  function removeLogo() {
-    styleOptions.image = null;
-    invalidateQRInstance();
-    syncLogoUI();
-    render();
-  }
   function getQRInstance() { return qrInstance; }
 
   function createInstance(data, options = {}) {
@@ -802,7 +715,7 @@ const QRCustomizer = (() => {
 
   return {
     THEMES, FRAMES, DOT_STYLES, STYLE_COMBOS, initPreviewEl, initPickr, updateData, updateStyle, setStyleOptions,
-    getStyleOptions, getStyleSnapshot, applyTheme, applyFrame, setLogo, removeLogo, getQRInstance,
+    getStyleOptions, getStyleSnapshot, applyTheme, applyFrame, getQRInstance,
     createInstance, renderThemePresets, renderFramePresets, renderStylePickers, renderCustomThemePresets,
     saveCustomTheme, deleteCustomTheme, applyCustomTheme, render, renderNow,
     exportStyleJSON, importStyleJSON, resetStyle, downloadStylePreset, getFrameLabelText,

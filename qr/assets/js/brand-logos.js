@@ -91,21 +91,23 @@ const QRBrandLogos = (() => {
     if (!preset) return style;
 
     const logoSize = extra.logoSize ?? preset.logoSize ?? 0.32;
+    const image = assetUrl(brandId);
+    const imageOptions = {
+      margin: extra.logoMargin ?? 4,
+      imageSize: logoSize,
+      hideBackgroundDots: true,
+      ...(style.imageOptions || {})
+    };
+    if (/^https?:\/\//i.test(image)) imageOptions.crossOrigin = 'anonymous';
     return {
       ...style,
-      image: assetUrl(brandId),
+      image,
       unifiedColors: extra.unifiedColors ?? false,
       colorMode: preset.colorMode || style.colorMode || 'solid',
       fgColor2: preset.fgColor2 ?? style.fgColor2,
       gradientRotation: preset.gradientRotation ?? style.gradientRotation ?? 0,
       qrOptions: { errorCorrectionLevel: 'H', ...(style.qrOptions || {}) },
-      imageOptions: {
-        crossOrigin: 'anonymous',
-        margin: extra.logoMargin ?? 4,
-        imageSize: logoSize,
-        hideBackgroundDots: true,
-        ...(style.imageOptions || {})
-      }
+      imageOptions
     };
   }
 

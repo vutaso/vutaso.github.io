@@ -42,46 +42,4 @@ test.describe('QR Generator', () => {
     expect(hasLib).toBe(true);
   });
 
-  test('uploaded logo keeps preview visible', async ({ page }) => {
-    await page.goto('/');
-    const png = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-      'base64'
-    );
-    await page.locator('#field-url').fill('https://example.com/logo-test');
-    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
-    await page.locator('#logo-upload').setInputFiles({
-      name: 'logo.png',
-      mimeType: 'image/png',
-      buffer: png
-    });
-    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
-    const box = await page.locator('#qr-preview canvas').first().boundingBox();
-    expect(box?.width).toBeGreaterThan(10);
-    expect(box?.height).toBeGreaterThan(10);
-  });
-
-  test('uploaded logo after social template keeps preview visible', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('#field-url').fill('https://example.com/logo-template-test');
-    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
-    const template = page.locator('.template-card').first();
-    if (await template.count()) {
-      await template.click();
-      await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
-    }
-    const png = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-      'base64'
-    );
-    await page.locator('#logo-upload').setInputFiles({
-      name: 'Logo_MoneyBay.jpeg',
-      mimeType: 'image/jpeg',
-      buffer: png
-    });
-    await expect(page.locator('#qr-preview canvas').first()).toBeVisible({ timeout: 15_000 });
-    const box = await page.locator('#qr-preview canvas').first().boundingBox();
-    expect(box?.width).toBeGreaterThan(10);
-    expect(box?.height).toBeGreaterThan(10);
-  });
 });
