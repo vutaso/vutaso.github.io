@@ -1,0 +1,279 @@
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 0 8px;
+}
+
+.messages-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.messages-empty h2 {
+  font-size: 26px;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.messages-empty-sub {
+  font-size: 15px;
+  color: var(--text-dim);
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  padding: 6px 20px;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.message.assistant { background: transparent; }
+
+.message.user {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  background: transparent;
+}
+
+.message.user .body {
+  flex: 0 1 auto;
+  max-width: 85%;
+  background: var(--user-bubble);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: 20px 20px 4px 20px;
+  padding: 10px 16px;
+}
+
+.message .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.message .avatar.user-av {
+  background: var(--bg-active);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.message .avatar.assistant-av {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.message .body {
+  flex: 1;
+  min-width: 0;
+}
+
+.message.assistant .body {
+  max-width: 100%;
+  padding: 2px 0;
+}
+
+.message .content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.message .content > *:first-child { margin-top: 0; }
+.message .content > *:last-child { margin-bottom: 0; }
+
+.message .content p { margin: 4px 0; }
+.message .content h1,
+.message .content h2,
+.message .content h3 {
+  margin: 20px 0 8px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.message .content h1 { font-size: 1.5em; }
+.message .content h2 { font-size: 1.3em; }
+.message .content h3 { font-size: 1.1em; }
+
+.message .content ul,
+.message .content ol { padding-left: 22px; margin: 8px 0; }
+.message .content li { margin: 4px 0; }
+.message .content ul { list-style: disc; }
+.message .content ol { list-style: decimal; }
+
+.message .content a { color: var(--accent); text-decoration: underline; }
+
+.message .content pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  margin: 14px 0;
+  overflow: hidden;
+}
+
+.message .content pre .pre-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.message .content pre .copy-code-btn {
+  background: transparent;
+  color: var(--text-dim);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+  border: 0;
+  font-family: inherit;
+}
+.message .content pre .copy-code-btn:hover { color: var(--text); background: var(--bg-hover); }
+
+.message .content pre code {
+  display: block;
+  padding: 14px;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: transparent !important;
+}
+
+.message .content :not(pre) > code {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.88em;
+}
+
+.message .content blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.message .content table {
+  border-collapse: collapse;
+  margin: 14px 0;
+  width: 100%;
+}
+.message .content th,
+.message .content td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+.message .content th { background: var(--bg-elev); font-weight: 600; }
+
+.message .toolbar {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.message:hover .toolbar,
+.message:focus-within .toolbar { opacity: 1; }
+
+.message.user .toolbar {
+  justify-content: flex-end;
+}
+
+.message .toolbar .tb-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  background: transparent;
+  cursor: pointer;
+  border: 0;
+  font-size: 13px;
+  transition: background var(--transition), color var(--transition);
+}
+.message .toolbar .tb-btn:hover { background: var(--bg-hover); color: var(--text); }
+
+.message.user .toolbar .tb-btn:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.message.editing .toolbar { opacity: 1; }
+
+.message.editing .content .edit-textarea {
+  width: 100%;
+  background: var(--bg-elev);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 10px 14px;
+  font-family: inherit;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+}
+
+.message.editing .content .edit-textarea:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 1px;
+}
+
+.message.streaming .content::after {
+  content: "▍";
+  display: inline-block;
+  color: var(--accent);
+  opacity: 0.9;
+  animation: blink 1s steps(2) infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.error-banner {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin: 8px auto;
+  font-size: 13px;
+  max-width: var(--content-max-width);
+}

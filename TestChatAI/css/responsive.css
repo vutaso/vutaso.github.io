@@ -1,0 +1,47 @@
+@media (max-width: 768px) {
+  .app[data-sidebar="open"],
+  .app[data-sidebar="closed"] {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    z-index: 95;
+    transition: transform 220ms ease;
+    border-right: 1px solid var(--border);
+  }
+
+  .app[data-sidebar="open"]  .sidebar { transform: translateX(0); }
+  .app[data-sidebar="closed"] .sidebar { transform: translateX(-100%); }
+
+  .app[data-sidebar="open"]  .sidebar-overlay { display: block; }
+  .app[data-sidebar="closed"] .sidebar-overlay { display: none; }
+
+  .header-actions { min-width: auto; }
+
+  .messages { padding: 4px 0; }
+  .message { padding: 6px 14px; gap: 10px; }
+  .message .avatar { width: 28px; height: 28px; font-size: 12px; }
+  .message.user .body { max-width: 90%; }
+  .message .toolbar { opacity: 1; }
+
+  .header-title .model-badge { display: none; }
+
+  .composer { padding: 8px 12px 14px; }
+  .composer-inner { padding: 4px 4px 4px 14px; }
+  .composer-hint { font-size: 11px; }
+
+  .modal-content { max-height: 95vh; max-width: 95vw; }
+  .modal-body { padding: 16px; }
+
+  .messages-empty h2 { font-size: 20px; }
+}
+
+@media (max-width: 480px) {
+  .message { gap: 8px; padding: 12px; }
+  .message .content pre { font-size: 12px; }
+  .composer-inner { padding: 4px; }
+  .composer-input { font-size: 16px; }
+}

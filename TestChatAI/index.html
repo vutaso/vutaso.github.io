@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0c0c0e" />
+  <title>VUTASO AI</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+  <link rel="stylesheet" href="css/composer.css" />
+  <link rel="stylesheet" href="css/modals.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <div id="app" class="app" data-sidebar="open">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-avatar" aria-hidden="true">V</div>
+        <span class="brand-name">VUTASO AI</span>
+      </div>
+      <div class="sidebar-header">
+        <button id="newChatBtn" class="btn btn-primary" title="Cuộc trò chuyện mới">
+          <span class="icon"><i class="fa-solid fa-plus"></i></span>
+          <span class="label">Cuộc trò chuyện mới</span>
+        </button>
+      </div>
+      <div class="sidebar-section-label">Lịch sử</div>
+      <ul id="conversationList" class="conversation-list" role="list"></ul>
+      <div class="sidebar-footer">
+        <button id="openSettingsBtn" class="btn btn-ghost" title="Cài đặt">
+          <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          <span class="label">Cài đặt</span>
+        </button>
+        <button id="themeToggleBtn" class="btn btn-ghost" title="Chuyển theme">
+          <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
+        </button>
+      </div>
+    </aside>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <main class="main">
+      <header class="main-header">
+        <button id="openSidebarBtn" class="btn btn-icon header-menu" title="Đóng sidebar">
+          <span class="icon"><i class="fa-solid fa-bars"></i></span>
+        </button>
+        <div class="header-title">
+          <span class="brand-avatar brand-avatar-sm" aria-hidden="true">V</span>
+          <span>VUTASO AI</span>
+          <span class="model-badge">GPT-4o mini</span>
+        </div>
+        <div class="header-actions">
+          <button id="downloadConvoBtn" class="btn btn-icon" title="Tải về Markdown">
+            <span class="icon"><i class="fa-solid fa-file-arrow-down"></i></span>
+          </button>
+          <button id="copyMarkdownBtn" class="btn btn-icon" title="Sao chép Markdown">
+            <span class="icon"><i class="fa-solid fa-copy"></i></span>
+          </button>
+          <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF">
+            <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
+          </button>
+          <button id="headerSettingsBtn" class="btn btn-icon" title="Cài đặt">
+            <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          </button>
+        </div>
+      </header>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <form id="composer" class="composer" autocomplete="off">
+        <div class="composer-inner">
+          <textarea
+            id="composerInput"
+            class="composer-input"
+            rows="1"
+            enterkeyhint="send"
+            placeholder="Nhắn tin cho VUTASO AI..."
+            aria-label="Nhập tin nhắn"
+          ></textarea>
+          <div class="composer-actions">
+            <button id="sendBtn" type="submit" class="btn btn-send" title="Gửi" aria-label="Gửi">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3l4 4M8 3L4 7M8 3v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="stopBtn" type="button" class="btn btn-stop hidden" title="Dừng" aria-label="Dừng">
+              <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="composer-hint">Nhấn Enter để gửi, Shift + Enter để xuống dòng. API key lưu trong trình duyệt, không dùng trên máy công cộng.</p>
+      </form>
+    </main>
+  </div>
+
+  <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="settingsTitle">Cài đặt</h2>
+        <button class="btn btn-icon" data-modal-close title="Đóng">
+          <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </header>
+      <form id="settingsForm" class="modal-body">
+        <div class="field">
+          <label for="apiKeyInput">API Key (OpenAI)</label>
+          <div class="input-group">
+            <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." required />
+            <button type="button" id="toggleApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+              <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+            </button>
+          </div>
+          <p class="field-hint">Lưu vào localStorage, không gửi đi đâu ngoài OpenAI.</p>
+        </div>
+
+        <div class="field">
+          <label for="systemPromptInput">System Prompt</label>
+          <textarea id="systemPromptInput" class="input textarea" rows="4" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
+        </div>
+
+        <div class="field field-row">
+          <label>Theme</label>
+          <div class="theme-toggle">
+            <label class="radio"><input type="radio" name="theme" value="dark" /> Dark</label>
+            <label class="radio"><input type="radio" name="theme" value="light" /> Light</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <button type="button" id="clearAllBtn" class="btn btn-danger">Xoá tất cả hội thoại</button>
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-modal-close>Huỷ</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/conversations.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
