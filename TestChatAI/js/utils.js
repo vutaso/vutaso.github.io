@@ -45,6 +45,43 @@ window.Utils = (() => {
     }
   };
 
+  const dataUrlToBlob = async (dataUrl) => {
+    const res = await fetch(dataUrl);
+    return res.blob();
+  };
+
+  const extensionFromDataUrl = (dataUrl) => {
+    const mime = (dataUrl.match(/^data:([^;,]+)/) || [])[1] || 'image/png';
+    if (mime.includes('jpeg') || mime.includes('jpg')) return 'jpg';
+    if (mime.includes('webp')) return 'webp';
+    if (mime.includes('gif')) return 'gif';
+    return 'png';
+  };
+
+  const copyImageToClipboard = async (dataUrl) => {
+    if (!dataUrl || !navigator.clipboard?.write) return false;
+    try {
+      const blob = await dataUrlToBlob(dataUrl);
+      const type = blob.type || 'image/png';
+      await navigator.clipboard.write([new ClipboardItem({ [type]: blob })]);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const downloadDataUrlImage = async (dataUrl, filename) => {
+    if (!dataUrl) return;
+    const ext = extensionFromDataUrl(dataUrl);
+    const base = String(filename || 'hinh-ai')
+      .replace(/\.(png|jpe?g|webp|gif)$/i, '')
+      .replace(/[^\w\-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'hinh-ai';
+    const blob = await dataUrlToBlob(dataUrl);
+    downloadBlob(blob, base + '.' + ext);
+  };
+
   const truncate = (str, n) => {
     const s = String(str).replace(/\s+/g, ' ').trim();
     return s.length > n ? s.slice(0, n - 1) + '…' : s;
@@ -60,13 +97,23 @@ window.Utils = (() => {
     for (const msg of convo.messages) {
       if (msg.role === 'user') {
         const text = msg.content || '';
+        const translateNote = msg.translateTo
+          ? '\n\n_' + window.APP_CONFIG.getTranslateLabel(msg.translateTo) + '_'
+          : '';
+        const imageGenNote = msg.imageGen
+          ? '\n\n_' + [
+            'Tỷ lệ ' + window.APP_CONFIG.getImageGenRatio(msg.imageGen.ratio).label,
+            msg.imageGen.style !== 'auto' ? window.APP_CONFIG.getImageGenStyle(msg.imageGen.style).label : '',
+            msg.imageGen.template !== 'none' ? window.APP_CONFIG.getImageGenTemplate(msg.imageGen.template).label : ''
+          ].filter(Boolean).join(' · ') + '_'
+          : '';
         const imgNote = msg.images && msg.images.length
           ? '\n\n_[' + msg.images.length + ' hình ảnh đính kèm]_'
           : '';
         const fileNote = msg.files && msg.files.length
           ? '\n\n' + msg.files.map((f) => '**Tệp: ' + f.name + '**\n```\n' + f.content + '\n```').join('\n\n')
           : '';
-        parts.push('**' + (text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh')) + '**' + imgNote + fileNote);
+        parts.push('**' + (text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh')) + '**' + translateNote + imageGenNote + imgNote + fileNote);
       } else {
         parts.push(window.Conversations.getAssistantContent(msg));
       }
@@ -1001,5 +1048,5 @@ window.Utils = (() => {
     reader.readAsDataURL(file);
   });
 
-  return { escapeHTML, formatTime, uuid, debounce, copyToClipboard, truncate, autoResize, formatConversation, downloadFile, downloadBlob, exportToPDF, exportToDocx, readFileAsDataUrl };
+  return { escapeHTML, formatTime, uuid, debounce, copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize, formatConversation, downloadFile, downloadBlob, exportToPDF, exportToDocx, readFileAsDataUrl };
 })();

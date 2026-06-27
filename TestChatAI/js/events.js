@@ -1,5 +1,5 @@
 window.Events = (() => {
-  const { copyToClipboard, autoResize, escapeHTML, debounce, readFileAsDataUrl } = window.Utils;
+  const { copyToClipboard, copyImageToClipboard, downloadDataUrlImage, autoResize, escapeHTML, debounce, readFileAsDataUrl } = window.Utils;
   const { send: apiSend, abort: apiAbort } = window.API;
   const { MAX_IMAGES_PER_MESSAGE, MAX_IMAGE_SIZE_MB, ACCEPTED_IMAGE_TYPES, MAX_FILES_PER_MESSAGE, MAX_FILE_SIZE_MB } = window.APP_CONFIG;
   const fileMod = window.Files;
@@ -12,7 +12,39 @@ window.Events = (() => {
   let docxExporting = false;
   let pendingImages = [];
   let pendingFiles = [];
+  let pendingReferenceImage = null;
+  let imageGenRatioPicked = false;
+  let imageGenStylePicked = false;
+  let imageGenTemplatePicked = false;
   let pendingReplyText = '';
+
+  const getToolState = (patch = {}) => {
+    const s = { ...state.get(), ...patch };
+    return {
+      webSearchEnabled: s.webSearchEnabled,
+      imageGenEnabled: s.imageGenEnabled,
+      thinkingEnabled: s.thinkingEnabled,
+      translateEnabled: s.translateEnabled,
+      translateTargetLang: s.translateTargetLang,
+      imageGenRatio: s.imageGenRatio,
+      imageGenStyle: s.imageGenStyle,
+      imageGenTemplate: s.imageGenTemplate,
+      referenceImage: pendingReferenceImage,
+      imageGenRatioPicked,
+      imageGenStylePicked,
+      imageGenTemplatePicked
+    };
+  };
+
+  const resetImageGenPicked = () => {
+    imageGenRatioPicked = false;
+    imageGenStylePicked = false;
+    imageGenTemplatePicked = false;
+  };
+
+  const syncComposerTools = (modelId, patch = {}) => {
+    ui.syncComposerToolsUI(modelId || state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL, getToolState(patch));
+  };
 
   const getContentFromNode = (node) => {
     if (!node) return null;
@@ -129,11 +161,13 @@ window.Events = (() => {
     });
 
     if (streamingContext && streamingContext.convo.id === convo.id && streamingContext.buffer) {
-      messages.push({
+      const partial = {
         role: 'assistant',
         content: streamingContext.buffer,
         ts: Date.now()
-      });
+      };
+      if (streamingContext.reasoningBuffer) partial.reasoningContent = streamingContext.reasoningBuffer;
+      messages.push(partial);
     }
 
     return { ...convo, messages };
@@ -141,14 +175,20 @@ window.Events = (() => {
 
   const updateSendEnabled = () => {
     const s = state.get();
-    const hasKey = !!s.apiKey;
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const hasKey = window.APP_CONFIG.hasApiKey(s, modelId);
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
-    ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
+    if (s.imageGenEnabled) {
+      ui.els.sendBtn.disabled = !hasKey || !hasText;
+    } else {
+      ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
+    }
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
-      ui.els.attachImageBtn.disabled = false;
-      ui.els.attachFileBtn.disabled = false;
+      const imageGenOn = s.imageGenEnabled;
+      ui.els.attachImageBtn.disabled = imageGenOn;
+      ui.els.attachFileBtn.disabled = imageGenOn;
     }
   };
 
@@ -304,95 +344,157 @@ window.Events = (() => {
     }
 
     let buffer = '';
+    let reasoningBuffer = '';
+    let generatedImages = [];
     ui.setStreaming(true);
     ui.removeError();
+    ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
 
-    streamingContext = { convo, contentEl: content, article, buffer: '', retryIdx };
+    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, retryIdx };
+
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const users = convo.messages.filter((m) => m.role === 'user');
+    let triggerUser = users[users.length - 1] || null;
+    if (retryIdx !== undefined) {
+      triggerUser = null;
+      for (let i = retryIdx - 1; i >= 0; i--) {
+        if (convo.messages[i].role === 'user') {
+          triggerUser = convo.messages[i];
+          break;
+        }
+      }
+    }
+    const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
+    const useImageGen = !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
+    const useThinking = s.thinkingEnabled && window.APP_CONFIG.modelSupportsThinking(modelId);
+
+    const refreshStreamingContent = () => {
+      const reasoningOpen = !!reasoningBuffer && !buffer;
+      ui.updateStreamingAssistantContent(
+        content, buffer, generatedImages, reasoningBuffer, { reasoningOpen }
+      );
+    };
+
+    const upsertGeneratedImage = (payload) => {
+      const img = {
+        dataUrl: payload.dataUrl,
+        name: payload.partial ? 'Xem trước ' + ((payload.index ?? 0) + 1) : 'Hình ảnh AI'
+      };
+      if (payload.partial) {
+        generatedImages[payload.index ?? 0] = img;
+      } else {
+        generatedImages = [img];
+      }
+      generatedImages = generatedImages.filter(Boolean);
+      if (streamingContext) streamingContext.generatedImages = generatedImages;
+      refreshStreamingContent();
+    };
+
+    const saveAssistantResult = (text) => {
+      const extra = {};
+      if (generatedImages.length) extra.generatedImages = generatedImages.slice();
+      if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
+      if (retryIdx !== undefined) {
+        convoMod.finalizeAssistantMessage(convo, messageIndex, text, extra);
+      } else {
+        convoMod.addMessage(convo, {
+          role: 'assistant',
+          content: text,
+          variants: [text],
+          variantIndex: 0,
+          ts: Date.now(),
+          ...extra
+        });
+      }
+    };
+
+    const finishStreamingResponse = (buffer, { aborted = false } = {}) => {
+      ui.setStreamingSearchStatus(article, null);
+      ui.setStreamingImageStatus(article, null);
+
+      const finalMsg = convo.messages[messageIndex];
+      if (!article.dataset.idx && messageIndex !== undefined) {
+        article.dataset.idx = String(messageIndex);
+      }
+      ui.finalizeStreaming(article, buffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
+      ui.setStreaming(false);
+      streamingContext = null;
+
+      if (useImageGen && generatedImages.length && !aborted) {
+        state.set({ imageGenEnabled: false });
+        resetImageGenPicked();
+        syncComposerTools(modelId, { imageGenEnabled: false });
+      }
+
+      updateSendEnabled();
+    };
 
     await apiSend({
-      apiKey: s.apiKey,
-      model: s.currentModel || window.APP_CONFIG.DEFAULT_MODEL,
+      apiKey: window.APP_CONFIG.getApiKey(s, modelId),
+      model: modelId,
       systemPrompt: s.systemPrompt,
       convo,
+      webSearch: useWebSearch,
+      imageGen: useImageGen,
+      thinking: useThinking,
+      onSearchStatus: (status) => {
+        if (status === 'searching') ui.setStreamingSearchStatus(article, 'searching');
+      },
+      onImageStatus: (status) => {
+        if (status === 'generating') ui.setStreamingImageStatus(article, 'generating');
+        else ui.setStreamingImageStatus(article, null);
+      },
+      onImagePartial: upsertGeneratedImage,
+      onImageComplete: (payload) => {
+        ui.setStreamingImageStatus(article, null);
+        upsertGeneratedImage(payload);
+      },
       onToken: (delta) => {
+        ui.setStreamingSearchStatus(article, null);
         buffer += delta;
         if (streamingContext) streamingContext.buffer = buffer;
-        ui.updateStreamingContent(content, buffer);
+        refreshStreamingContent();
+      },
+      onReasoningToken: (delta) => {
+        reasoningBuffer += delta;
+        if (streamingContext) streamingContext.reasoningBuffer = reasoningBuffer;
+        refreshStreamingContent();
       },
       onDone: (info) => {
         const msg = convo.messages[messageIndex];
-        if (info && info.aborted) {
-          if (buffer) {
-            if (retryIdx !== undefined) {
-              convoMod.finalizeAssistantMessage(convo, messageIndex, buffer);
-            } else {
-              convoMod.addMessage(convo, {
-                role: 'assistant',
-                content: buffer,
-                variants: [buffer],
-                variantIndex: 0,
-                ts: Date.now()
-              });
-            }
+        const hasResult = buffer || generatedImages.length;
+        const aborted = !!(info && info.aborted);
+        if (aborted) {
+          if (hasResult) {
+            saveAssistantResult(buffer);
             ui.showToast('Đã dừng');
           } else if (retryIdx !== undefined) {
             convoMod.cancelRetryVariant(convo, messageIndex);
             if (msg) ui.updateAssistantMessage(messageIndex, msg);
           }
-        } else if (buffer) {
-          if (retryIdx !== undefined) {
-            convoMod.finalizeAssistantMessage(convo, messageIndex, buffer);
-          } else {
-            convoMod.addMessage(convo, {
-              role: 'assistant',
-              content: buffer,
-              variants: [buffer],
-              variantIndex: 0,
-              ts: Date.now()
-            });
-          }
+        } else if (hasResult) {
+          saveAssistantResult(buffer);
         } else if (retryIdx !== undefined) {
           convoMod.cancelRetryVariant(convo, messageIndex);
         }
 
-        const finalMsg = convo.messages[messageIndex];
-        if (!article.dataset.idx && messageIndex !== undefined) {
-          article.dataset.idx = String(messageIndex);
-        }
-        ui.finalizeStreaming(article, buffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
-        ui.setStreaming(false);
-        streamingContext = null;
-        updateSendEnabled();
+        finishStreamingResponse(buffer, { aborted });
       },
       onError: (err) => {
         const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
-        if (retryIdx !== undefined) {
-          convoMod.finalizeAssistantMessage(convo, messageIndex, finalText);
-        } else {
-          convoMod.addMessage(convo, {
-            role: 'assistant',
-            content: finalText,
-            variants: [finalText],
-            variantIndex: 0,
-            ts: Date.now()
-          });
-        }
-        const finalMsg = convo.messages[messageIndex];
-        if (!article.dataset.idx) article.dataset.idx = String(messageIndex);
-        ui.finalizeStreaming(article, finalText, finalMsg);
-        ui.setStreaming(false);
-        streamingContext = null;
+        saveAssistantResult(finalText);
+        finishStreamingResponse(finalText);
         ui.showError(err);
-        updateSendEnabled();
       }
     });
   };
 
   const retryAssistantMessage = async (idx) => {
     const s = state.get();
-    if (!s.apiKey) {
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
       ui.openSettings(s);
-      ui.showToast('Nhập API key trong Cài đặt trước');
+      ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
     if (window.API.isStreaming()) return;
@@ -410,14 +512,19 @@ window.Events = (() => {
 
   const sendCurrent = async () => {
     const s = state.get();
-    if (!s.apiKey) {
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
       ui.openSettings(s);
-      ui.showToast('Nhập API key trong Cài đặt trước');
+      ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
     const text = ui.els.composerInput.value.trim();
-    if (!text && !pendingImages.length && !pendingFiles.length) return;
     if (window.API.isStreaming()) return;
+    if (s.imageGenEnabled) {
+      if (!text) return;
+    } else if (!text && !pendingImages.length && !pendingFiles.length) {
+      return;
+    }
 
     const convo = convoMod.ensure();
 
@@ -426,26 +533,48 @@ window.Events = (() => {
       content: text,
       ts: Date.now()
     };
-    if (pendingImages.length) {
-      userMsg.images = pendingImages.map(img => ({
-        dataUrl: img.dataUrl,
-        name: img.name,
-        mime: img.mime
-      }));
-    }
-    if (pendingFiles.length) {
-      userMsg.files = pendingFiles.map(f => ({
-        name: f.name,
-        mime: f.mime,
-        size: f.size,
-        content: f.content
-      }));
+    if (s.imageGenEnabled && text) {
+      userMsg.imageGen = {
+        ratio: s.imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
+        style: s.imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
+        template: s.imageGenTemplate || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE
+      };
+      if (pendingReferenceImage) {
+        userMsg.images = [{
+          dataUrl: pendingReferenceImage.dataUrl,
+          name: pendingReferenceImage.name,
+          mime: pendingReferenceImage.mime,
+          reference: true
+        }];
+      }
+    } else {
+      if (pendingImages.length) {
+        userMsg.images = pendingImages.map(img => ({
+          dataUrl: img.dataUrl,
+          name: img.name,
+          mime: img.mime
+        }));
+      }
+      if (pendingFiles.length) {
+        userMsg.files = pendingFiles.map(f => ({
+          name: f.name,
+          mime: f.mime,
+          size: f.size,
+          content: f.content
+        }));
+      }
+      if (s.translateEnabled && text) {
+        userMsg.translateTo = s.translateTargetLang || window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
+      }
     }
     convoMod.addMessage(convo, userMsg);
     const userMsgIdx = convo.messages.length - 1;
 
     ui.els.composerInput.value = '';
     clearPendingAttachments();
+    pendingReferenceImage = null;
+    resetImageGenPicked();
+    syncComposerTools();
     autoResize(ui.els.composerInput);
     ui.removeError();
     ui.appendMessage(userMsg, userMsgIdx);
@@ -690,9 +819,212 @@ window.Events = (() => {
     ui.els.headerSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.modelSelect.addEventListener('change', () => {
       const modelId = ui.els.modelSelect.value;
-      state.set({ currentModel: modelId });
+      const s = state.get();
+      let webSearchEnabled = s.webSearchEnabled;
+      let imageGenEnabled = s.imageGenEnabled;
+      let thinkingEnabled = s.thinkingEnabled;
+      if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
+      if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
+      if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
+      state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled });
+      syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled });
+      updateSendEnabled();
       const label = ui.els.modelSelect.selectedOptions[0]?.textContent || modelId;
       ui.showToast('Model: ' + label);
+    });
+
+    ui.els.webSearchBtn.addEventListener('click', () => {
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) return;
+      const next = !s.webSearchEnabled;
+      state.set({ webSearchEnabled: next });
+      syncComposerTools(modelId, { webSearchEnabled: next });
+      ui.showToast(next ? 'Đã bật tìm kiếm web' : 'Đã tắt tìm kiếm web');
+    });
+
+    ui.els.thinkingBtn.addEventListener('click', () => {
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      if (!window.APP_CONFIG.modelSupportsThinking(modelId)) return;
+      const next = !s.thinkingEnabled;
+      state.set({ thinkingEnabled: next });
+      syncComposerTools(modelId, { thinkingEnabled: next });
+      ui.showToast(next ? 'Đã bật Thinking' : 'Đã tắt Thinking');
+    });
+
+    const setImageGenEnabled = (enabled) => {
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      if (enabled && !window.APP_CONFIG.modelSupportsImageGen(modelId)) return;
+      const patch = { imageGenEnabled: enabled };
+      if (enabled) {
+        patch.translateEnabled = false;
+        clearPendingAttachments();
+        resetImageGenPicked();
+      } else {
+        pendingReferenceImage = null;
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? 'Đã bật tạo hình ảnh' : 'Đã tắt tạo hình ảnh');
+    };
+
+    ui.els.imageGenBtn.addEventListener('click', () => {
+      setImageGenEnabled(!state.get().imageGenEnabled);
+    });
+
+    ui.els.imageGenChipClose.addEventListener('click', () => {
+      setImageGenEnabled(false);
+    });
+
+    ui.els.imageGenRefBtn.addEventListener('click', () => {
+      if (!state.get().imageGenEnabled) return;
+      ui.els.imageGenRefInput.click();
+    });
+
+    ui.els.imageGenRefInput.addEventListener('change', async () => {
+      const file = ui.els.imageGenRefInput.files && ui.els.imageGenRefInput.files[0];
+      ui.els.imageGenRefInput.value = '';
+      if (!file) return;
+      if (!window.APP_CONFIG.ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+        ui.showToast('Chỉ hỗ trợ JPEG, PNG, GIF, WebP');
+        return;
+      }
+      const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+      if (file.size > maxBytes) {
+        ui.showToast('Ảnh vượt quá ' + MAX_IMAGE_SIZE_MB + 'MB');
+        return;
+      }
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        pendingReferenceImage = { dataUrl, name: file.name, mime: file.type };
+        syncComposerTools();
+        ui.showToast('Đã thêm ảnh tham chiếu');
+      } catch {
+        ui.showToast('Không đọc được ảnh tham chiếu');
+      }
+    });
+
+    ui.els.imageGenRatioBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.get().imageGenEnabled) return;
+      ui.toggleImageGenMenu(ui.els.imageGenRatioMenu, ui.els.imageGenRatioBtn);
+    });
+
+    ui.els.imageGenStyleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.get().imageGenEnabled) return;
+      ui.toggleImageGenMenu(ui.els.imageGenStyleMenu, ui.els.imageGenStyleBtn);
+    });
+
+    ui.els.imageGenTemplateBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.get().imageGenEnabled) return;
+      ui.toggleImageGenMenu(ui.els.imageGenTemplateMenu, ui.els.imageGenTemplateBtn);
+    });
+
+    ui.els.imageGenRatioOptions.addEventListener('click', (e) => {
+      const option = e.target.closest('.composer-dropdown-option');
+      if (!option) return;
+      const ratioId = option.dataset.value;
+      if (!ratioId) return;
+      imageGenRatioPicked = true;
+      state.set({ imageGenRatio: ratioId });
+      syncComposerTools(null, { imageGenRatio: ratioId });
+    });
+
+    ui.els.imageGenStyleOptions.addEventListener('click', (e) => {
+      const option = e.target.closest('.composer-dropdown-option');
+      if (!option) return;
+      const styleId = option.dataset.value;
+      if (!styleId) return;
+      imageGenStylePicked = true;
+      state.set({ imageGenStyle: styleId });
+      syncComposerTools(null, { imageGenStyle: styleId });
+    });
+
+    ui.els.imageGenTemplateOptions.addEventListener('click', (e) => {
+      const option = e.target.closest('.composer-dropdown-option');
+      if (!option) return;
+      const templateId = option.dataset.value;
+      if (!templateId) return;
+      imageGenTemplatePicked = true;
+      state.set({ imageGenTemplate: templateId });
+      syncComposerTools(null, { imageGenTemplate: templateId });
+    });
+
+    ui.els.imageGenRatioChipClear.addEventListener('click', () => {
+      imageGenRatioPicked = false;
+      syncComposerTools();
+      ui.els.imageGenRatioBtn?.click();
+    });
+
+    ui.els.imageGenStyleChipClear.addEventListener('click', () => {
+      imageGenStylePicked = false;
+      syncComposerTools();
+      ui.els.imageGenStyleBtn?.click();
+    });
+
+    ui.els.imageGenTemplateChipClear.addEventListener('click', () => {
+      imageGenTemplatePicked = false;
+      syncComposerTools();
+      ui.els.imageGenTemplateBtn?.click();
+    });
+
+    const setTranslateEnabled = (enabled) => {
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { translateEnabled: enabled };
+      if (enabled) {
+        patch.imageGenEnabled = false;
+        pendingReferenceImage = null;
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? 'Đã bật dịch' : 'Đã tắt dịch');
+    };
+
+    ui.els.translateBtn.addEventListener('click', () => {
+      setTranslateEnabled(!state.get().translateEnabled);
+    });
+
+    ui.els.translateChipClose.addEventListener('click', () => {
+      setTranslateEnabled(false);
+    });
+
+    ui.els.translateLangBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.get().translateEnabled) return;
+      ui.closeImageGenMenus();
+      const menu = ui.els.translateLangMenu;
+      const open = menu.classList.contains('hidden');
+      if (open) {
+        menu.classList.remove('hidden');
+        ui.els.translateLangBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        ui.closeTranslateLangMenu();
+      }
+    });
+
+    ui.els.translateLangOptions.addEventListener('click', (e) => {
+      const option = e.target.closest('.translate-lang-option');
+      if (!option) return;
+      const langCode = option.dataset.lang;
+      if (!langCode) return;
+      state.set({ translateTargetLang: langCode });
+      syncComposerTools(null, { translateTargetLang: langCode });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.translate-lang-wrap')) {
+        ui.closeTranslateLangMenu();
+      }
+      if (!e.target.closest('.composer-dropdown-wrap')) {
+        ui.closeImageGenMenus();
+      }
     });
 
     ui.els.themeToggleBtn.addEventListener('click', () => {
@@ -706,6 +1038,18 @@ window.Events = (() => {
       const isPwd = ui.els.apiKeyInput.type === 'password';
       ui.els.apiKeyInput.type = isPwd ? 'text' : 'password';
       ui.els.apiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
+    ui.els.toggleAnthropicApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.anthropicApiKeyInput.type === 'password';
+      ui.els.anthropicApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.anthropicApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
+    ui.els.toggleDeepseekApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.deepseekApiKeyInput.type === 'password';
+      ui.els.deepseekApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.deepseekApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
     const handleClearAll = () => {
@@ -722,10 +1066,12 @@ window.Events = (() => {
     ui.els.settingsForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const apiKey = ui.els.apiKeyInput.value.trim();
+      const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
+      const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
       const systemPrompt = ui.els.systemPromptInput.value.trim() || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
       const theme = ui.els.settingsForm.querySelector('input[name="theme"]:checked')?.value || 'dark';
       const prevTheme = state.get().theme;
-      state.set({ apiKey, systemPrompt, theme });
+      state.set({ apiKey, anthropicApiKey, deepseekApiKey, systemPrompt, theme });
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
       ui.closeSettings();
@@ -762,6 +1108,16 @@ window.Events = (() => {
           return;
         }
         hideSelectionReplyTooltip();
+        if (!ui.els.translateLangMenu.classList.contains('hidden')) {
+          ui.closeTranslateLangMenu();
+          return;
+        }
+        if (!ui.els.imageGenRatioMenu.classList.contains('hidden')
+          || !ui.els.imageGenStyleMenu.classList.contains('hidden')
+          || !ui.els.imageGenTemplateMenu.classList.contains('hidden')) {
+          ui.closeImageGenMenus();
+          return;
+        }
         if (ui.isRenameModalOpen()) {
           ui.closeRenameModal(null);
           return;
@@ -806,6 +1162,13 @@ window.Events = (() => {
         if (code) ui.openMarkdownPreview(code);
         return;
       }
+      const previewHtmlBtn = e.target.closest('[data-preview-html]');
+      if (previewHtmlBtn) {
+        const pre = previewHtmlBtn.closest('pre');
+        const code = pre?.querySelector('code')?.innerText || '';
+        if (code) ui.openHtmlPreview(code);
+        return;
+      }
       const toggleMermaid = e.target.closest('[data-toggle-mermaid]');
       if (toggleMermaid) {
         const block = toggleMermaid.closest('.mermaid-block');
@@ -816,6 +1179,29 @@ window.Events = (() => {
           toggleMermaid.innerHTML = showing
             ? '<i class="fa-solid fa-diagram-project"></i>'
             : '<i class="fa-solid fa-code"></i>';
+        }
+        return;
+      }
+      const copyGenImgBtn = e.target.closest('[data-copy-generated-image]');
+      if (copyGenImgBtn) {
+        const img = copyGenImgBtn.closest('.message-generated-image-wrap')?.querySelector('img');
+        const src = img?.currentSrc || img?.src;
+        if (src && await copyImageToClipboard(src)) ui.showToast('Đã sao chép ảnh');
+        else ui.showToast('Không sao chép được ảnh');
+        return;
+      }
+      const downloadGenImgBtn = e.target.closest('[data-download-generated-image]');
+      if (downloadGenImgBtn) {
+        const img = downloadGenImgBtn.closest('.message-generated-image-wrap')?.querySelector('img');
+        const src = img?.currentSrc || img?.src;
+        const name = img?.alt || 'hinh-ai';
+        if (src) {
+          try {
+            await downloadDataUrlImage(src, name);
+            ui.showToast('Đã tải ảnh');
+          } catch {
+            ui.showToast('Không tải được ảnh');
+          }
         }
         return;
       }

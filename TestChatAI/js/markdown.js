@@ -4,9 +4,13 @@ window.Markdown = (() => {
   const COPY_BTN = '<button type="button" class="copy-code-btn" data-copy-code title="Sao chép" aria-label="Sao chép"><i class="fa-solid fa-copy"></i></button>';
   const COPY_TABLE_BTN = '<button type="button" class="copy-table-btn" data-copy-table title="Sao chép bảng" aria-label="Sao chép bảng"><i class="fa-solid fa-table"></i></button>';
   const PREVIEW_MD_BTN = '<button type="button" class="preview-md-btn" data-preview-md title="Xem preview Markdown"><i class="fa-solid fa-eye"></i></button>';
+  const PREVIEW_HTML_BTN = '<button type="button" class="preview-md-btn" data-preview-html title="Xem preview HTML"><i class="fa-solid fa-eye"></i></button>';
 
   const MD_LANG_RE = /^(?:markdown|md|mdown|mkdn)$/i;
   const isMarkdownLang = (lang) => MD_LANG_RE.test((lang || '').trim());
+
+  const HTML_LANG_RE = /^(?:html|htm|xhtml)$/i;
+  const isHtmlLang = (lang) => HTML_LANG_RE.test((lang || '').trim());
 
   const highlightCode = (code, lang) => {
     const validLang = lang && window.hljs && window.hljs.getLanguage(lang) ? lang : '';
@@ -110,7 +114,9 @@ window.Markdown = (() => {
   };
 
   const codeBlockActions = (lang) => {
-    const preview = isMarkdownLang(lang) ? PREVIEW_MD_BTN : '';
+    let preview = '';
+    if (isMarkdownLang(lang)) preview = PREVIEW_MD_BTN;
+    else if (isHtmlLang(lang)) preview = PREVIEW_HTML_BTN;
     return '<div class="pre-header-actions">' + preview + COPY_BTN + '</div>';
   };
 

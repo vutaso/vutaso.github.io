@@ -55,6 +55,12 @@
   .btn-stop { width: 34px; height: 34px; }
   .composer-attachment-remove { opacity: 1; }
   .composer-hint { font-size: 11px; }
+  .composer-tool-btn { height: 30px; padding: 0 10px; font-size: 12px; }
+  .translate-chip,
+  .mode-chip { height: 26px; font-size: 12px; }
+  .composer-pill-btn { height: 26px; font-size: 12px; padding: 0 8px; }
+  .composer-dropdown-menu { min-width: 240px; max-height: 260px; }
+  .generated-image-actions { opacity: 1; }
 
   .modal-content { max-height: 95vh; max-width: 95vw; }
   .modal-body { padding: 16px; }

@@ -128,6 +128,21 @@
   line-height: 1.7;
 }
 
+.md-preview-content.is-html-preview {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.md-preview-content .html-preview-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: none;
+  background: #fff;
+}
+
 .md-preview-content > *:first-child { margin-top: 0; }
 .md-preview-content > *:last-child { margin-bottom: 0; }
 .md-preview-content h1,

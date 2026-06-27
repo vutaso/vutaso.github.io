@@ -23,6 +23,10 @@ window.UI = (() => {
     els.settingsModal = $('#settingsModal');
     els.apiKeyInput = $('#apiKeyInput');
     els.apiKeyIcon = $('#apiKeyIcon');
+    els.anthropicApiKeyInput = $('#anthropicApiKeyInput');
+    els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
+    els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
+    els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsForm = $('#settingsForm');
     els.toast = $('#toast');
@@ -36,7 +40,46 @@ window.UI = (() => {
     els.clearAllBtn = $('#clearAllBtn');
     els.clearAllSidebarBtn = $('#clearAllSidebarBtn');
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
+    els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
+    els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
+    els.composerTools = $('#composerTools');
+    els.webSearchBtn = $('#webSearchBtn');
+    els.imageGenBtn = $('#imageGenBtn');
+    els.thinkingBtn = $('#thinkingBtn');
+    els.translateBtn = $('#translateBtn');
+    els.composerTranslateBar = $('#composerTranslateBar');
+    els.translateChipClose = $('#translateChipClose');
+    els.translateLangBtn = $('#translateLangBtn');
+    els.translateLangLabel = $('#translateLangLabel');
+    els.translateLangMenu = $('#translateLangMenu');
+    els.translateLangOptions = $('#translateLangOptions');
+    els.composerImageGenBar = $('#composerImageGenBar');
+    els.imageGenChipClose = $('#imageGenChipClose');
+    els.imageGenRefBtn = $('#imageGenRefBtn');
+    els.imageGenRefLabel = $('#imageGenRefLabel');
+    els.imageGenRefInput = $('#imageGenRefInput');
+    els.imageGenRatioBtn = $('#imageGenRatioBtn');
+    els.imageGenRatioPicker = $('#imageGenRatioPicker');
+    els.imageGenRatioChip = $('#imageGenRatioChip');
+    els.imageGenRatioChipLabel = $('#imageGenRatioChipLabel');
+    els.imageGenRatioChipClear = $('#imageGenRatioChipClear');
+    els.imageGenRatioMenu = $('#imageGenRatioMenu');
+    els.imageGenRatioOptions = $('#imageGenRatioOptions');
+    els.imageGenStyleBtn = $('#imageGenStyleBtn');
+    els.imageGenStylePicker = $('#imageGenStylePicker');
+    els.imageGenStyleChip = $('#imageGenStyleChip');
+    els.imageGenStyleChipLabel = $('#imageGenStyleChipLabel');
+    els.imageGenStyleChipClear = $('#imageGenStyleChipClear');
+    els.imageGenStyleMenu = $('#imageGenStyleMenu');
+    els.imageGenStyleOptions = $('#imageGenStyleOptions');
+    els.imageGenTemplateBtn = $('#imageGenTemplateBtn');
+    els.imageGenTemplatePicker = $('#imageGenTemplatePicker');
+    els.imageGenTemplateChip = $('#imageGenTemplateChip');
+    els.imageGenTemplateChipLabel = $('#imageGenTemplateChipLabel');
+    els.imageGenTemplateChipClear = $('#imageGenTemplateChipClear');
+    els.imageGenTemplateMenu = $('#imageGenTemplateMenu');
+    els.imageGenTemplateOptions = $('#imageGenTemplateOptions');
     els.composerDropZone = $('#composerDropZone');
     els.appDropOverlay = $('#appDropOverlay');
     els.app = $('#app');
@@ -48,10 +91,320 @@ window.UI = (() => {
     els.markdownPreviewContent = $('#markdownPreviewContent');
     els.closeMdPreviewBtn = $('#closeMdPreviewBtn');
     els.mdPreviewOverlay = $('#mdPreviewOverlay');
+    els.previewPanelIcon = $('#previewPanelIcon');
+    els.previewPanelTitle = $('#previewPanelTitle');
     els.renameModal = $('#renameModal');
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
+  };
+
+  const syncComposerToolsUI = (modelId, toolState) => {
+    const {
+      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
+      imageGenRatio, imageGenStyle, imageGenTemplate
+    } = toolState;
+    const showWebSearch = window.APP_CONFIG.modelSupportsWebSearch(modelId);
+    const showImageGen = window.APP_CONFIG.modelSupportsImageGen(modelId);
+    const showThinking = window.APP_CONFIG.modelSupportsThinking(modelId);
+    const hasTools = showWebSearch || showImageGen || showThinking || true;
+
+    if (els.composerTools) {
+      els.composerTools.classList.toggle('hidden', !hasTools);
+    }
+    if (els.webSearchBtn) {
+      els.webSearchBtn.classList.toggle('hidden', !showWebSearch);
+      const active = showWebSearch && !!webSearchEnabled;
+      els.webSearchBtn.classList.toggle('is-active', active);
+      els.webSearchBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (els.imageGenBtn) {
+      els.imageGenBtn.classList.toggle('hidden', !showImageGen);
+      const active = showImageGen && !!imageGenEnabled;
+      els.imageGenBtn.classList.toggle('is-active', active);
+      els.imageGenBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (els.thinkingBtn) {
+      els.thinkingBtn.classList.toggle('hidden', !showThinking);
+      const active = showThinking && !!thinkingEnabled;
+      els.thinkingBtn.classList.toggle('is-active', active);
+      els.thinkingBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (els.translateBtn) {
+      const active = !!translateEnabled;
+      els.translateBtn.classList.toggle('is-active', active);
+      els.translateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    syncTranslateUI({ translateEnabled, translateTargetLang: translateTargetLang || stateTranslateLang });
+    syncImageGenUI({
+      imageGenEnabled: showImageGen && !!imageGenEnabled,
+      imageGenRatio,
+      imageGenStyle,
+      imageGenTemplate,
+      referenceImage: toolState.referenceImage,
+      imageGenRatioPicked: toolState.imageGenRatioPicked,
+      imageGenStylePicked: toolState.imageGenStylePicked,
+      imageGenTemplatePicked: toolState.imageGenTemplatePicked
+    });
+    syncComposerPlaceholder({ imageGenEnabled, translateEnabled });
+  };
+
+  let stateTranslateLang = window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
+
+  const initTranslateLangMenu = () => {
+    if (!els.translateLangOptions) return;
+    const { TRANSLATE_LANGUAGES } = window.APP_CONFIG;
+    els.translateLangOptions.innerHTML = TRANSLATE_LANGUAGES.map((lang) =>
+      '<button type="button" class="translate-lang-option" role="option" data-lang="' + escapeHTML(lang.code) + '">'
+      + '<span>' + escapeHTML(lang.label) + '</span>'
+      + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+      + '</button>'
+    ).join('');
+  };
+
+  const closeTranslateLangMenu = () => {
+    if (!els.translateLangMenu) return;
+    els.translateLangMenu.classList.add('hidden');
+    if (els.translateLangBtn) els.translateLangBtn.setAttribute('aria-expanded', 'false');
+  };
+
+  const syncTranslateUI = ({ translateEnabled, translateTargetLang }) => {
+    const langCode = translateTargetLang || window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
+    stateTranslateLang = langCode;
+
+    if (els.composerTranslateBar) {
+      const on = !!translateEnabled;
+      els.composerTranslateBar.classList.toggle('hidden', !on);
+      els.composerTranslateBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+    if (els.translateLangLabel) {
+      els.translateLangLabel.textContent = window.APP_CONFIG.getTranslateLabel(langCode);
+    }
+    if (els.composerInput) {
+      els.composerInput.placeholder = 'Nhắn tin cho VUTASO AI...';
+    }
+    if (els.translateLangOptions) {
+      els.translateLangOptions.querySelectorAll('.translate-lang-option').forEach((btn) => {
+        const selected = btn.dataset.lang === langCode;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    }
+    closeTranslateLangMenu();
+  };
+
+  const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled }) => {
+    if (!els.composerInput) return;
+    if (imageGenEnabled) {
+      els.composerInput.placeholder = 'Mô tả hình ảnh bạn muốn tạo';
+    } else if (translateEnabled) {
+      els.composerInput.placeholder = 'Nhập văn bản';
+    } else {
+      els.composerInput.placeholder = 'Nhắn tin cho VUTASO AI...';
+    }
+  };
+
+  const closeImageGenMenus = () => {
+    [els.imageGenRatioMenu, els.imageGenStyleMenu, els.imageGenTemplateMenu].forEach((menu) => {
+      if (menu) menu.classList.add('hidden');
+    });
+    [els.imageGenRatioBtn, els.imageGenStyleBtn, els.imageGenTemplateBtn].forEach((btn) => {
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  const toggleImageGenMenu = (menu, btn) => {
+    const isOpen = !menu.classList.contains('hidden');
+    closeImageGenMenus();
+    closeTranslateLangMenu();
+    if (!isOpen) {
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  };
+
+  const initImageGenMenus = () => {
+    if (els.imageGenRatioOptions) {
+      els.imageGenRatioOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_RATIOS.map((ratio) =>
+        '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(ratio.id) + '">'
+        + '<span class="ratio-icon" data-ratio="' + escapeHTML(ratio.id) + '" aria-hidden="true"></span>'
+        + '<span class="composer-dropdown-option-text">'
+        + '<span class="composer-dropdown-option-title">' + escapeHTML(ratio.label) + '</span> '
+        + '<span class="composer-dropdown-option-desc">(' + escapeHTML(ratio.desc) + ')</span>'
+        + '</span>'
+        + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+        + '</button>'
+      ).join('');
+    }
+    if (els.imageGenStyleOptions) {
+      els.imageGenStyleOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_STYLES.map((style) =>
+        '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(style.id) + '">'
+        + '<span class="composer-dropdown-option-text">' + escapeHTML(style.label) + '</span>'
+        + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+        + '</button>'
+      ).join('');
+    }
+    if (els.imageGenTemplateOptions) {
+      els.imageGenTemplateOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_TEMPLATES.map((tpl) =>
+        '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(tpl.id) + '">'
+        + '<span class="composer-dropdown-option-text">' + escapeHTML(tpl.label) + '</span>'
+        + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+        + '</button>'
+      ).join('');
+    }
+  };
+
+  const setImageGenOptionPicked = (type, picked, { ratioId, styleId, templateId } = {}) => {
+    const ratio = window.APP_CONFIG.getImageGenRatio(ratioId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO);
+    const style = window.APP_CONFIG.getImageGenStyle(styleId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE);
+    const template = window.APP_CONFIG.getImageGenTemplate(templateId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE);
+
+    if (type === 'ratio') {
+      if (els.imageGenRatioPicker) els.imageGenRatioPicker.classList.toggle('hidden', picked);
+      if (els.imageGenRatioChip) els.imageGenRatioChip.classList.toggle('hidden', !picked);
+      if (picked && els.imageGenRatioChipLabel) {
+        els.imageGenRatioChipLabel.textContent = ratio.label;
+      }
+      if (picked && els.imageGenRatioChip) {
+        const icon = els.imageGenRatioChip.querySelector('.ratio-icon');
+        if (icon) icon.setAttribute('data-ratio', ratio.id);
+      }
+      if (picked) closeImageGenMenus();
+    }
+
+    if (type === 'style') {
+      if (els.imageGenStylePicker) els.imageGenStylePicker.classList.toggle('hidden', picked);
+      if (els.imageGenStyleChip) els.imageGenStyleChip.classList.toggle('hidden', !picked);
+      if (picked && els.imageGenStyleChipLabel) {
+        els.imageGenStyleChipLabel.textContent = style.label;
+      }
+      if (picked) closeImageGenMenus();
+    }
+
+    if (type === 'template') {
+      if (els.imageGenTemplatePicker) els.imageGenTemplatePicker.classList.toggle('hidden', picked);
+      if (els.imageGenTemplateChip) els.imageGenTemplateChip.classList.toggle('hidden', !picked);
+      if (picked && els.imageGenTemplateChipLabel) {
+        els.imageGenTemplateChipLabel.textContent = template.label;
+      }
+      if (picked) closeImageGenMenus();
+    }
+  };
+
+  const syncImageGenUI = ({
+    imageGenEnabled, imageGenRatio, imageGenStyle, imageGenTemplate, referenceImage,
+    imageGenRatioPicked, imageGenStylePicked, imageGenTemplatePicked
+  }) => {
+    const ratioId = imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO;
+    const styleId = imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE;
+    const templateId = imageGenTemplate || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE;
+
+    if (els.composerImageGenBar) {
+      const on = !!imageGenEnabled;
+      els.composerImageGenBar.classList.toggle('hidden', !on);
+      els.composerImageGenBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+    if (els.imageGenRatioBtn) {
+      const icon = els.imageGenRatioBtn.querySelector('.ratio-icon');
+      if (icon) icon.setAttribute('data-ratio', ratioId);
+    }
+    setImageGenOptionPicked('ratio', !!imageGenRatioPicked, { ratioId });
+    setImageGenOptionPicked('style', !!imageGenStylePicked, { styleId });
+    setImageGenOptionPicked('template', !!imageGenTemplatePicked, { templateId });
+    if (els.imageGenRatioOptions) {
+      els.imageGenRatioOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
+        const selected = btn.dataset.value === ratioId;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    }
+    if (els.imageGenStyleOptions) {
+      els.imageGenStyleOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
+        const selected = btn.dataset.value === styleId;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    }
+    if (els.imageGenTemplateOptions) {
+      els.imageGenTemplateOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
+        const selected = btn.dataset.value === templateId;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    }
+    if (els.imageGenRefBtn) {
+      const hasRef = !!referenceImage;
+      els.imageGenRefBtn.classList.toggle('is-active', hasRef);
+      if (els.imageGenRefLabel) {
+        els.imageGenRefLabel.textContent = hasRef
+          ? truncate(referenceImage.name || 'Ảnh tham chiếu', 18)
+          : 'Hình ảnh tham chiếu';
+      }
+    }
+    if (!imageGenEnabled) {
+      closeImageGenMenus();
+      setImageGenOptionPicked('ratio', false);
+      setImageGenOptionPicked('style', false);
+      setImageGenOptionPicked('template', false);
+    }
+  };
+
+  const setStreamingSearchStatus = (article, status) => {
+    if (!article) return;
+    let badge = article.querySelector('.streaming-search-badge');
+    if (status === 'searching') {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'streaming-tool-badge streaming-search-badge';
+        badge.innerHTML = '<i class="fa-solid fa-globe" aria-hidden="true"></i> Đang tìm kiếm web...';
+        article.querySelector('.content')?.prepend(badge);
+      }
+    } else if (badge) {
+      badge.remove();
+    }
+  };
+
+  const setStreamingImageStatus = (article, status) => {
+    if (!article) return;
+    let badge = article.querySelector('.streaming-image-badge');
+    if (status === 'generating') {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'streaming-tool-badge streaming-image-badge';
+        badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Đang tạo hình ảnh...';
+        article.querySelector('.content')?.prepend(badge);
+      }
+    } else if (badge) {
+      badge.remove();
+    }
+  };
+
+  const generatedImagesHTML = (images) => {
+    if (!images || !images.length) return '';
+    return '<div class="message-images message-generated-images">' + images.map((img, i) => {
+      const alt = escapeHTML(img.name || 'Hình ảnh AI ' + (i + 1));
+      return '<div class="message-image-wrap message-generated-image-wrap">'
+        + '<img src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" />'
+        + '<div class="generated-image-actions" aria-label="Thao tác ảnh">'
+        + '<button type="button" class="generated-image-btn" data-copy-generated-image title="Sao chép ảnh" aria-label="Sao chép ảnh">'
+        + '<i class="fa-solid fa-copy" aria-hidden="true"></i></button>'
+        + '<button type="button" class="generated-image-btn" data-download-generated-image title="Tải ảnh" aria-label="Tải ảnh">'
+        + '<i class="fa-solid fa-download" aria-hidden="true"></i></button>'
+        + '</div></div>';
+    }).join('') + '</div>';
+  };
+
+  const reasoningHTML = (reasoning, { open = false } = {}) => {
+    if (!reasoning || !reasoning.trim()) return '';
+    return '<details class="message-reasoning"' + (open ? ' open' : '') + '>'
+      + '<summary><i class="fa-solid fa-brain" aria-hidden="true"></i> Quá trình suy nghĩ</summary>'
+      + '<div class="message-reasoning-body">' + window.Markdown.render(reasoning) + '</div>'
+      + '</details>';
+  };
+
+  const assistantContentHTML = (m) => {
+    const text = window.Conversations.getAssistantContent(m);
+    return reasoningHTML(m.reasoningContent) + window.Markdown.render(text) + generatedImagesHTML(m.generatedImages);
   };
 
   const initModelSelect = (currentModel) => {
@@ -84,9 +437,25 @@ window.UI = (() => {
   };
 
   const userContentHTML = (m) => {
-    const text = m.content && m.content.trim()
-      ? '<p>' + escapeHTML(m.content).replace(/\n/g, '<br>') + '</p>'
-      : '';
+    let text = '';
+    if (m.content && m.content.trim()) {
+      const escaped = escapeHTML(m.content).replace(/\n/g, '<br>');
+      if (m.translateTo) {
+        const label = window.APP_CONFIG.getTranslateLabel(m.translateTo);
+        text = '<p class="message-translate-original">' + escaped + '</p>'
+          + '<p class="message-translate-label">' + escapeHTML(label) + '</p>';
+      } else if (m.imageGen) {
+        const parts = ['Tỷ lệ ' + window.APP_CONFIG.getImageGenRatio(m.imageGen.ratio).label];
+        const style = window.APP_CONFIG.getImageGenStyle(m.imageGen.style);
+        const template = window.APP_CONFIG.getImageGenTemplate(m.imageGen.template);
+        if (style.id !== 'auto') parts.push('Phong cách ' + style.label.toLowerCase());
+        if (template.id !== 'none') parts.push('Mẫu ' + template.label.toLowerCase());
+        text = '<p class="message-imagegen-prompt">' + escaped + '</p>'
+          + '<p class="message-imagegen-label">' + escapeHTML(parts.join(' · ')) + '</p>';
+      } else {
+        text = '<p>' + escaped + '</p>';
+      }
+    }
     return text + userImagesHTML(m.images) + userFilesHTML(m.files);
   };
 
@@ -124,7 +493,11 @@ window.UI = (() => {
       return;
     }
     const shown = convo.messages.map((m, i) => ({ m, i })).filter(({ m }) => {
-      if (m.role === 'assistant' && !window.Conversations.getAssistantContent(m)) return false;
+      if (m.role === 'assistant') {
+        const hasText = !!window.Conversations.getAssistantContent(m);
+        const hasImages = !!(m.generatedImages && m.generatedImages.length);
+        if (!hasText && !hasImages) return false;
+      }
       return true;
     });
     if (!shown.length) {
@@ -168,7 +541,7 @@ window.UI = (() => {
     const assistantText = isUser ? '' : window.Conversations.getAssistantContent(m);
     const body = isUser
       ? '<div class="content">' + userContentHTML(m) + '</div>'
-      : '<div class="content">' + window.Markdown.render(assistantText) + '</div>';
+      : '<div class="content">' + assistantContentHTML(m) + '</div>';
     const idxAttr = idx !== undefined ? ' data-idx="' + idx + '"' : '';
     const editBtn = isUser
       ? '<button type="button" class="tb-btn" data-action="edit" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>'
@@ -219,7 +592,7 @@ window.UI = (() => {
     if (!article) return;
     const content = article.querySelector('.content');
     if (content) {
-      content.innerHTML = window.Markdown.render(window.Conversations.getAssistantContent(m));
+      content.innerHTML = assistantContentHTML(m);
       polishContent(content, { renderMermaid: true });
     }
     setAssistantToolbar(article, m);
@@ -244,14 +617,29 @@ window.UI = (() => {
   let streamThrottle = null;
   let _latestCE = null;
   let _latestText = '';
+  let _latestImages = null;
   let _streamingCodeScrollTarget = 0;
-  const updateStreamingContent = (contentEl, text) => {
+
+  let _latestReasoning = '';
+  let _reasoningOpen = false;
+
+  const renderStreamingAssistantHTML = (text, images, reasoning, { reasoningOpen = false } = {}) => {
+    return reasoningHTML(reasoning, { open: reasoningOpen })
+      + window.Markdown.render(text || '') + generatedImagesHTML(images);
+  };
+
+  const updateStreamingAssistantContent = (contentEl, text, images, reasoning, { reasoningOpen = false } = {}) => {
     _latestCE = contentEl;
     _latestText = text;
+    _latestImages = images;
+    _latestReasoning = reasoning || '';
+    _reasoningOpen = reasoningOpen;
     if (streamThrottle) return;
     streamThrottle = requestAnimationFrame(() => {
       if (_latestCE) {
-        _latestCE.innerHTML = window.Markdown.render(_latestText);
+        _latestCE.innerHTML = renderStreamingAssistantHTML(
+          _latestText, _latestImages, _latestReasoning, { reasoningOpen: _reasoningOpen }
+        );
         polishContent(_latestCE, { streaming: true });
         scrollStreamingCodeToEnd(_latestCE, _latestText);
         scrollToBottomIfNear();
@@ -260,12 +648,25 @@ window.UI = (() => {
     });
   };
 
+  const updateStreamingContent = (contentEl, text) => {
+    updateStreamingAssistantContent(
+      contentEl, text, _latestImages, _latestReasoning, { reasoningOpen: _reasoningOpen }
+    );
+  };
+
   const finalizeStreaming = (article, text, message) => {
     resetStreamingCodeScroll();
+    _latestImages = null;
+    _latestText = '';
+    _latestReasoning = '';
+    _reasoningOpen = false;
+    _latestCE = null;
     article.classList.remove('streaming');
     const content = article.querySelector('.content');
     if (content) {
-      content.innerHTML = window.Markdown.render(text);
+      content.innerHTML = renderStreamingAssistantHTML(
+        text, message?.generatedImages, message?.reasoningContent, { reasoningOpen: false }
+      );
       polishContent(content, { renderMermaid: true });
     }
     if (message) setAssistantToolbar(article, message);
@@ -276,7 +677,9 @@ window.UI = (() => {
     window.Markdown.updateMermaidTheme();
     window.Markdown.resetMermaidBlocks(els.messages);
     window.Markdown.renderMermaid(els.messages, { skipIfStreaming: false });
-    if (els.markdownPreviewPanel?.classList.contains('is-open') && els.markdownPreviewContent) {
+    if (els.markdownPreviewPanel?.classList.contains('is-open')
+      && els.markdownPreviewContent
+      && !els.markdownPreviewContent.classList.contains('is-html-preview')) {
       window.Markdown.resetMermaidBlocks(els.markdownPreviewContent);
       window.Markdown.renderMermaid(els.markdownPreviewContent, { skipIfStreaming: false });
     }
@@ -475,6 +878,19 @@ window.UI = (() => {
     els.composerInput.disabled = on;
     els.attachImageBtn.disabled = on;
     els.attachFileBtn.disabled = on;
+    if (els.webSearchBtn) els.webSearchBtn.disabled = on;
+    if (els.imageGenBtn) els.imageGenBtn.disabled = on;
+    if (els.translateBtn) els.translateBtn.disabled = on;
+    if (els.translateChipClose) els.translateChipClose.disabled = on;
+    if (els.translateLangBtn) els.translateLangBtn.disabled = on;
+    if (els.imageGenChipClose) els.imageGenChipClose.disabled = on;
+    if (els.imageGenRefBtn) els.imageGenRefBtn.disabled = on;
+    if (els.imageGenRatioBtn) els.imageGenRatioBtn.disabled = on;
+    if (els.imageGenStyleBtn) els.imageGenStyleBtn.disabled = on;
+    if (els.imageGenTemplateBtn) els.imageGenTemplateBtn.disabled = on;
+    if (els.imageGenRatioChipClear) els.imageGenRatioChipClear.disabled = on;
+    if (els.imageGenStyleChipClear) els.imageGenStyleChipClear.disabled = on;
+    if (els.imageGenTemplateChipClear) els.imageGenTemplateChipClear.disabled = on;
     els.messages.classList.toggle('is-streaming', on);
   };
 
@@ -513,11 +929,17 @@ window.UI = (() => {
 
   const openSettings = (state) => {
     els.apiKeyInput.value = state.apiKey || '';
+    els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
+    els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || DEFAULT_SYSTEM_PROMPT;
     const radios = els.settingsForm.querySelectorAll('input[name="theme"]');
     radios.forEach(r => { r.checked = r.value === (state.theme || 'dark'); });
     els.apiKeyInput.type = 'password';
     els.apiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.anthropicApiKeyInput.type = 'password';
+    els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.deepseekApiKeyInput.type = 'password';
+    els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
   };
@@ -574,15 +996,56 @@ window.UI = (() => {
     if (isMobileSidebar()) toggleSidebar(false);
   };
 
-  const openMarkdownPreview = (source) => {
-    if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
-    els.markdownPreviewContent.innerHTML = window.Markdown.render(source);
-    polishContent(els.markdownPreviewContent, { renderMermaid: true });
-    els.markdownPreviewContent.scrollTop = 0;
+  const setPreviewPanelTitle = (mode) => {
+    if (els.previewPanelIcon) {
+      els.previewPanelIcon.className = mode === 'html'
+        ? 'fa-brands fa-html5'
+        : 'fa-brands fa-markdown';
+    }
+    if (els.previewPanelTitle) {
+      els.previewPanelTitle.textContent = mode === 'html' ? 'Preview HTML' : 'Preview Markdown';
+    }
+    if (els.markdownPreviewPanel) {
+      els.markdownPreviewPanel.setAttribute('aria-label', mode === 'html' ? 'Preview HTML' : 'Preview Markdown');
+    }
+  };
+
+  const wrapHtmlPreview = (source) => {
+    const trimmed = (source || '').trim();
+    if (/<!doctype\s+html|<html[\s>]/i.test(trimmed)) return trimmed;
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'
+      + trimmed + '</body></html>';
+  };
+
+  const openPreviewPanel = () => {
     els.markdownPreviewPanel.classList.add('is-open');
     els.markdownPreviewPanel.setAttribute('aria-hidden', 'false');
     els.app.setAttribute('data-md-preview', 'open');
     if (els.mdPreviewOverlay) els.mdPreviewOverlay.classList.remove('hidden');
+  };
+
+  const openMarkdownPreview = (source) => {
+    if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    setPreviewPanelTitle('markdown');
+    els.markdownPreviewContent.classList.remove('is-html-preview');
+    els.markdownPreviewContent.innerHTML = window.Markdown.render(source);
+    polishContent(els.markdownPreviewContent, { renderMermaid: true });
+    els.markdownPreviewContent.scrollTop = 0;
+    openPreviewPanel();
+  };
+
+  const openHtmlPreview = (source) => {
+    if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    setPreviewPanelTitle('html');
+    els.markdownPreviewContent.classList.add('is-html-preview');
+    els.markdownPreviewContent.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.className = 'html-preview-frame';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-modals');
+    iframe.setAttribute('title', 'HTML Preview');
+    iframe.srcdoc = wrapHtmlPreview(source);
+    els.markdownPreviewContent.appendChild(iframe);
+    openPreviewPanel();
   };
 
   const closeMarkdownPreview = () => {
@@ -591,7 +1054,10 @@ window.UI = (() => {
     els.markdownPreviewPanel.setAttribute('aria-hidden', 'true');
     els.app.removeAttribute('data-md-preview');
     if (els.mdPreviewOverlay) els.mdPreviewOverlay.classList.add('hidden');
-    if (els.markdownPreviewContent) els.markdownPreviewContent.innerHTML = '';
+    if (els.markdownPreviewContent) {
+      els.markdownPreviewContent.classList.remove('is-html-preview');
+      els.markdownPreviewContent.innerHTML = '';
+    }
   };
 
   const downloadConversation = (convo) => {
@@ -610,7 +1076,9 @@ window.UI = (() => {
   };
 
   return {
-    cacheEls, setTheme, initModelSelect,
+    cacheEls, setTheme, initModelSelect, initTranslateLangMenu, initImageGenMenus,
+    syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
+    setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, renderMessages, renderEmpty,
     appendMessage, appendStreamingMessage, updateStreamingContent, finalizeStreaming,
     enterEditMode, exitEditMode, downloadConversation,
@@ -618,6 +1086,6 @@ window.UI = (() => {
     renderComposerAttachments, setDragOverlay,
     openSettings, closeSettings, openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
-    openMarkdownPreview, closeMarkdownPreview, els
+    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, els
   };
 })();

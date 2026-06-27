@@ -111,6 +111,7 @@ window.Conversations = (() => {
     msg.variants.push('');
     msg.variantIndex = msg.variants.length - 1;
     msg.content = '';
+    msg.generatedImages = [];
     saveConvo(convo);
     return msg;
   };
@@ -136,13 +137,21 @@ window.Conversations = (() => {
     }
   };
 
-  const finalizeAssistantMessage = (convo, messageIndex, content) => {
+  const finalizeAssistantMessage = (convo, messageIndex, content, extra = {}) => {
     const msg = convo.messages[messageIndex];
     if (!msg) return;
     initAssistantVariants(msg);
     msg.variants[msg.variantIndex] = content;
     msg.content = content;
     msg.ts = Date.now();
+    if (extra.generatedImages !== undefined) {
+      msg.generatedImages = extra.generatedImages;
+    }
+    if (extra.reasoningContent) {
+      msg.reasoningContent = extra.reasoningContent;
+    } else {
+      delete msg.reasoningContent;
+    }
     saveConvo(convo);
   };
 

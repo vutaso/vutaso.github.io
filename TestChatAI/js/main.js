@@ -10,6 +10,22 @@
   ui.initSidebar();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
   ui.initModelSelect(state.currentModel);
+  ui.initTranslateLangMenu();
+  ui.initImageGenMenus();
+  ui.syncComposerToolsUI(state.currentModel, {
+    webSearchEnabled: state.webSearchEnabled,
+    imageGenEnabled: state.imageGenEnabled,
+    thinkingEnabled: state.thinkingEnabled,
+    translateEnabled: state.translateEnabled,
+    translateTargetLang: state.translateTargetLang,
+    imageGenRatio: state.imageGenRatio,
+    imageGenStyle: state.imageGenStyle,
+    imageGenTemplate: state.imageGenTemplate,
+    imageGenRatioPicked: false,
+    imageGenStylePicked: false,
+    imageGenTemplatePicked: false,
+    referenceImage: null
+  });
 
   const list = convoMod.getAll();
   const current = convoMod.getCurrent();
@@ -18,7 +34,7 @@
 
   window.Events.bind();
 
-  if (!state.apiKey) {
+  if (!window.APP_CONFIG.hasApiKey(state, state.currentModel)) {
     setTimeout(() => ui.openSettings(state), 200);
   } else {
     ui.els.composerInput.focus();

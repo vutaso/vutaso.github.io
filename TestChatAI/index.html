@@ -96,6 +96,24 @@
 
       <form id="composer" class="composer" autocomplete="off">
         <div id="composerAttachments" class="composer-attachments hidden" aria-live="polite"></div>
+        <div id="composerTools" class="composer-tools hidden">
+          <button type="button" id="thinkingBtn" class="composer-tool-btn" title="Bật chế độ suy nghĩ (reasoning)" aria-label="Thinking" aria-pressed="false">
+            <i class="fa-solid fa-brain" aria-hidden="true"></i>
+            <span>Thinking</span>
+          </button>
+          <button type="button" id="webSearchBtn" class="composer-tool-btn" title="Tìm kiếm thông tin trên web" aria-label="Tìm kiếm web" aria-pressed="false">
+            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+            <span>Tìm kiếm web</span>
+          </button>
+          <button type="button" id="imageGenBtn" class="composer-tool-btn" title="Tạo hình ảnh bằng AI" aria-label="Tạo hình ảnh" aria-pressed="false">
+            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+            <span>Tạo hình ảnh</span>
+          </button>
+          <button type="button" id="translateBtn" class="composer-tool-btn" title="Dịch văn bản sang ngôn ngữ khác" aria-label="Dịch" aria-pressed="false">
+            <i class="fa-solid fa-language" aria-hidden="true"></i>
+            <span>Dịch</span>
+          </button>
+        </div>
         <div id="composerDropZone" class="composer-inner">
           <button type="button" id="attachImageBtn" class="btn btn-icon composer-attach" title="Đính kèm ảnh" aria-label="Đính kèm ảnh">
             <i class="fa-solid fa-image"></i>
@@ -105,14 +123,109 @@
           </button>
           <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" multiple hidden />
           <input type="file" id="documentFileInput" accept=".txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden />
-          <textarea
-            id="composerInput"
-            class="composer-input"
-            rows="1"
-            enterkeyhint="send"
-            placeholder="Nhắn tin cho VUTASO AI..."
-            aria-label="Nhập tin nhắn"
-          ></textarea>
+          <div class="composer-field">
+            <textarea
+              id="composerInput"
+              class="composer-input"
+              rows="1"
+              enterkeyhint="send"
+              placeholder="Nhắn tin cho VUTASO AI..."
+              aria-label="Nhập tin nhắn"
+            ></textarea>
+            <div id="composerImageGenBar" class="composer-imagegen-bar hidden" aria-hidden="true">
+              <div class="mode-chip imagegen-chip">
+                <i class="fa-regular fa-image" aria-hidden="true"></i>
+                <span>Tạo hình ảnh</span>
+                <button type="button" id="imageGenChipClose" class="mode-chip-close" title="Tắt tạo hình ảnh" aria-label="Tắt tạo hình ảnh">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+              <button type="button" id="imageGenRefBtn" class="composer-pill-btn" title="Thêm hình ảnh tham chiếu">
+                <i class="fa-solid fa-paperclip" aria-hidden="true"></i>
+                <span id="imageGenRefLabel">Hình ảnh tham chiếu</span>
+              </button>
+              <input type="file" id="imageGenRefInput" accept="image/jpeg,image/png,image/gif,image/webp" hidden />
+              <div class="imagegen-option" data-option="ratio">
+                <div id="imageGenRatioPicker" class="composer-dropdown-wrap">
+                  <button type="button" id="imageGenRatioBtn" class="composer-pill-btn" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="ratio-icon" data-ratio="1:1" aria-hidden="true"></span>
+                    <span>Tỷ lệ</span>
+                    <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                  </button>
+                  <div id="imageGenRatioMenu" class="composer-dropdown-menu hidden" role="listbox" aria-label="Chọn tỷ lệ">
+                    <div class="composer-dropdown-header">Tỷ lệ</div>
+                    <div id="imageGenRatioOptions" class="composer-dropdown-options"></div>
+                  </div>
+                </div>
+                <div id="imageGenRatioChip" class="mode-chip imagegen-option-chip hidden">
+                  <span class="ratio-icon" data-ratio="1:1" aria-hidden="true"></span>
+                  <span id="imageGenRatioChipLabel">1:1</span>
+                  <button type="button" id="imageGenRatioChipClear" class="mode-chip-close" title="Đổi tỷ lệ" aria-label="Đổi tỷ lệ">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="imagegen-option" data-option="style">
+                <div id="imageGenStylePicker" class="composer-dropdown-wrap">
+                  <button type="button" id="imageGenStyleBtn" class="composer-pill-btn" aria-haspopup="listbox" aria-expanded="false">
+                    <i class="fa-solid fa-palette" aria-hidden="true"></i>
+                    <span>Phong cách</span>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                  </button>
+                  <div id="imageGenStyleMenu" class="composer-dropdown-menu hidden" role="listbox" aria-label="Chọn phong cách">
+                    <div class="composer-dropdown-header">Phong cách</div>
+                    <div id="imageGenStyleOptions" class="composer-dropdown-options"></div>
+                  </div>
+                </div>
+                <div id="imageGenStyleChip" class="mode-chip imagegen-option-chip hidden">
+                  <i class="fa-solid fa-palette" aria-hidden="true"></i>
+                  <span id="imageGenStyleChipLabel">Tự động</span>
+                  <button type="button" id="imageGenStyleChipClear" class="mode-chip-close" title="Đổi phong cách" aria-label="Đổi phong cách">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="imagegen-option" data-option="template">
+                <div id="imageGenTemplatePicker" class="composer-dropdown-wrap">
+                  <button type="button" id="imageGenTemplateBtn" class="composer-pill-btn" aria-haspopup="listbox" aria-expanded="false">
+                    <i class="fa-regular fa-square" aria-hidden="true"></i>
+                    <span>Mẫu</span>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                  </button>
+                  <div id="imageGenTemplateMenu" class="composer-dropdown-menu hidden" role="listbox" aria-label="Chọn mẫu">
+                    <div class="composer-dropdown-header">Mẫu</div>
+                    <div id="imageGenTemplateOptions" class="composer-dropdown-options"></div>
+                  </div>
+                </div>
+                <div id="imageGenTemplateChip" class="mode-chip imagegen-option-chip hidden">
+                  <i class="fa-regular fa-square" aria-hidden="true"></i>
+                  <span id="imageGenTemplateChipLabel">Không dùng mẫu</span>
+                  <button type="button" id="imageGenTemplateChipClear" class="mode-chip-close" title="Đổi mẫu" aria-label="Đổi mẫu">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="composerTranslateBar" class="composer-translate-bar hidden" aria-hidden="true">
+              <div class="translate-chip">
+                <i class="fa-solid fa-language" aria-hidden="true"></i>
+                <span>Dịch</span>
+                <button type="button" id="translateChipClose" class="translate-chip-close" title="Tắt dịch" aria-label="Tắt dịch">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="translate-lang-wrap">
+                <button type="button" id="translateLangBtn" class="translate-lang-btn" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="translateLangLabel">Dịch sang English</span>
+                  <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                </button>
+                <div id="translateLangMenu" class="translate-lang-menu hidden" role="listbox" aria-label="Chọn ngôn ngữ dịch">
+                  <div class="translate-lang-menu-header">Dịch sang</div>
+                  <div id="translateLangOptions" class="translate-lang-options"></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="composer-actions">
             <button id="sendBtn" type="submit" class="btn btn-send" title="Gửi" aria-label="Gửi">
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3l4 4M8 3L4 7M8 3v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -126,9 +239,9 @@
       </form>
       </div>
 
-      <aside id="markdownPreviewPanel" class="md-preview-panel" aria-hidden="true" aria-label="Preview Markdown">
+      <aside id="markdownPreviewPanel" class="md-preview-panel" aria-hidden="true" aria-label="Preview">
         <header class="md-preview-header">
-          <span class="md-preview-title"><i class="fa-brands fa-markdown" aria-hidden="true"></i> Preview Markdown</span>
+          <span class="md-preview-title"><i id="previewPanelIcon" class="fa-brands fa-markdown" aria-hidden="true"></i> <span id="previewPanelTitle">Preview Markdown</span></span>
           <button type="button" id="closeMdPreviewBtn" class="btn btn-icon" title="Đóng preview" aria-label="Đóng preview">
             <span class="icon"><i class="fa-solid fa-xmark"></i></span>
           </button>
@@ -151,12 +264,34 @@
         <div class="field">
           <label for="apiKeyInput">API Key (OpenAI)</label>
           <div class="input-group">
-            <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." required />
+            <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." />
             <button type="button" id="toggleApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
               <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
           <p class="field-hint">Lưu vào localStorage, không gửi đi đâu ngoài OpenAI.</p>
+        </div>
+
+        <div class="field">
+          <label for="anthropicApiKeyInput">API Key (Anthropic)</label>
+          <div class="input-group">
+            <input id="anthropicApiKeyInput" type="password" class="input" placeholder="sk-ant-..." />
+            <button type="button" id="toggleAnthropicApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+              <span class="icon" id="anthropicApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+            </button>
+          </div>
+          <p class="field-hint">Dùng cho Claude. Lưu cục bộ, chỉ gửi tới Anthropic.</p>
+        </div>
+
+        <div class="field">
+          <label for="deepseekApiKeyInput">API Key (DeepSeek)</label>
+          <div class="input-group">
+            <input id="deepseekApiKeyInput" type="password" class="input" placeholder="sk-..." />
+            <button type="button" id="toggleDeepseekApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+              <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+            </button>
+          </div>
+          <p class="field-hint">Dùng cho DeepSeek V4 Flash / Pro. Lưu cục bộ, chỉ gửi tới DeepSeek.</p>
         </div>
 
         <div class="field">
