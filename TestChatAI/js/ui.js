@@ -35,6 +35,10 @@ window.UI = (() => {
     els.selectionReplyTooltip = $('#selectionReplyTooltip');
     els.openSettingsBtn = $('#openSettingsBtn');
     els.headerSettingsBtn = $('#headerSettingsBtn');
+    els.guideModal = $('#guideModal');
+    els.openGuideBtn = $('#openGuideBtn');
+    els.headerGuideBtn = $('#headerGuideBtn');
+    els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
     els.downloadConvoBtn = $('#downloadConvoBtn');
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
     els.pdfExportBtn = $('#pdfExportBtn');
@@ -992,6 +996,14 @@ window.UI = (() => {
 
   const closeSettings = () => els.settingsModal.classList.add('hidden');
 
+  const openGuide = () => {
+    els.guideModal.classList.remove('hidden');
+  };
+
+  const closeGuide = () => els.guideModal.classList.add('hidden');
+
+  const isGuideModalOpen = () => !els.guideModal.classList.contains('hidden');
+
   let renameResolve = null;
 
   const openRenameModal = (title) => {
@@ -1130,7 +1142,8 @@ window.UI = (() => {
     enterEditMode, exitEditMode, downloadConversation,
     scrollToBottom, scrollToBottomIfNear, showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
-    openSettings, closeSettings, openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
+    openSettings, closeSettings, openGuide, closeGuide, isGuideModalOpen,
+    openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, els
   };

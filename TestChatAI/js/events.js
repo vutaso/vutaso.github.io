@@ -643,7 +643,9 @@ window.Events = (() => {
     });
 
     const hasFileDrag = (e) => e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files');
-    const canAcceptImageDrop = () => ui.els.settingsModal.classList.contains('hidden');
+    const canAcceptImageDrop = () =>
+      ui.els.settingsModal.classList.contains('hidden')
+      && ui.els.guideModal.classList.contains('hidden');
 
     const appEl = ui.els.app;
 
@@ -796,6 +798,12 @@ window.Events = (() => {
 
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.headerSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
+    ui.els.openGuideBtn.addEventListener('click', () => ui.openGuide());
+    ui.els.headerGuideBtn.addEventListener('click', () => ui.openGuide());
+    ui.els.guideOpenSettingsBtn.addEventListener('click', () => {
+      ui.closeGuide();
+      ui.openSettings(state.get());
+    });
     ui.els.modelSelect.addEventListener('change', () => {
       const modelId = ui.els.modelSelect.value;
       const s = state.get();
@@ -1072,11 +1080,17 @@ window.Events = (() => {
 
     document.querySelectorAll('[data-modal-close]').forEach(el => {
       el.addEventListener('click', () => {
+        if (el.closest('#guideModal')) {
+          ui.closeGuide();
+          return;
+        }
         if (el.closest('#renameModal')) {
           ui.closeRenameModal(null);
           return;
         }
-        ui.closeSettings();
+        if (el.closest('#settingsModal')) {
+          ui.closeSettings();
+        }
       });
     });
 
@@ -1101,6 +1115,10 @@ window.Events = (() => {
         }
         if (ui.isRenameModalOpen()) {
           ui.closeRenameModal(null);
+          return;
+        }
+        if (ui.isGuideModalOpen()) {
+          ui.closeGuide();
           return;
         }
         if (!ui.els.settingsModal.classList.contains('hidden')) {

@@ -23,19 +23,6 @@ window.APP_CONFIG = {
   REASONING_EFFORT: 'high',
   SEARCH_CONTEXT_SIZE: 'high',
 
-  // Sau khi deploy Cloudflare Worker, điền URL workers.dev vào đây (xem worker/wrangler.toml).
-  DEEPSEEK_PROXY_ENDPOINT: '',
-
-  usesDeepseekProxy() {
-    return !!this.DEEPSEEK_PROXY_ENDPOINT;
-  },
-
-  getDeepseekMode(state) {
-    if (state.deepseekApiKey) return 'direct';
-    if (this.usesDeepseekProxy()) return 'proxy';
-    return 'none';
-  },
-
   getModel(modelId) {
     const id = modelId || this.DEFAULT_MODEL;
     return this.MODELS.find((m) => m.id === id) || this.MODELS[0];
@@ -56,7 +43,7 @@ window.APP_CONFIG = {
   getMissingApiKeyMessage(modelId) {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Nhập Anthropic API key trong Cài đặt trước';
-    if (provider === 'deepseek') return 'Nhập DeepSeek API key trong Cài đặt (tuỳ chọn nếu đã bật proxy)';
+    if (provider === 'deepseek') return 'Nhập DeepSeek API key trong Cài đặt trước';
     if (provider === 'google') return 'Nhập Gemini API key trong Cài đặt trước';
     return 'Nhập API key trong Cài đặt trước';
   },
@@ -64,15 +51,12 @@ window.APP_CONFIG = {
   getMissingApiKeyError(modelId) {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Chưa có Anthropic API key. Mở Cài đặt để nhập.';
-    if (provider === 'deepseek') return 'Chưa có DeepSeek API key và chưa cấu hình proxy.';
+    if (provider === 'deepseek') return 'Chưa có DeepSeek API key. Mở Cài đặt để nhập.';
     if (provider === 'google') return 'Chưa có Gemini API key. Mở Cài đặt để nhập.';
     return 'Chưa có API key. Mở Cài đặt để nhập.';
   },
 
   hasApiKey(state, modelId) {
-    if (this.getModelProvider(modelId) === 'deepseek') {
-      return this.getDeepseekMode(state) !== 'none';
-    }
     return !!this.getApiKey(state, modelId);
   },
 

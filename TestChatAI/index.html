@@ -37,10 +37,16 @@
       <div class="sidebar-section-label">Lịch sử</div>
       <ul id="conversationList" class="conversation-list" role="list"></ul>
       <div class="sidebar-footer">
-        <button id="openSettingsBtn" class="btn btn-ghost" title="Cài đặt">
-          <span class="icon"><i class="fa-solid fa-gear"></i></span>
-          <span class="label">Cài đặt</span>
-        </button>
+        <div class="sidebar-footer-primary">
+          <button id="openGuideBtn" class="btn btn-ghost" title="Hướng dẫn sử dụng cho người mới">
+            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
+            <span class="label">Hướng dẫn</span>
+          </button>
+          <button id="openSettingsBtn" class="btn btn-ghost" title="Cài đặt">
+            <span class="icon"><i class="fa-solid fa-gear"></i></span>
+            <span class="label">Cài đặt</span>
+          </button>
+        </div>
         <div class="sidebar-footer-actions">
           <button id="clearAllSidebarBtn" class="btn btn-ghost" title="Xoá tất cả hội thoại">
             <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
@@ -85,6 +91,9 @@
           </button>
           <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
             <span class="icon"><i class="fa-solid fa-file-word"></i></span>
+          </button>
+          <button id="headerGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới">
+            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
           </button>
           <button id="headerSettingsBtn" class="btn btn-icon" title="Cài đặt">
             <span class="icon"><i class="fa-solid fa-gear"></i></span>
@@ -291,7 +300,7 @@
               <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Tuỳ chọn. Để trống sẽ dùng proxy server (nếu đã cấu hình). Nhập key riêng để gọi thẳng DeepSeek.</p>
+          <p class="field-hint">Dùng cho DeepSeek. Lưu cục bộ, chỉ gửi tới DeepSeek.</p>
         </div>
 
         <div class="field">
@@ -350,6 +359,100 @@
           <button type="submit" class="btn btn-primary">Lưu</button>
         </footer>
       </form>
+    </div>
+  </div>
+
+  <div id="guideModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-content">
+      <header class="modal-header modal-header-stack">
+        <div class="modal-badge-inline" aria-hidden="true">
+          <div class="brand-avatar brand-avatar-sm">V</div>
+        </div>
+        <h2 id="guideTitle">Hướng dẫn sử dụng cho người mới</h2>
+        <p class="modal-subtitle">Làm theo các bước dưới đây để bắt đầu chat với VUTASO AI</p>
+      </header>
+      <div class="modal-body guide-body">
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">1</div>
+          <div class="guide-step-body">
+            <h3>Cấu hình API Key</h3>
+            <p>Bấm <strong>Cài đặt</strong> (icon bánh răng) và nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng. Chưa có key thì app sẽ tự mở Cài đặt khi khởi động.</p>
+            <button type="button" id="guideOpenSettingsBtn" class="btn btn-ghost btn-sm">Mở Cài đặt</button>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">2</div>
+          <div class="guide-step-body">
+            <h3>Chọn model</h3>
+            <p>Dùng dropdown trên header để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.</p>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">3</div>
+          <div class="guide-step-body">
+            <h3>Bắt đầu chat</h3>
+            <p>Gõ tin nhắn vào ô nhập phía dưới. AI trả lời theo thời gian thực (streaming). Bấm <strong>Dừng</strong> để hủy — nội dung đã nhận vẫn được giữ.</p>
+            <ul>
+              <li><kbd>Enter</kbd> — gửi tin nhắn</li>
+              <li><kbd>Shift</kbd> + <kbd>Enter</kbd> — xuống dòng</li>
+              <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>K</kbd> — focus ô nhập</li>
+            </ul>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">4</div>
+          <div class="guide-step-body">
+            <h3>Công cụ Composer</h3>
+            <p>Thanh công cụ phía trên ô nhập:</p>
+            <ul>
+              <li><strong>Thinking</strong> — bật suy nghĩ (reasoning), xem trong khối có thể mở/đóng</li>
+              <li><strong>Tìm kiếm web</strong> — AI tra cứu thông tin trên web</li>
+              <li><strong>Tạo hình ảnh</strong> — sinh ảnh từ mô tả (tuỳ chọn tỷ lệ, phong cách, mẫu)</li>
+              <li><strong>Dịch</strong> — dịch sang ngôn ngữ đích, chỉ trả về bản dịch</li>
+            </ul>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">5</div>
+          <div class="guide-step-body">
+            <h3>Đính kèm ảnh &amp; tài liệu</h3>
+            <p>Dùng nút đính kèm ảnh/tài liệu, kéo thả vào màn hình, hoặc dán ảnh từ clipboard (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>). Hỗ trợ txt, md, pdf, docx, csv, json và nhiều định dạng code.</p>
+            <p>Khi bật <strong>Tạo hình ảnh</strong>, đính kèm thường bị tắt; có thể dùng ảnh tham chiếu để chỉnh sửa.</p>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">6</div>
+          <div class="guide-step-body">
+            <h3>Quản lý hội thoại</h3>
+            <p><strong>Cuộc trò chuyện mới</strong> ở sidebar để tạo phiên mới. Click mục trong <strong>Lịch sử</strong> để chuyển phiên. AI nhớ toàn bộ tin nhắn trong phiên hiện tại. Tiêu đề tự lấy từ tin user đầu tiên; có thể đổi tên qua menu từng cuộc trò chuyện.</p>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">7</div>
+          <div class="guide-step-body">
+            <h3>Thao tác trên tin nhắn</h3>
+            <ul>
+              <li>Tin <strong>user</strong>: Sửa, Sao chép, Xóa (cắt tin phía sau)</li>
+              <li>Tin <strong>assistant</strong>: Tạo lại, chuyển phiên bản <strong>1/N</strong>, Sao chép</li>
+              <li>Bôi đen văn bản trong tin → <strong>Reply</strong> → chèn trích dẫn vào ô nhập</li>
+            </ul>
+          </div>
+        </section>
+        <section class="guide-step">
+          <div class="guide-step-num" aria-hidden="true">8</div>
+          <div class="guide-step-body">
+            <h3>Xuất &amp; phím tắt khác</h3>
+            <p>Trên header: tải Markdown, sao chép Markdown, xuất PDF, xuất Word (.docx). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid.</p>
+            <ul>
+              <li><kbd>Escape</kbd> — đóng modal, menu, preview; thoát sửa tin</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-primary" data-modal-close>Đã hiểu</button>
+      </footer>
     </div>
   </div>
 

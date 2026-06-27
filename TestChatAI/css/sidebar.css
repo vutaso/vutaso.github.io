@@ -121,6 +121,14 @@
   gap: 8px;
 }
 
+.sidebar-footer-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
 .sidebar-footer .btn-ghost {
   border-radius: var(--radius-md);
 }

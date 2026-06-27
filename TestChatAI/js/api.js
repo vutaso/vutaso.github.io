@@ -1,5 +1,5 @@
 window.API = (() => {
-  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, DEEPSEEK_PROXY_ENDPOINT } = window.APP_CONFIG;
+  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT } = window.APP_CONFIG;
 
   let currentController = null;
   const isStreaming = () => currentController !== null;
@@ -413,24 +413,6 @@ window.API = (() => {
     return body;
   };
 
-  const sendDeepseekViaProxy = async ({ model, systemPrompt, convo, controller, handlers, thinking }) => {
-    const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
-
-    const res = await fetch(DEEPSEEK_PROXY_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw await parseApiError(res, 'deepseek');
-    if (!res.body || !res.body.getReader) {
-      throw new Error('Trình duyệt không hỗ trợ streaming response');
-    }
-
-    await readSseStream(res.body.getReader(), handlers);
-  };
-
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
     const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
     if (provider !== 'deepseek') {
@@ -618,11 +600,8 @@ window.API = (() => {
     }
 
     const provider = window.APP_CONFIG.getModelProvider(model);
-    const useDeepseekProxy = provider === 'deepseek'
-      && !apiKey
-      && window.APP_CONFIG.usesDeepseekProxy();
 
-    if (!useDeepseekProxy && !apiKey) {
+    if (!apiKey) {
       throw new Error(window.APP_CONFIG.getMissingApiKeyError(model));
     }
 
@@ -649,8 +628,6 @@ window.API = (() => {
         await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, controller, handlers });
       } else if (provider === 'google') {
         await sendGemini({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, controller, handlers });
-      } else if (provider === 'deepseek' && useDeepseekProxy) {
-        await sendDeepseekViaProxy({ model, systemPrompt, convo, controller, handlers, thinking });
       } else if (provider === 'deepseek') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
