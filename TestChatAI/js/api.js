@@ -407,8 +407,9 @@ window.API = (() => {
       stream: true,
       thinking: { type: thinking ? 'enabled' : 'disabled' }
     };
-    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
-      body.max_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
     }
     return body;
   };
@@ -418,8 +419,9 @@ window.API = (() => {
     if (provider !== 'deepseek') {
       delete body.thinking;
       delete body.max_tokens;
-      if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
-        body.max_completion_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+      const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+      if (maxOutputTokens) {
+        body.max_completion_tokens = maxOutputTokens;
       }
       if (thinking) body.reasoning_effort = window.APP_CONFIG.REASONING_EFFORT || 'high';
     }
@@ -453,8 +455,9 @@ window.API = (() => {
       messages,
       stream: true
     };
-    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
-      body.max_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
     }
     const tools = buildAnthropicTools({ webSearch });
     if (tools.length) body.tools = tools;
@@ -497,8 +500,9 @@ window.API = (() => {
       contents,
       generationConfig: {}
     };
-    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
-      body.generationConfig.maxOutputTokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.generationConfig.maxOutputTokens = maxOutputTokens;
     }
     if (imageGen) {
       body.generationConfig.responseModalities = ['TEXT', 'IMAGE'];
@@ -549,8 +553,9 @@ window.API = (() => {
       tools,
       stream: true
     };
-    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
-      body.max_output_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_output_tokens = maxOutputTokens;
     }
     if (systemPrompt && systemPrompt.trim()) {
       body.instructions = systemPrompt;

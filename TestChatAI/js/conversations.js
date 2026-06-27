@@ -11,10 +11,48 @@ window.Conversations = (() => {
     return s.currentConversationId ? getById(s.currentConversationId) : null;
   };
 
-  const create = () => {
+  const getModel = (convo) => {
+    if (!convo) return window.Storage.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
+    if (convo.model && validIds.includes(convo.model)) return convo.model;
+    return window.Storage.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+  };
+
+  const setModel = (id, modelId) => {
+    const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
+    const next = validIds.includes(modelId) ? modelId : window.APP_CONFIG.DEFAULT_MODEL;
+    const all = getAll().map((c) => c.id === id ? { ...c, model: next, updatedAt: Date.now() } : c);
+    set({ conversations: all });
+  };
+
+  const messageSearchText = (message) => {
+    if (!message) return '';
+    if (message.role === 'assistant') return getAssistantContent(message);
+    return message.content || messagePreviewText(message);
+  };
+
+  const matchesSearch = (convo, query) => {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return true;
+    if ((convo.title || '').toLowerCase().includes(q)) return true;
+    const model = window.APP_CONFIG.getModel(getModel(convo));
+    if (model.label.toLowerCase().includes(q) || model.id.toLowerCase().includes(q)) return true;
+    return convo.messages.some((m) => messageSearchText(m).toLowerCase().includes(q));
+  };
+
+  const filterBySearch = (query) => {
+    const all = getAll();
+    const q = (query || '').trim();
+    if (!q) return all;
+    return all.filter((c) => matchesSearch(c, q));
+  };
+
+  const create = (modelId) => {
+    const model = modelId || window.Storage.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const convo = {
       id: uuid(),
       title: 'Cuộc trò chuyện mới',
+      model,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       messages: []
@@ -181,6 +219,7 @@ window.Conversations = (() => {
 
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
+    getModel, setModel, matchesSearch, filterBySearch,
     addMessage, updateMessage, editMessage, deleteMessageFrom, clearAll,
     getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };

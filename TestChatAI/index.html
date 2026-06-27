@@ -131,7 +131,7 @@
             <i class="fa-solid fa-paperclip"></i>
           </button>
           <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" multiple hidden />
-          <input type="file" id="documentFileInput" accept=".txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden />
+          <input type="file" id="documentFileInput" accept=".txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,.xlsx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden />
           <div class="composer-field">
             <textarea
               id="composerInput"
@@ -283,7 +283,7 @@
               <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Lưu vào localStorage, không gửi đi đâu ngoài OpenAI.</p>
+          <p class="field-hint">Lưu cục bộ, chỉ gửi tới OpenAI.</p>
         </div>
 
         <div class="field">
@@ -294,7 +294,7 @@
               <span class="icon" id="anthropicApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Dùng cho Claude. Lưu cục bộ, chỉ gửi tới Anthropic.</p>
+          <p class="field-hint">Lưu cục bộ, chỉ gửi tới Anthropic.</p>
         </div>
 
         <div class="field">
@@ -305,7 +305,7 @@
               <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Dùng cho DeepSeek. Lưu cục bộ, chỉ gửi tới DeepSeek.</p>
+          <p class="field-hint">Lưu cục bộ, chỉ gửi tới DeepSeek.</p>
         </div>
 
         <div class="field">
@@ -316,7 +316,7 @@
               <span class="icon" id="geminiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Dùng cho Gemini. Lấy tại Google AI Studio. Lưu cục bộ, chỉ gửi tới Google.</p>
+          <p class="field-hint">Lưu cục bộ, chỉ gửi tới Google.</p>
         </div>
 
         <div class="field">
@@ -425,7 +425,7 @@
           <div class="guide-step-num" aria-hidden="true">5</div>
           <div class="guide-step-body">
             <h3>Đính kèm ảnh &amp; tài liệu</h3>
-            <p>Dùng nút đính kèm ảnh/tài liệu, kéo thả vào màn hình, hoặc dán ảnh từ clipboard (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>). Hỗ trợ txt, md, pdf, docx, csv, json và nhiều định dạng code.</p>
+            <p>Dùng nút đính kèm ảnh/tài liệu, kéo thả vào màn hình, hoặc dán ảnh từ clipboard (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>). Hỗ trợ txt, md, pdf, docx, xlsx, csv, json và nhiều định dạng code.</p>
             <p>Khi bật <strong>Tạo hình ảnh</strong>, đính kèm thường bị tắt; có thể dùng ảnh tham chiếu để chỉnh sửa.</p>
           </div>
         </section>
@@ -481,6 +481,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>

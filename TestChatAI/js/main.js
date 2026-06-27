@@ -9,10 +9,14 @@
   ui.cacheEls();
   ui.initSidebar();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
-  ui.initModelSelect(state.currentModel);
+  const list = convoMod.getAll();
+  const current = convoMod.getCurrent();
+  const initialModel = convoMod.getModel(current);
+
+  ui.initModelSelect(initialModel);
   ui.initTranslateLangMenu();
   ui.initImageGenMenus();
-  ui.syncComposerToolsUI(state.currentModel, {
+  ui.syncComposerToolsUI(initialModel, {
     webSearchEnabled: state.webSearchEnabled,
     imageGenEnabled: state.imageGenEnabled,
     thinkingEnabled: state.thinkingEnabled,
@@ -27,14 +31,12 @@
     referenceImage: null
   });
 
-  const list = convoMod.getAll();
-  const current = convoMod.getCurrent();
   ui.renderConversationList(list, current ? current.id : null);
   ui.renderMessages(current);
 
   window.Events.bind();
 
-  if (!window.APP_CONFIG.hasApiKey(state, state.currentModel)) {
+  if (!window.APP_CONFIG.hasApiKey(state, initialModel)) {
     setTimeout(() => ui.openSettings(state), 200);
   } else {
     ui.els.composerInput.focus();

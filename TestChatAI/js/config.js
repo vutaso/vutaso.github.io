@@ -6,7 +6,7 @@ window.APP_CONFIG = {
     { id: 'gpt-5.4-mini', label: 'GPT-5.4 mini', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'gpt-5.4', label: 'GPT-5.4', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'gpt-5.5', label: 'GPT-5.5', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
+    { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
@@ -26,6 +26,13 @@ window.APP_CONFIG = {
   getModel(modelId) {
     const id = modelId || this.DEFAULT_MODEL;
     return this.MODELS.find((m) => m.id === id) || this.MODELS[0];
+  },
+
+  getMaxOutputTokens(modelId) {
+    const configured = this.API_MAX_OUTPUT_TOKENS;
+    if (!configured) return null;
+    const cap = this.getModel(modelId).maxOutputTokens;
+    return cap ? Math.min(configured, cap) : configured;
   },
 
   getModelProvider(modelId) {
@@ -200,6 +207,6 @@ window.APP_CONFIG = {
   ACCEPTED_FILE_EXTENSIONS: [
     '.txt', '.md', '.markdown', '.csv', '.json', '.xml', '.html', '.htm',
     '.css', '.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.c', '.cpp', '.h',
-    '.yaml', '.yml', '.log', '.rtf', '.pdf', '.docx'
+    '.yaml', '.yml', '.log', '.rtf', '.pdf', '.docx', '.xlsx'
   ]
 };

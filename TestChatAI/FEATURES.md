@@ -14,7 +14,7 @@
 | **Dừng phản hồi** | Nút Stop để hủy yêu cầu đang chạy; nội dung đã nhận được vẫn được giữ lại |
 | **System Prompt** | Tùy chỉnh hướng dẫn hệ thống cho AI (mặc định: trợ lý tiếng Việt, trả lời có cấu trúc) |
 | **Vision (đa phương thức)** | Gửi ảnh kèm tin nhắn để AI phân tích (JPEG, PNG, GIF, WebP) |
-| **Đính kèm tài liệu** | Gửi nội dung file văn bản kèm tin nhắn (txt, md, csv, json, pdf, docx, code...) |
+| **Đính kèm tài liệu** | Gửi nội dung file văn bản kèm tin nhắn (txt, md, csv, json, pdf, docx, xlsx, code...) |
 | **Tạo lại câu trả lời** | Nút Retry trên tin nhắn assistant để sinh phiên bản mới |
 | **Nhiều phiên bản trả lời** | Lưu và chuyển đổi giữa các phiên bản khi dùng Retry (điều hướng 1/N) |
 | **Sửa tin nhắn người dùng** | Chỉnh sửa tin nhắn user và tự động gửi lại từ điểm đó |
@@ -86,8 +86,9 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | **Xóa đính kèm** | Gỡ từng ảnh/file trước khi gửi |
 | **Đọc PDF** | Trích xuất toàn bộ text từ PDF bằng PDF.js |
 | **Đọc DOCX** | Trích xuất text từ Word bằng Mammoth |
+| **Đọc XLSX** | Trích xuất dữ liệu từng sheet Excel dạng CSV bằng SheetJS |
 
-**Định dạng tài liệu hỗ trợ:** `.txt`, `.md`, `.csv`, `.json`, `.xml`, `.html`, `.css`, `.js`, `.ts`, `.py`, `.java`, `.c`, `.cpp`, `.yaml`, `.log`, `.rtf`, `.pdf`, `.docx` và các file `text/*`.
+**Định dạng tài liệu hỗ trợ:** `.txt`, `.md`, `.csv`, `.json`, `.xml`, `.html`, `.css`, `.js`, `.ts`, `.py`, `.java`, `.c`, `.cpp`, `.yaml`, `.log`, `.rtf`, `.pdf`, `.docx`, `.xlsx` và các file `text/*`.
 
 ---
 
@@ -149,7 +150,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 |-----------|--------|
 | **API Key (OpenAI)** | Dùng cho model GPT; ẩn/hiện bằng nút mắt |
 | **API Key (Anthropic)** | Dùng cho model Claude |
-| **API Key (DeepSeek)** | Tuỳ chọn — để trống sẽ dùng proxy server (nếu đã cấu hình) |
+| **API Key (DeepSeek)** | Dùng cho model DeepSeek |
 | **API Key (Gemini)** | Dùng cho model Google Gemini |
 | **System Prompt** | Chỉnh prompt hệ thống tùy ý |
 | **Theme** | Chọn Dark hoặc Light trong modal |
@@ -177,26 +178,11 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 - **API đa nhà cung cấp:**
   - OpenAI: Chat Completions + Responses API (web search, image gen, thinking)
   - Anthropic: Messages API (web search, thinking)
-  - DeepSeek: Chat Completions (thinking) — trực tiếp hoặc qua proxy
+  - DeepSeek: Chat Completions (thinking) — gọi trực tiếp từ trình duyệt
   - Google: Gemini `streamGenerateContent` (web search, image gen, thinking)
-- **DeepSeek proxy:** Cloudflare Worker (`worker/`) giữ API key phía server, CORS whitelist
 - **Lưu trữ:** `localStorage` (key: `testchatai`)
-- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, jsPDF, html2canvas, PDF.js, Mammoth, docx
+- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, jsPDF, html2canvas, PDF.js, Mammoth, SheetJS (xlsx), docx
 - **Tuỳ chỉnh API** (`config.js`): `API_MAX_OUTPUT_TOKENS` (65536), `REASONING_EFFORT` (`high`), `SEARCH_CONTEXT_SIZE` (`high`)
-
-### DeepSeek proxy (Cloudflare Worker)
-
-```
-TestChatAI/worker/
-├── src/index.js       # Proxy POST → api.deepseek.com
-├── wrangler.toml      # Cấu hình worker & ALLOWED_ORIGINS
-├── .dev.vars.example  # Mẫu biến môi trường local
-└── package.json
-```
-
-1. `cd TestChatAI/worker && npx wrangler secret put DEEPSEEK_API_KEY`
-2. `npx wrangler deploy`
-3. Điền URL `workers.dev` vào `DEEPSEEK_PROXY_ENDPOINT` trong `js/config.js`
 
 ---
 
@@ -207,7 +193,7 @@ TestChatAI/
 ├── index.html          # Giao diện chính
 ├── css/                # Reset, biến, layout, sidebar, chat, composer, modal, responsive
 ├── js/
-│   ├── config.js       # Model, endpoint, cấu hình proxy
+│   ├── config.js       # Model, endpoint, cấu hình API
 │   ├── storage.js      # localStorage
 │   ├── conversations.js# CRUD hội thoại & tin nhắn
 │   ├── api.js          # Streaming API đa nhà cung cấp
@@ -217,6 +203,5 @@ TestChatAI/
 │   ├── events.js       # Sự kiện & luồng tương tác
 │   ├── utils.js        # Tiện ích, xuất PDF/DOCX
 │   └── main.js         # Khởi tạo app
-├── worker/             # Cloudflare Worker proxy DeepSeek
 └── assets/             # Favicon
 ```

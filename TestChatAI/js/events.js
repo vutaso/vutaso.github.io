@@ -268,7 +268,7 @@ window.Events = (() => {
       else if (kind === 'document') docFiles.push(file);
     }
     if (!imageFiles.length && !docFiles.length) {
-      ui.showToast('Chỉ hỗ trợ ảnh và tài liệu (txt, pdf, docx, csv, json...)');
+      ui.showToast('Chỉ hỗ trợ ảnh và tài liệu (txt, pdf, docx, xlsx, csv, json...)');
       return;
     }
     if (imageFiles.length) await addPendingImages(imageFiles);
