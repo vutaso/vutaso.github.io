@@ -643,9 +643,11 @@ window.Events = (() => {
     });
 
     const hasFileDrag = (e) => e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files');
-    const canAcceptImageDrop = () =>
-      ui.els.settingsModal.classList.contains('hidden')
-      && ui.els.guideModal.classList.contains('hidden');
+    const canAcceptImageDrop = () => {
+      const settingsOpen = ui.els.settingsModal && !ui.els.settingsModal.classList.contains('hidden');
+      const guideOpen = ui.els.guideModal && !ui.els.guideModal.classList.contains('hidden');
+      return !settingsOpen && !guideOpen;
+    };
 
     const appEl = ui.els.app;
 
@@ -796,11 +798,18 @@ window.Events = (() => {
       }
     });
 
+    const openGuideFromClick = (e) => {
+      const trigger = e.target.closest('[data-action="open-guide"], #openGuideBtn, #headerGuideBtn, #settingsGuideBtn');
+      if (!trigger) return;
+      e.preventDefault();
+      ui.openGuide();
+    };
+
+    document.addEventListener('click', openGuideFromClick);
+
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.headerSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
-    ui.els.openGuideBtn.addEventListener('click', () => ui.openGuide());
-    ui.els.headerGuideBtn.addEventListener('click', () => ui.openGuide());
-    ui.els.guideOpenSettingsBtn.addEventListener('click', () => {
+    ui.els.guideOpenSettingsBtn?.addEventListener('click', () => {
       ui.closeGuide();
       ui.openSettings(state.get());
     });

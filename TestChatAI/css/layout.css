@@ -368,6 +368,9 @@
   gap: 2px;
   min-width: 80px;
   justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .select {

@@ -119,6 +119,9 @@
   padding: 12px;
   border-top: 1px solid var(--border);
   gap: 8px;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .sidebar-footer-primary {
@@ -127,6 +130,11 @@
   gap: 4px;
   flex: 1;
   min-width: 0;
+}
+
+.sidebar-footer-primary .btn-ghost {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .sidebar-footer .btn-ghost {

@@ -38,7 +38,7 @@
       <ul id="conversationList" class="conversation-list" role="list"></ul>
       <div class="sidebar-footer">
         <div class="sidebar-footer-primary">
-          <button id="openGuideBtn" class="btn btn-ghost" title="Hướng dẫn sử dụng cho người mới">
+          <button type="button" id="openGuideBtn" class="btn btn-ghost" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
             <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
             <span class="label">Hướng dẫn</span>
           </button>
@@ -92,7 +92,7 @@
           <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
             <span class="icon"><i class="fa-solid fa-file-word"></i></span>
           </button>
-          <button id="headerGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới">
+          <button type="button" id="headerGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
             <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
           </button>
           <button id="headerSettingsBtn" class="btn btn-icon" title="Cài đặt">
@@ -265,9 +265,14 @@
     <div class="modal-content">
       <header class="modal-header">
         <h2 id="settingsTitle">Cài đặt</h2>
-        <button class="btn btn-icon" data-modal-close title="Đóng">
-          <span class="icon"><i class="fa-solid fa-xmark"></i></span>
-        </button>
+        <div class="modal-header-actions">
+          <button type="button" id="settingsGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn sử dụng">
+            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
+          </button>
+          <button type="button" class="btn btn-icon" data-modal-close title="Đóng">
+            <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+          </button>
+        </div>
       </header>
       <form id="settingsForm" class="modal-body">
         <div class="field">
@@ -362,9 +367,12 @@
     </div>
   </div>
 
-  <div id="guideModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+  <div id="guideModal" class="modal modal-guide hidden" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
     <div class="modal-backdrop" data-modal-close></div>
-    <div class="modal-content">
+    <div class="modal-content modal-content-guide">
+      <button type="button" class="btn btn-icon guide-modal-close" data-modal-close title="Đóng" aria-label="Đóng">
+        <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+      </button>
       <header class="modal-header modal-header-stack">
         <div class="modal-badge-inline" aria-hidden="true">
           <div class="brand-avatar brand-avatar-sm">V</div>
@@ -450,7 +458,7 @@
           </div>
         </section>
       </div>
-      <footer class="modal-footer">
+      <footer class="modal-footer guide-modal-footer">
         <button type="button" class="btn btn-primary" data-modal-close>Đã hiểu</button>
       </footer>
     </div>

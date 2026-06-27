@@ -38,7 +38,9 @@ window.UI = (() => {
     els.guideModal = $('#guideModal');
     els.openGuideBtn = $('#openGuideBtn');
     els.headerGuideBtn = $('#headerGuideBtn');
+    els.settingsGuideBtn = $('#settingsGuideBtn');
     els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
+    els.guideBody = $('#guideModal')?.querySelector('.guide-body');
     els.downloadConvoBtn = $('#downloadConvoBtn');
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
     els.pdfExportBtn = $('#pdfExportBtn');
@@ -997,12 +999,17 @@ window.UI = (() => {
   const closeSettings = () => els.settingsModal.classList.add('hidden');
 
   const openGuide = () => {
+    closeSettings();
+    if (!els.guideModal) return;
     els.guideModal.classList.remove('hidden');
+    if (els.guideBody) els.guideBody.scrollTop = 0;
   };
 
-  const closeGuide = () => els.guideModal.classList.add('hidden');
+  const closeGuide = () => {
+    if (els.guideModal) els.guideModal.classList.add('hidden');
+  };
 
-  const isGuideModalOpen = () => !els.guideModal.classList.contains('hidden');
+  const isGuideModalOpen = () => !!(els.guideModal && !els.guideModal.classList.contains('hidden'));
 
   let renameResolve = null;
 
