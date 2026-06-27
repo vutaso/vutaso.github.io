@@ -5,6 +5,7 @@ window.Storage = (() => {
     apiKey: '',
     anthropicApiKey: '',
     deepseekApiKey: '',
+    geminiApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
     imageGenEnabled: false,
@@ -81,7 +82,7 @@ window.Storage = (() => {
 
   const resetAll = () => {
     const fresh = defaultState();
-    state = { ...fresh, apiKey: state.apiKey, anthropicApiKey: state.anthropicApiKey, deepseekApiKey: state.deepseekApiKey, currentModel: state.currentModel, systemPrompt: state.systemPrompt, theme: state.theme };
+    state = { ...fresh, apiKey: state.apiKey, anthropicApiKey: state.anthropicApiKey, deepseekApiKey: state.deepseekApiKey, geminiApiKey: state.geminiApiKey, currentModel: state.currentModel, systemPrompt: state.systemPrompt, theme: state.theme };
     save();
   };
 

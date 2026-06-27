@@ -27,6 +27,8 @@ window.UI = (() => {
     els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
     els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
+    els.geminiApiKeyInput = $('#geminiApiKeyInput');
+    els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsForm = $('#settingsForm');
     els.toast = $('#toast');
@@ -42,6 +44,7 @@ window.UI = (() => {
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
+    els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
@@ -931,6 +934,7 @@ window.UI = (() => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
+    els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || DEFAULT_SYSTEM_PROMPT;
     const radios = els.settingsForm.querySelectorAll('input[name="theme"]');
     radios.forEach(r => { r.checked = r.value === (state.theme || 'dark'); });
@@ -940,6 +944,8 @@ window.UI = (() => {
     els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.deepseekApiKeyInput.type = 'password';
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.geminiApiKeyInput.type = 'password';
+    els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
   };

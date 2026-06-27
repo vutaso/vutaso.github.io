@@ -1052,6 +1052,12 @@ window.Events = (() => {
       ui.els.deepseekApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
+    ui.els.toggleGeminiApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.geminiApiKeyInput.type === 'password';
+      ui.els.geminiApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.geminiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
     const handleClearAll = () => {
       if (!confirm('Xoá tất cả hội thoại? Hành động này không thể hoàn tác.')) return;
       convoMod.clearAll();
@@ -1068,10 +1074,11 @@ window.Events = (() => {
       const apiKey = ui.els.apiKeyInput.value.trim();
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
       const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
+      const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
       const systemPrompt = ui.els.systemPromptInput.value.trim() || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
       const theme = ui.els.settingsForm.querySelector('input[name="theme"]:checked')?.value || 'dark';
       const prevTheme = state.get().theme;
-      state.set({ apiKey, anthropicApiKey, deepseekApiKey, systemPrompt, theme });
+      state.set({ apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, systemPrompt, theme });
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
       ui.closeSettings();

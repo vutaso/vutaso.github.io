@@ -10,10 +10,26 @@ window.APP_CONFIG = {
     { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
-    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true }
+    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
+    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: false, imageGen: false, thinking: true },
+    { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: false, imageGen: false, thinking: true },
+    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: false, imageGen: false, thinking: true }
   ],
 
-  DEFAULT_MODEL: 'gpt-5.4-nano',
+  DEFAULT_MODEL: 'gemini-3.5-flash',
+
+  // Sau khi deploy Cloudflare Worker, điền URL workers.dev vào đây (xem worker/wrangler.toml).
+  DEEPSEEK_PROXY_ENDPOINT: '',
+
+  usesDeepseekProxy() {
+    return !!this.DEEPSEEK_PROXY_ENDPOINT;
+  },
+
+  getDeepseekMode(state) {
+    if (state.deepseekApiKey) return 'direct';
+    if (this.usesDeepseekProxy()) return 'proxy';
+    return 'none';
+  },
 
   getModel(modelId) {
     const id = modelId || this.DEFAULT_MODEL;
@@ -28,24 +44,30 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
+    if (provider === 'google') return state.geminiApiKey || '';
     return state.apiKey || '';
   },
 
   getMissingApiKeyMessage(modelId) {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Nhập Anthropic API key trong Cài đặt trước';
-    if (provider === 'deepseek') return 'Nhập DeepSeek API key trong Cài đặt trước';
+    if (provider === 'deepseek') return 'Nhập DeepSeek API key trong Cài đặt (tuỳ chọn nếu đã bật proxy)';
+    if (provider === 'google') return 'Nhập Gemini API key trong Cài đặt trước';
     return 'Nhập API key trong Cài đặt trước';
   },
 
   getMissingApiKeyError(modelId) {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Chưa có Anthropic API key. Mở Cài đặt để nhập.';
-    if (provider === 'deepseek') return 'Chưa có DeepSeek API key. Mở Cài đặt để nhập.';
+    if (provider === 'deepseek') return 'Chưa có DeepSeek API key và chưa cấu hình proxy.';
+    if (provider === 'google') return 'Chưa có Gemini API key. Mở Cài đặt để nhập.';
     return 'Chưa có API key. Mở Cài đặt để nhập.';
   },
 
   hasApiKey(state, modelId) {
+    if (this.getModelProvider(modelId) === 'deepseek') {
+      return this.getDeepseekMode(state) !== 'none';
+    }
     return !!this.getApiKey(state, modelId);
   },
 
@@ -164,6 +186,11 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
+  GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
+
+  geminiStreamUrl(modelId) {
+    return this.GEMINI_API_BASE + '/' + modelId + ':streamGenerateContent?alt=sse';
+  },
 
   MAX_TITLE_LENGTH: 40,
   MAX_CONVERSATIONS: 100,

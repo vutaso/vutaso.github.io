@@ -1,5 +1,5 @@
 window.API = (() => {
-  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT } = window.APP_CONFIG;
+  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, DEEPSEEK_PROXY_ENDPOINT } = window.APP_CONFIG;
 
   let currentController = null;
   const isStreaming = () => currentController !== null;
@@ -61,6 +61,44 @@ window.API = (() => {
       msgs.push({ role: m.role, content: buildAnthropicMessageContent(m) });
     }
     return msgs;
+  };
+
+  const buildGeminiParts = (m) => {
+    const images = m.images || [];
+    let text = appendFilesToText(m.content || '', m.files);
+    if (m.role === 'user') {
+      text = appendTranslateInstruction(text, m);
+    }
+
+    if (m.role === 'user' && images.length > 0) {
+      const parts = [];
+      if (text.trim()) parts.push({ text });
+      for (const img of images) {
+        const parsed = parseDataUrl(img.dataUrl);
+        if (parsed) {
+          parts.push({
+            inlineData: { mimeType: parsed.media_type, data: parsed.data }
+          });
+        }
+      }
+      return parts.length ? parts : [{ text: text || '' }];
+    }
+    return [{ text: text || '' }];
+  };
+
+  const buildGeminiContents = (convo) => {
+    const contents = [];
+    const all = convo.messages || [];
+    for (let i = 0; i < all.length; i++) {
+      const m = all[i];
+      if (m.role !== 'user' && m.role !== 'assistant') continue;
+      if (i === all.length - 1 && m.role === 'assistant' && !m.content) continue;
+      contents.push({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: buildGeminiParts(m)
+      });
+    }
+    return contents;
   };
 
   const buildMessageContent = (m, format = 'chat') => {
@@ -151,6 +189,8 @@ window.API = (() => {
       const errJson = await res.json();
       if (provider === 'anthropic' && errJson.error) {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
+      } else if (provider === 'google' && errJson.error) {
+        errMsg = errJson.error.message || JSON.stringify(errJson.error);
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -234,6 +274,18 @@ window.API = (() => {
           return null;
         }
       }
+      if (json.candidates && json.candidates[0] && json.candidates[0].content) {
+        const parts = json.candidates[0].content.parts || [];
+        for (const part of parts) {
+          if (!part.text) continue;
+          if (part.thought) {
+            if (handlers.onReasoningToken) handlers.onReasoningToken(part.text);
+          } else if (handlers.onToken) {
+            handlers.onToken(part.text);
+          }
+        }
+        return null;
+      }
       const delta = json.choices && json.choices[0] && json.choices[0].delta;
       if (delta) {
         if (delta.reasoning_content) {
@@ -294,26 +346,47 @@ window.API = (() => {
     }
   };
 
+  const buildDeepseekBody = (model, systemPrompt, convo, thinking) => ({
+    model,
+    messages: buildMessages(convo, systemPrompt),
+    stream: true,
+    max_tokens: 16384,
+    thinking: { type: thinking ? 'enabled' : 'disabled' }
+  });
+
+  const sendDeepseekViaProxy = async ({ model, systemPrompt, convo, controller, handlers, thinking }) => {
+    const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
+
+    const res = await fetch(DEEPSEEK_PROXY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'deepseek');
+    if (!res.body || !res.body.getReader) {
+      throw new Error('Trình duyệt không hỗ trợ streaming response');
+    }
+
+    await readSseStream(res.body.getReader(), handlers);
+  };
+
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
-    const body = {
-      model,
-      messages: buildMessages(convo, systemPrompt),
-      stream: true
-    };
-    if (provider === 'deepseek') {
-      body.max_tokens = 16384;
-      body.thinking = { type: thinking ? 'enabled' : 'disabled' };
-    } else {
+    const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
+    if (provider !== 'deepseek') {
+      delete body.thinking;
+      delete body.max_tokens;
       body.max_completion_tokens = 16384;
       if (thinking) body.reasoning_effort = 'medium';
     }
 
+    const headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
+
     const res = await fetch(endpoint || OPENAI_ENDPOINT, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey
-      },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal
     });
@@ -363,6 +436,43 @@ window.API = (() => {
     });
 
     if (!res.ok) throw await parseApiError(res, 'anthropic');
+    if (!res.body || !res.body.getReader) {
+      throw new Error('Trình duyệt không hỗ trợ streaming response');
+    }
+
+    await readSseStream(res.body.getReader(), handlers);
+  };
+
+  const sendGemini = async ({ apiKey, model, systemPrompt, convo, thinking, controller, handlers }) => {
+    const contents = buildGeminiContents(convo);
+    if (!contents.length) {
+      throw new Error('Không có tin nhắn để gửi');
+    }
+
+    const body = {
+      contents,
+      generationConfig: { maxOutputTokens: 16384 }
+    };
+    if (systemPrompt && systemPrompt.trim()) {
+      body.systemInstruction = { parts: [{ text: systemPrompt.trim() }] };
+    }
+    if (thinking) {
+      body.generationConfig.thinkingConfig = {
+        thinkingBudget: window.APP_CONFIG.THINKING_BUDGET_TOKENS
+      };
+    }
+
+    const res = await fetch(window.APP_CONFIG.geminiStreamUrl(model), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'google');
     if (!res.body || !res.body.getReader) {
       throw new Error('Trình duyệt không hỗ trợ streaming response');
     }
@@ -428,7 +538,13 @@ window.API = (() => {
     if (currentController) {
       throw new Error('Đang có yêu cầu khác đang chạy');
     }
-    if (!apiKey) {
+
+    const provider = window.APP_CONFIG.getModelProvider(model);
+    const useDeepseekProxy = provider === 'deepseek'
+      && !apiKey
+      && window.APP_CONFIG.usesDeepseekProxy();
+
+    if (!useDeepseekProxy && !apiKey) {
       throw new Error(window.APP_CONFIG.getMissingApiKeyError(model));
     }
 
@@ -437,11 +553,14 @@ window.API = (() => {
     const handlers = { onToken, onReasoningToken, onSearchStatus, onImageStatus, onImagePartial, onImageComplete };
     const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(convo) : null;
     const tools = buildResponsesTools({ webSearch, imageGen, imageGenOptions });
-    const provider = window.APP_CONFIG.getModelProvider(model);
 
     try {
       if (provider === 'anthropic') {
         await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, controller, handlers });
+      } else if (provider === 'google') {
+        await sendGemini({ apiKey, model, systemPrompt, convo, thinking, controller, handlers });
+      } else if (provider === 'deepseek' && useDeepseekProxy) {
+        await sendDeepseekViaProxy({ model, systemPrompt, convo, controller, handlers, thinking });
       } else if (provider === 'deepseek') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
