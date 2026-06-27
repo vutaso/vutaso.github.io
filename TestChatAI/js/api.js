@@ -68,6 +68,13 @@ window.API = (() => {
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
       text = appendTranslateInstruction(text, m);
+      if (m.imageGen) {
+        text = window.APP_CONFIG.buildImageGenPrompt(text, {
+          ratioId: m.imageGen.ratio,
+          styleId: m.imageGen.style,
+          templateId: m.imageGen.template
+        });
+      }
     }
 
     if (m.role === 'user' && images.length > 0) {
@@ -158,7 +165,7 @@ window.API = (() => {
   const buildAnthropicTools = ({ webSearch }) => {
     const tools = [];
     if (webSearch) {
-      tools.push({ type: 'web_search_20250305', name: 'web_search', max_uses: 5 });
+      tools.push({ type: 'web_search_20250305', name: 'web_search' });
     }
     return tools;
   };
@@ -166,15 +173,47 @@ window.API = (() => {
   const buildResponsesTools = ({ webSearch, imageGen, imageGenOptions }) => {
     const tools = [];
     if (webSearch) {
-      tools.push({ type: 'web_search', search_context_size: 'medium' });
+      tools.push({
+        type: 'web_search',
+        search_context_size: window.APP_CONFIG.SEARCH_CONTEXT_SIZE || 'high'
+      });
     }
     if (imageGen) {
-      const tool = { type: 'image_generation', partial_images: 2 };
+      const tool = { type: 'image_generation' };
       if (imageGenOptions?.size) tool.size = imageGenOptions.size;
       if (imageGenOptions?.action) tool.action = imageGenOptions.action;
       tools.push(tool);
     }
     return tools;
+  };
+
+  const mergeGroundingMetadata = (prev, next) => {
+    if (!next) return prev;
+    if (!prev) return { ...next };
+    const merged = { ...prev, ...next };
+    if (next.groundingChunks?.length) {
+      const seen = new Set((prev.groundingChunks || []).map((c) => c.web?.uri).filter(Boolean));
+      merged.groundingChunks = [...(prev.groundingChunks || [])];
+      for (const chunk of next.groundingChunks) {
+        const uri = chunk.web?.uri;
+        if (!uri || !seen.has(uri)) {
+          merged.groundingChunks.push(chunk);
+          if (uri) seen.add(uri);
+        }
+      }
+    }
+    if (next.webSearchQueries?.length) {
+      const qs = new Set(prev.webSearchQueries || []);
+      next.webSearchQueries.forEach((q) => qs.add(q));
+      merged.webSearchQueries = [...qs];
+    }
+    return merged;
+  };
+
+  const toGeminiInlineDataUrl = (inlineData) => {
+    if (!inlineData?.data) return '';
+    const mime = inlineData.mimeType || 'image/png';
+    return 'data:' + mime + ';base64,' + inlineData.data;
   };
 
   const toImageDataUrl = (b64) => {
@@ -274,9 +313,24 @@ window.API = (() => {
           return null;
         }
       }
-      if (json.candidates && json.candidates[0] && json.candidates[0].content) {
-        const parts = json.candidates[0].content.parts || [];
+      if (json.candidates && json.candidates[0]) {
+        const candidate = json.candidates[0];
+        const queries = candidate.groundingMetadata?.webSearchQueries;
+        if (queries?.length && handlers.onSearchStatus) {
+          handlers.onSearchStatus('searching');
+        }
+        if (candidate.groundingMetadata && handlers.onGroundingMetadata) {
+          handlers.onGroundingMetadata(candidate.groundingMetadata);
+        }
+        const parts = candidate.content?.parts || [];
         for (const part of parts) {
+          if (part.inlineData?.data) {
+            const dataUrl = toGeminiInlineDataUrl(part.inlineData);
+            if (dataUrl && handlers.onImageComplete) {
+              handlers.onImageComplete({ dataUrl });
+            }
+            continue;
+          }
           if (!part.text) continue;
           if (part.thought) {
             if (handlers.onReasoningToken) handlers.onReasoningToken(part.text);
@@ -346,13 +400,18 @@ window.API = (() => {
     }
   };
 
-  const buildDeepseekBody = (model, systemPrompt, convo, thinking) => ({
-    model,
-    messages: buildMessages(convo, systemPrompt),
-    stream: true,
-    max_tokens: 16384,
-    thinking: { type: thinking ? 'enabled' : 'disabled' }
-  });
+  const buildDeepseekBody = (model, systemPrompt, convo, thinking) => {
+    const body = {
+      model,
+      messages: buildMessages(convo, systemPrompt),
+      stream: true,
+      thinking: { type: thinking ? 'enabled' : 'disabled' }
+    };
+    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
+      body.max_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    }
+    return body;
+  };
 
   const sendDeepseekViaProxy = async ({ model, systemPrompt, convo, controller, handlers, thinking }) => {
     const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
@@ -377,8 +436,10 @@ window.API = (() => {
     if (provider !== 'deepseek') {
       delete body.thinking;
       delete body.max_tokens;
-      body.max_completion_tokens = 16384;
-      if (thinking) body.reasoning_effort = 'medium';
+      if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
+        body.max_completion_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+      }
+      if (thinking) body.reasoning_effort = window.APP_CONFIG.REASONING_EFFORT || 'high';
     }
 
     const headers = { 'Content-Type': 'application/json' };
@@ -408,19 +469,18 @@ window.API = (() => {
     const body = {
       model,
       messages,
-      max_tokens: 16384,
       stream: true
     };
+    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
+      body.max_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    }
     const tools = buildAnthropicTools({ webSearch });
     if (tools.length) body.tools = tools;
     if (systemPrompt && systemPrompt.trim()) {
       body.system = systemPrompt.trim();
     }
     if (thinking) {
-      body.thinking = {
-        type: 'enabled',
-        budget_tokens: window.APP_CONFIG.THINKING_BUDGET_TOKENS
-      };
+      body.thinking = { type: 'enabled' };
     }
 
     const res = await fetch(ANTHROPIC_ENDPOINT, {
@@ -443,26 +503,41 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendGemini = async ({ apiKey, model, systemPrompt, convo, thinking, controller, handlers }) => {
+  const sendGemini = async ({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, controller, handlers }) => {
     const contents = buildGeminiContents(convo);
     if (!contents.length) {
       throw new Error('Không có tin nhắn để gửi');
     }
 
+    const requestModel = imageGen ? window.APP_CONFIG.getGeminiImageModel(model) : model;
+
     const body = {
       contents,
-      generationConfig: { maxOutputTokens: 16384 }
+      generationConfig: {}
     };
+    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
+      body.generationConfig.maxOutputTokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    }
+    if (imageGen) {
+      body.generationConfig.responseModalities = ['TEXT', 'IMAGE'];
+      const imageGenOptions = getImageGenOptionsFromConvo(convo);
+      if (imageGenOptions?.aspectRatio && window.APP_CONFIG.geminiSupportsImageAspectRatio(model)) {
+        body.generationConfig.imageConfig = { aspectRatio: imageGenOptions.aspectRatio };
+      }
+      if (handlers.onImageStatus) handlers.onImageStatus('generating');
+    } else {
+      if (webSearch) {
+        body.tools = [{ google_search: {} }];
+      }
+      if (thinking) {
+        body.generationConfig.thinkingConfig = { includeThoughts: true };
+      }
+    }
     if (systemPrompt && systemPrompt.trim()) {
       body.systemInstruction = { parts: [{ text: systemPrompt.trim() }] };
     }
-    if (thinking) {
-      body.generationConfig.thinkingConfig = {
-        thinkingBudget: window.APP_CONFIG.THINKING_BUDGET_TOKENS
-      };
-    }
 
-    const res = await fetch(window.APP_CONFIG.geminiStreamUrl(model), {
+    const res = await fetch(window.APP_CONFIG.geminiStreamUrl(requestModel), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -490,14 +565,16 @@ window.API = (() => {
       model,
       input,
       tools,
-      stream: true,
-      max_output_tokens: 16384
+      stream: true
     };
+    if (window.APP_CONFIG.API_MAX_OUTPUT_TOKENS) {
+      body.max_output_tokens = window.APP_CONFIG.API_MAX_OUTPUT_TOKENS;
+    }
     if (systemPrompt && systemPrompt.trim()) {
       body.instructions = systemPrompt;
     }
     if (thinking) {
-      body.reasoning = { effort: 'medium' };
+      body.reasoning = { effort: window.APP_CONFIG.REASONING_EFFORT || 'high' };
     }
 
     const res = await fetch(RESPONSES_ENDPOINT, {
@@ -526,6 +603,7 @@ window.API = (() => {
     const hasRef = !!(last.images && last.images.length);
     return {
       size: ratio.size,
+      aspectRatio: ratio.id,
       action: hasRef ? 'edit' : 'auto'
     };
   };
@@ -533,7 +611,7 @@ window.API = (() => {
   const send = async ({
     apiKey, model, systemPrompt, convo,
     webSearch, imageGen, thinking,
-    onToken, onReasoningToken, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete
+    onToken, onReasoningToken, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
     if (currentController) {
       throw new Error('Đang có yêu cầu khác đang chạy');
@@ -550,7 +628,19 @@ window.API = (() => {
 
     const controller = new AbortController();
     currentController = controller;
-    const handlers = { onToken, onReasoningToken, onSearchStatus, onImageStatus, onImagePartial, onImageComplete };
+    let groundingMeta = null;
+    const handlers = {
+      onToken,
+      onReasoningToken,
+      onSearchStatus,
+      onImageStatus,
+      onImagePartial,
+      onImageComplete,
+      onGroundingMetadata: (meta) => {
+        groundingMeta = mergeGroundingMetadata(groundingMeta, meta);
+        if (onGroundingMetadata) onGroundingMetadata(groundingMeta);
+      }
+    };
     const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(convo) : null;
     const tools = buildResponsesTools({ webSearch, imageGen, imageGenOptions });
 
@@ -558,7 +648,7 @@ window.API = (() => {
       if (provider === 'anthropic') {
         await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, controller, handlers });
       } else if (provider === 'google') {
-        await sendGemini({ apiKey, model, systemPrompt, convo, thinking, controller, handlers });
+        await sendGemini({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, controller, handlers });
       } else if (provider === 'deepseek' && useDeepseekProxy) {
         await sendDeepseekViaProxy({ model, systemPrompt, convo, controller, handlers, thinking });
       } else if (provider === 'deepseek') {
@@ -566,7 +656,7 @@ window.API = (() => {
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking
         });
-      } else if (tools.length) {
+      } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, controller, handlers });
       } else {
         await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking });

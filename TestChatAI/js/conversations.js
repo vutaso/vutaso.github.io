@@ -1,8 +1,6 @@
 window.Conversations = (() => {
-  const { uuid, truncate } = window.Utils;
+  const { uuid } = window.Utils;
   const { get, set } = window.Storage;
-  const MAX = window.APP_CONFIG.MAX_CONVERSATIONS;
-  const MAX_TITLE = window.APP_CONFIG.MAX_TITLE_LENGTH;
 
   const getAll = () => get().conversations || [];
 
@@ -21,7 +19,7 @@ window.Conversations = (() => {
       updatedAt: Date.now(),
       messages: []
     };
-    const all = [convo, ...getAll()].slice(0, MAX);
+    const all = [convo, ...getAll()];
     set({ conversations: all, currentConversationId: convo.id });
     return convo;
   };
@@ -60,7 +58,8 @@ window.Conversations = (() => {
   };
 
   const updateTitleFromFirst = (convo, firstUserText) => {
-    convo.title = truncate(firstUserText, MAX_TITLE);
+    const text = (firstUserText || '').trim();
+    if (text) convo.title = text;
   };
 
   const addMessage = (convo, message) => {
@@ -151,6 +150,11 @@ window.Conversations = (() => {
       msg.reasoningContent = extra.reasoningContent;
     } else {
       delete msg.reasoningContent;
+    }
+    if (extra.groundingMetadata) {
+      msg.groundingMetadata = extra.groundingMetadata;
+    } else {
+      delete msg.groundingMetadata;
     }
     saveConvo(convo);
   };

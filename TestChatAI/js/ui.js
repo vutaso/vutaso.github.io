@@ -405,9 +405,36 @@ window.UI = (() => {
       + '</details>';
   };
 
+  const groundingHTML = (meta) => {
+    if (!meta) return '';
+    const chunks = (meta.groundingChunks || []).filter((c) => c.web?.uri);
+    const queries = meta.webSearchQueries || [];
+    if (!chunks.length && !queries.length) return '';
+    let html = '<details class="message-grounding"><summary><i class="fa-solid fa-globe" aria-hidden="true"></i> Nguồn tham khảo';
+    if (queries.length) {
+      html += '<span class="message-grounding-queries">' + escapeHTML(queries.join(', ')) + '</span>';
+    }
+    html += '</summary>';
+    if (chunks.length) {
+      html += '<ul class="message-grounding-sources">';
+      chunks.forEach((chunk) => {
+        const uri = chunk.web.uri;
+        const title = chunk.web.title || uri;
+        html += '<li><a href="' + escapeHTML(uri) + '" target="_blank" rel="noopener noreferrer">'
+          + escapeHTML(title) + '</a></li>';
+      });
+      html += '</ul>';
+    }
+    html += '</details>';
+    return html;
+  };
+
   const assistantContentHTML = (m) => {
     const text = window.Conversations.getAssistantContent(m);
-    return reasoningHTML(m.reasoningContent) + window.Markdown.render(text) + generatedImagesHTML(m.generatedImages);
+    return reasoningHTML(m.reasoningContent)
+      + groundingHTML(m.groundingMetadata)
+      + window.Markdown.render(text)
+      + generatedImagesHTML(m.generatedImages);
   };
 
   const initModelSelect = (currentModel) => {
@@ -624,24 +651,30 @@ window.UI = (() => {
   let _streamingCodeScrollTarget = 0;
 
   let _latestReasoning = '';
+  let _latestGrounding = null;
   let _reasoningOpen = false;
 
-  const renderStreamingAssistantHTML = (text, images, reasoning, { reasoningOpen = false } = {}) => {
+  const renderStreamingAssistantHTML = (text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
     return reasoningHTML(reasoning, { open: reasoningOpen })
+      + groundingHTML(groundingMetadata)
       + window.Markdown.render(text || '') + generatedImagesHTML(images);
   };
 
-  const updateStreamingAssistantContent = (contentEl, text, images, reasoning, { reasoningOpen = false } = {}) => {
+  const updateStreamingAssistantContent = (contentEl, text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
     _latestCE = contentEl;
     _latestText = text;
     _latestImages = images;
     _latestReasoning = reasoning || '';
+    _latestGrounding = groundingMetadata;
     _reasoningOpen = reasoningOpen;
     if (streamThrottle) return;
     streamThrottle = requestAnimationFrame(() => {
       if (_latestCE) {
         _latestCE.innerHTML = renderStreamingAssistantHTML(
-          _latestText, _latestImages, _latestReasoning, { reasoningOpen: _reasoningOpen }
+          _latestText, _latestImages, _latestReasoning, {
+            reasoningOpen: _reasoningOpen,
+            groundingMetadata: _latestGrounding
+          }
         );
         polishContent(_latestCE, { streaming: true });
         scrollStreamingCodeToEnd(_latestCE, _latestText);
@@ -653,7 +686,10 @@ window.UI = (() => {
 
   const updateStreamingContent = (contentEl, text) => {
     updateStreamingAssistantContent(
-      contentEl, text, _latestImages, _latestReasoning, { reasoningOpen: _reasoningOpen }
+      contentEl, text, _latestImages, _latestReasoning, {
+        reasoningOpen: _reasoningOpen,
+        groundingMetadata: _latestGrounding
+      }
     );
   };
 
@@ -662,13 +698,17 @@ window.UI = (() => {
     _latestImages = null;
     _latestText = '';
     _latestReasoning = '';
+    _latestGrounding = null;
     _reasoningOpen = false;
     _latestCE = null;
     article.classList.remove('streaming');
     const content = article.querySelector('.content');
     if (content) {
       content.innerHTML = renderStreamingAssistantHTML(
-        text, message?.generatedImages, message?.reasoningContent, { reasoningOpen: false }
+        text, message?.generatedImages, message?.reasoningContent, {
+          reasoningOpen: false,
+          groundingMetadata: message?.groundingMetadata
+        }
       );
       polishContent(content, { renderMermaid: true });
     }

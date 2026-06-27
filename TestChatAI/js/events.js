@@ -1,7 +1,7 @@
 window.Events = (() => {
   const { copyToClipboard, copyImageToClipboard, downloadDataUrlImage, autoResize, escapeHTML, debounce, readFileAsDataUrl } = window.Utils;
   const { send: apiSend, abort: apiAbort } = window.API;
-  const { MAX_IMAGES_PER_MESSAGE, MAX_IMAGE_SIZE_MB, ACCEPTED_IMAGE_TYPES, MAX_FILES_PER_MESSAGE, MAX_FILE_SIZE_MB } = window.APP_CONFIG;
+  const { ACCEPTED_IMAGE_TYPES } = window.APP_CONFIG;
   const fileMod = window.Files;
   const state = window.Storage;
   const convoMod = window.Conversations;
@@ -201,12 +201,6 @@ window.Events = (() => {
 
   const addPendingImages = async (files) => {
     if (!files || !files.length) return;
-    const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
-    const remaining = MAX_IMAGES_PER_MESSAGE - pendingImages.length;
-    if (remaining <= 0) {
-      ui.showToast('Tối đa ' + MAX_IMAGES_PER_MESSAGE + ' ảnh mỗi tin nhắn');
-      return;
-    }
 
     const imageFiles = Array.from(files).filter(f => ACCEPTED_IMAGE_TYPES.includes(f.type));
     if (!imageFiles.length) {
@@ -215,11 +209,7 @@ window.Events = (() => {
     }
 
     let added = 0;
-    for (const file of imageFiles.slice(0, remaining)) {
-      if (file.size > maxBytes) {
-        ui.showToast('Ảnh "' + file.name + '" vượt quá ' + MAX_IMAGE_SIZE_MB + 'MB');
-        continue;
-      }
+    for (const file of imageFiles) {
       try {
         const dataUrl = await readFileAsDataUrl(file);
         pendingImages.push({ dataUrl, name: file.name, mime: file.type });
@@ -227,10 +217,6 @@ window.Events = (() => {
       } catch {
         ui.showToast('Không đọc được ảnh "' + file.name + '"');
       }
-    }
-
-    if (imageFiles.length > remaining) {
-      ui.showToast('Chỉ thêm được ' + remaining + ' ảnh nữa');
     }
 
     if (added > 0) {
@@ -241,12 +227,6 @@ window.Events = (() => {
 
   const addPendingDocuments = async (files) => {
     if (!files || !files.length) return;
-    const maxBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
-    const remaining = MAX_FILES_PER_MESSAGE - pendingFiles.length;
-    if (remaining <= 0) {
-      ui.showToast('Tối đa ' + MAX_FILES_PER_MESSAGE + ' tệp mỗi tin nhắn');
-      return;
-    }
 
     const docFiles = Array.from(files).filter((f) => fileMod.getKind(f) === 'document');
     if (!docFiles.length) {
@@ -255,11 +235,7 @@ window.Events = (() => {
     }
 
     let added = 0;
-    for (const file of docFiles.slice(0, remaining)) {
-      if (file.size > maxBytes) {
-        ui.showToast('Tệp "' + file.name + '" vượt quá ' + MAX_FILE_SIZE_MB + 'MB');
-        continue;
-      }
+    for (const file of docFiles) {
       try {
         ui.showToast('Đang đọc "' + file.name + '"...');
         const content = await fileMod.extractContent(file);
@@ -273,10 +249,6 @@ window.Events = (() => {
       } catch (err) {
         ui.showToast('Không đọc được "' + file.name + '": ' + (err.message || err));
       }
-    }
-
-    if (docFiles.length > remaining) {
-      ui.showToast('Chỉ thêm được ' + remaining + ' tệp nữa');
     }
 
     if (added > 0) {
@@ -346,11 +318,12 @@ window.Events = (() => {
     let buffer = '';
     let reasoningBuffer = '';
     let generatedImages = [];
+    let groundingMetadata = null;
     ui.setStreaming(true);
     ui.removeError();
     ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
 
-    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, retryIdx };
+    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, groundingMetadata, retryIdx };
 
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const users = convo.messages.filter((m) => m.role === 'user');
@@ -371,7 +344,7 @@ window.Events = (() => {
     const refreshStreamingContent = () => {
       const reasoningOpen = !!reasoningBuffer && !buffer;
       ui.updateStreamingAssistantContent(
-        content, buffer, generatedImages, reasoningBuffer, { reasoningOpen }
+        content, buffer, generatedImages, reasoningBuffer, { reasoningOpen, groundingMetadata }
       );
     };
 
@@ -394,6 +367,7 @@ window.Events = (() => {
       const extra = {};
       if (generatedImages.length) extra.generatedImages = generatedImages.slice();
       if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
+      if (groundingMetadata) extra.groundingMetadata = groundingMetadata;
       if (retryIdx !== undefined) {
         convoMod.finalizeAssistantMessage(convo, messageIndex, text, extra);
       } else {
@@ -458,6 +432,11 @@ window.Events = (() => {
       onReasoningToken: (delta) => {
         reasoningBuffer += delta;
         if (streamingContext) streamingContext.reasoningBuffer = reasoningBuffer;
+        refreshStreamingContent();
+      },
+      onGroundingMetadata: (meta) => {
+        groundingMetadata = meta;
+        if (streamingContext) streamingContext.groundingMetadata = meta;
         refreshStreamingContent();
       },
       onDone: (info) => {
@@ -891,11 +870,6 @@ window.Events = (() => {
       if (!file) return;
       if (!window.APP_CONFIG.ACCEPTED_IMAGE_TYPES.includes(file.type)) {
         ui.showToast('Chỉ hỗ trợ JPEG, PNG, GIF, WebP');
-        return;
-      }
-      const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
-      if (file.size > maxBytes) {
-        ui.showToast('Ảnh vượt quá ' + MAX_IMAGE_SIZE_MB + 'MB');
         return;
       }
       try {

@@ -1,6 +1,6 @@
 # VUTASO AI — Danh sách tính năng
 
-Ứng dụng chat AI chạy trên trình duyệt, kết nối trực tiếp với OpenAI API. Dữ liệu được lưu cục bộ trên máy người dùng.
+Ứng dụng chat AI chạy trên trình duyệt, hỗ trợ nhiều nhà cung cấp (OpenAI, Anthropic, DeepSeek, Google Gemini). Dữ liệu được lưu cục bộ trên máy người dùng.
 
 ---
 
@@ -8,7 +8,8 @@
 
 | Tính năng | Mô tả |
 |-----------|--------|
-| **Trò chuyện với AI** | Gửi tin nhắn văn bản và nhận phản hồi từ model `gpt-5.4-nano` qua OpenAI Chat Completions API |
+| **Trò chuyện với AI** | Gửi tin nhắn văn bản và nhận phản hồi streaming từ model đang chọn |
+| **Chọn model** | Dropdown trên header với 12 model từ 4 nhà cung cấp (mặc định: `gemini-3.5-flash`) |
 | **Streaming** | Hiển thị câu trả lời theo thời gian thực (token-by-token) |
 | **Dừng phản hồi** | Nút Stop để hủy yêu cầu đang chạy; nội dung đã nhận được vẫn được giữ lại |
 | **System Prompt** | Tùy chỉnh hướng dẫn hệ thống cho AI (mặc định: trợ lý tiếng Việt, trả lời có cấu trúc) |
@@ -20,41 +21,77 @@
 | **Xóa tin nhắn** | Xóa một tin nhắn user và toàn bộ tin nhắn phía sau |
 | **Reply theo đoạn chọn** | Bôi đen văn bản trong tin nhắn → tooltip Reply → chèn trích dẫn dạng blockquote vào ô nhập |
 
+### Model hỗ trợ
+
+| Nhà cung cấp | Model | Web search | Tạo ảnh | Thinking |
+|--------------|-------|:----------:|:-------:|:--------:|
+| **OpenAI** | GPT-5.4 nano, GPT-5.4 mini, GPT-5.4, GPT-5.5 | ✓ | ✓ | ✓ |
+| **Anthropic** | Claude Haiku 4.5, Claude Sonnet 4.6, Claude Opus 4.8 | ✓ | — | ✓ |
+| **DeepSeek** | DeepSeek V4 Flash, DeepSeek V4 Pro | — | — | ✓ |
+| **Google** | Gemini 2.5 Flash Lite, Gemini 2.5 Flash, Gemini 3.5 Flash | ✓ | ✓ | ✓ |
+
 ---
 
-## 2. Quản lý hội thoại
+## 2. Công cụ Composer
+
+Thanh công cụ phía trên ô nhập tin nhắn; tự ẩn/hiện tùy model đang chọn.
+
+| Tính năng | Mô tả | Model hỗ trợ |
+|-----------|--------|--------------|
+| **Thinking** | Bật chế độ suy nghĩ (reasoning); hiển thị nội dung reasoning trong khối `<details>` có thể mở/đóng | Tất cả model |
+| **Tìm kiếm web** | AI tra cứu thông tin trên web khi trả lời | OpenAI, Anthropic, Google Gemini |
+| **Tạo hình ảnh** | Sinh ảnh từ mô tả văn bản | OpenAI (Responses API), Google Gemini (tự chuyển sang model image: `gemini-2.5-flash-image`, `gemini-3.1-flash-image`) |
+| **Dịch** | Dịch văn bản sang ngôn ngữ đích; chỉ trả về bản dịch | Tất cả model |
+
+### Tạo hình ảnh — tuỳ chọn
+
+| Tuỳ chọn | Giá trị |
+|----------|---------|
+| **Tỷ lệ** | 1:1, 2:3, 3:4, 4:3, 9:16, 16:9 |
+| **Phong cách** | Tự động, Ảnh thật, Minh họa, Anime, Tranh sơn dầu, Pixel art |
+| **Mẫu** | Không dùng mẫu, Chân dung, Sản phẩm, Logo, Nền trừu tượng, Tối giản |
+| **Ảnh tham chiếu** | Đính kèm ảnh để chỉnh sửa/biến tấu (edit mode) |
+
+> Khi bật **Tạo hình ảnh**, đính kèm ảnh/tài liệu thường bị tắt. **Dịch** và **Tạo hình ảnh** loại trừ lẫn nhau.
+
+### Dịch — ngôn ngữ đích
+
+English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, Español, Español (España), Filipino, Français, Bahasa Indonesia, Italiano, Bahasa Melayu.
+
+---
+
+## 3. Quản lý hội thoại
 
 | Tính năng | Mô tả |
 |-----------|--------|
 | **Cuộc trò chuyện mới** | Tạo hội thoại mới từ sidebar |
-| **Lịch sử hội thoại** | Danh sách tối đa 100 cuộc trò chuyện, sắp xếp theo thời gian cập nhật |
+| **Lịch sử hội thoại** | Danh sách cuộc trò chuyện, sắp xếp theo thời gian cập nhật |
 | **Chuyển hội thoại** | Click vào mục trong sidebar để mở |
-| **Đặt tên tự động** | Tiêu đề hội thoại lấy từ tin nhắn user đầu tiên (tối đa 40 ký tự) |
+| **Đặt tên tự động** | Tiêu đề hội thoại lấy từ tin nhắn user đầu tiên |
 | **Đổi tên** | Đổi tên hiển thị qua modal |
 | **Xóa hội thoại** | Xóa từng cuộc hoặc xóa tất cả (sidebar / Cài đặt) |
 | **Lưu trữ cục bộ** | Toàn bộ hội thoại lưu trong `localStorage` |
 
 ---
 
-## 3. Đính kèm file & ảnh
+## 4. Đính kèm file & ảnh
 
 | Tính năng | Mô tả |
 |-----------|--------|
-| **Chọn ảnh** | Nút đính kèm ảnh hoặc file picker (tối đa 5 ảnh/tin, 5MB/ảnh) |
-| **Chọn tài liệu** | Nút đính kèm tài liệu (tối đa 5 file/tin, 10MB/file) |
+| **Chọn ảnh** | Nút đính kèm ảnh hoặc file picker (JPEG, PNG, GIF, WebP) |
+| **Chọn tài liệu** | Nút đính kèm tài liệu văn bản |
 | **Kéo thả** | Kéo thả ảnh/tài liệu vào vùng app (overlay hướng dẫn) |
 | **Dán ảnh từ clipboard** | Ctrl/Cmd+V ảnh trực tiếp vào ô nhập |
 | **Xem trước đính kèm** | Thumbnail ảnh và chip tên file trước khi gửi |
 | **Xóa đính kèm** | Gỡ từng ảnh/file trước khi gửi |
-| **Đọc PDF** | Trích xuất text từ PDF (tối đa 50 trang) bằng PDF.js |
+| **Đọc PDF** | Trích xuất toàn bộ text từ PDF bằng PDF.js |
 | **Đọc DOCX** | Trích xuất text từ Word bằng Mammoth |
-| **Giới hạn nội dung** | Nội dung file text cắt ở 80.000 ký tự |
 
 **Định dạng tài liệu hỗ trợ:** `.txt`, `.md`, `.csv`, `.json`, `.xml`, `.html`, `.css`, `.js`, `.ts`, `.py`, `.java`, `.c`, `.cpp`, `.yaml`, `.log`, `.rtf`, `.pdf`, `.docx` và các file `text/*`.
 
 ---
 
-## 4. Hiển thị Markdown
+## 5. Hiển thị Markdown
 
 | Tính năng | Mô tả |
 |-----------|--------|
@@ -68,10 +105,13 @@
 | **Sao chép bảng** | Sao chép bảng dưới dạng Markdown |
 | **Preview Markdown** | Panel bên phải xem trước nội dung trong code block `markdown`/`md` |
 | **Theme Mermaid** | Sơ đồ Mermaid đổi theme theo Dark/Light |
+| **Reasoning** | Khối suy nghĩ (thinking) có thể thu gọn/mở rộng trên tin nhắn assistant |
+| **Nguồn web (Gemini)** | Hiển thị liên kết nguồn khi dùng Google Search grounding |
+| **Ảnh AI sinh ra** | Hiển thị ảnh được tạo bởi model trong phản hồi |
 
 ---
 
-## 5. Xuất & sao chép
+## 6. Xuất & sao chép
 
 | Tính năng | Mô tả |
 |-----------|--------|
@@ -79,11 +119,12 @@
 | **Sao chép Markdown** | Copy toàn bộ hội thoại dạng Markdown vào clipboard |
 | **Xuất PDF** | Xuất hội thoại ra PDF (hỗ trợ cả tin đang stream) |
 | **PDF có định dạng** | Tự chọn chế độ raster (html2canvas) khi có code/bảng/toán/ảnh, hoặc text thuần (jsPDF + Noto Sans) |
+| **Xuất Word (.docx)** | Xuất hội thoại ra file `.docx` với định dạng Markdown (tiêu đề, code block, bảng, ảnh đính kèm) |
 | **Sao chép tin nhắn** | Copy nội dung từng tin nhắn (user/assistant) |
 
 ---
 
-## 6. Giao diện & trải nghiệm
+## 7. Giao diện & trải nghiệm
 
 | Tính năng | Mô tả |
 |-----------|--------|
@@ -91,6 +132,7 @@
 | **Sidebar** | Panel lịch sử hội thoại, thu gọn/mở rộng |
 | **Responsive mobile** | Sidebar overlay trên màn hình ≤768px |
 | **Composer tự co giãn** | Textarea tự điều chỉnh chiều cao theo nội dung |
+| **Placeholder động** | Ô nhập đổi gợi ý khi bật Tạo hình ảnh hoặc Dịch |
 | **Enter gửi / Shift+Enter xuống dòng** | Phím tắt nhập liệu quen thuộc |
 | **Toast thông báo** | Phản hồi ngắn cho các thao tác (lưu, sao chép, lỗi...) |
 | **Banner lỗi API** | Hiển thị lỗi kết nối/API phía trên composer |
@@ -101,21 +143,24 @@
 
 ---
 
-## 7. Cài đặt
+## 8. Cài đặt
 
 | Tính năng | Mô tả |
 |-----------|--------|
-| **API Key OpenAI** | Nhập và lưu key (ẩn/hiện bằng nút mắt) |
+| **API Key (OpenAI)** | Dùng cho model GPT; ẩn/hiện bằng nút mắt |
+| **API Key (Anthropic)** | Dùng cho model Claude |
+| **API Key (DeepSeek)** | Tuỳ chọn — để trống sẽ dùng proxy server (nếu đã cấu hình) |
+| **API Key (Gemini)** | Dùng cho model Google Gemini |
 | **System Prompt** | Chỉnh prompt hệ thống tùy ý |
 | **Theme** | Chọn Dark hoặc Light trong modal |
 | **Xóa tất cả hội thoại** | Nút trong Cài đặt (có xác nhận) |
-| **Tự mở Cài đặt** | Hiện modal khi chưa có API key |
+| **Tự mở Cài đặt** | Hiện modal khi chưa có API key cho model đang chọn |
 
-> API key chỉ lưu trong `localStorage` trên máy bạn và chỉ gửi tới OpenAI khi chat.
+> API key chỉ lưu trong `localStorage` trên máy bạn và chỉ gửi tới nhà cung cấp tương ứng khi chat. **Không** hardcode key trong mã nguồn.
 
 ---
 
-## 8. Phím tắt
+## 9. Phím tắt
 
 | Phím | Hành động |
 |------|-----------|
@@ -126,42 +171,52 @@
 
 ---
 
-## 9. Kiến trúc kỹ thuật
+## 10. Kiến trúc kỹ thuật
 
 - **Frontend thuần:** HTML, CSS, JavaScript (không framework, không build step)
-- **API:** OpenAI Chat Completions (`stream: true`, `max_completion_tokens: 16384`)
+- **API đa nhà cung cấp:**
+  - OpenAI: Chat Completions + Responses API (web search, image gen, thinking)
+  - Anthropic: Messages API (web search, thinking)
+  - DeepSeek: Chat Completions (thinking) — trực tiếp hoặc qua proxy
+  - Google: Gemini `streamGenerateContent` (web search, image gen, thinking)
+- **DeepSeek proxy:** Cloudflare Worker (`worker/`) giữ API key phía server, CORS whitelist
 - **Lưu trữ:** `localStorage` (key: `testchatai`)
-- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, jsPDF, html2canvas, PDF.js, Mammoth
+- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, jsPDF, html2canvas, PDF.js, Mammoth, docx
+- **Tuỳ chỉnh API** (`config.js`): `API_MAX_OUTPUT_TOKENS` (65536), `REASONING_EFFORT` (`high`), `SEARCH_CONTEXT_SIZE` (`high`)
 
-### Giới hạn cấu hình
+### DeepSeek proxy (Cloudflare Worker)
 
-| Tham số | Giá trị |
-|---------|---------|
-| Số hội thoại tối đa | 100 |
-| Độ dài tiêu đề | 40 ký tự |
-| Ảnh / tin nhắn | 5 (≤ 5 MB/ảnh) |
-| File / tin nhắn | 5 (≤ 10 MB/file) |
-| Nội dung file gửi API | ≤ 80.000 ký tự |
-| Trang PDF đọc | ≤ 50 trang |
+```
+TestChatAI/worker/
+├── src/index.js       # Proxy POST → api.deepseek.com
+├── wrangler.toml      # Cấu hình worker & ALLOWED_ORIGINS
+├── .dev.vars.example  # Mẫu biến môi trường local
+└── package.json
+```
+
+1. `cd TestChatAI/worker && npx wrangler secret put DEEPSEEK_API_KEY`
+2. `npx wrangler deploy`
+3. Điền URL `workers.dev` vào `DEEPSEEK_PROXY_ENDPOINT` trong `js/config.js`
 
 ---
 
-## 10. Cấu trúc mã nguồn
+## 11. Cấu trúc mã nguồn
 
 ```
 TestChatAI/
 ├── index.html          # Giao diện chính
 ├── css/                # Reset, biến, layout, sidebar, chat, composer, modal, responsive
 ├── js/
-│   ├── config.js       # Cấu hình app & giới hạn
+│   ├── config.js       # Model, endpoint, cấu hình proxy
 │   ├── storage.js      # localStorage
 │   ├── conversations.js# CRUD hội thoại & tin nhắn
-│   ├── api.js          # OpenAI streaming API
+│   ├── api.js          # Streaming API đa nhà cung cấp
 │   ├── files.js        # Xử lý đọc file/ảnh
 │   ├── markdown.js     # Render MD, KaTeX, Mermaid
 │   ├── ui.js           # DOM & render giao diện
 │   ├── events.js       # Sự kiện & luồng tương tác
-│   ├── utils.js        # Tiện ích, xuất PDF
+│   ├── utils.js        # Tiện ích, xuất PDF/DOCX
 │   └── main.js         # Khởi tạo app
+├── worker/             # Cloudflare Worker proxy DeepSeek
 └── assets/             # Favicon
 ```

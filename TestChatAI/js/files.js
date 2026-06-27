@@ -1,6 +1,5 @@
 window.Files = (() => {
   const { ACCEPTED_IMAGE_TYPES, ACCEPTED_FILE_EXTENSIONS } = window.APP_CONFIG;
-  const MAX_FILE_CONTENT_CHARS = window.APP_CONFIG.MAX_FILE_CONTENT_CHARS || 80000;
 
   const getExtension = (name) => {
     const idx = name.lastIndexOf('.');
@@ -38,15 +37,10 @@ window.Files = (() => {
     const data = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data }).promise;
     const chunks = [];
-    const maxPages = 50;
-    const pages = Math.min(pdf.numPages, maxPages);
-    for (let i = 1; i <= pages; i++) {
+    for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const tc = await page.getTextContent();
       chunks.push(tc.items.map((x) => x.str).join(' '));
-    }
-    if (pdf.numPages > maxPages) {
-      chunks.push('\n\n[... nội dung bị cắt sau ' + maxPages + ' trang ...]');
     }
     return chunks.join('\n\n');
   };
@@ -56,11 +50,6 @@ window.Files = (() => {
     const buf = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: buf });
     return result.value;
-  };
-
-  const truncateContent = (text) => {
-    if (text.length <= MAX_FILE_CONTENT_CHARS) return text;
-    return text.slice(0, MAX_FILE_CONTENT_CHARS) + '\n\n[... nội dung bị cắt ...]';
   };
 
   const extractContent = async (file) => {
@@ -78,7 +67,7 @@ window.Files = (() => {
     }
     text = String(text || '').trim();
     if (!text) throw new Error('File không có nội dung đọc được');
-    return truncateContent(text);
+    return text;
   };
 
   const formatSize = (bytes) => {

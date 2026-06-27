@@ -11,12 +11,17 @@ window.APP_CONFIG = {
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
-    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: false, imageGen: false, thinking: true },
-    { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: false, imageGen: false, thinking: true },
-    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: false, imageGen: false, thinking: true }
+    { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true }
   ],
 
   DEFAULT_MODEL: 'gemini-3.5-flash',
+
+  // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
+  API_MAX_OUTPUT_TOKENS: 65536,
+  REASONING_EFFORT: 'high',
+  SEARCH_CONTEXT_SIZE: 'high',
 
   // Sau khi deploy Cloudflare Worker, điền URL workers.dev vào đây (xem worker/wrangler.toml).
   DEEPSEEK_PROXY_ENDPOINT: '',
@@ -92,8 +97,6 @@ window.APP_CONFIG = {
       || this.modelSupportsThinking(modelId)
       || true;
   },
-
-  THINKING_BUDGET_TOKENS: 10000,
 
   TRANSLATE_LANGUAGES: [
     { code: 'en', label: 'English' },
@@ -192,16 +195,24 @@ window.APP_CONFIG = {
     return this.GEMINI_API_BASE + '/' + modelId + ':streamGenerateContent?alt=sse';
   },
 
-  MAX_TITLE_LENGTH: 40,
-  MAX_CONVERSATIONS: 100,
+  // Model chat → model tạo ảnh (Nano Banana) khi bật Tạo hình ảnh
+  GEMINI_IMAGE_MODEL_MAP: {
+    'gemini-2.5-flash-lite': 'gemini-2.5-flash-image',
+    'gemini-2.5-flash': 'gemini-2.5-flash-image',
+    'gemini-3.5-flash': 'gemini-3.1-flash-image'
+  },
 
-  MAX_IMAGES_PER_MESSAGE: 5,
-  MAX_IMAGE_SIZE_MB: 5,
+  getGeminiImageModel(modelId) {
+    return this.GEMINI_IMAGE_MODEL_MAP[modelId] || 'gemini-2.5-flash-image';
+  },
+
+  geminiSupportsImageAspectRatio(modelId) {
+    const imageModel = this.getGeminiImageModel(modelId);
+    return new Set(['gemini-2.5-flash-image', 'gemini-3.1-flash-image']).has(imageModel);
+  },
+
   ACCEPTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
 
-  MAX_FILES_PER_MESSAGE: 5,
-  MAX_FILE_SIZE_MB: 10,
-  MAX_FILE_CONTENT_CHARS: 80000,
   ACCEPTED_FILE_EXTENSIONS: [
     '.txt', '.md', '.markdown', '.csv', '.json', '.xml', '.html', '.htm',
     '.css', '.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.c', '.cpp', '.h',

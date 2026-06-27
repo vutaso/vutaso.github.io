@@ -1,5 +1,4 @@
 const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions';
-const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const ALLOWED_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
 
 const DEFAULT_ORIGINS = [
@@ -62,11 +61,6 @@ export default {
     const apiKey = env.DEEPSEEK_API_KEY;
     if (!apiKey) {
       return jsonError('Proxy not configured', 503, origin, env);
-    }
-
-    const contentLength = Number(request.headers.get('Content-Length') || 0);
-    if (contentLength > MAX_BODY_BYTES) {
-      return jsonError('Request too large', 413, origin, env);
     }
 
     let body;
