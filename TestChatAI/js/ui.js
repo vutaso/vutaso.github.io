@@ -181,7 +181,7 @@ window.UI = (() => {
       els.translateLangLabel.textContent = window.APP_CONFIG.getTranslateLabel(langCode);
     }
     if (els.composerInput) {
-      els.composerInput.placeholder = 'Nhắn tin cho VUTASO AI...';
+      els.composerInput.placeholder = 'Nhập nội dung...';
     }
     if (els.translateLangOptions) {
       els.translateLangOptions.querySelectorAll('.translate-lang-option').forEach((btn) => {
@@ -200,7 +200,7 @@ window.UI = (() => {
     } else if (translateEnabled) {
       els.composerInput.placeholder = 'Nhập văn bản';
     } else {
-      els.composerInput.placeholder = 'Nhắn tin cho VUTASO AI...';
+      els.composerInput.placeholder = 'Nhập nội dung...';
     }
   };
 
