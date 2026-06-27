@@ -52,6 +52,13 @@ window.Conversations = (() => {
     set({ conversations: all });
   };
 
+  const messagePreviewText = (message) => {
+    if (message.content && message.content.trim()) return message.content;
+    if (message.files && message.files.length) return message.files[0].name;
+    if (message.images && message.images.length) return 'Hình ảnh';
+    return '';
+  };
+
   const updateTitleFromFirst = (convo, firstUserText) => {
     convo.title = truncate(firstUserText, MAX_TITLE);
   };
@@ -60,19 +67,83 @@ window.Conversations = (() => {
     convo.messages.push(message);
     convo.updatedAt = Date.now();
     if (convo.messages.length === 1 && message.role === 'user') {
-      updateTitleFromFirst(convo, message.content);
+      updateTitleFromFirst(convo, messagePreviewText(message));
     }
     const all = getAll().map(c => c.id === convo.id ? convo : c);
     set({ conversations: all });
   };
 
-  const updateLastMessage = (convo, patch) => {
-    if (!convo.messages.length) return;
-    const last = convo.messages[convo.messages.length - 1];
-    Object.assign(last, patch);
+  const saveConvo = (convo) => {
     convo.updatedAt = Date.now();
     const all = getAll().map(c => c.id === convo.id ? convo : c);
     set({ conversations: all });
+  };
+
+  const getAssistantContent = (message) => {
+    if (!message || message.role !== 'assistant') return '';
+    if (message.variants && message.variants.length) {
+      const i = message.variantIndex ?? 0;
+      return message.variants[i] ?? message.variants[0] ?? '';
+    }
+    return message.content || '';
+  };
+
+  const initAssistantVariants = (message) => {
+    if (!message || message.role !== 'assistant') return;
+    if (!message.variants) {
+      message.variants = [message.content || ''];
+      message.variantIndex = 0;
+    }
+  };
+
+  const updateMessage = (convo, messageIndex, patch) => {
+    const msg = convo.messages[messageIndex];
+    if (!msg) return;
+    Object.assign(msg, patch);
+    saveConvo(convo);
+  };
+
+  const prepareRetry = (convo, messageIndex) => {
+    const msg = convo.messages[messageIndex];
+    if (!msg || msg.role !== 'assistant') return null;
+    convo.messages = convo.messages.slice(0, messageIndex + 1);
+    initAssistantVariants(msg);
+    msg.variants.push('');
+    msg.variantIndex = msg.variants.length - 1;
+    msg.content = '';
+    saveConvo(convo);
+    return msg;
+  };
+
+  const setAssistantVariant = (convo, messageIndex, variantIndex) => {
+    const msg = convo.messages[messageIndex];
+    if (!msg || msg.role !== 'assistant') return;
+    initAssistantVariants(msg);
+    const next = Math.max(0, Math.min(variantIndex, msg.variants.length - 1));
+    msg.variantIndex = next;
+    msg.content = msg.variants[next] || '';
+    saveConvo(convo);
+  };
+
+  const cancelRetryVariant = (convo, messageIndex) => {
+    const msg = convo.messages[messageIndex];
+    if (!msg || !msg.variants || msg.variants.length <= 1) return;
+    if (msg.variants[msg.variantIndex] === '') {
+      msg.variants.pop();
+      msg.variantIndex = msg.variants.length - 1;
+      msg.content = msg.variants[msg.variantIndex] || '';
+      saveConvo(convo);
+    }
+  };
+
+  const finalizeAssistantMessage = (convo, messageIndex, content) => {
+    const msg = convo.messages[messageIndex];
+    if (!msg) return;
+    initAssistantVariants(msg);
+    msg.variants[msg.variantIndex] = content;
+    msg.content = content;
+    msg.ts = Date.now();
+    saveConvo(convo);
   };
 
   const editMessage = (convo, messageIndex, newContent) => {
@@ -95,5 +166,9 @@ window.Conversations = (() => {
     set({ conversations: [], currentConversationId: null });
   };
 
-  return { getAll, getById, getCurrent, create, ensure, select, remove, rename, addMessage, updateLastMessage, editMessage, deleteMessageFrom, clearAll };
+  return {
+    getAll, getById, getCurrent, create, ensure, select, remove, rename,
+    addMessage, updateMessage, editMessage, deleteMessageFrom, clearAll,
+    getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
+  };
 })();

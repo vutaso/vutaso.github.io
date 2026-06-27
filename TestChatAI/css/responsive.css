@@ -1,3 +1,20 @@
+.md-preview-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 95;
+  backdrop-filter: blur(2px);
+}
+
+.app[data-md-preview="open"] .md-preview-overlay:not(.hidden) {
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .md-preview-overlay { display: none !important; }
+}
+
 @media (max-width: 768px) {
   .app[data-sidebar="open"],
   .app[data-sidebar="closed"] {
@@ -27,16 +44,33 @@
   .message.user .body { max-width: 90%; }
   .message .toolbar { opacity: 1; }
 
-  .header-title .model-badge { display: none; }
+  .header-title .model-select { display: none; }
 
   .composer { padding: 8px 12px 14px; }
-  .composer-inner { padding: 4px 4px 4px 14px; }
+  .composer-inner { padding: 4px 4px 4px 8px; }
+  .composer-attach { width: 34px; height: 34px; }
+  .composer-actions { width: 34px; height: 34px; }
+  .composer-input { min-height: 34px; padding: 6px 4px 6px 0; }
+  .btn-send,
+  .btn-stop { width: 34px; height: 34px; }
+  .composer-attachment-remove { opacity: 1; }
   .composer-hint { font-size: 11px; }
 
   .modal-content { max-height: 95vh; max-width: 95vw; }
   .modal-body { padding: 16px; }
 
   .messages-empty h2 { font-size: 20px; }
+
+  .md-preview-panel.is-open {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    width: min(92vw, 360px);
+    z-index: 96;
+    box-shadow: var(--shadow);
+  }
 }
 
 @media (max-width: 480px) {

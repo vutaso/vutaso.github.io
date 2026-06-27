@@ -20,6 +20,10 @@ window.Storage = (() => {
       if (raw) {
         const parsed = JSON.parse(raw);
         state = { ...defaultState(), ...parsed };
+        const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
+        if (!validIds.includes(state.currentModel)) {
+          state.currentModel = window.APP_CONFIG.DEFAULT_MODEL;
+        }
         const def = window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
         if (state.systemPrompt && state.systemPrompt !== def && state.systemPrompt.includes('ngắn gọn')) {
           state.systemPrompt = def;

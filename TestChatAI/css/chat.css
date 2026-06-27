@@ -106,6 +106,67 @@
 .message .content > *:last-child { margin-bottom: 0; }
 
 .message .content p { margin: 4px 0; }
+
+.message-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.message-image-wrap {
+  max-width: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.message-image-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+}
+
+.message .content p + .message-images { margin-top: 8px; }
+
+.message-files {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.message-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  font-size: 13px;
+}
+
+.message-file-chip > i {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.message-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.message-file-size {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 11px;
+}
 .message .content h1,
 .message .content h2,
 .message .content h3 {
@@ -125,13 +186,148 @@
 
 .message .content a { color: var(--accent); text-decoration: underline; }
 
+.message .content .mermaid-block {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin: 14px 0;
+  overflow: hidden;
+}
+
+.message .content .mermaid-block .pre-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.message .content .mermaid-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message .content .toggle-mermaid-btn {
+  background: transparent;
+  color: var(--text-dim);
+  width: 28px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message .content .toggle-mermaid-btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.message .content .mermaid-view {
+  padding: 16px;
+  overflow-x: auto;
+  text-align: center;
+  min-height: 48px;
+}
+
+.message .content .mermaid-view .mermaid {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.message .content .mermaid-view svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.message .content .mermaid-error {
+  color: var(--danger);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.message .content .mermaid-view .mermaid-pending {
+  text-align: left;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: auto;
+}
+
+.message .content .mermaid-view .mermaid-pending code {
+  display: block;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.message .content .mermaid-error-detail {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message .content .mermaid-block script.mermaid-source-raw {
+  display: none !important;
+}
+
+.message .content .mermaid-block .mermaid-source {
+  background: var(--code-bg);
+  border-top: 1px solid var(--border);
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  max-height: min(50vh, 400px);
+}
+
+.message .content .mermaid-block .mermaid-source code {
+  display: block;
+  padding: 14px;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  background: transparent;
+}
+
+.message .content .mermaid-block.show-source .mermaid-view {
+  display: none;
+}
+
+.message .content .mermaid-block.show-source .mermaid-source.hidden {
+  display: block;
+}
+
 .message .content pre {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0;
   margin: 14px 0;
-  overflow: hidden;
+  overflow: auto;
+  max-height: min(70vh, 560px);
+}
+
+.message.streaming .content pre,
+.message.streaming .content .mermaid-pending,
+.message.streaming .content .mermaid-source {
+  overflow-anchor: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message .content pre .pre-header {
@@ -143,18 +339,52 @@
   border-bottom: 1px solid var(--border);
   font-size: 12px;
   color: var(--text-dim);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
-.message .content pre .copy-code-btn {
+.message .content pre .pre-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message .content pre .preview-md-btn {
   background: transparent;
   color: var(--text-dim);
-  padding: 2px 8px;
+  width: 28px;
+  height: 24px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
   transition: color var(--transition), background var(--transition);
   border: 0;
-  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message .content pre .preview-md-btn:hover {
+  color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.message .content pre .copy-code-btn {
+  background: transparent;
+  color: var(--text-dim);
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .message .content pre .copy-code-btn:hover { color: var(--text); background: var(--bg-hover); }
 
@@ -177,6 +407,50 @@
   font-size: 0.88em;
 }
 
+.message .content .math-inline {
+  display: inline;
+  margin: 0 1px;
+}
+
+.message .content .math-inline .katex {
+  font-size: 1.08em;
+  color: var(--text);
+}
+
+.message .content .math-block {
+  display: block;
+  margin: 12px 0;
+  padding: 8px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.message .content li .math-block {
+  margin: 10px 0 10px 0;
+}
+
+.message .content .math-block .katex-display {
+  margin: 0;
+}
+
+.message .content .math-block > .katex {
+  font-size: 1.2em;
+  color: var(--text);
+}
+
+.message .content .katex-display {
+  margin: 0.75em 0;
+}
+
+.message .content .katex {
+  color: var(--text);
+}
+
+.message .content .katex-error {
+  color: var(--danger);
+  font-size: 0.9em;
+}
+
 .message .content blockquote {
   border-left: 3px solid var(--accent);
   padding-left: 12px;
@@ -185,9 +459,53 @@
   font-style: italic;
 }
 
+.message .content .table-block {
+  margin: 14px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+
+.message .content .table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.message .content .copy-table-btn {
+  background: transparent;
+  color: var(--text-dim);
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message .content .copy-table-btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.message .content .table-scroll {
+  overflow-x: auto;
+}
+
 .message .content table {
   border-collapse: collapse;
-  margin: 14px 0;
+  margin: 0;
   width: 100%;
 }
 .message .content th,
@@ -197,6 +515,42 @@
   text-align: left;
 }
 .message .content th { background: var(--bg-elev); font-weight: 600; }
+
+.message.assistant .toolbar {
+  opacity: 1;
+}
+
+.message .toolbar .variant-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  margin-left: 2px;
+}
+
+.message .toolbar .variant-count {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 40px;
+  text-align: center;
+  user-select: none;
+  padding: 0 2px;
+}
+
+.message .toolbar .tb-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.message .toolbar .tb-btn:disabled:hover {
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.messages.is-streaming .tb-btn[data-action="retry"],
+.messages.is-streaming .variant-btn {
+  pointer-events: none;
+  opacity: 0.35;
+}
 
 .message .toolbar {
   display: flex;
@@ -276,4 +630,54 @@
   margin: 8px auto;
   font-size: 13px;
   max-width: var(--content-max-width);
+}
+
+.selection-reply-tooltip {
+  position: fixed;
+  z-index: 200;
+  transform: translate(-50%, calc(-100% - 8px));
+  pointer-events: auto;
+  animation: selection-reply-in 140ms ease;
+}
+
+.selection-reply-tooltip.hidden {
+  display: none;
+}
+
+.selection-reply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--composer-shadow);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.selection-reply-btn:hover {
+  background: var(--bg-hover);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  color: var(--accent);
+}
+
+.selection-reply-btn i {
+  font-size: 12px;
+}
+
+@keyframes selection-reply-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 4px)) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - 8px)) scale(1);
+  }
 }

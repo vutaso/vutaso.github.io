@@ -6,16 +6,119 @@
 
 .composer-inner {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   max-width: var(--content-max-width);
   margin: 0 auto;
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: 26px;
-  padding: 8px 8px 8px 20px;
+  padding: 6px 6px 6px 10px;
   box-shadow: var(--composer-shadow);
   transition: border-color var(--transition), box-shadow var(--transition);
+  position: relative;
+}
+
+.composer-inner.drag-over {
+  border-color: var(--accent);
+  box-shadow: var(--composer-shadow), 0 0 0 3px var(--accent-glow);
+}
+
+.composer-attach {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  border-radius: 50%;
+}
+
+.composer-attach:hover:not(:disabled) {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.composer-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: var(--content-max-width);
+  margin: 0 auto 8px;
+  padding: 0 4px;
+}
+
+.composer-attachment {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+}
+
+.composer-attachment-image {
+  width: 72px;
+  height: 72px;
+}
+
+.composer-attachment-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.composer-attachment-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 220px;
+  padding: 8px 36px 8px 12px;
+  font-size: 13px;
+}
+
+.composer-attachment-file > i {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.composer-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.composer-file-size {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.composer-attachment-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.composer-attachment:hover .composer-attachment-remove,
+.composer-attachment:focus-within .composer-attachment-remove {
+  opacity: 1;
 }
 
 .composer-inner:focus-within {
@@ -30,11 +133,12 @@
   outline: 0;
   resize: none;
   max-height: var(--composer-max-height);
-  min-height: 26px;
-  padding: 9px 0;
+  min-height: 36px;
+  padding: 7px 4px 7px 0;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text);
+  box-sizing: border-box;
 }
 
 .composer-input::placeholder { color: var(--text-dim); }
@@ -45,6 +149,7 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
+  margin: 0 2px 0 0;
 }
 
 .composer-actions > .btn-send,

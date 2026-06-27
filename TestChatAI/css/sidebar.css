@@ -124,3 +124,9 @@
 .sidebar-footer .btn-ghost {
   border-radius: var(--radius-md);
 }
+
+.sidebar-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -4,6 +4,32 @@ window.API = (() => {
   let currentController = null;
   const isStreaming = () => currentController !== null;
 
+  const appendFilesToText = (text, files) => {
+    if (!files || !files.length) return text || '';
+    const blocks = files.map((f) =>
+      '**Tệp đính kèm: ' + f.name + '**\n```\n' + f.content + '\n```'
+    ).join('\n\n');
+    return text ? text + '\n\n' + blocks : blocks;
+  };
+
+  const buildMessageContent = (m) => {
+    const images = m.images || [];
+    const text = appendFilesToText(m.content || '', m.files);
+    if (m.role === 'user' && images.length > 0) {
+      const parts = [];
+      if (text.trim()) {
+        parts.push({ type: 'text', text });
+      }
+      for (const img of images) {
+        if (img.dataUrl) {
+          parts.push({ type: 'image_url', image_url: { url: img.dataUrl, detail: 'auto' } });
+        }
+      }
+      return parts.length ? parts : (text || '');
+    }
+    return text;
+  };
+
   const buildMessages = (convo, systemPrompt) => {
     const msgs = [];
     if (systemPrompt && systemPrompt.trim()) {
@@ -14,7 +40,7 @@ window.API = (() => {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
       if (i === all.length - 1 && m.role === 'assistant' && !m.content) continue;
-      msgs.push({ role: m.role, content: m.content || '' });
+      msgs.push({ role: m.role, content: buildMessageContent(m) });
     }
     return msgs;
   };
@@ -36,8 +62,7 @@ window.API = (() => {
       model,
       messages,
       stream: true,
-      temperature: 0.7,
-      max_tokens: 16384
+      max_completion_tokens: 16384
     };
 
     try {

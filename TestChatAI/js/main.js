@@ -7,7 +7,9 @@
   const convoMod = window.Conversations;
 
   ui.cacheEls();
+  ui.initSidebar();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
+  ui.initModelSelect(state.currentModel);
 
   const list = convoMod.getAll();
   const current = convoMod.getCurrent();
