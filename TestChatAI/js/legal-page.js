@@ -4,10 +4,18 @@
       const raw = localStorage.getItem('testchatai');
       if (!raw) return;
       const data = JSON.parse(raw);
-      if (data.theme === 'light' || data.theme === 'dark') {
+      const themeColors = {
+        dark: '#0c0c0e',
+        'vs-dark': '#1e1e1e',
+        monokai: '#272822',
+        light: '#f8f9fc',
+        apple: '#f5f5f7',
+        'apple-dark': '#1c1c1e'
+      };
+      if (themeColors[data.theme]) {
         document.documentElement.setAttribute('data-theme', data.theme);
         const mc = document.querySelector('meta[name="theme-color"]');
-        if (mc) mc.setAttribute('content', data.theme === 'dark' ? '#0c0c0e' : '#f8f9fc');
+        if (mc) mc.setAttribute('content', themeColors[data.theme]);
       }
     } catch {}
   };

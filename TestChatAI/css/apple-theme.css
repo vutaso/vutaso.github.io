@@ -1,0 +1,237 @@
+/* Apple-style theme overrides (light + dark) */
+
+:root[data-theme="apple"],
+:root[data-theme="apple-dark"] {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+
+:root[data-theme="apple"] body,
+:root[data-theme="apple-dark"] body {
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="apple"] .main {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 0, 0, 0.04), transparent),
+    var(--bg);
+}
+
+:root[data-theme="apple-dark"] .main {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.04), transparent),
+    var(--bg);
+}
+
+:root[data-theme="apple"] .sidebar,
+:root[data-theme="apple-dark"] .sidebar,
+:root[data-theme="apple"] .main-header,
+:root[data-theme="apple-dark"] .main-header {
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="apple"] .sidebar,
+:root[data-theme="apple-dark"] .sidebar {
+  background: var(--bg-elev);
+  border-right-color: var(--border);
+}
+
+:root[data-theme="apple"] .main-header,
+:root[data-theme="apple-dark"] .main-header {
+  background: color-mix(in srgb, var(--bg-elev) 88%, transparent);
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="apple"] .brand-avatar,
+:root[data-theme="apple-dark"] .brand-avatar {
+  border-radius: 9px;
+  background: linear-gradient(145deg, #1d1d1f 0%, #3a3a3c 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme="apple-dark"] .brand-avatar {
+  background: linear-gradient(145deg, #636366 0%, #48484a 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="apple"] .brand-name,
+:root[data-theme="apple-dark"] .brand-name {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+:root[data-theme="apple"] .btn-primary,
+:root[data-theme="apple-dark"] .btn-primary {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px var(--accent-glow);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme="apple"] .btn-primary:hover,
+:root[data-theme="apple-dark"] .btn-primary:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+:root[data-theme="apple"] .btn-send,
+:root[data-theme="apple-dark"] .btn-send {
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+:root[data-theme="apple"] .btn-send:hover,
+:root[data-theme="apple-dark"] .btn-send:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+  transform: scale(1.04);
+}
+
+:root[data-theme="apple"] .btn-icon,
+:root[data-theme="apple-dark"] .btn-icon {
+  border-radius: var(--radius-full);
+}
+
+:root[data-theme="apple"] .conversation-item,
+:root[data-theme="apple-dark"] .conversation-item {
+  border-radius: var(--radius-md);
+  margin: 0 8px;
+  transition: background var(--transition), transform var(--transition);
+}
+
+:root[data-theme="apple"] .conversation-item.active,
+:root[data-theme="apple-dark"] .conversation-item.active {
+  background: var(--bg-active);
+  font-weight: 500;
+}
+
+:root[data-theme="apple"] .conversation-item:hover:not(.active),
+:root[data-theme="apple-dark"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+}
+
+:root[data-theme="apple"] .composer-inner,
+:root[data-theme="apple-dark"] .composer-inner {
+  border-radius: 24px;
+  border-color: var(--border-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="apple"] .composer-inner:focus-within,
+:root[data-theme="apple-dark"] .composer-inner:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+  box-shadow: var(--composer-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+:root[data-theme="apple"] .message.user .body,
+:root[data-theme="apple-dark"] .message.user .body {
+  border-radius: 20px 20px 6px 20px;
+  background: var(--user-bubble);
+  border: 0.5px solid color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+:root[data-theme="apple"] .message.assistant .body,
+:root[data-theme="apple-dark"] .message.assistant .body {
+  padding: 4px 0;
+}
+
+:root[data-theme="apple"] .message .avatar.assistant-av,
+:root[data-theme="apple-dark"] .message .avatar.assistant-av {
+  background: linear-gradient(145deg, #1d1d1f 0%, #3a3a3c 100%);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+:root[data-theme="apple-dark"] .message .avatar.assistant-av {
+  background: linear-gradient(145deg, #636366 0%, #48484a 100%);
+}
+
+:root[data-theme="apple"] .modal-content,
+:root[data-theme="apple-dark"] .modal-content {
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-elev) 95%, transparent);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 0.5px solid var(--border-strong);
+}
+
+:root[data-theme="apple"] .modal-content {
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.14);
+}
+
+:root[data-theme="apple-dark"] .modal-content {
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+:root[data-theme="apple"] .modal-backdrop {
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="apple-dark"] .modal-backdrop {
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+:root[data-theme="apple"] .select,
+:root[data-theme="apple-dark"] .select,
+:root[data-theme="apple"] .input,
+:root[data-theme="apple-dark"] .input {
+  border-radius: var(--radius-md);
+  border-color: var(--border-strong);
+  background: var(--bg-input);
+}
+
+:root[data-theme="apple"] .select:focus,
+:root[data-theme="apple-dark"] .select:focus,
+:root[data-theme="apple"] .input:focus,
+:root[data-theme="apple-dark"] .input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+:root[data-theme="apple"] .header-title .model-select,
+:root[data-theme="apple-dark"] .header-title .model-select {
+  border-radius: var(--radius-full);
+  background-color: var(--bg-hover);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme="apple"] .toast,
+:root[data-theme="apple-dark"] .toast {
+  border-radius: var(--radius-full);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 0.5px solid var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+:root[data-theme="apple"] .md-preview-panel,
+:root[data-theme="apple-dark"] .md-preview-panel {
+  background: var(--bg-elev);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left-color: var(--border);
+}
+
+:root[data-theme="apple"] .composer-tool-btn,
+:root[data-theme="apple-dark"] .composer-tool-btn {
+  border-radius: var(--radius-full);
+}
+
+:root[data-theme="apple"] .export-select-bar,
+:root[data-theme="apple-dark"] .export-select-bar {
+  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}

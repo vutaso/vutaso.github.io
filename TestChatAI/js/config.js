@@ -13,7 +13,11 @@ window.APP_CONFIG = {
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true }
+    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
+    { id: 'kimi-k2.5', label: 'Kimi K2.5', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
+    { id: 'kimi-k2.6', label: 'Kimi K2.6', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
+    { id: 'kimi-k2.7-code', label: 'Kimi K2.7 Code', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
+    { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true }
   ],
 
   DEFAULT_MODEL: 'gemini-3.5-flash',
@@ -46,6 +50,7 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
+    if (provider === 'kimi') return state.kimiApiKey || '';
     return state.apiKey || '';
   },
 
@@ -55,6 +60,7 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
+    if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
     return 'Enter your API key in Settings first';
   },
 
@@ -64,6 +70,7 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
+    if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 
@@ -84,6 +91,16 @@ window.APP_CONFIG = {
   modelSupportsThinking(modelId) {
     const m = this.MODELS.find((x) => x.id === modelId);
     return !!(m && m.thinking);
+  },
+
+  modelThinkingRequired(modelId) {
+    const m = this.MODELS.find((x) => x.id === modelId);
+    return !!(m && m.thinkingRequired);
+  },
+
+  kimiRequiresPreservedThinking(modelId) {
+    const id = modelId || '';
+    return id === 'kimi-k2.7-code' || id === 'kimi-k2.7-code-highspeed';
   },
 
   modelSupportsVision(modelId) {
@@ -190,6 +207,7 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
+  KIMI_ENDPOINT: 'https://api.moonshot.ai/v1/chat/completions',
   GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
 
   geminiStreamUrl(modelId) {

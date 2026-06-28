@@ -8,6 +8,15 @@ window.I18n = (() => {
     zh: '中文',
   };
 
+  const THEMES = [
+    { value: 'dark', label: 'Dark' },
+    { value: 'vs-dark', label: 'Dark (Visual Studio)' },
+    { value: 'monokai', label: 'Monokai' },
+    { value: 'light', label: 'Light' },
+    { value: 'apple', label: 'Apple Light' },
+    { value: 'apple-dark', label: 'Apple Dark' },
+  ];
+
   let locale = 'en';
 
   const STRINGS = {
@@ -73,10 +82,12 @@ window.I18n = (() => {
       apiKeyAnthropic: 'API Key (Anthropic)',
       apiKeyDeepSeek: 'API Key (DeepSeek)',
       apiKeyGemini: 'API Key (Gemini)',
+      apiKeyKimi: 'API Key (Kimi)',
       apiKeyLabelOpenAI: 'OpenAI',
       apiKeyLabelAnthropic: 'Anthropic',
       apiKeyLabelDeepSeek: 'DeepSeek',
       apiKeyLabelGemini: 'Gemini',
+      apiKeyLabelKimi: 'Kimi',
       apiKeyHintAll: 'Stored locally, sent only to the matching provider.',
       settingsApiKeys: 'API Keys',
       apiKeyHintAnthropic: 'Stored locally, sent only to Anthropic.',
@@ -114,6 +125,13 @@ window.I18n = (() => {
       edit: 'Edit',
       copy: 'Copy',
       retry: 'Regenerate',
+      exportMessage: 'Export message',
+      exportFormatMd: 'Markdown',
+      exportFormatTxt: 'TXT',
+      exportFormatPdf: 'PDF',
+      exportFormatDocs: 'Docs',
+      exportFormatImage: 'Image',
+      exportMessageLabel: 'Answer {n}',
       variantPrev: 'Previous version',
       variantNext: 'Next version',
       copyImage: 'Copy image',
@@ -149,10 +167,12 @@ window.I18n = (() => {
       missingApiKeyAnthropic: 'Enter your Anthropic API key in Settings first',
       missingApiKeyDeepSeek: 'Enter your DeepSeek API key in Settings first',
       missingApiKeyGemini: 'Enter your Gemini API key in Settings first',
+      missingApiKeyKimi: 'Enter your Kimi API key in Settings first',
       missingApiKeyErrorOpenAI: 'No API key. Open Settings to enter one.',
       missingApiKeyErrorAnthropic: 'No Anthropic API key. Open Settings to enter one.',
       missingApiKeyErrorDeepSeek: 'No DeepSeek API key. Open Settings to enter one.',
       missingApiKeyErrorGemini: 'No Gemini API key. Open Settings to enter one.',
+      missingApiKeyErrorKimi: 'No Kimi API key. Open Settings to enter one.',
       toastSelectOneExport: 'Select at least one message to export',
       toastNoConvoExport: 'No conversation to export',
       toastNoImageAttach: 'Current model does not support image attachments',
@@ -195,7 +215,9 @@ window.I18n = (() => {
       toastCopyImageOk: 'Image copied',
       toastCopyImageFail: 'Could not copy image',
       toastDownloadImageOk: 'Image downloaded',
+      toastDownloadImagesOk: 'Downloaded {n} images',
       toastDownloadImageFail: 'Could not download image',
+      toastNoImageExport: 'No image in this message',
       toastCopyCode: 'Code copied',
       toastCopyTable: 'Table copied (Markdown)',
       toastCopyMessage: 'Message copied',
@@ -297,10 +319,12 @@ window.I18n = (() => {
       apiKeyAnthropic: 'API Key (Anthropic)',
       apiKeyDeepSeek: 'API Key (DeepSeek)',
       apiKeyGemini: 'API Key (Gemini)',
+      apiKeyKimi: 'API Key (Kimi)',
       apiKeyLabelOpenAI: 'OpenAI',
       apiKeyLabelAnthropic: 'Anthropic',
       apiKeyLabelDeepSeek: 'DeepSeek',
       apiKeyLabelGemini: 'Gemini',
+      apiKeyLabelKimi: 'Kimi',
       apiKeyHintAll: 'Lưu cục bộ, chỉ gửi tới provider tương ứng.',
       settingsApiKeys: 'API Keys',
       apiKeyHintAnthropic: 'Lưu cục bộ, chỉ gửi tới Anthropic.',
@@ -338,6 +362,13 @@ window.I18n = (() => {
       edit: 'Sửa',
       copy: 'Sao chép',
       retry: 'Tạo lại',
+      exportMessage: 'Xuất tin nhắn',
+      exportFormatMd: 'Markdown',
+      exportFormatTxt: 'TXT',
+      exportFormatPdf: 'PDF',
+      exportFormatDocs: 'Docs',
+      exportFormatImage: 'Hình ảnh',
+      exportMessageLabel: 'Câu trả lời {n}',
       variantPrev: 'Phiên bản trước',
       variantNext: 'Phiên bản sau',
       copyImage: 'Sao chép ảnh',
@@ -373,10 +404,12 @@ window.I18n = (() => {
       missingApiKeyAnthropic: 'Nhập Anthropic API key trong Cài đặt trước',
       missingApiKeyDeepSeek: 'Nhập DeepSeek API key trong Cài đặt trước',
       missingApiKeyGemini: 'Nhập Gemini API key trong Cài đặt trước',
+      missingApiKeyKimi: 'Nhập Kimi API key trong Cài đặt trước',
       missingApiKeyErrorOpenAI: 'Chưa có API key. Mở Cài đặt để nhập.',
       missingApiKeyErrorAnthropic: 'Chưa có Anthropic API key. Mở Cài đặt để nhập.',
       missingApiKeyErrorDeepSeek: 'Chưa có DeepSeek API key. Mở Cài đặt để nhập.',
       missingApiKeyErrorGemini: 'Chưa có Gemini API key. Mở Cài đặt để nhập.',
+      missingApiKeyErrorKimi: 'Chưa có Kimi API key. Mở Cài đặt để nhập.',
       toastSelectOneExport: 'Chọn ít nhất một tin nhắn để xuất',
       toastNoConvoExport: 'Chưa có hội thoại để xuất',
       toastNoImageAttach: 'Model hiện tại không hỗ trợ đính kèm hình ảnh',
@@ -419,7 +452,9 @@ window.I18n = (() => {
       toastCopyImageOk: 'Đã sao chép ảnh',
       toastCopyImageFail: 'Không sao chép được ảnh',
       toastDownloadImageOk: 'Đã tải ảnh',
+      toastDownloadImagesOk: 'Đã tải {n} ảnh',
       toastDownloadImageFail: 'Không tải được ảnh',
+      toastNoImageExport: 'Câu trả lời không có hình ảnh',
       toastCopyCode: 'Đã sao chép code',
       toastCopyTable: 'Đã sao chép bảng (Markdown)',
       toastCopyMessage: 'Đã sao chép tin nhắn',
@@ -521,10 +556,12 @@ window.I18n = (() => {
       apiKeyAnthropic: 'API Key (Anthropic)',
       apiKeyDeepSeek: 'API Key (DeepSeek)',
       apiKeyGemini: 'API Key (Gemini)',
+      apiKeyKimi: 'API Key (Kimi)',
       apiKeyLabelOpenAI: 'OpenAI',
       apiKeyLabelAnthropic: 'Anthropic',
       apiKeyLabelDeepSeek: 'DeepSeek',
       apiKeyLabelGemini: 'Gemini',
+      apiKeyLabelKimi: 'Kimi',
       apiKeyHintAll: 'ローカル保存、該当プロバイダーへのみ送信。',
       settingsApiKeys: 'API Keys',
       apiKeyHintAnthropic: 'ローカル保存、Anthropicへのみ送信。',
@@ -562,6 +599,13 @@ window.I18n = (() => {
       edit: '編集',
       copy: 'コピー',
       retry: '再生成',
+      exportMessage: 'メッセージをエクスポート',
+      exportFormatMd: 'Markdown',
+      exportFormatTxt: 'TXT',
+      exportFormatPdf: 'PDF',
+      exportFormatDocs: 'Docs',
+      exportFormatImage: '画像',
+      exportMessageLabel: '回答 {n}',
       variantPrev: '前のバージョン',
       variantNext: '次のバージョン',
       copyImage: '画像をコピー',
@@ -597,10 +641,12 @@ window.I18n = (() => {
       missingApiKeyAnthropic: '先に設定でAnthropic APIキーを入力してください',
       missingApiKeyDeepSeek: '先に設定でDeepSeek APIキーを入力してください',
       missingApiKeyGemini: '先に設定でGemini APIキーを入力してください',
+      missingApiKeyKimi: '先に設定でKimi APIキーを入力してください',
       missingApiKeyErrorOpenAI: 'APIキーがありません。設定を開いて入力してください。',
       missingApiKeyErrorAnthropic: 'Anthropic APIキーがありません。設定を開いて入力してください。',
       missingApiKeyErrorDeepSeek: 'DeepSeek APIキーがありません。設定を開いて入力してください。',
       missingApiKeyErrorGemini: 'Gemini APIキーがありません。設定を開いて入力してください。',
+      missingApiKeyErrorKimi: 'Kimi APIキーがありません。設定を開いて入力してください。',
       toastSelectOneExport: 'エクスポートするメッセージを1件以上選択してください',
       toastNoConvoExport: 'エクスポートする会話がありません',
       toastNoImageAttach: '現在のモデルは画像添付に対応していません',
@@ -643,7 +689,9 @@ window.I18n = (() => {
       toastCopyImageOk: '画像をコピーしました',
       toastCopyImageFail: '画像をコピーできませんでした',
       toastDownloadImageOk: '画像をダウンロードしました',
+      toastDownloadImagesOk: '{n} 枚の画像をダウンロードしました',
       toastDownloadImageFail: '画像をダウンロードできませんでした',
+      toastNoImageExport: 'このメッセージに画像がありません',
       toastCopyCode: 'コードをコピーしました',
       toastCopyTable: '表をコピーしました (Markdown)',
       toastCopyMessage: 'メッセージをコピーしました',
@@ -745,10 +793,12 @@ window.I18n = (() => {
       apiKeyAnthropic: 'API Key (Anthropic)',
       apiKeyDeepSeek: 'API Key (DeepSeek)',
       apiKeyGemini: 'API Key (Gemini)',
+      apiKeyKimi: 'API Key (Kimi)',
       apiKeyLabelOpenAI: 'OpenAI',
       apiKeyLabelAnthropic: 'Anthropic',
       apiKeyLabelDeepSeek: 'DeepSeek',
       apiKeyLabelGemini: 'Gemini',
+      apiKeyLabelKimi: 'Kimi',
       apiKeyHintAll: '本地保存，仅发送至对应服务商。',
       settingsApiKeys: 'API Keys',
       apiKeyHintAnthropic: '本地保存，仅发送至 Anthropic。',
@@ -786,6 +836,13 @@ window.I18n = (() => {
       edit: '编辑',
       copy: '复制',
       retry: '重新生成',
+      exportMessage: '导出消息',
+      exportFormatMd: 'Markdown',
+      exportFormatTxt: 'TXT',
+      exportFormatPdf: 'PDF',
+      exportFormatDocs: 'Docs',
+      exportFormatImage: '图片',
+      exportMessageLabel: '回答 {n}',
       variantPrev: '上一版本',
       variantNext: '下一版本',
       copyImage: '复制图片',
@@ -821,10 +878,12 @@ window.I18n = (() => {
       missingApiKeyAnthropic: '请先在设置中输入 Anthropic API Key',
       missingApiKeyDeepSeek: '请先在设置中输入 DeepSeek API Key',
       missingApiKeyGemini: '请先在设置中输入 Gemini API Key',
+      missingApiKeyKimi: '请先在设置中输入 Kimi API Key',
       missingApiKeyErrorOpenAI: '未设置 API Key。请打开设置输入。',
       missingApiKeyErrorAnthropic: '未设置 Anthropic API Key。请打开设置输入。',
       missingApiKeyErrorDeepSeek: '未设置 DeepSeek API Key。请打开设置输入。',
       missingApiKeyErrorGemini: '未设置 Gemini API Key。请打开设置输入。',
+      missingApiKeyErrorKimi: '未设置 Kimi API Key。请打开设置输入。',
       toastSelectOneExport: '请至少选择一条消息导出',
       toastNoConvoExport: '没有可导出的对话',
       toastNoImageAttach: '当前模型不支持附加图片',
@@ -867,7 +926,9 @@ window.I18n = (() => {
       toastCopyImageOk: '图片已复制',
       toastCopyImageFail: '无法复制图片',
       toastDownloadImageOk: '图片已下载',
+      toastDownloadImagesOk: '已下载 {n} 张图片',
       toastDownloadImageFail: '无法下载图片',
+      toastNoImageExport: '此回复没有图片',
       toastCopyCode: '代码已复制',
       toastCopyTable: '表格已复制（Markdown）',
       toastCopyMessage: '消息已复制',
@@ -1056,10 +1117,12 @@ window.I18n = (() => {
     { sel: 'label[for="anthropicApiKeyInput"]', key: 'apiKeyLabelAnthropic' },
     { sel: 'label[for="deepseekApiKeyInput"]', key: 'apiKeyLabelDeepSeek' },
     { sel: 'label[for="geminiApiKeyInput"]', key: 'apiKeyLabelGemini' },
+    { sel: 'label[for="kimiApiKeyInput"]', key: 'apiKeyLabelKimi' },
     { sel: '#apiKeyInput', attr: 'placeholder', key: 'apiKeyOpenAI', raw: 'sk-...' },
     { sel: '#anthropicApiKeyInput', attr: 'placeholder', key: 'apiKeyAnthropic', raw: 'sk-ant-...' },
     { sel: '#deepseekApiKeyInput', attr: 'placeholder', key: 'apiKeyDeepSeek', raw: 'sk-...' },
     { sel: '#geminiApiKeyInput', attr: 'placeholder', key: 'apiKeyGemini', raw: 'AIza...' },
+    { sel: '#kimiApiKeyInput', attr: 'placeholder', key: 'apiKeyKimi', raw: 'sk-...' },
     { sel: '#toggleApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleAnthropicApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleDeepseekApiKeyBtn', attr: 'title', key: 'showHide' },
@@ -1069,6 +1132,7 @@ window.I18n = (() => {
     { sel: '#settingsLanguageLabel', key: 'language' },
     { sel: '#settingsLocaleSelect', attr: 'aria-label', key: 'language' },
     { sel: '#settingsThemeLabel', key: 'theme' },
+    { sel: '#settingsThemeSelect', attr: 'aria-label', key: 'theme' },
     { sel: '#clearAllBtn', key: 'clearAllConversations' },
     { sel: '#renameTitle', key: 'renameTitle' },
     { sel: '#renameModal .modal-subtitle', key: 'renameSubtitle' },
@@ -1138,6 +1202,7 @@ window.I18n = (() => {
     if (provider === 'anthropic') return t('missingApiKeyAnthropic');
     if (provider === 'deepseek') return t('missingApiKeyDeepSeek');
     if (provider === 'google') return t('missingApiKeyGemini');
+    if (provider === 'kimi') return t('missingApiKeyKimi');
     return t('missingApiKeyOpenAI');
   };
 
@@ -1146,10 +1211,22 @@ window.I18n = (() => {
     if (provider === 'anthropic') return t('missingApiKeyErrorAnthropic');
     if (provider === 'deepseek') return t('missingApiKeyErrorDeepSeek');
     if (provider === 'google') return t('missingApiKeyErrorGemini');
+    if (provider === 'kimi') return t('missingApiKeyErrorKimi');
     return t('missingApiKeyErrorOpenAI');
   };
 
   const getLocaleLabel = (code) => LOCALE_LABELS[normalizeLocale(code)] || code;
+
+  const populateThemeSelect = (selectEl, selected) => {
+    if (!selectEl) return;
+    const fallback = document.documentElement.getAttribute('data-theme') || 'dark';
+    const resolved = selected || selectEl.value || fallback;
+    const current = THEMES.some((t) => t.value === resolved) ? resolved : 'dark';
+    selectEl.innerHTML = THEMES.map((t) =>
+      `<option value="${t.value}">${t.label}</option>`
+    ).join('');
+    selectEl.value = current;
+  };
 
   const populateLocaleSelect = (selectEl, selected) => {
     if (!selectEl) return;
@@ -1208,6 +1285,7 @@ window.I18n = (() => {
     });
     applyGuideContent();
     populateLocaleSelect(document.getElementById('settingsLocaleSelect'));
+    populateThemeSelect(document.getElementById('settingsThemeSelect'));
     document.querySelectorAll('[data-i18n-key]').forEach((el) => {
       el.textContent = t(el.dataset.i18nKey);
     });
@@ -1234,6 +1312,7 @@ window.I18n = (() => {
     applyToDOM,
     getLocaleLabel,
     populateLocaleSelect,
+    populateThemeSelect,
     getDefaultSystemPrompt,
     isDefaultSystemPrompt,
     imageGenLabel,

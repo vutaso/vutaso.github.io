@@ -221,8 +221,10 @@ window.Markdown = (() => {
     window.marked.use({ renderer, breaks: true, gfm: true });
   };
 
-  const getMermaidTheme = () =>
-    document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  const getMermaidTheme = () => {
+    const theme = document.documentElement.getAttribute('data-theme');
+    return theme === 'dark' || theme === 'vs-dark' || theme === 'monokai' || theme === 'apple-dark' ? 'dark' : 'default';
+  };
 
   let mermaidReady = false;
 

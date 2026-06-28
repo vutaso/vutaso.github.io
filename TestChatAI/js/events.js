@@ -97,8 +97,7 @@ window.Events = (() => {
     tooltip.classList.remove('hidden');
   };
 
-  const formatQuoteForComposer = (text) =>
-    text.split('\n').map((line) => '> ' + line).join('\n');
+  const formatQuoteForComposer = (text) => text;
 
   const applySelectionReply = () => {
     if (!pendingReplyText) return;
@@ -246,6 +245,137 @@ window.Events = (() => {
       ui.showToast(t('toastNoConvoExport'));
     }
     return null;
+  };
+
+  const buildSingleMessageExportConvo = (idx) => {
+    const convo = convoMod.getCurrent();
+    if (!convo) return null;
+    const m = getMessageForExport(convo, idx);
+    if (!m) return null;
+    const baseTitle = (convo.title || t('conversation')).replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || t('conversation');
+    return {
+      ...convo,
+      title: baseTitle + ' - ' + t('exportMessageLabel', { n: idx + 1 }),
+      messages: [m]
+    };
+  };
+
+  const requireMessageExportConvo = (idx) => {
+    const exportConvo = buildSingleMessageExportConvo(idx);
+    if (exportConvo) return exportConvo;
+    ui.showToast(t('toastNoConvoExport'));
+    return null;
+  };
+
+  const exportSingleMessageMarkdown = (idx) => {
+    const exportConvo = requireMessageExportConvo(idx);
+    if (!exportConvo) return;
+    const { formatConversation, downloadFile } = window.Utils;
+    const md = formatConversation(exportConvo);
+    const safeName = exportConvo.title.replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || 'message';
+    downloadFile(md, safeName + '.md', 'text/markdown');
+    ui.showToast(t('toastDownloadMd'));
+  };
+
+  const exportSingleMessageTxt = (idx) => {
+    const exportConvo = requireMessageExportConvo(idx);
+    if (!exportConvo) return;
+    const { formatConversationPlainText, downloadFile } = window.Utils;
+    const text = formatConversationPlainText(exportConvo);
+    const safeName = exportConvo.title.replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || 'message';
+    downloadFile(text, safeName + '.txt', 'text/plain');
+    ui.showToast(t('toastDownloadTxt'));
+  };
+
+  const exportSingleMessageImages = async (idx) => {
+    const convo = convoMod.getCurrent();
+    if (!convo) {
+      ui.showToast(t('toastNoConvoExport'));
+      return;
+    }
+    const m = getMessageForExport(convo, idx);
+    const images = (m?.generatedImages || []).filter((img) => img?.dataUrl);
+    if (!images.length) {
+      ui.showToast(t('toastNoImageExport'));
+      return;
+    }
+
+    const baseTitle = (convo.title || t('conversation')).replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || 'message';
+    const answerLabel = t('exportMessageLabel', { n: idx + 1 }).replace(/\s+/g, '-');
+
+    try {
+      for (let i = 0; i < images.length; i++) {
+        const img = images[i];
+        const fallbackName = images.length > 1
+          ? baseTitle + '-' + answerLabel + '-' + (i + 1)
+          : baseTitle + '-' + answerLabel;
+        await downloadDataUrlImage(img.dataUrl, img.name || fallbackName);
+        if (i < images.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+      }
+      ui.showToast(images.length > 1 ? t('toastDownloadImagesOk', { n: images.length }) : t('toastDownloadImageOk'));
+    } catch {
+      ui.showToast(t('toastDownloadImageFail'));
+    }
+  };
+
+  const exportSingleMessageDocx = async (idx) => {
+    if (docxExporting) return;
+    const exportConvo = requireMessageExportConvo(idx);
+    if (!exportConvo) return;
+
+    docxExporting = true;
+    ui.setPdfExportLoading(true, {
+      title: t('toastExportingWord'),
+      hint: t('exportPdfHint'),
+    });
+
+    try {
+      const result = await window.Utils.exportToDocx(exportConvo);
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('exportDownloadWordBtn'),
+        kind: 'docx',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastExportWordOk'));
+    } catch (err) {
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastExportWordFail', { err: err.message || err }));
+    } finally {
+      docxExporting = false;
+    }
+  };
+
+  const exportSingleMessagePdf = async (idx) => {
+    if (pdfExporting) return;
+    const exportConvo = requireMessageExportConvo(idx);
+    if (!exportConvo) return;
+
+    pdfExporting = true;
+    ui.setPdfExportLoading(true, {
+      title: t('exportPdfTitle'),
+      hint: t('exportPdfHint'),
+    });
+
+    try {
+      const result = await window.PdfExport.exportToPdf(exportConvo, {
+        onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+      });
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('exportDownloadPdfBtn'),
+        kind: 'pdf',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
+    } catch (err) {
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
+    } finally {
+      pdfExporting = false;
+    }
   };
 
   const updateSendEnabled = () => {
@@ -438,7 +568,8 @@ window.Events = (() => {
     }
     const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const useImageGen = !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
-    const useThinking = s.thinkingEnabled && window.APP_CONFIG.modelSupportsThinking(modelId);
+    const useThinking = (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
+      && window.APP_CONFIG.modelSupportsThinking(modelId);
 
     const refreshStreamingContent = () => {
       const reasoningOpen = !!reasoningBuffer && !buffer;
@@ -1097,6 +1228,7 @@ window.Events = (() => {
       if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
       if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
+      if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
       if (!window.APP_CONFIG.modelSupportsVision(modelId) && pendingImages.length) {
         pendingImages = [];
         ui.renderComposerAttachments(pendingImages, pendingFiles);
@@ -1122,6 +1254,7 @@ window.Events = (() => {
       const s = state.get();
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) return;
+      if (window.APP_CONFIG.modelThinkingRequired(modelId)) return;
       const next = !s.thinkingEnabled;
       state.set({ thinkingEnabled: next });
       syncComposerTools(modelId, { thinkingEnabled: next });
@@ -1295,16 +1428,21 @@ window.Events = (() => {
       if (!e.target.closest('.composer-dropdown-wrap')) {
         ui.closeImageGenMenus();
       }
+      if (!e.target.closest('.msg-export-wrap')) {
+        ui.closeAllMsgExportMenus();
+      }
     });
 
+    const THEME_CYCLE = ['dark', 'vs-dark', 'monokai', 'light', 'apple', 'apple-dark'];
+
     ui.els.themeToggleBtn.addEventListener('click', () => {
-      const next = state.get().theme === 'dark' ? 'light' : 'dark';
+      const current = state.get().theme || 'dark';
+      const idx = THEME_CYCLE.indexOf(current);
+      const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
       state.set({ theme: next });
       ui.setTheme(next);
       ui.rerenderMermaid();
-      ui.els.settingsForm?.querySelectorAll('input[name="theme"]').forEach((r) => {
-        r.checked = r.value === next;
-      });
+      if (ui.els.settingsThemeSelect) ui.els.settingsThemeSelect.value = next;
     });
 
     ui.els.toggleApiKeyBtn.addEventListener('click', () => {
@@ -1331,6 +1469,12 @@ window.Events = (() => {
       ui.els.geminiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
+    ui.els.toggleKimiApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.kimiApiKeyInput.type === 'password';
+      ui.els.kimiApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.kimiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
     const handleClearAll = async () => {
       if (!confirm(t('confirmClearAll'))) return;
       await settleActiveStream({ discard: true });
@@ -1350,6 +1494,7 @@ window.Events = (() => {
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
       const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
       const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
+      const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
       const prev = state.get();
       const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
       let systemPrompt = ui.els.systemPromptInput.value.trim();
@@ -1357,9 +1502,9 @@ window.Events = (() => {
         systemPrompt = window.I18n.getDefaultSystemPrompt(locale);
         ui.els.systemPromptInput.value = systemPrompt;
       }
-      const theme = ui.els.settingsForm.querySelector('input[name="theme"]:checked')?.value || 'dark';
+      const theme = ui.els.settingsThemeSelect?.value || 'dark';
       const prevTheme = prev.theme;
-      const nextState = { apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, systemPrompt, theme, locale };
+      const nextState = { apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey, systemPrompt, theme, locale };
       state.set(nextState);
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
@@ -1379,16 +1524,14 @@ window.Events = (() => {
     });
 
     ui.els.settingsLocaleSelect?.addEventListener('change', applySettingsFromForm);
-
-    ui.els.settingsForm.querySelectorAll('input[name="theme"]').forEach((input) => {
-      input.addEventListener('change', applySettingsFromForm);
-    });
+    ui.els.settingsThemeSelect?.addEventListener('change', applySettingsFromForm);
 
     [
       ui.els.apiKeyInput,
       ui.els.anthropicApiKeyInput,
       ui.els.deepseekApiKeyInput,
       ui.els.geminiApiKeyInput,
+      ui.els.kimiApiKeyInput,
       ui.els.systemPromptInput,
     ].forEach((input) => {
       input?.addEventListener('blur', applySettingsFromForm);
@@ -1438,6 +1581,10 @@ window.Events = (() => {
         }
         if (!ui.els.translateLangMenu.classList.contains('hidden')) {
           ui.closeTranslateLangMenu();
+          return;
+        }
+        if (document.querySelector('.msg-export-menu:not(.hidden)')) {
+          ui.closeAllMsgExportMenus();
           return;
         }
         if (!ui.els.imageGenRatioMenu.classList.contains('hidden')
@@ -1591,6 +1738,37 @@ window.Events = (() => {
         const msgEl = retryBtn.closest('.message');
         const idx = parseInt(msgEl?.dataset.idx, 10);
         if (!isNaN(idx)) retryAssistantMessage(idx);
+        return;
+      }
+      const exportToggle = e.target.closest('[data-action="export-toggle"]');
+      if (exportToggle) {
+        if (window.API.isStreaming()) return;
+        e.stopPropagation();
+        const wrap = exportToggle.closest('.msg-export-wrap');
+        const menu = wrap?.querySelector('.msg-export-menu');
+        if (!menu) return;
+        const isOpen = !menu.classList.contains('hidden');
+        ui.closeAllMsgExportMenus();
+        if (!isOpen) {
+          menu.classList.remove('hidden');
+          exportToggle.setAttribute('aria-expanded', 'true');
+        }
+        return;
+      }
+      const exportOption = e.target.closest('[data-export-format]');
+      if (exportOption) {
+        if (window.API.isStreaming()) return;
+        e.stopPropagation();
+        ui.closeAllMsgExportMenus();
+        const msgEl = exportOption.closest('.message');
+        const idx = parseInt(msgEl?.dataset.idx, 10);
+        if (isNaN(idx)) return;
+        const format = exportOption.dataset.exportFormat;
+        if (format === 'md') exportSingleMessageMarkdown(idx);
+        else if (format === 'txt') exportSingleMessageTxt(idx);
+        else if (format === 'pdf') exportSingleMessagePdf(idx);
+        else if (format === 'docx') exportSingleMessageDocx(idx);
+        else if (format === 'image') exportSingleMessageImages(idx);
         return;
       }
       const variantPrev = e.target.closest('[data-action="variant-prev"]');

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/pdf-export.css" />
   <link rel="stylesheet" href="css/docx-export.css" />
+  <link rel="stylesheet" href="css/apple-theme.css" />
 </head>
 <body>
   <div id="app" class="app" data-sidebar="open">
@@ -350,6 +351,15 @@
                 </button>
               </div>
             </div>
+            <div class="field settings-api-field">
+              <label for="kimiApiKeyInput">Kimi</label>
+              <div class="input-group">
+                <input id="kimiApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
+                <button type="button" id="toggleKimiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="kimiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
           </div>
           <p class="field-hint settings-api-hint" data-i18n-key="apiKeyHintAll">Stored locally, sent only to the matching provider.</p>
         </section>
@@ -368,11 +378,8 @@
               <select id="settingsLocaleSelect" name="locale" class="select settings-locale-select" aria-label="Language"></select>
             </div>
             <div class="field field-row settings-pref">
-              <label id="settingsThemeLabel">Theme</label>
-              <div class="theme-toggle">
-                <label class="radio"><input type="radio" name="theme" value="dark" /> Dark</label>
-                <label class="radio"><input type="radio" name="theme" value="light" /> Light</label>
-              </div>
+              <label id="settingsThemeLabel" for="settingsThemeSelect">Theme</label>
+              <select id="settingsThemeSelect" name="theme" class="select settings-theme-select" aria-label="Theme"></select>
             </div>
           </div>
           <button type="button" id="clearAllBtn" class="btn btn-danger settings-clear-btn">Xoá tất cả hội thoại</button>

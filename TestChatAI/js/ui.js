@@ -30,8 +30,11 @@ window.UI = (() => {
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
     els.geminiApiKeyInput = $('#geminiApiKeyInput');
     els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
+    els.kimiApiKeyInput = $('#kimiApiKeyInput');
+    els.kimiApiKeyIcon = $('#kimiApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsLocaleSelect = $('#settingsLocaleSelect');
+    els.settingsThemeSelect = $('#settingsThemeSelect');
     els.settingsForm = $('#settingsForm');
     els.toast = $('#toast');
     els.selectionReplyTooltip = $('#selectionReplyTooltip');
@@ -65,6 +68,7 @@ window.UI = (() => {
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
+    els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
@@ -155,7 +159,8 @@ window.UI = (() => {
     }
     if (els.thinkingBtn) {
       els.thinkingBtn.classList.toggle('hidden', !showThinking);
-      const active = showThinking && !!thinkingEnabled;
+      const thinkingRequired = window.APP_CONFIG.modelThinkingRequired(modelId);
+      const active = showThinking && (!!thinkingEnabled || thinkingRequired);
       els.thinkingBtn.classList.toggle('is-active', active);
       els.thinkingBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
@@ -518,11 +523,46 @@ window.UI = (() => {
     return text + userImagesHTML(m.images) + userFilesHTML(m.files);
   };
 
+  const THEME_META_COLORS = {
+    dark: '#0c0c0e',
+    'vs-dark': '#1e1e1e',
+    monokai: '#272822',
+    light: '#f8f9fc',
+    apple: '#f5f5f7',
+    'apple-dark': '#1c1c1e'
+  };
+  const THEME_ICONS = {
+    dark: '<i class="fa-solid fa-sun"></i>',
+    'vs-dark': '<i class="fa-brands fa-microsoft"></i>',
+    monokai: '<i class="fa-solid fa-palette"></i>',
+    light: '<i class="fa-solid fa-moon"></i>',
+    apple: '<i class="fa-brands fa-apple"></i>',
+    'apple-dark': '<i class="fa-solid fa-moon"></i>'
+  };
+  const HIGHLIGHT_THEMES = {
+    dark: 'atom-one-dark',
+    'vs-dark': 'vs2015',
+    monokai: 'monokai',
+    light: 'atom-one-light',
+    apple: 'atom-one-light',
+    'apple-dark': 'atom-one-dark'
+  };
+
+  const updateHighlightTheme = (theme) => {
+    const hl = HIGHLIGHT_THEMES[theme] || 'atom-one-dark';
+    const link = document.getElementById('hljs-theme');
+    if (!link) return;
+    const next = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${hl}.min.css`;
+    if (link.href !== next) link.href = next;
+  };
+
   const setTheme = (theme) => {
-    document.documentElement.setAttribute('data-theme', theme);
+    const resolved = THEME_META_COLORS[theme] ? theme : 'dark';
+    document.documentElement.setAttribute('data-theme', resolved);
     const mc = document.querySelector('meta[name="theme-color"]');
-    if (mc) mc.setAttribute('content', theme === 'dark' ? '#0c0c0e' : '#f8f9fc');
-    els.themeIcon.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    if (mc) mc.setAttribute('content', THEME_META_COLORS[resolved]);
+    if (els.themeIcon) els.themeIcon.innerHTML = THEME_ICONS[resolved] || THEME_ICONS.dark;
+    updateHighlightTheme(resolved);
   };
 
   const renderConversationList = (conversations, currentId, searchQuery = '', snippetMap = null) => {
@@ -776,8 +816,30 @@ window.UI = (() => {
         + '</span>';
     }
 
+    const hasImages = !!(m.generatedImages && m.generatedImages.length);
+    const imageExportOption = hasImages
+      ? '<button type="button" class="msg-export-option" data-export-format="image" role="menuitem">'
+        + '<i class="fa-solid fa-image" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatImage')) + '</span></button>'
+      : '';
+
+    const exportMenu = '<div class="msg-export-wrap">'
+      + '<button type="button" class="tb-btn" data-action="export-toggle" title="' + escapeHTML(t('exportMessage')) + '" aria-haspopup="menu" aria-expanded="false">'
+      + '<i class="fa-solid fa-download"></i></button>'
+      + '<div class="msg-export-menu hidden" role="menu" aria-label="' + escapeHTML(t('exportMessage')) + '">'
+      + '<button type="button" class="msg-export-option" data-export-format="md" role="menuitem">'
+      + '<i class="fa-brands fa-markdown" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatMd')) + '</span></button>'
+      + '<button type="button" class="msg-export-option" data-export-format="txt" role="menuitem">'
+      + '<i class="fa-solid fa-file-lines" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatTxt')) + '</span></button>'
+      + '<button type="button" class="msg-export-option" data-export-format="pdf" role="menuitem">'
+      + '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatPdf')) + '</span></button>'
+      + '<button type="button" class="msg-export-option" data-export-format="docx" role="menuitem">'
+      + '<i class="fa-solid fa-file-word" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatDocs')) + '</span></button>'
+      + imageExportOption
+      + '</div></div>';
+
     return '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
       + '<button type="button" class="tb-btn" data-action="retry" title="' + escapeHTML(t('retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>'
+      + exportMenu
       + pager;
   };
 
@@ -1290,10 +1352,9 @@ window.UI = (() => {
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
+    els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
-    els.settingsForm.querySelectorAll('input[name="theme"]').forEach((r) => {
-      r.checked = r.value === (state.theme || 'dark');
-    });
+    window.I18n.populateThemeSelect(els.settingsThemeSelect, state.theme || window.APP_CONFIG.DEFAULT_THEME);
     window.I18n.populateLocaleSelect(els.settingsLocaleSelect, state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
     els.apiKeyInput.type = 'password';
     els.apiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
@@ -1303,6 +1364,8 @@ window.UI = (() => {
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.geminiApiKeyInput.type = 'password';
     els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.kimiApiKeyInput.type = 'password';
+    els.kimiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
   };
@@ -1497,6 +1560,14 @@ window.UI = (() => {
   const isImagePreviewOpen = () =>
     !!(els.imagePreviewOverlay && !els.imagePreviewOverlay.classList.contains('hidden'));
 
+  const closeAllMsgExportMenus = () => {
+    document.querySelectorAll('.msg-export-menu:not(.hidden)').forEach((menu) => {
+      menu.classList.add('hidden');
+      const toggle = menu.closest('.msg-export-wrap')?.querySelector('[data-action="export-toggle"]');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    });
+  };
+
   const downloadConversation = (convo) => {
     const { formatConversation, downloadFile } = window.Utils;
     const md = formatConversation(convo);
@@ -1597,6 +1668,7 @@ window.UI = (() => {
     getExportSelectedIndices, toggleExportSelectIndex,
     selectAllExportMessages, clearExportSelection,
     preparePdfExportRoot,
+    closeAllMsgExportMenus,
     els
   };
 })();

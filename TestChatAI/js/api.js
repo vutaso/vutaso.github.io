@@ -1,5 +1,5 @@
 window.API = (() => {
-  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT } = window.APP_CONFIG;
+  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
 
   let currentController = null;
   const isStreaming = () => currentController !== null;
@@ -442,6 +442,44 @@ window.API = (() => {
     return body;
   };
 
+  const buildKimiMessages = (convo, systemPrompt, modelId) => {
+    const msgs = [];
+    if (systemPrompt && systemPrompt.trim()) {
+      msgs.push({ role: 'system', content: systemPrompt });
+    }
+    const preserved = window.APP_CONFIG.kimiRequiresPreservedThinking(modelId);
+    const all = convo.messages || [];
+    for (let i = 0; i < all.length; i++) {
+      const m = all[i];
+      if (m.role !== 'user' && m.role !== 'assistant') continue;
+      if (i === all.length - 1 && m.role === 'assistant' && !m.content) continue;
+      const msg = { role: m.role, content: buildMessageContent(m) };
+      if (preserved && m.role === 'assistant' && m.reasoningContent) {
+        msg.reasoning_content = m.reasoningContent;
+      }
+      msgs.push(msg);
+    }
+    return msgs;
+  };
+
+  const buildKimiBody = (model, systemPrompt, convo, thinking) => {
+    const alwaysThinking = window.APP_CONFIG.modelThinkingRequired(model);
+    const preserved = window.APP_CONFIG.kimiRequiresPreservedThinking(model);
+    const body = {
+      model,
+      messages: buildKimiMessages(convo, systemPrompt, model),
+      stream: true,
+      thinking: preserved
+        ? { type: 'enabled', keep: 'all' }
+        : { type: (alwaysThinking || thinking) ? 'enabled' : 'disabled' }
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    return body;
+  };
+
   const buildOpenAIChatBody = (model, systemPrompt, convo, thinking) => {
     const body = {
       model,
@@ -461,7 +499,9 @@ window.API = (() => {
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking)
-      : buildOpenAIChatBody(model, systemPrompt, convo, thinking);
+      : provider === 'kimi'
+        ? buildKimiBody(model, systemPrompt, convo, thinking)
+        : buildOpenAIChatBody(model, systemPrompt, convo, thinking);
 
     const headers = { 'Content-Type': 'application/json' };
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
@@ -674,6 +714,11 @@ window.API = (() => {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking
+        });
+      } else if (provider === 'kimi') {
+        await sendChatCompletions({
+          apiKey, model, systemPrompt, convo, controller, handlers,
+          endpoint: KIMI_ENDPOINT, provider: 'kimi', thinking
         });
       } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, controller, handlers });

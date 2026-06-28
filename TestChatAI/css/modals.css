@@ -254,8 +254,8 @@
 
 .field-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
 .field-row > label { flex-shrink: 0; min-width: 72px; }
-.field-row .theme-toggle { flex-shrink: 0; justify-content: flex-end; }
-.field-row .settings-locale-select {
+.field-row .settings-locale-select,
+.field-row .settings-theme-select {
   min-width: 160px;
   max-width: 100%;
   flex-shrink: 0;
@@ -372,19 +372,12 @@
   min-width: auto;
 }
 
-.settings-pref .settings-locale-select {
+.settings-pref .settings-locale-select,
+.settings-pref .settings-theme-select {
   min-width: 128px;
   padding: 6px 28px 6px 10px;
   font-size: 13px;
   border-radius: var(--radius-md);
-}
-
-.settings-pref .theme-toggle {
-  gap: 10px;
-}
-
-.settings-pref .radio {
-  font-size: 13px;
 }
 
 .settings-clear-btn {
@@ -461,7 +454,7 @@
 }
 .input-group .input { flex: 1; }
 
-.theme-toggle { display: flex; gap: 12px; }
+.theme-toggle { display: flex; flex-wrap: wrap; gap: 12px; }
 .radio { display: flex; align-items: center; gap: 4px; font-size: 14px; cursor: pointer; }
 
 .modal-footer {

@@ -12,6 +12,7 @@ window.Storage = (() => {
     anthropicApiKey: '',
     deepseekApiKey: '',
     geminiApiKey: '',
+    kimiApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
     imageGenEnabled: false,
@@ -334,6 +335,7 @@ window.Storage = (() => {
       anthropicApiKey: state.anthropicApiKey,
       deepseekApiKey: state.deepseekApiKey,
       geminiApiKey: state.geminiApiKey,
+      kimiApiKey: state.kimiApiKey,
       currentModel: state.currentModel,
       systemPrompt: state.systemPrompt,
       theme: state.theme
