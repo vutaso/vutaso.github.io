@@ -1,6 +1,7 @@
 window.UI = (() => {
   const { escapeHTML, formatTime, truncate, copyToClipboard, autoResize, highlightSearchText } = window.Utils;
   const { DEFAULT_SYSTEM_PROMPT } = window.APP_CONFIG;
+  const t = (key, params) => window.I18n.t(key, params);
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
@@ -34,10 +35,8 @@ window.UI = (() => {
     els.toast = $('#toast');
     els.selectionReplyTooltip = $('#selectionReplyTooltip');
     els.openSettingsBtn = $('#openSettingsBtn');
-    els.headerSettingsBtn = $('#headerSettingsBtn');
     els.guideModal = $('#guideModal');
     els.openGuideBtn = $('#openGuideBtn');
-    els.headerGuideBtn = $('#headerGuideBtn');
     els.settingsGuideBtn = $('#settingsGuideBtn');
     els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
     els.guideBody = $('#guideModal')?.querySelector('.guide-body');
@@ -103,10 +102,8 @@ window.UI = (() => {
     els.composerDropZone = $('#composerDropZone');
     els.appDropOverlay = $('#appDropOverlay');
     els.app = $('#app');
-    els.attachImageBtn = $('#attachImageBtn');
-    els.attachFileBtn = $('#attachFileBtn');
-    els.imageFileInput = $('#imageFileInput');
-    els.documentFileInput = $('#documentFileInput');
+    els.attachBtn = $('#attachBtn');
+    els.attachFileInput = $('#attachFileInput');
     els.markdownPreviewPanel = $('#markdownPreviewPanel');
     els.markdownPreviewContent = $('#markdownPreviewContent');
     els.closeMdPreviewBtn = $('#closeMdPreviewBtn');
@@ -206,10 +203,10 @@ window.UI = (() => {
       els.composerTranslateBar.setAttribute('aria-hidden', on ? 'false' : 'true');
     }
     if (els.translateLangLabel) {
-      els.translateLangLabel.textContent = window.APP_CONFIG.getTranslateLabel(langCode);
+      els.translateLangLabel.textContent = window.I18n.getTranslateLabel(langCode);
     }
-    if (els.composerInput) {
-      els.composerInput.placeholder = 'Nhập nội dung...';
+    if (els.composerInput && !els.composerInput.dataset.mode) {
+      els.composerInput.placeholder = t('composerPlaceholder');
     }
     if (els.translateLangOptions) {
       els.translateLangOptions.querySelectorAll('.translate-lang-option').forEach((btn) => {
@@ -224,11 +221,14 @@ window.UI = (() => {
   const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled }) => {
     if (!els.composerInput) return;
     if (imageGenEnabled) {
-      els.composerInput.placeholder = 'Mô tả hình ảnh bạn muốn tạo';
+      els.composerInput.placeholder = t('composerPlaceholderImageGen');
+      els.composerInput.dataset.mode = 'imagegen';
     } else if (translateEnabled) {
-      els.composerInput.placeholder = 'Nhập văn bản';
+      els.composerInput.placeholder = t('composerPlaceholderTranslate');
+      els.composerInput.dataset.mode = 'translate';
     } else {
-      els.composerInput.placeholder = 'Nhập nội dung...';
+      els.composerInput.placeholder = t('composerPlaceholder');
+      delete els.composerInput.dataset.mode;
     }
   };
 
@@ -258,7 +258,7 @@ window.UI = (() => {
         + '<span class="ratio-icon" data-ratio="' + escapeHTML(ratio.id) + '" aria-hidden="true"></span>'
         + '<span class="composer-dropdown-option-text">'
         + '<span class="composer-dropdown-option-title">' + escapeHTML(ratio.label) + '</span> '
-        + '<span class="composer-dropdown-option-desc">(' + escapeHTML(ratio.desc) + ')</span>'
+        + '<span class="composer-dropdown-option-desc">(' + escapeHTML(window.I18n.imageGenLabel('ratio', ratio.id, 'desc')) + ')</span>'
         + '</span>'
         + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
         + '</button>'
@@ -267,7 +267,7 @@ window.UI = (() => {
     if (els.imageGenStyleOptions) {
       els.imageGenStyleOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_STYLES.map((style) =>
         '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(style.id) + '">'
-        + '<span class="composer-dropdown-option-text">' + escapeHTML(style.label) + '</span>'
+        + '<span class="composer-dropdown-option-text">' + escapeHTML(window.I18n.imageGenLabel('style', style.id)) + '</span>'
         + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
         + '</button>'
       ).join('');
@@ -275,7 +275,7 @@ window.UI = (() => {
     if (els.imageGenTemplateOptions) {
       els.imageGenTemplateOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_TEMPLATES.map((tpl) =>
         '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(tpl.id) + '">'
-        + '<span class="composer-dropdown-option-text">' + escapeHTML(tpl.label) + '</span>'
+        + '<span class="composer-dropdown-option-text">' + escapeHTML(window.I18n.imageGenLabel('template', tpl.id)) + '</span>'
         + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
         + '</button>'
       ).join('');
@@ -304,7 +304,7 @@ window.UI = (() => {
       if (els.imageGenStylePicker) els.imageGenStylePicker.classList.toggle('hidden', picked);
       if (els.imageGenStyleChip) els.imageGenStyleChip.classList.toggle('hidden', !picked);
       if (picked && els.imageGenStyleChipLabel) {
-        els.imageGenStyleChipLabel.textContent = style.label;
+        els.imageGenStyleChipLabel.textContent = window.I18n.imageGenLabel('style', styleId);
       }
       if (picked) closeImageGenMenus();
     }
@@ -313,7 +313,7 @@ window.UI = (() => {
       if (els.imageGenTemplatePicker) els.imageGenTemplatePicker.classList.toggle('hidden', picked);
       if (els.imageGenTemplateChip) els.imageGenTemplateChip.classList.toggle('hidden', !picked);
       if (picked && els.imageGenTemplateChipLabel) {
-        els.imageGenTemplateChipLabel.textContent = template.label;
+        els.imageGenTemplateChipLabel.textContent = window.I18n.imageGenLabel('template', templateId);
       }
       if (picked) closeImageGenMenus();
     }
@@ -365,8 +365,8 @@ window.UI = (() => {
       els.imageGenRefBtn.classList.toggle('is-active', hasRef);
       if (els.imageGenRefLabel) {
         els.imageGenRefLabel.textContent = hasRef
-          ? truncate(referenceImage.name || 'Ảnh tham chiếu', 18)
-          : 'Hình ảnh tham chiếu';
+          ? truncate(referenceImage.name || t('referenceImage'), 18)
+          : t('referenceImage');
       }
     }
     if (!imageGenEnabled) {
@@ -384,7 +384,7 @@ window.UI = (() => {
       if (!badge) {
         badge = document.createElement('div');
         badge.className = 'streaming-tool-badge streaming-search-badge';
-        badge.innerHTML = '<i class="fa-solid fa-globe" aria-hidden="true"></i> Đang tìm kiếm web...';
+        badge.innerHTML = '<i class="fa-solid fa-globe" aria-hidden="true"></i> ' + t('searchingWeb');
         article.querySelector('.content')?.prepend(badge);
       }
     } else if (badge) {
@@ -399,7 +399,7 @@ window.UI = (() => {
       if (!badge) {
         badge = document.createElement('div');
         badge.className = 'streaming-tool-badge streaming-image-badge';
-        badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Đang tạo hình ảnh...';
+        badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ' + t('generatingImage');
         article.querySelector('.content')?.prepend(badge);
       }
     } else if (badge) {
@@ -410,13 +410,13 @@ window.UI = (() => {
   const generatedImagesHTML = (images) => {
     if (!images || !images.length) return '';
     return '<div class="message-images message-generated-images">' + images.map((img, i) => {
-      const alt = escapeHTML(img.name || 'Hình ảnh AI ' + (i + 1));
+      const alt = escapeHTML(img.name || t('aiImage', { n: i + 1 }));
       return '<div class="message-image-wrap message-generated-image-wrap">'
-        + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" title="Xem ảnh" />'
-        + '<div class="generated-image-actions" aria-label="Thao tác ảnh">'
-        + '<button type="button" class="generated-image-btn" data-copy-generated-image title="Sao chép ảnh" aria-label="Sao chép ảnh">'
+        + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
+        + '<div class="generated-image-actions" aria-label="' + escapeHTML(t('copy')) + '">'
+        + '<button type="button" class="generated-image-btn" data-copy-generated-image title="' + escapeHTML(t('copyImage')) + '" aria-label="' + escapeHTML(t('copyImage')) + '">'
         + '<i class="fa-solid fa-copy" aria-hidden="true"></i></button>'
-        + '<button type="button" class="generated-image-btn" data-download-generated-image title="Tải ảnh" aria-label="Tải ảnh">'
+        + '<button type="button" class="generated-image-btn" data-download-generated-image title="' + escapeHTML(t('downloadImage')) + '" aria-label="' + escapeHTML(t('downloadImage')) + '">'
         + '<i class="fa-solid fa-download" aria-hidden="true"></i></button>'
         + '</div></div>';
     }).join('') + '</div>';
@@ -425,7 +425,7 @@ window.UI = (() => {
   const reasoningHTML = (reasoning, { open = false } = {}) => {
     if (!reasoning || !reasoning.trim()) return '';
     return '<details class="message-reasoning"' + (open ? ' open' : '') + '>'
-      + '<summary><i class="fa-solid fa-brain" aria-hidden="true"></i> Quá trình suy nghĩ</summary>'
+      + '<summary><i class="fa-solid fa-brain" aria-hidden="true"></i> ' + escapeHTML(t('reasoning')) + '</summary>'
       + '<div class="message-reasoning-body">' + window.Markdown.render(reasoning) + '</div>'
       + '</details>';
   };
@@ -435,7 +435,7 @@ window.UI = (() => {
     const chunks = (meta.groundingChunks || []).filter((c) => c.web?.uri);
     const queries = meta.webSearchQueries || [];
     if (!chunks.length && !queries.length) return '';
-    let html = '<details class="message-grounding"><summary><i class="fa-solid fa-globe" aria-hidden="true"></i> Nguồn tham khảo';
+    let html = '<details class="message-grounding"><summary><i class="fa-solid fa-globe" aria-hidden="true"></i> ' + escapeHTML(t('sources'));
     if (queries.length) {
       html += '<span class="message-grounding-queries">' + escapeHTML(queries.join(', ')) + '</span>';
     }
@@ -486,7 +486,7 @@ window.UI = (() => {
     if (!images || !images.length) return '';
     return '<div class="message-images">' + images.map((img, i) =>
       '<div class="message-image-wrap">'
-      + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || 'Hình ảnh ' + (i + 1)) + '" loading="lazy" title="Xem ảnh" />'
+      + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || t('image', { n: i + 1 })) + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
       + '</div>'
     ).join('') + '</div>';
   };
@@ -500,11 +500,11 @@ window.UI = (() => {
         text = '<p class="message-translate-original">' + escaped + '</p>'
           + '<p class="message-translate-label">' + escapeHTML(label) + '</p>';
       } else if (m.imageGen) {
-        const parts = ['Tỷ lệ ' + window.APP_CONFIG.getImageGenRatio(m.imageGen.ratio).label];
-        const style = window.APP_CONFIG.getImageGenStyle(m.imageGen.style);
-        const template = window.APP_CONFIG.getImageGenTemplate(m.imageGen.template);
-        if (style.id !== 'auto') parts.push('Phong cách ' + style.label.toLowerCase());
-        if (template.id !== 'none') parts.push('Mẫu ' + template.label.toLowerCase());
+        const parts = [t('ratioPrefix') + window.APP_CONFIG.getImageGenRatio(m.imageGen.ratio).label];
+        const styleId = m.imageGen.style;
+        const templateId = m.imageGen.template;
+        if (styleId !== 'auto') parts.push(t('stylePrefix') + window.I18n.imageGenLabel('style', styleId).toLowerCase());
+        if (templateId !== 'none') parts.push(t('templatePrefix') + window.I18n.imageGenLabel('template', templateId).toLowerCase());
         text = '<p class="message-imagegen-prompt">' + escaped + '</p>'
           + '<p class="message-imagegen-label">' + escapeHTML(parts.join(' · ')) + '</p>';
       } else {
@@ -523,9 +523,7 @@ window.UI = (() => {
 
   const renderConversationList = (conversations, currentId, searchQuery = '', snippetMap = null) => {
     const q = (searchQuery || '').trim();
-    const emptyMsg = q
-      ? 'Không tìm thấy cuộc trò chuyện nào'
-      : 'Chưa có cuộc trò chuyện nào';
+    const emptyMsg = q ? t('noSearchResults') : t('noConversations');
     const html = conversations.length
       ? conversations.map(c => {
           const snippet = snippetMap ? (snippetMap.get(c.id) || '') : '';
@@ -540,8 +538,8 @@ window.UI = (() => {
               ${snippetHTML}
             </span>
             <span class="actions">
-              <button type="button" class="btn btn-icon" data-action="rename" title="Đổi tên"><i class="fa-solid fa-pen"></i></button>
-              <button type="button" class="btn btn-icon" data-action="delete" title="Xoá"><i class="fa-solid fa-trash"></i></button>
+              <button type="button" class="btn btn-icon" data-action="rename" title="${escapeHTML(t('rename'))}"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" class="btn btn-icon" data-action="delete" title="${escapeHTML(t('delete'))}"><i class="fa-solid fa-trash"></i></button>
             </span>
           </li>`;
         }).join('')
@@ -560,8 +558,8 @@ window.UI = (() => {
     if (!els.exportSelectCount) return;
     const n = exportSelected.size;
     els.exportSelectCount.textContent = n
-      ? 'Đã chọn ' + n + ' tin nhắn'
-      : 'Chọn tin nhắn để xuất';
+      ? t('exportSelectCount', { n })
+      : t('exportSelectPrompt');
   };
 
   const syncExportSelectOnMessages = () => {
@@ -686,7 +684,7 @@ window.UI = (() => {
 
   const renderEmpty = (animate = false) => {
     closeMarkdownPreview();
-    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>Xin chào!</h2><p class="messages-empty-sub">Tôi có thể giúp gì cho bạn hôm nay? Kéo thả ảnh hoặc tài liệu vào màn hình để phân tích.</p></div>';
+    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(t('hello')) + '</h2><p class="messages-empty-sub">' + escapeHTML(t('emptySub')) + '</p></div>';
     if (!animate) return;
     const empty = els.messages.querySelector('.messages-empty');
     if (empty) requestAnimationFrame(() => empty.classList.add('is-entering'));
@@ -764,18 +762,18 @@ window.UI = (() => {
     let pager = '';
     if (total > 1) {
       pager = '<span class="variant-nav">'
-        + '<button type="button" class="tb-btn variant-btn" data-action="variant-prev" title="Phiên bản trước"'
+        + '<button type="button" class="tb-btn variant-btn" data-action="variant-prev" title="' + escapeHTML(t('variantPrev')) + '"'
         + (variantIndex <= 0 ? ' disabled' : '')
         + '><i class="fa-solid fa-chevron-left"></i></button>'
         + '<span class="variant-count">' + current + ' / ' + total + '</span>'
-        + '<button type="button" class="tb-btn variant-btn" data-action="variant-next" title="Phiên bản sau"'
+        + '<button type="button" class="tb-btn variant-btn" data-action="variant-next" title="' + escapeHTML(t('variantNext')) + '"'
         + (variantIndex >= total - 1 ? ' disabled' : '')
         + '><i class="fa-solid fa-chevron-right"></i></button>'
         + '</span>';
     }
 
-    return '<button type="button" class="tb-btn" data-action="copy" title="Sao chép"><i class="fa-solid fa-copy"></i></button>'
-      + '<button type="button" class="tb-btn" data-action="retry" title="Tạo lại"><i class="fa-solid fa-rotate-right"></i></button>'
+    return '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
+      + '<button type="button" class="tb-btn" data-action="retry" title="' + escapeHTML(t('retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>'
       + pager;
   };
 
@@ -790,14 +788,14 @@ window.UI = (() => {
       : '<div class="content">' + assistantContentHTML(m) + '</div>';
     const idxAttr = idx !== undefined ? ' data-idx="' + idx + '"' : '';
     const editBtn = isUser
-      ? '<button type="button" class="tb-btn" data-action="edit" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>'
+      ? '<button type="button" class="tb-btn" data-action="edit" title="' + escapeHTML(t('edit')) + '"><i class="fa-solid fa-pen-to-square"></i></button>'
       : '';
     const delBtn = isUser
-      ? '<button type="button" class="tb-btn" data-action="delete-msg" title="Xoá"><i class="fa-solid fa-trash"></i></button>'
+      ? '<button type="button" class="tb-btn" data-action="delete-msg" title="' + escapeHTML(t('delete')) + '"><i class="fa-solid fa-trash"></i></button>'
       : '';
     const toolbar = isUser
       ? editBtn
-        + '<button type="button" class="tb-btn" data-action="copy" title="Sao chép"><i class="fa-solid fa-copy"></i></button>'
+        + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
         + delBtn
       : assistantToolbarHTML(m);
     return '<article class="message ' + m.role + '" data-role="' + m.role + '"' + idxAttr + '>'
@@ -956,8 +954,8 @@ window.UI = (() => {
     const text = p ? p.innerText : contentEl.innerText;
     contentEl.innerHTML = '<textarea class="edit-textarea" rows="1">' + escapeHTML(text) + '</textarea>';
     toolbarEl.innerHTML =
-      '<button type="button" class="tb-btn" data-action="save-edit" title="Lưu"><i class="fa-solid fa-check"></i></button>' +
-      '<button type="button" class="tb-btn" data-action="cancel-edit" title="Huỷ"><i class="fa-solid fa-xmark"></i></button>';
+      '<button type="button" class="tb-btn" data-action="save-edit" title="' + escapeHTML(t('save')) + '"><i class="fa-solid fa-check"></i></button>' +
+      '<button type="button" class="tb-btn" data-action="cancel-edit" title="' + escapeHTML(t('cancel')) + '"><i class="fa-solid fa-xmark"></i></button>';
     article.classList.add('editing');
     const textarea = contentEl.querySelector('.edit-textarea');
     autoResize(textarea);
@@ -1004,7 +1002,7 @@ window.UI = (() => {
 
     const titleEl = document.createElement('h1');
     titleEl.className = 'pdf-export-title';
-    titleEl.textContent = convo.title || 'Cuộc trò chuyện';
+    titleEl.textContent = convo.title || t('conversation');
     sheet.appendChild(titleEl);
 
     const messagesWrap = document.createElement('div');
@@ -1188,7 +1186,7 @@ window.UI = (() => {
     const div = document.createElement('div');
     div.className = 'error-banner';
     div.id = 'errorBanner';
-    div.textContent = `Lỗi: ${err.message || err}. Kiểm tra API key trong Cài đặt.`;
+    div.textContent = t('toastErrorApiKey', { err: err.message || err });
     els.composer.insertAdjacentElement('beforebegin', div);
   };
 
@@ -1201,8 +1199,7 @@ window.UI = (() => {
     els.sendBtn.classList.toggle('hidden', on);
     els.stopBtn.classList.toggle('hidden', !on);
     els.composerInput.disabled = on;
-    els.attachImageBtn.disabled = on;
-    els.attachFileBtn.disabled = on;
+    els.attachBtn.disabled = on;
     if (els.webSearchBtn) els.webSearchBtn.disabled = on;
     if (els.imageGenBtn) els.imageGenBtn.disabled = on;
     if (els.translateBtn) els.translateBtn.disabled = on;
@@ -1231,7 +1228,7 @@ window.UI = (() => {
     const imageHtml = imgList.map((img, i) =>
       '<div class="composer-attachment composer-attachment-image" data-type="image" data-idx="' + i + '">'
       + '<img src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || 'Ảnh ' + (i + 1)) + '" />'
-      + '<button type="button" class="composer-attachment-remove" data-remove-type="image" data-remove-idx="' + i + '" title="Xoá ảnh" aria-label="Xoá ảnh">'
+      + '<button type="button" class="composer-attachment-remove" data-remove-type="image" data-remove-idx="' + i + '" title="' + escapeHTML(t('removeImage')) + '" aria-label="' + escapeHTML(t('removeImage')) + '">'
       + '<i class="fa-solid fa-xmark"></i></button>'
       + '</div>'
     ).join('');
@@ -1240,7 +1237,7 @@ window.UI = (() => {
       + '<i class="fa-solid ' + window.Files.getIconClass(f.name) + '"></i>'
       + '<span class="composer-file-name" title="' + escapeHTML(f.name) + '">' + escapeHTML(f.name) + '</span>'
       + '<span class="composer-file-size">' + window.Files.formatSize(f.size || 0) + '</span>'
-      + '<button type="button" class="composer-attachment-remove" data-remove-type="file" data-remove-idx="' + i + '" title="Xoá tệp" aria-label="Xoá tệp">'
+      + '<button type="button" class="composer-attachment-remove" data-remove-type="file" data-remove-idx="' + i + '" title="' + escapeHTML(t('removeFile')) + '" aria-label="' + escapeHTML(t('removeFile')) + '">'
       + '<i class="fa-solid fa-xmark"></i></button>'
       + '</div>'
     ).join('');
@@ -1289,9 +1286,13 @@ window.UI = (() => {
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
-    els.systemPromptInput.value = state.systemPrompt || DEFAULT_SYSTEM_PROMPT;
-    const radios = els.settingsForm.querySelectorAll('input[name="theme"]');
-    radios.forEach(r => { r.checked = r.value === (state.theme || 'dark'); });
+    els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
+    els.settingsForm.querySelectorAll('input[name="theme"]').forEach((r) => {
+      r.checked = r.value === (state.theme || 'dark');
+    });
+    els.settingsForm.querySelectorAll('input[name="locale"]').forEach((r) => {
+      r.checked = r.value === (state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+    });
     els.apiKeyInput.type = 'password';
     els.apiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.anthropicApiKeyInput.type = 'password';
@@ -1305,6 +1306,31 @@ window.UI = (() => {
   };
 
   const closeSettings = () => els.settingsModal.classList.add('hidden');
+
+  const applyLocale = (appState) => {
+    window.I18n.setLocale(appState.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+    window.I18n.applyToDOM();
+    initImageGenMenus();
+    syncComposerToolsUI(appState.currentModel, {
+      webSearchEnabled: appState.webSearchEnabled,
+      imageGenEnabled: appState.imageGenEnabled,
+      thinkingEnabled: appState.thinkingEnabled,
+      translateEnabled: appState.translateEnabled,
+      translateTargetLang: appState.translateTargetLang,
+      imageGenRatio: appState.imageGenRatio,
+      imageGenStyle: appState.imageGenStyle,
+      imageGenTemplate: appState.imageGenTemplate,
+      imageGenRatioPicked: false,
+      imageGenStylePicked: false,
+      imageGenTemplatePicked: false,
+      referenceImage: null
+    });
+    refreshConversationList(window.Conversations.getCurrent()?.id || null);
+    const convo = window.Conversations.getCurrent();
+    if (convo) renderMessages(convo);
+    else renderEmpty();
+    updateExportSelectCount();
+  };
 
   const openGuide = () => {
     closeSettings();
@@ -1357,8 +1383,7 @@ window.UI = (() => {
       next = current === 'open' ? 'closed' : 'open';
     }
     app.setAttribute('data-sidebar', next);
-    const btn = els.openSidebarBtn;
-    if (btn) btn.title = next === 'open' ? 'Đóng sidebar' : 'Mở sidebar';
+    window.I18n.updateSidebarMenuTitle();
   };
 
   const closeMobileSidebar = () => {
@@ -1376,10 +1401,10 @@ window.UI = (() => {
         : 'fa-brands fa-markdown';
     }
     if (els.previewPanelTitle) {
-      els.previewPanelTitle.textContent = mode === 'html' ? 'Preview HTML' : 'Preview Markdown';
+      els.previewPanelTitle.textContent = mode === 'html' ? t('previewHtml') : t('previewMarkdown');
     }
     if (els.markdownPreviewPanel) {
-      els.markdownPreviewPanel.setAttribute('aria-label', mode === 'html' ? 'Preview HTML' : 'Preview Markdown');
+      els.markdownPreviewPanel.setAttribute('aria-label', mode === 'html' ? t('previewHtml') : t('previewMarkdown'));
     }
   };
 
@@ -1520,7 +1545,7 @@ window.UI = (() => {
     enterEditMode, exitEditMode, downloadConversation, downloadConversationTxt,
     scrollToBottom, scrollToBottomIfNear, showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
-    openSettings, closeSettings, openGuide, closeGuide, isGuideModalOpen,
+    openSettings, closeSettings, applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,

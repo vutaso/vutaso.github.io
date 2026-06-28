@@ -135,7 +135,7 @@ window.Conversations = (() => {
     const model = modelId || window.Storage.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const convo = {
       id: uuid(),
-      title: 'Cuộc trò chuyện mới',
+      title: window.I18n.t('newConversation'),
       model,
       createdAt: Date.now(),
       updatedAt: Date.now(),

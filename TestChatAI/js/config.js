@@ -17,6 +17,8 @@ window.APP_CONFIG = {
   ],
 
   DEFAULT_MODEL: 'gemini-3.5-flash',
+  DEFAULT_LOCALE: 'en',
+  LOCALES: ['en', 'vi', 'jp'],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
   API_MAX_OUTPUT_TOKENS: 65536,
@@ -48,19 +50,21 @@ window.APP_CONFIG = {
   },
 
   getMissingApiKeyMessage(modelId) {
+    if (window.I18n) return window.I18n.getMissingApiKeyMessage(modelId);
     const provider = this.getModelProvider(modelId);
-    if (provider === 'anthropic') return 'Nhập Anthropic API key trong Cài đặt trước';
-    if (provider === 'deepseek') return 'Nhập DeepSeek API key trong Cài đặt trước';
-    if (provider === 'google') return 'Nhập Gemini API key trong Cài đặt trước';
-    return 'Nhập API key trong Cài đặt trước';
+    if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
+    if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
+    if (provider === 'google') return 'Enter your Gemini API key in Settings first';
+    return 'Enter your API key in Settings first';
   },
 
   getMissingApiKeyError(modelId) {
+    if (window.I18n) return window.I18n.getMissingApiKeyError(modelId);
     const provider = this.getModelProvider(modelId);
-    if (provider === 'anthropic') return 'Chưa có Anthropic API key. Mở Cài đặt để nhập.';
-    if (provider === 'deepseek') return 'Chưa có DeepSeek API key. Mở Cài đặt để nhập.';
-    if (provider === 'google') return 'Chưa có Gemini API key. Mở Cài đặt để nhập.';
-    return 'Chưa có API key. Mở Cài đặt để nhập.';
+    if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
+    if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
+    if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
+    return 'No API key. Open Settings to enter one.';
   },
 
   hasApiKey(state, modelId) {
@@ -119,7 +123,8 @@ window.APP_CONFIG = {
   },
 
   getTranslateLabel(code) {
-    return 'Dịch sang ' + this.getTranslateLanguage(code).label;
+    if (window.I18n) return window.I18n.getTranslateLabel(code);
+    return 'Translate to ' + this.getTranslateLanguage(code).label;
   },
 
   IMAGE_GEN_RATIOS: [

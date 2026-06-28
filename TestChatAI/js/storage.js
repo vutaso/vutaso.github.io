@@ -23,6 +23,7 @@ window.Storage = (() => {
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
     theme: window.APP_CONFIG.DEFAULT_THEME,
+    locale: window.APP_CONFIG.DEFAULT_LOCALE,
     currentConversationId: null,
     conversations: []
   });
@@ -192,6 +193,15 @@ window.Storage = (() => {
     if (!validTemplates.includes(state.imageGenTemplate)) {
       state.imageGenTemplate = window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE;
     }
+    if (!window.APP_CONFIG.LOCALES.includes(state.locale)) {
+      state.locale = window.APP_CONFIG.DEFAULT_LOCALE;
+    }
+    if (parsed && !('locale' in parsed) && parsed.conversations?.length) {
+      state.locale = 'vi';
+    }
+    if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt)) {
+      state.systemPrompt = window.I18n.getDefaultSystemPrompt(state.locale);
+    }
     const def = window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
     if (state.systemPrompt && state.systemPrompt !== def && state.systemPrompt.includes('ngắn gọn')) {
       state.systemPrompt = def;
@@ -217,7 +227,7 @@ window.Storage = (() => {
           try {
             tryWriteLocalStorage(state);
             usingIdbBackend = false;
-            notify('Đã nén ảnh để tiếp tục lưu hội thoại.');
+            notify(window.I18n.t('storageCompress'));
             return;
           } catch (err) {
             if (!isQuotaError(err)) throw err;
@@ -229,7 +239,7 @@ window.Storage = (() => {
           try {
             tryWriteLocalStorage(state);
             usingIdbBackend = false;
-            notify('Đã nén ảnh để tiếp tục lưu hội thoại.');
+            notify(window.I18n.t('storageCompress'));
             return;
           } catch (err) {
             if (!isQuotaError(err)) throw err;
@@ -237,10 +247,10 @@ window.Storage = (() => {
         }
 
         await saveToIndexedDb();
-        notify('Bộ nhớ trình duyệt đầy. Hội thoại được lưu sang bộ nhớ mở rộng (IndexedDB).');
+        notify(window.I18n.t('storageIdb'));
       } catch (err) {
         console.error('Storage heavy save failed', err);
-        notify('Không lưu được hội thoại: bộ nhớ trình duyệt đầy. Hãy xóa bớt hội thoại hoặc ảnh đính kèm.', 'error');
+        notify(window.I18n.t('storageFail'), 'error');
       } finally {
         heavySavePending = false;
       }
@@ -251,7 +261,7 @@ window.Storage = (() => {
     if (usingIdbBackend) {
       idbSet(state).catch((err) => {
         console.error('IndexedDB save failed', err);
-        notify('Không lưu được hội thoại vào bộ nhớ mở rộng. Kiểm tra dung lượng trình duyệt.', 'error');
+        notify(window.I18n.t('storageFail'), 'error');
       });
       return true;
     }
@@ -262,7 +272,7 @@ window.Storage = (() => {
     } catch (err) {
       if (!isQuotaError(err)) {
         console.error('Storage save failed', err);
-        notify('Không lưu được cài đặt/hội thoại.', 'error');
+        notify(window.I18n.t('storageSettingsFail'), 'error');
         return false;
       }
       scheduleHeavySave();

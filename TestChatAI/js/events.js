@@ -6,6 +6,7 @@ window.Events = (() => {
   const state = window.Storage;
   const convoMod = window.Conversations;
   const ui = window.UI;
+  const t = (key, params) => window.I18n.t(key, params);
 
   let streamingContext = null;
   let streamEndPromise = null;
@@ -230,7 +231,7 @@ window.Events = (() => {
 
     return {
       ...convo,
-      title: (convo.title || 'Cuộc trò chuyện') + ' (đã chọn)',
+      title: (convo.title || t('conversation')) + t('exportSelectedSuffix'),
       messages
     };
   };
@@ -239,9 +240,9 @@ window.Events = (() => {
     const exportConvo = getExportConvoForDownload();
     if (exportConvo && exportConvo.messages.length) return exportConvo;
     if (ui.isExportSelectMode()) {
-      ui.showToast('Chọn ít nhất một tin nhắn để xuất');
+      ui.showToast(t('toastSelectOneExport'));
     } else {
-      ui.showToast('Chưa có hội thoại để xuất');
+      ui.showToast(t('toastNoConvoExport'));
     }
     return null;
   };
@@ -260,9 +261,7 @@ window.Events = (() => {
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
-      const visionOn = window.APP_CONFIG.modelSupportsVision(modelId);
-      ui.els.attachImageBtn.disabled = imageGenOn || !visionOn;
-      ui.els.attachFileBtn.disabled = imageGenOn;
+      ui.els.attachBtn.disabled = imageGenOn;
     }
   };
 
@@ -278,13 +277,13 @@ window.Events = (() => {
 
     const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     if (!window.APP_CONFIG.modelSupportsVision(modelId)) {
-      ui.showToast('Model hiện tại không hỗ trợ đính kèm hình ảnh');
+      ui.showToast(t('toastNoImageAttach'));
       return;
     }
 
     const imageFiles = Array.from(files).filter(f => ACCEPTED_IMAGE_TYPES.includes(f.type));
     if (!imageFiles.length) {
-      ui.showToast('Chỉ hỗ trợ JPEG, PNG, GIF, WebP');
+      ui.showToast(t('toastImageTypes'));
       return;
     }
 
@@ -295,7 +294,7 @@ window.Events = (() => {
         pendingImages.push({ dataUrl, name: file.name, mime: file.type });
         added++;
       } catch {
-        ui.showToast('Không đọc được ảnh "' + file.name + '"');
+        ui.showToast(t('toastReadImageFail', { name: file.name }));
       }
     }
 
@@ -310,14 +309,14 @@ window.Events = (() => {
 
     const docFiles = Array.from(files).filter((f) => fileMod.getKind(f) === 'document');
     if (!docFiles.length) {
-      ui.showToast('Định dạng tài liệu không được hỗ trợ');
+      ui.showToast(t('toastUnsupportedDoc'));
       return;
     }
 
     let added = 0;
     for (const file of docFiles) {
       try {
-        ui.showToast('Đang đọc "' + file.name + '"...');
+        ui.showToast(t('toastReadingFile', { name: file.name }));
         const content = await fileMod.extractContent(file);
         pendingFiles.push({
           name: file.name,
@@ -327,14 +326,14 @@ window.Events = (() => {
         });
         added++;
       } catch (err) {
-        ui.showToast('Không đọc được "' + file.name + '": ' + (err.message || err));
+        ui.showToast(t('toastReadFileFail', { name: file.name, err: err.message || err }));
       }
     }
 
     if (added > 0) {
       ui.renderComposerAttachments(pendingImages, pendingFiles);
       updateSendEnabled();
-      ui.showToast('Đã thêm ' + added + ' tệp');
+      ui.showToast(t('toastAddedFiles', { n: added }));
     }
   };
 
@@ -348,7 +347,7 @@ window.Events = (() => {
       else if (kind === 'document') docFiles.push(file);
     }
     if (!imageFiles.length && !docFiles.length) {
-      ui.showToast('Chỉ hỗ trợ ảnh và tài liệu (txt, pdf, docx, xlsx, csv, json...)');
+      ui.showToast(t('toastDropTypes'));
       return;
     }
     if (imageFiles.length) await addPendingImages(imageFiles);
@@ -560,7 +559,7 @@ window.Events = (() => {
         if (aborted) {
           if (hasResult && !discard) {
             saveAssistantResult(buffer);
-            ui.showToast('Đã dừng');
+            ui.showToast(t('toastStopped'));
           } else if (retryIdx !== undefined && !discard) {
             convoMod.cancelRetryVariant(convo, messageIndex);
             if (msg && convoMod.getById(convo.id)) ui.updateAssistantMessage(messageIndex, msg);
@@ -696,7 +695,7 @@ window.Events = (() => {
     if (!convo) return;
     convoMod.editMessage(convo, idx, newContent);
     ui.renderMessages(convo);
-    ui.showToast('Đã lưu chỉnh sửa');
+    ui.showToast(t('toastEditSaved'));
     streamResponse(convo);
   };
 
@@ -733,22 +732,13 @@ window.Events = (() => {
       addPendingImages(imageFiles);
     });
 
-    ui.els.attachImageBtn.addEventListener('click', () => {
-      ui.els.imageFileInput.click();
+    ui.els.attachBtn.addEventListener('click', () => {
+      ui.els.attachFileInput.click();
     });
 
-    ui.els.attachFileBtn.addEventListener('click', () => {
-      ui.els.documentFileInput.click();
-    });
-
-    ui.els.imageFileInput.addEventListener('change', () => {
-      addPendingImages(ui.els.imageFileInput.files);
-      ui.els.imageFileInput.value = '';
-    });
-
-    ui.els.documentFileInput.addEventListener('change', () => {
-      addPendingDocuments(ui.els.documentFileInput.files);
-      ui.els.documentFileInput.value = '';
+    ui.els.attachFileInput.addEventListener('change', () => {
+      addDroppedFiles(ui.els.attachFileInput.files);
+      ui.els.attachFileInput.value = '';
     });
 
     ui.els.composerAttachments.addEventListener('click', (e) => {
@@ -886,7 +876,7 @@ window.Events = (() => {
       const action = e.target.closest('[data-action]')?.dataset.action;
       if (action === 'delete') {
         e.stopPropagation();
-        if (!confirm('Bạn có chắc muốn xoá cuộc trò chuyện này?')) return;
+        if (!confirm(t('confirmDeleteConvo'))) return;
         await settleIfStreamingConvo(id, { discard: true });
         convoMod.remove(id);
         const cur = convoMod.getCurrent();
@@ -949,14 +939,14 @@ window.Events = (() => {
       const exportConvo = requireExportConvo();
       if (!exportConvo) return;
       ui.downloadConversation(exportConvo);
-      ui.showToast(ui.isExportSelectMode() ? 'Đã tải phần đã chọn (Markdown)' : 'Đã tải về Markdown');
+      ui.showToast(ui.isExportSelectMode() ? t('toastDownloadMdSelected') : t('toastDownloadMd'));
     });
 
     ui.els.downloadTxtBtn.addEventListener('click', () => {
       const exportConvo = requireExportConvo();
       if (!exportConvo) return;
       ui.downloadConversationTxt(exportConvo);
-      ui.showToast(ui.isExportSelectMode() ? 'Đã tải phần đã chọn (TXT)' : 'Đã tải về TXT');
+      ui.showToast(ui.isExportSelectMode() ? t('toastDownloadTxtSelected') : t('toastDownloadTxt'));
     });
 
     ui.els.copyMarkdownBtn.addEventListener('click', async () => {
@@ -964,7 +954,7 @@ window.Events = (() => {
       if (!exportConvo) return;
       const md = window.Utils.formatConversation(exportConvo);
       if (await copyToClipboard(md)) {
-        ui.showToast(ui.isExportSelectMode() ? 'Đã sao chép phần đã chọn' : 'Đã sao chép toàn bộ hội thoại');
+        ui.showToast(ui.isExportSelectMode() ? t('toastCopiedSelected') : t('toastCopied'));
       }
     });
 
@@ -978,13 +968,13 @@ window.Events = (() => {
       docxExporting = true;
       ui.els.docxExportBtn.disabled = true;
       const streaming = window.API.isStreaming();
-      ui.showToast(streaming ? 'Đang xuất Word (gồm tin đang trả lời)...' : 'Đang xuất Word...');
+      ui.showToast(streaming ? t('toastExportingWordStream') : t('toastExportingWord'));
 
       try {
         await window.Utils.exportToDocx(exportConvo);
-        ui.showToast('Đã xuất Word thành công');
+        ui.showToast(t('toastExportWordOk'));
       } catch (err) {
-        ui.showToast('Xuất Word thất bại: ' + (err.message || err));
+        ui.showToast(t('toastExportWordFail', { err: err.message || err }));
       } finally {
         docxExporting = false;
         ui.els.docxExportBtn.disabled = false;
@@ -1009,9 +999,9 @@ window.Events = (() => {
         await window.PdfExport.exportToPdf(exportConvo, {
           onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
         });
-        ui.showToast('Đã xuất PDF thành công');
+        ui.showToast(t('toastExportPdfOk'));
       } catch (err) {
-        ui.showToast('Xuất PDF thất bại: ' + (err.message || err));
+        ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
       } finally {
         pdfExporting = false;
         ui.els.pdfExportBtn.disabled = false;
@@ -1020,7 +1010,7 @@ window.Events = (() => {
     });
 
     const openGuideFromClick = (e) => {
-      const trigger = e.target.closest('[data-action="open-guide"], #openGuideBtn, #headerGuideBtn, #settingsGuideBtn');
+      const trigger = e.target.closest('[data-action="open-guide"], #openGuideBtn, #settingsGuideBtn');
       if (!trigger) return;
       e.preventDefault();
       ui.openGuide();
@@ -1029,7 +1019,6 @@ window.Events = (() => {
     document.addEventListener('click', openGuideFromClick);
 
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
-    ui.els.headerSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.guideOpenSettingsBtn?.addEventListener('click', () => {
       ui.closeGuide();
       ui.openSettings(state.get());
@@ -1051,7 +1040,7 @@ window.Events = (() => {
       syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled });
       updateSendEnabled();
       const label = ui.els.modelSelect.selectedOptions[0]?.textContent || modelId;
-      ui.showToast('Model: ' + label);
+      ui.showToast(t('toastModel', { label }));
     });
 
     ui.els.webSearchBtn.addEventListener('click', () => {
@@ -1061,7 +1050,7 @@ window.Events = (() => {
       const next = !s.webSearchEnabled;
       state.set({ webSearchEnabled: next });
       syncComposerTools(modelId, { webSearchEnabled: next });
-      ui.showToast(next ? 'Đã bật tìm kiếm web' : 'Đã tắt tìm kiếm web');
+      ui.showToast(next ? t('toastWebSearchOn') : t('toastWebSearchOff'));
     });
 
     ui.els.thinkingBtn.addEventListener('click', () => {
@@ -1071,7 +1060,7 @@ window.Events = (() => {
       const next = !s.thinkingEnabled;
       state.set({ thinkingEnabled: next });
       syncComposerTools(modelId, { thinkingEnabled: next });
-      ui.showToast(next ? 'Đã bật Thinking' : 'Đã tắt Thinking');
+      ui.showToast(next ? t('toastThinkingOn') : t('toastThinkingOff'));
     });
 
     const setImageGenEnabled = (enabled) => {
@@ -1090,7 +1079,7 @@ window.Events = (() => {
       state.set(patch);
       syncComposerTools(modelId, patch);
       updateSendEnabled();
-      ui.showToast(enabled ? 'Đã bật tạo hình ảnh' : 'Đã tắt tạo hình ảnh');
+      ui.showToast(enabled ? t('toastImageGenOn') : t('toastImageGenOff'));
     };
 
     ui.els.imageGenBtn.addEventListener('click', () => {
@@ -1111,16 +1100,16 @@ window.Events = (() => {
       ui.els.imageGenRefInput.value = '';
       if (!file) return;
       if (!window.APP_CONFIG.ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-        ui.showToast('Chỉ hỗ trợ JPEG, PNG, GIF, WebP');
+        ui.showToast(t('toastImageTypes'));
         return;
       }
       try {
         const dataUrl = await readFileAsDataUrl(file);
         pendingReferenceImage = { dataUrl, name: file.name, mime: file.type };
         syncComposerTools();
-        ui.showToast('Đã thêm ảnh tham chiếu');
+        ui.showToast(t('toastRefImageAdded'));
       } catch {
-        ui.showToast('Không đọc được ảnh tham chiếu');
+        ui.showToast(t('toastRefImageFail'));
       }
     });
 
@@ -1200,7 +1189,7 @@ window.Events = (() => {
       state.set(patch);
       syncComposerTools(modelId, patch);
       updateSendEnabled();
-      ui.showToast(enabled ? 'Đã bật dịch' : 'Đã tắt dịch');
+      ui.showToast(enabled ? t('toastTranslateOn') : t('toastTranslateOff'));
     };
 
     ui.els.translateBtn.addEventListener('click', () => {
@@ -1275,14 +1264,14 @@ window.Events = (() => {
     });
 
     const handleClearAll = async () => {
-      if (!confirm('Xoá tất cả hội thoại? Hành động này không thể hoàn tác.')) return;
+      if (!confirm(t('confirmClearAll'))) return;
       await settleActiveStream({ discard: true });
       await ui.animateClearAll();
       convoMod.clearAll();
       ui.clearConversationSearch();
       ui.refreshConversationList(null);
       ui.renderMessages(null, { animateEmpty: true });
-      ui.showToast('Đã xoá tất cả hội thoại');
+      ui.showToast(t('toastClearAll'));
     };
 
     ui.els.clearAllBtn.addEventListener('click', handleClearAll);
@@ -1294,14 +1283,22 @@ window.Events = (() => {
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
       const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
       const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
-      const systemPrompt = ui.els.systemPromptInput.value.trim() || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
+      const prev = state.get();
+      const locale = ui.els.settingsForm.querySelector('input[name="locale"]:checked')?.value || window.APP_CONFIG.DEFAULT_LOCALE;
+      let systemPrompt = ui.els.systemPromptInput.value.trim();
+      if (!systemPrompt || window.I18n.isDefaultSystemPrompt(systemPrompt)) {
+        systemPrompt = window.I18n.getDefaultSystemPrompt(locale);
+      }
       const theme = ui.els.settingsForm.querySelector('input[name="theme"]:checked')?.value || 'dark';
-      const prevTheme = state.get().theme;
-      state.set({ apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, systemPrompt, theme });
+      const prevTheme = prev.theme;
+      const nextState = { apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, systemPrompt, theme, locale };
+      state.set(nextState);
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
+      if (prev.locale !== locale) ui.applyLocale({ ...prev, ...nextState });
+      else window.I18n.applyToDOM();
       ui.closeSettings();
-      ui.showToast('Đã lưu cài đặt');
+      ui.showToast(t('toastSettingsSaved'));
       updateSendEnabled();
     });
 
@@ -1451,8 +1448,8 @@ window.Events = (() => {
       if (copyGenImgBtn) {
         const img = copyGenImgBtn.closest('.message-generated-image-wrap')?.querySelector('img');
         const src = img?.currentSrc || img?.src;
-        if (src && await copyImageToClipboard(src)) ui.showToast('Đã sao chép ảnh');
-        else ui.showToast('Không sao chép được ảnh');
+        if (src && await copyImageToClipboard(src)) ui.showToast(t('toastCopyImageOk'));
+        else ui.showToast(t('toastCopyImageFail'));
         return;
       }
       const downloadGenImgBtn = e.target.closest('[data-download-generated-image]');
@@ -1463,9 +1460,9 @@ window.Events = (() => {
         if (src) {
           try {
             await downloadDataUrlImage(src, name);
-            ui.showToast('Đã tải ảnh');
+            ui.showToast(t('toastDownloadImageOk'));
           } catch {
-            ui.showToast('Không tải được ảnh');
+            ui.showToast(t('toastDownloadImageFail'));
           }
         }
         return;
@@ -1476,14 +1473,14 @@ window.Events = (() => {
         const code = mermaidBlock
           ? window.Markdown.getMermaidSource(mermaidBlock)
           : (copyBtn.closest('pre')?.querySelector('code')?.innerText || '');
-        if (await copyToClipboard(code)) ui.showToast('Đã sao chép code');
+        if (await copyToClipboard(code)) ui.showToast(t('toastCopyCode'));
         return;
       }
       const copyTableBtn = e.target.closest('[data-copy-table]');
       if (copyTableBtn) {
         const table = copyTableBtn.closest('.table-block')?.querySelector('table');
         if (table && await copyToClipboard(window.Markdown.tableToMarkdown(table))) {
-          ui.showToast('Đã sao chép bảng (Markdown)');
+          ui.showToast(t('toastCopyTable'));
         }
         return;
       }
@@ -1491,7 +1488,7 @@ window.Events = (() => {
       if (msgCopy) {
         const msg = msgCopy.closest('.message');
         const txt = msg?.querySelector('.content')?.innerText || '';
-        if (await copyToClipboard(txt)) ui.showToast('Đã sao chép tin nhắn');
+        if (await copyToClipboard(txt)) ui.showToast(t('toastCopyMessage'));
         return;
       }
       const retryBtn = e.target.closest('[data-action="retry"]');
@@ -1554,7 +1551,7 @@ window.Events = (() => {
         if (!msg || window.API.isStreaming()) return;
         const idx = parseInt(msg.dataset.idx, 10);
         if (isNaN(idx)) return;
-        if (!confirm('Xoá tin nhắn này và tất cả tin nhắn phía sau?')) return;
+        if (!confirm(t('confirmDeleteMsg'))) return;
         const convo = convoMod.getCurrent();
         if (!convo) return;
         convoMod.deleteMessageFrom(convo, idx);

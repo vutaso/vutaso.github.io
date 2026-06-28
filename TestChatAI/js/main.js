@@ -8,6 +8,9 @@
 
   ui.cacheEls();
 
+  window.I18n.setLocale(state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+  window.I18n.applyToDOM();
+
   window.addEventListener('app-storage-notify', (e) => {
     const message = e.detail?.message;
     if (message) ui.showToast(message);

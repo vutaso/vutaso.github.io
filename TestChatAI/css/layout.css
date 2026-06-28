@@ -1,10 +1,11 @@
 .app {
   display: grid;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .app[data-sidebar="open"] {
@@ -18,7 +19,9 @@
 .sidebar {
   grid-column: 1;
   grid-row: 1;
+  height: 100%;
   min-height: 0;
+  align-self: stretch;
 }
 
 .app[data-sidebar="closed"] .sidebar {
@@ -237,6 +240,7 @@ body.pdf-export-loading {
   grid-row: 1;
   display: flex;
   flex-direction: row;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -248,6 +252,8 @@ body.pdf-export-loading {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -478,30 +484,30 @@ body.pdf-export-loading {
   backdrop-filter: blur(12px);
   flex-shrink: 0;
   z-index: 10;
+  position: relative;
 }
 
 .header-menu { display: inline-flex; }
 
 .header-title {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.01em;
+  pointer-events: none;
 }
 
 .header-title .model-select {
-  font-size: 11px;
+  pointer-events: auto;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text-dim);
+  color: var(--text);
   background-color: var(--bg-hover);
-  padding: 2px 24px 2px 8px;
-  background-position: right 6px center;
-  max-width: 150px;
+  padding: 6px 28px 6px 12px;
+  background-position: right 8px center;
+  max-width: min(240px, 50vw);
 }
 .header-title .model-select:hover,
 .header-title .model-select:focus {
@@ -547,6 +553,7 @@ body.pdf-export-loading {
   position: relative;
   z-index: 2;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .export-select-bar {

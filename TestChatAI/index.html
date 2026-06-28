@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -52,24 +52,20 @@
       </div>
       <ul id="conversationList" class="conversation-list" role="list"></ul>
       <div class="sidebar-footer">
-        <div class="sidebar-footer-primary">
-          <button type="button" id="openGuideBtn" class="btn btn-ghost" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
-            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
-            <span class="label">Hướng dẫn</span>
-          </button>
-          <button id="openSettingsBtn" class="btn btn-ghost" title="Cài đặt">
-            <span class="icon"><i class="fa-solid fa-gear"></i></span>
-            <span class="label">Cài đặt</span>
-          </button>
-        </div>
-        <div class="sidebar-footer-actions">
-          <button id="clearAllSidebarBtn" class="btn btn-ghost" title="Xoá tất cả hội thoại">
-            <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
-          </button>
-          <button id="themeToggleBtn" class="btn btn-ghost" title="Chuyển theme">
-            <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
-          </button>
-        </div>
+        <button type="button" id="openGuideBtn" class="btn btn-ghost sidebar-footer-item" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
+          <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
+          <span class="label">Hướng dẫn</span>
+        </button>
+        <button id="clearAllSidebarBtn" class="btn btn-icon sidebar-footer-action" title="Xoá tất cả hội thoại">
+          <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
+        </button>
+        <button id="openSettingsBtn" class="btn btn-ghost sidebar-footer-item" title="Cài đặt">
+          <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          <span class="label">Cài đặt</span>
+        </button>
+        <button id="themeToggleBtn" class="btn btn-icon sidebar-footer-action" title="Chuyển theme">
+          <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
+        </button>
       </div>
     </aside>
 
@@ -94,13 +90,14 @@
           <span class="icon"><i class="fa-solid fa-bars"></i></span>
         </button>
         <div class="header-title">
-          <span class="brand-avatar brand-avatar-sm" aria-hidden="true">V</span>
-          <span>VUTASO AI</span>
           <select id="modelSelect" class="select model-select" title="Chọn model" aria-label="Chọn model"></select>
         </div>
         <div class="header-actions">
           <button type="button" id="toggleExportSelectBtn" class="btn btn-icon" title="Chọn tin để xuất" aria-pressed="false" aria-label="Chọn tin để xuất">
             <span class="icon"><i class="fa-solid fa-check-double"></i></span>
+          </button>
+          <button id="copyMarkdownBtn" class="btn btn-icon" title="Sao chép Markdown">
+            <span class="icon"><i class="fa-solid fa-copy"></i></span>
           </button>
           <button id="downloadConvoBtn" class="btn btn-icon" title="Tải về Markdown">
             <span class="icon"><i class="fa-solid fa-file-arrow-down"></i></span>
@@ -108,21 +105,12 @@
           <button id="downloadTxtBtn" class="btn btn-icon" title="Tải về TXT">
             <span class="icon"><i class="fa-solid fa-file-lines"></i></span>
           </button>
-          <button id="copyMarkdownBtn" class="btn btn-icon" title="Sao chép Markdown">
-            <span class="icon"><i class="fa-solid fa-copy"></i></span>
-          </button>
 
           <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
             <span class="icon"><i class="fa-solid fa-file-word"></i></span>
           </button>
           <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF (A4)">
             <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
-          </button>
-          <button type="button" id="headerGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
-            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
-          </button>
-          <button id="headerSettingsBtn" class="btn btn-icon" title="Cài đặt">
-            <span class="icon"><i class="fa-solid fa-gear"></i></span>
           </button>
         </div>
       </header>
@@ -161,14 +149,10 @@
           </button>
         </div>
         <div id="composerDropZone" class="composer-inner">
-          <button type="button" id="attachImageBtn" class="btn btn-icon composer-attach" title="Đính kèm ảnh" aria-label="Đính kèm ảnh">
-            <i class="fa-solid fa-image"></i>
+          <button type="button" id="attachBtn" class="btn btn-icon composer-attach" title="Đính kèm ảnh hoặc tài liệu" aria-label="Đính kèm ảnh hoặc tài liệu">
+            <i class="fa-solid fa-plus"></i>
           </button>
-          <button type="button" id="attachFileBtn" class="btn btn-icon composer-attach" title="Đính kèm tài liệu" aria-label="Đính kèm tài liệu">
-            <i class="fa-solid fa-paperclip"></i>
-          </button>
-          <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" multiple hidden />
-          <input type="file" id="documentFileInput" accept=".txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,.xlsx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden />
+          <input type="file" id="attachFileInput" accept="image/jpeg,image/png,image/gif,image/webp,.txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,.xlsx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden />
           <div class="composer-field">
             <textarea
               id="composerInput"
@@ -303,6 +287,7 @@
       <header class="modal-header">
         <h2 id="settingsTitle">Cài đặt</h2>
         <div class="modal-header-actions">
+          <button type="submit" form="settingsForm" class="btn btn-primary btn-sm">Lưu</button>
           <button type="button" id="settingsGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn sử dụng">
             <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
           </button>
@@ -320,7 +305,7 @@
               <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Lưu cục bộ, chỉ gửi tới OpenAI.</p>
+          <p class="field-hint" data-i18n-key="apiKeyHintOpenAI">Stored locally, sent only to OpenAI.</p>
         </div>
 
         <div class="field">
@@ -331,7 +316,7 @@
               <span class="icon" id="anthropicApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Lưu cục bộ, chỉ gửi tới Anthropic.</p>
+          <p class="field-hint" data-i18n-key="apiKeyHintAnthropic">Stored locally, sent only to Anthropic.</p>
         </div>
 
         <div class="field">
@@ -342,7 +327,7 @@
               <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Lưu cục bộ, chỉ gửi tới DeepSeek.</p>
+          <p class="field-hint" data-i18n-key="apiKeyHintDeepSeek">Stored locally, sent only to DeepSeek.</p>
         </div>
 
         <div class="field">
@@ -353,7 +338,7 @@
               <span class="icon" id="geminiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
             </button>
           </div>
-          <p class="field-hint">Lưu cục bộ, chỉ gửi tới Google.</p>
+          <p class="field-hint" data-i18n-key="apiKeyHintGemini">Stored locally, sent only to Google.</p>
         </div>
 
         <div class="field">
@@ -362,7 +347,16 @@
         </div>
 
         <div class="field field-row">
-          <label>Theme</label>
+          <label id="settingsLanguageLabel">Language</label>
+          <div class="theme-toggle">
+            <label class="radio"><input type="radio" name="locale" value="en" /> EN</label>
+            <label class="radio"><input type="radio" name="locale" value="vi" /> VI</label>
+            <label class="radio"><input type="radio" name="locale" value="jp" /> JP</label>
+          </div>
+        </div>
+
+        <div class="field field-row">
+          <label id="settingsThemeLabel">Theme</label>
           <div class="theme-toggle">
             <label class="radio"><input type="radio" name="theme" value="dark" /> Dark</label>
             <label class="radio"><input type="radio" name="theme" value="light" /> Light</label>
@@ -372,11 +366,6 @@
         <div class="field">
           <button type="button" id="clearAllBtn" class="btn btn-danger">Xoá tất cả hội thoại</button>
         </div>
-
-        <footer class="modal-footer">
-          <button type="button" class="btn btn-ghost" data-modal-close>Huỷ</button>
-          <button type="submit" class="btn btn-primary">Lưu</button>
-        </footer>
       </form>
     </div>
   </div>
@@ -540,6 +529,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.2.0/dist/html2canvas-pro.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/files.js"></script>
   <script src="js/storage.js"></script>
