@@ -605,7 +605,7 @@ window.Utils = (() => {
     const paragraphs = [buildDocxRoleParagraph('Bạn', docxLib)];
 
     if (msg.content && msg.content.trim()) {
-      paragraphs.push(...markdownToDocxParagraphs(msg.content, docxLib));
+      paragraphs.push(...await window.DocxExport.markdownToDocxParagraphs(msg.content, docxLib));
     }
 
     for (const img of msg.images || []) {
@@ -646,17 +646,18 @@ window.Utils = (() => {
     return paragraphs;
   };
 
-  const buildDocxAssistantParagraphs = (msg, docxLib) => {
+  const buildDocxAssistantParagraphs = async (msg, docxLib) => {
     const content = window.Conversations.getAssistantContent(msg);
     if (!content || !content.trim()) return [];
     return [
       buildDocxRoleParagraph('Trợ lý', docxLib),
-      ...markdownToDocxParagraphs(content, docxLib),
+      ...(await window.DocxExport.markdownToDocxParagraphs(content, docxLib)),
     ];
   };
 
   const exportToDocx = async (convo) => {
     if (!window.docx) throw new Error('Thư viện docx chưa tải');
+    if (!window.DocxExport) throw new Error('Module xuất DOCX chưa tải');
 
     const messages = filterExportMessages(convo);
     if (!messages.length) throw new Error('Không có tin nhắn để xuất');
@@ -674,7 +675,7 @@ window.Utils = (() => {
       if (msg.role === 'user') {
         children.push(...await buildDocxUserParagraphs(msg, window.docx));
       } else {
-        children.push(...buildDocxAssistantParagraphs(msg, window.docx));
+        children.push(...await buildDocxAssistantParagraphs(msg, window.docx));
       }
     }
 

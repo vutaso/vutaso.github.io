@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/modals.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/pdf-export.css" />
+  <link rel="stylesheet" href="css/docx-export.css" />
 </head>
 <body>
   <div id="app" class="app" data-sidebar="open">
@@ -508,6 +509,15 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
+  <div id="pdfExportOverlay" class="pdf-export-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="pdfExportLoadingTitle" aria-busy="true">
+    <div class="pdf-export-overlay-backdrop"></div>
+    <div class="pdf-export-overlay-content">
+      <div class="pdf-export-spinner" aria-hidden="true"></div>
+      <p id="pdfExportLoadingTitle" class="pdf-export-overlay-title">Đang xuất PDF A4...</p>
+      <p id="pdfExportLoadingText" class="pdf-export-overlay-hint">Vui lòng đợi trong giây lát</p>
+    </div>
+  </div>
+
   <div id="imagePreviewOverlay" class="image-preview-overlay hidden" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
     <button type="button" id="closeImagePreviewBtn" class="image-preview-close btn btn-icon" title="Đóng" aria-label="Đóng">
       <span class="icon"><i class="fa-solid fa-xmark"></i></span>
@@ -534,6 +544,7 @@
   <script src="js/files.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/markdown.js"></script>
+  <script src="js/docx-export.js"></script>
   <script src="js/conversations.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>

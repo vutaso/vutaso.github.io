@@ -1000,16 +1000,22 @@ window.Events = (() => {
       pdfExporting = true;
       ui.els.pdfExportBtn.disabled = true;
       const streaming = window.API.isStreaming();
-      ui.showToast(streaming ? 'Đang xuất PDF A4 (gồm tin đang trả lời)...' : 'Đang xuất PDF A4...');
+      ui.setPdfExportLoading(true, {
+        title: 'Đang xuất PDF A4...',
+        hint: streaming ? 'Gồm cả tin đang trả lời' : 'Vui lòng đợi trong giây lát',
+      });
 
       try {
-        await window.PdfExport.exportToPdf(exportConvo);
+        await window.PdfExport.exportToPdf(exportConvo, {
+          onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+        });
         ui.showToast('Đã xuất PDF thành công');
       } catch (err) {
         ui.showToast('Xuất PDF thất bại: ' + (err.message || err));
       } finally {
         pdfExporting = false;
         ui.els.pdfExportBtn.disabled = false;
+        ui.setPdfExportLoading(false);
       }
     });
 

@@ -6,8 +6,8 @@
   z-index: -1;
   opacity: 1;
   pointer-events: none;
-  background: var(--bg);
-  color: var(--text);
+  background: #ffffff;
+  color: #111118;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   clip-path: inset(100%);
@@ -31,7 +31,7 @@
   font-weight: 700;
   margin: 0 0 16px;
   padding: 0 20px;
-  color: var(--text);
+  color: #111118;
   letter-spacing: -0.02em;
 }
 
@@ -42,12 +42,41 @@
   height: auto !important;
 }
 
+.pdf-export-root .pdf-export-title,
+.pdf-export-root .pdf-export-message,
+.pdf-export-root .pdf-export-chunk {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pdf-export-root .pdf-export-chunk {
+  display: flex;
+  gap: 12px;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 20px;
+}
+
+.pdf-export-root .pdf-export-chunk.continuation {
+  padding-top: 2px;
+}
+
+.pdf-export-root .pdf-export-chunk-spacer {
+  width: 32px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 .pdf-export-root .message {
   max-width: 100%;
   margin: 0;
   padding: 8px 20px;
-  page-break-inside: avoid;
-  break-inside: avoid;
+}
+
+.pdf-export-root .content {
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .pdf-export-root .message.user .body {
@@ -80,16 +109,37 @@
 
 .pdf-export-root .katex,
 .pdf-export-root .katex-display {
-  color: var(--text);
+  color: #111118;
 }
 
-.pdf-export-root pre,
+.pdf-export-root pre {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pdf-export-root pre .pre-header {
+  position: static !important;
+}
+
+.pdf-export-root pre code {
+  display: block;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pdf-export-root .table-block,
+.pdf-export-root .table-scroll,
+.pdf-export-root .mermaid-block,
 .pdf-export-root .mermaid-view {
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.pdf-export-root .math-block {
-  page-break-inside: avoid;
-  break-inside: avoid;
+  max-height: none !important;
+  overflow: visible !important;
 }

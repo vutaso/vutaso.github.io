@@ -47,6 +47,9 @@ window.UI = (() => {
 
     els.docxExportBtn = $('#docxExportBtn');
     els.pdfExportBtn = $('#pdfExportBtn');
+    els.pdfExportOverlay = $('#pdfExportOverlay');
+    els.pdfExportLoadingTitle = $('#pdfExportLoadingTitle');
+    els.pdfExportLoadingText = $('#pdfExportLoadingText');
     els.toggleExportSelectBtn = $('#toggleExportSelectBtn');
     els.exportSelectBar = $('#exportSelectBar');
     els.exportSelectCount = $('#exportSelectCount');
@@ -992,10 +995,9 @@ window.UI = (() => {
     new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   const preparePdfExportRoot = async (convo) => {
-    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     const root = document.createElement('div');
     root.className = 'pdf-export-root';
-    root.setAttribute('data-theme', theme);
+    root.setAttribute('data-theme', 'light');
 
     const sheet = document.createElement('div');
     sheet.className = 'pdf-export-sheet';
@@ -1036,6 +1038,18 @@ window.UI = (() => {
     document.body.appendChild(root);
 
     polishContent(root, { renderMermaid: true });
+    if (window.mermaid) {
+      try {
+        window.mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          logLevel: 'error',
+          suppressErrorRendering: true
+        });
+      } catch {}
+    }
     await window.Markdown.renderMermaid(root, { skipIfStreaming: false });
     await document.fonts.ready;
     await waitForLayout();
@@ -1478,6 +1492,23 @@ window.UI = (() => {
     toastTimer = setTimeout(() => els.toast.classList.add('hidden'), 1800);
   };
 
+  const setPdfExportLoading = (visible, { title, hint } = {}) => {
+    if (!els.pdfExportOverlay) return;
+    if (visible) {
+      if (title && els.pdfExportLoadingTitle) els.pdfExportLoadingTitle.textContent = title;
+      if (hint && els.pdfExportLoadingText) els.pdfExportLoadingText.textContent = hint;
+      els.pdfExportOverlay.classList.remove('hidden');
+      els.pdfExportOverlay.setAttribute('aria-hidden', 'false');
+      els.pdfExportOverlay.setAttribute('aria-busy', 'true');
+      document.body.classList.add('pdf-export-loading');
+    } else {
+      els.pdfExportOverlay.classList.add('hidden');
+      els.pdfExportOverlay.setAttribute('aria-hidden', 'true');
+      els.pdfExportOverlay.setAttribute('aria-busy', 'false');
+      document.body.classList.remove('pdf-export-loading');
+    }
+  };
+
   return {
     cacheEls, setTheme, initModelSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
@@ -1494,6 +1525,7 @@ window.UI = (() => {
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
+    setPdfExportLoading,
     isExportSelectMode, toggleExportSelectMode, setExportSelectMode,
     getExportSelectedIndices, toggleExportSelectIndex,
     selectAllExportMessages, clearExportSelection,

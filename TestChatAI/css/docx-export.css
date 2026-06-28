@@ -1,0 +1,14 @@
+.docx-export-host {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.docx-export-host .katex,
+.docx-export-host .katex-display {
+  color: #111118;
+}
+
+.docx-export-host .math-inline .katex {
+  font-size: 1.1em;
+}
