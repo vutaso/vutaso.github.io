@@ -330,6 +330,40 @@
   gap: 4px;
 }
 
+.settings-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-prompt-header > label[for="systemPromptInput"] {
+  font-size: 12px;
+}
+
+.settings-inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.settings-inline-check input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.settings-token-save-hint {
+  margin-top: 2px;
+}
+
 .settings-prompt-field label {
   font-size: 12px;
 }

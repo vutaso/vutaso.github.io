@@ -22,6 +22,7 @@ window.Storage = (() => {
     imageGenTemplate: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
     translateEnabled: false,
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
+    tokenSaveEnabled: false,
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
     theme: window.APP_CONFIG.DEFAULT_THEME,
     locale: window.APP_CONFIG.DEFAULT_LOCALE,
@@ -200,13 +201,14 @@ window.Storage = (() => {
     if (parsed && !('locale' in parsed) && parsed.conversations?.length) {
       state.locale = 'vi';
     }
-    if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt)) {
+    if (state.tokenSaveEnabled) {
+      if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt) || window.I18n?.isTokenSaveSystemPrompt(state.systemPrompt)) {
+        state.systemPrompt = window.I18n.getTokenSaveSystemPrompt(state.locale);
+      }
+    } else if (window.I18n?.isTokenSaveSystemPrompt(state.systemPrompt)) {
       state.systemPrompt = window.I18n.getDefaultSystemPrompt(state.locale);
-    }
-    const def = window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT;
-    if (state.systemPrompt && state.systemPrompt !== def && state.systemPrompt.includes('ngắn gọn')) {
-      state.systemPrompt = def;
-      return true;
+    } else if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt)) {
+      state.systemPrompt = window.I18n.getDefaultSystemPrompt(state.locale);
     }
     return false;
   };

@@ -366,8 +366,15 @@
 
         <section class="settings-section">
           <div class="field settings-prompt-field">
-            <label for="systemPromptInput">System Prompt</label>
+            <div class="settings-prompt-header">
+              <label for="systemPromptInput">System Prompt</label>
+              <label class="settings-inline-check" for="tokenSaveInput">
+                <input type="checkbox" id="tokenSaveInput" />
+                <span id="tokenSaveLabel">Tiết kiệm token</span>
+              </label>
+            </div>
             <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="2" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
+            <p class="field-hint settings-token-save-hint" id="tokenSaveHint">Trả lời ngắn gọn để giảm token input/output.</p>
           </div>
         </section>
 

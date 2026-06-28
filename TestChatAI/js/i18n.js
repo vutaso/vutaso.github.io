@@ -55,6 +55,9 @@ window.I18n = (() => {
       imageGenTitle: 'Generate images with AI',
       translate: 'Translate',
       translateTitle: 'Translate text to another language',
+      tokenSave: 'Save tokens',
+      tokenSaveTitle: 'Answer concisely to reduce token usage',
+      tokenSaveHint: 'Answer concisely to reduce input/output tokens.',
       attachImage: 'Attach image',
       attachFile: 'Attach document',
       attachMedia: 'Attach image or file',
@@ -204,6 +207,8 @@ window.I18n = (() => {
       toastWebSearchOff: 'Web search disabled',
       toastThinkingOn: 'Thinking enabled',
       toastThinkingOff: 'Thinking disabled',
+      toastTokenSaveOn: 'Token-saving mode enabled',
+      toastTokenSaveOff: 'Token-saving mode disabled',
       toastImageGenOn: 'Image generation enabled',
       toastImageGenOff: 'Image generation disabled',
       toastRefImageAdded: 'Reference image added',
@@ -292,6 +297,9 @@ window.I18n = (() => {
       imageGenTitle: 'Tạo hình ảnh bằng AI',
       translate: 'Dịch',
       translateTitle: 'Dịch văn bản sang ngôn ngữ khác',
+      tokenSave: 'Tiết kiệm token',
+      tokenSaveTitle: 'Trả lời ngắn gọn để tiết kiệm token',
+      tokenSaveHint: 'Trả lời ngắn gọn để giảm token input/output.',
       attachImage: 'Đính kèm ảnh',
       attachFile: 'Đính kèm tài liệu',
       attachMedia: 'Đính kèm ảnh hoặc tài liệu',
@@ -441,6 +449,8 @@ window.I18n = (() => {
       toastWebSearchOff: 'Đã tắt tìm kiếm web',
       toastThinkingOn: 'Đã bật Thinking',
       toastThinkingOff: 'Đã tắt Thinking',
+      toastTokenSaveOn: 'Đã bật chế độ tiết kiệm token',
+      toastTokenSaveOff: 'Đã tắt chế độ tiết kiệm token',
       toastImageGenOn: 'Đã bật tạo hình ảnh',
       toastImageGenOff: 'Đã tắt tạo hình ảnh',
       toastRefImageAdded: 'Đã thêm ảnh tham chiếu',
@@ -529,6 +539,9 @@ window.I18n = (() => {
       imageGenTitle: 'AIで画像を生成',
       translate: '翻訳',
       translateTitle: '別の言語に翻訳',
+      tokenSave: 'トークン節約',
+      tokenSaveTitle: '簡潔に回答してトークン使用量を抑える',
+      tokenSaveHint: '簡潔に回答して入出力トークンを抑えます。',
       attachImage: '画像を添付',
       attachFile: 'ドキュメントを添付',
       attachMedia: '画像またはファイルを添付',
@@ -678,6 +691,8 @@ window.I18n = (() => {
       toastWebSearchOff: 'Web検索をオフにしました',
       toastThinkingOn: 'Thinkingをオンにしました',
       toastThinkingOff: 'Thinkingをオフにしました',
+      toastTokenSaveOn: 'トークン節約モードをオンにしました',
+      toastTokenSaveOff: 'トークン節約モードをオフにしました',
       toastImageGenOn: '画像生成をオンにしました',
       toastImageGenOff: '画像生成をオフにしました',
       toastRefImageAdded: '参照画像を追加しました',
@@ -766,6 +781,9 @@ window.I18n = (() => {
       imageGenTitle: '使用 AI 生成图片',
       translate: '翻译',
       translateTitle: '将文本翻译为其他语言',
+      tokenSave: '节省 Token',
+      tokenSaveTitle: '简洁回答以减少 Token 消耗',
+      tokenSaveHint: '简洁回答以减少输入/输出 Token。',
       attachImage: '附加图片',
       attachFile: '附加文档',
       attachMedia: '附加图片或文件',
@@ -915,6 +933,8 @@ window.I18n = (() => {
       toastWebSearchOff: '已关闭网络搜索',
       toastThinkingOn: '已开启 Thinking',
       toastThinkingOff: '已关闭 Thinking',
+      toastTokenSaveOn: '已开启节省 Token 模式',
+      toastTokenSaveOff: '已关闭节省 Token 模式',
       toastImageGenOn: '已开启图片生成',
       toastImageGenOff: '已关闭图片生成',
       toastRefImageAdded: '已添加参考图片',
@@ -1028,6 +1048,13 @@ window.I18n = (() => {
     zh: '你是一位智能、尽职且准确的 AI 助手。请遵循以下原则：\n\n1. 回答复杂问题前请逐步思考。\n2. 详细、结构化地回答。必要时使用 Markdown（标题、列表、表格、代码块）。\n3. 若不确定，请明确说明知识边界，不要编造。\n4. 涉及代码或技术问题时，请解释原理，而非仅给出代码。\n5. 除非用户要求其他语言，否则始终使用简体中文回答。\n6. 尽可能提供具体示例。'
   };
 
+  const TOKEN_SAVE_PROMPTS = {
+    en: 'Token-saving mode is active. Answer concisely: get straight to the point, omit filler, repetition, and unnecessary examples. Use minimal markdown only when it helps clarity. Do not greet or restate the question. Expand only if the user asks for more detail.',
+    vi: 'Chế độ tiết kiệm token đang bật. Trả lời ngắn gọn: đi thẳng vào ý chính, bỏ phần dư thừa, lặp lại và ví dụ không cần thiết. Chỉ dùng markdown tối thiểu khi thật sự cần. Không chào hỏi hay nhắc lại câu hỏi. Chỉ mở rộng khi người dùng yêu cầu thêm chi tiết.',
+    jp: 'トークン節約モードが有効です。簡潔に回答してください。要点を先に述べ、冗長な表現・繰り返し・不要な例は省略します。必要な場合のみ最小限のmarkdownを使います。挨拶や質問の言い換えは不要です。詳細はユーザーが求めたときだけ追加してください。',
+    zh: '节省 Token 模式已开启。请简洁回答：直奔主题，省略废话、重复和不必要的例子。仅在有助于理解时使用最少的 Markdown。不要寒暄或复述问题。仅在用户要求时再展开说明。'
+  };
+
   const DOM_BINDINGS = [
     { sel: '#newChatBtn .label', key: 'newChat' },
     { sel: '#newChatBtn', attr: 'title', key: 'newChat' },
@@ -1071,6 +1098,9 @@ window.I18n = (() => {
     { sel: '#translateBtn span', key: 'translate' },
     { sel: '#translateBtn', attr: 'title', key: 'translateTitle' },
     { sel: '#translateBtn', attr: 'aria-label', key: 'translate' },
+    { sel: '#tokenSaveLabel', key: 'tokenSave' },
+    { sel: '#tokenSaveInput', attr: 'title', key: 'tokenSaveTitle' },
+    { sel: '#tokenSaveHint', key: 'tokenSaveHint' },
     { sel: '#attachBtn', attr: 'title', key: 'attachMedia' },
     { sel: '#attachBtn', attr: 'aria-label', key: 'attachMedia' },
     { sel: '#composerInput', attr: 'aria-label', key: 'composerPlaceholder' },
@@ -1174,6 +1204,18 @@ window.I18n = (() => {
   };
 
   const getDefaultSystemPrompt = (loc) => DEFAULT_SYSTEM_PROMPTS[normalizeLocale(loc || locale)] || DEFAULT_SYSTEM_PROMPTS.en;
+
+  const getTokenSavePrompt = (loc) => TOKEN_SAVE_PROMPTS[normalizeLocale(loc || locale)] || TOKEN_SAVE_PROMPTS.en;
+
+  const getTokenSaveSystemPrompt = (loc) => {
+    const normalized = normalizeLocale(loc || locale);
+    return getDefaultSystemPrompt(normalized) + '\n\n' + getTokenSavePrompt(normalized);
+  };
+
+  const isTokenSaveSystemPrompt = (text) => {
+    if (!text) return false;
+    return LOCALES.some((code) => getTokenSaveSystemPrompt(code) === text);
+  };
 
   const isDefaultSystemPrompt = (text) => {
     if (!text) return true;
@@ -1314,6 +1356,9 @@ window.I18n = (() => {
     populateLocaleSelect,
     populateThemeSelect,
     getDefaultSystemPrompt,
+    getTokenSavePrompt,
+    getTokenSaveSystemPrompt,
+    isTokenSaveSystemPrompt,
     isDefaultSystemPrompt,
     imageGenLabel,
     getTranslateLabel,

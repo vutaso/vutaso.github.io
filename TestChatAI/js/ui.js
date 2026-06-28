@@ -75,6 +75,7 @@ window.UI = (() => {
     els.imageGenBtn = $('#imageGenBtn');
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
+    els.tokenSaveInput = $('#tokenSaveInput');
     els.composerTranslateBar = $('#composerTranslateBar');
     els.translateChipClose = $('#translateChipClose');
     els.translateLangBtn = $('#translateLangBtn');
@@ -1354,6 +1355,9 @@ window.UI = (() => {
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
+    if (els.tokenSaveInput) {
+      els.tokenSaveInput.checked = !!state.tokenSaveEnabled;
+    }
     window.I18n.populateThemeSelect(els.settingsThemeSelect, state.theme || window.APP_CONFIG.DEFAULT_THEME);
     window.I18n.populateLocaleSelect(els.settingsLocaleSelect, state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
     els.apiKeyInput.type = 'password';

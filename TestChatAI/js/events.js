@@ -1497,14 +1497,25 @@ window.Events = (() => {
       const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
       const prev = state.get();
       const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
+      const tokenSaveEnabled = !!ui.els.tokenSaveInput?.checked;
       let systemPrompt = ui.els.systemPromptInput.value.trim();
-      if (!systemPrompt || window.I18n.isDefaultSystemPrompt(systemPrompt)) {
+
+      if (tokenSaveEnabled) {
+        systemPrompt = window.I18n.getTokenSaveSystemPrompt(locale);
+        ui.els.systemPromptInput.value = systemPrompt;
+      } else if (!systemPrompt
+        || window.I18n.isDefaultSystemPrompt(systemPrompt)
+        || window.I18n.isTokenSaveSystemPrompt(systemPrompt)) {
         systemPrompt = window.I18n.getDefaultSystemPrompt(locale);
         ui.els.systemPromptInput.value = systemPrompt;
       }
+
       const theme = ui.els.settingsThemeSelect?.value || 'dark';
       const prevTheme = prev.theme;
-      const nextState = { apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey, systemPrompt, theme, locale };
+      const nextState = {
+        apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey,
+        systemPrompt, theme, locale, tokenSaveEnabled
+      };
       state.set(nextState);
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
@@ -1512,6 +1523,11 @@ window.Events = (() => {
       else window.I18n.applyToDOM();
       updateSendEnabled();
     };
+
+    ui.els.tokenSaveInput?.addEventListener('change', () => {
+      applySettingsFromForm();
+      ui.showToast(ui.els.tokenSaveInput.checked ? t('toastTokenSaveOn') : t('toastTokenSaveOff'));
+    });
 
     const closeSettingsModal = () => {
       applySettingsFromForm();
