@@ -12,6 +12,7 @@ window.Files = (() => {
     if (ACCEPTED_FILE_EXTENSIONS.includes(ext)) return 'document';
     if (file.type === 'application/pdf') return 'document';
     if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'document';
+    if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return 'document';
     if (file.type.startsWith('text/')) return 'document';
     return null;
   };
@@ -52,6 +53,29 @@ window.Files = (() => {
     return result.value;
   };
 
+  const extractXlsxText = async (file) => {
+    if (!window.XLSX) throw new Error('SheetJS chưa tải');
+    const buf = await file.arrayBuffer();
+    const workbook = XLSX.read(buf, { type: 'array' });
+    if (!workbook.SheetNames?.length) {
+      throw new Error('File Excel không có sheet');
+    }
+
+    const parts = [];
+    for (const sheetName of workbook.SheetNames) {
+      const sheet = workbook.Sheets[sheetName];
+      if (!sheet) continue;
+      const csv = XLSX.utils.sheet_to_csv(sheet).trim();
+      if (!csv) continue;
+      parts.push('## Sheet: ' + sheetName + '\n' + csv);
+    }
+
+    if (!parts.length) {
+      throw new Error('File Excel không có nội dung đọc được');
+    }
+    return parts.join('\n\n');
+  };
+
   const extractContent = async (file) => {
     const ext = getExtension(file.name);
     let text;
@@ -62,6 +86,11 @@ window.Files = (() => {
       || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ) {
       text = await extractDocxText(file);
+    } else if (
+      ext === '.xlsx'
+      || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ) {
+      text = await extractXlsxText(file);
     } else {
       text = await readTextFile(file);
     }
@@ -80,6 +109,7 @@ window.Files = (() => {
     const ext = getExtension(name);
     if (ext === '.pdf') return 'fa-file-pdf';
     if (ext === '.csv') return 'fa-file-csv';
+    if (ext === '.xlsx') return 'fa-file-excel';
     if (['.json', '.xml', '.yaml', '.yml'].includes(ext)) return 'fa-file-code';
     if (['.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.c', '.cpp', '.h', '.css'].includes(ext)) {
       return 'fa-file-code';

@@ -1,5 +1,5 @@
-(() => {
-  window.Storage.load();
+(async () => {
+  await window.Storage.load();
   window.Markdown.init();
 
   const state = window.Storage.get();
@@ -7,16 +7,18 @@
   const convoMod = window.Conversations;
 
   ui.cacheEls();
+
+  window.addEventListener('app-storage-notify', (e) => {
+    const message = e.detail?.message;
+    if (message) ui.showToast(message);
+  });
+
   ui.initSidebar();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
-  const list = convoMod.getAll();
-  const current = convoMod.getCurrent();
-  const initialModel = convoMod.getModel(current);
-
-  ui.initModelSelect(initialModel);
+  ui.initModelSelect(state.currentModel);
   ui.initTranslateLangMenu();
   ui.initImageGenMenus();
-  ui.syncComposerToolsUI(initialModel, {
+  ui.syncComposerToolsUI(state.currentModel, {
     webSearchEnabled: state.webSearchEnabled,
     imageGenEnabled: state.imageGenEnabled,
     thinkingEnabled: state.thinkingEnabled,
@@ -31,12 +33,13 @@
     referenceImage: null
   });
 
-  ui.renderConversationList(list, current ? current.id : null);
+  const current = convoMod.getCurrent();
+  ui.refreshConversationList(current ? current.id : null);
   ui.renderMessages(current);
 
   window.Events.bind();
 
-  if (!window.APP_CONFIG.hasApiKey(state, initialModel)) {
+  if (!window.APP_CONFIG.hasApiKey(state, state.currentModel)) {
     setTimeout(() => ui.openSettings(state), 200);
   } else {
     ui.els.composerInput.focus();

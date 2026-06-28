@@ -1,0 +1,95 @@
+.pdf-export-root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 186mm;
+  z-index: -1;
+  opacity: 1;
+  pointer-events: none;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.pdf-export-root.is-capturing {
+  z-index: 2147483647;
+  clip-path: none;
+  clip: auto;
+  overflow: visible;
+}
+
+.pdf-export-sheet {
+  padding: 0;
+}
+
+.pdf-export-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  padding: 0 20px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.pdf-export-messages {
+  overflow: visible !important;
+  padding: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+.pdf-export-root .message {
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 20px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.pdf-export-root .message.user .body {
+  max-width: 85%;
+}
+
+.pdf-export-root .toolbar,
+.pdf-export-root .copy-code-btn,
+.pdf-export-root .copy-table-btn,
+.pdf-export-root .preview-md-btn,
+.pdf-export-root .toggle-mermaid-btn,
+.pdf-export-root .generated-image-actions,
+.pdf-export-root .mermaid-source,
+.pdf-export-root script.mermaid-source-raw {
+  display: none !important;
+}
+
+.pdf-export-root .mermaid-block.show-source .mermaid-view {
+  display: block !important;
+}
+
+.pdf-export-root .message-image-wrap {
+  max-width: 100%;
+}
+
+.pdf-export-root .message-image-wrap img {
+  max-height: none;
+  object-fit: contain;
+}
+
+.pdf-export-root .katex,
+.pdf-export-root .katex-display {
+  color: var(--text);
+}
+
+.pdf-export-root pre,
+.pdf-export-root .mermaid-view {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.pdf-export-root .math-block {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}

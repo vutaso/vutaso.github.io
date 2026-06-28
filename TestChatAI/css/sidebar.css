@@ -34,12 +34,41 @@
 }
 
 .sidebar-section-label {
-  padding: 8px 16px 6px;
+  padding: 0;
   font-size: 11px;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 600;
+}
+
+.sidebar-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 6px 16px;
+}
+
+.sidebar-search-toggle {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.sidebar-search-toggle .icon {
+  font-size: 12px;
+}
+
+.sidebar-search-toggle.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-hover));
+  color: var(--accent);
+}
+
+.sidebar-search-toggle .label {
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .sidebar-search {
@@ -146,6 +175,8 @@
 }
 
 .conversation-item .title {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -166,10 +197,27 @@
   color: color-mix(in srgb, var(--accent) 70%, var(--text-dim));
 }
 
+.conversation-snippet {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.search-hl {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 .conversation-item .actions {
   display: none;
   gap: 2px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 .conversation-item:hover .actions { display: flex; }
 
@@ -187,6 +235,13 @@
   justify-content: center;
 }
 .conversation-item .actions .btn:hover { background: var(--bg-active); color: var(--text); }
+
+.conversation-item.is-removing {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 260ms ease;
+}
 
 .sidebar-footer {
   display: flex;

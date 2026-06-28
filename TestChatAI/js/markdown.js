@@ -447,25 +447,10 @@ window.Markdown = (() => {
     }
   };
 
-  const rehighlightCode = (root) => {
-    if (!root || !window.hljs) return;
-    root.querySelectorAll('pre code').forEach((block) => {
-      try { window.hljs.highlightElement(block); } catch {}
-    });
-  };
-
-  const prepareForExport = async (root) => {
-    if (!root) return;
-    enhanceCodeBlocks(root);
-    enhanceTables(root);
-    rehighlightCode(root);
-    await renderMermaid(root, { skipIfStreaming: false });
-  };
-
   const init = () => {
     ensure();
     initMermaid();
   };
 
-  return { init, render, enhanceCodeBlocks, enhanceTables, tableToMarkdown, typesetMath, renderMermaid, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang, prepareForExport, rehighlightCode };
+  return { init, render, enhanceCodeBlocks, enhanceTables, tableToMarkdown, typesetMath, renderMermaid, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
 })();

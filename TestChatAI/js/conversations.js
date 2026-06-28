@@ -1,10 +1,20 @@
 window.Conversations = (() => {
-  const { uuid } = window.Utils;
+  const {
+    uuid, normalizeSearchQuery, buildSearchFold, includesSearchFold, buildSearchSnippet
+  } = window.Utils;
   const { get, set } = window.Storage;
+
+  const MAX_MESSAGE_SEARCH_CHARS = 8000;
+
+  let searchIndexCache = null;
+  let searchIndexKey = '';
+  let searchIndexById = null;
 
   const getAll = () => get().conversations || [];
 
   const getById = (id) => getAll().find(c => c.id === id) || null;
+
+  const isPersisted = (id) => getAll().some((c) => c.id === id);
 
   const getCurrent = () => {
     const s = get();
@@ -31,20 +41,94 @@ window.Conversations = (() => {
     return message.content || messagePreviewText(message);
   };
 
-  const matchesSearch = (convo, query) => {
-    const q = (query || '').trim().toLowerCase();
-    if (!q) return true;
-    if ((convo.title || '').toLowerCase().includes(q)) return true;
-    const model = window.APP_CONFIG.getModel(getModel(convo));
-    if (model.label.toLowerCase().includes(q) || model.id.toLowerCase().includes(q)) return true;
-    return convo.messages.some((m) => messageSearchText(m).toLowerCase().includes(q));
+  const foldSearchText = (text) => {
+    const source = String(text || '');
+    const capped = source.length > MAX_MESSAGE_SEARCH_CHARS
+      ? source.slice(0, MAX_MESSAGE_SEARCH_CHARS)
+      : source;
+    return buildSearchFold(capped);
   };
 
-  const filterBySearch = (query) => {
+  const getSearchIndexKey = () => {
     const all = getAll();
-    const q = (query || '').trim();
-    if (!q) return all;
-    return all.filter((c) => matchesSearch(c, q));
+    let key = String(all.length);
+    for (const c of all) {
+      key += '|' + c.id + ':' + c.updatedAt + ':' + c.messages.length;
+    }
+    return key;
+  };
+
+  const getSearchIndex = () => {
+    const key = getSearchIndexKey();
+    if (searchIndexCache && searchIndexKey === key) return searchIndexCache;
+    searchIndexKey = key;
+    searchIndexById = new Map();
+    searchIndexCache = getAll().map((convo) => {
+      const model = window.APP_CONFIG.getModel(getModel(convo));
+      const entry = {
+        convo,
+        titleFold: foldSearchText(convo.title || ''),
+        modelLabelFold: foldSearchText(model.label),
+        modelIdFold: foldSearchText(model.id),
+        messageFolds: convo.messages.map((m) => foldSearchText(messageSearchText(m)))
+      };
+      searchIndexById.set(convo.id, entry);
+      return entry;
+    });
+    return searchIndexCache;
+  };
+
+  const getSearchEntry = (convoId) => {
+    getSearchIndex();
+    return searchIndexById.get(convoId) || null;
+  };
+
+  const matchSearchEntry = (entry, normQuery) => {
+    if (includesSearchFold(entry.titleFold, normQuery)) {
+      return { snippet: '' };
+    }
+    if (includesSearchFold(entry.modelLabelFold, normQuery)) {
+      return { snippet: entry.modelLabelFold.source };
+    }
+    if (includesSearchFold(entry.modelIdFold, normQuery)) {
+      return { snippet: entry.modelLabelFold.source };
+    }
+    for (const fold of entry.messageFolds) {
+      if (includesSearchFold(fold, normQuery)) {
+        return { snippet: buildSearchSnippet(fold, normQuery) };
+      }
+    }
+    return null;
+  };
+
+  const searchConversations = (query) => {
+    const normQuery = normalizeSearchQuery(query);
+    if (!normQuery) {
+      return getAll().map((convo) => ({ convo, snippet: '' }));
+    }
+    const results = [];
+    for (const entry of getSearchIndex()) {
+      const match = matchSearchEntry(entry, normQuery);
+      if (match) results.push({ convo: entry.convo, snippet: match.snippet });
+    }
+    return results;
+  };
+
+  const matchesSearch = (convo, query) => {
+    const normQuery = normalizeSearchQuery(query);
+    if (!normQuery) return true;
+    const entry = getSearchEntry(convo.id);
+    return entry ? !!matchSearchEntry(entry, normQuery) : false;
+  };
+
+  const filterBySearch = (query) => searchConversations(query).map((r) => r.convo);
+
+  const getSearchSnippet = (convo, query) => {
+    const normQuery = normalizeSearchQuery(query);
+    if (!normQuery) return '';
+    const entry = getSearchEntry(convo.id);
+    if (!entry || includesSearchFold(entry.titleFold, normQuery)) return '';
+    return matchSearchEntry(entry, normQuery)?.snippet || '';
   };
 
   const create = (modelId) => {
@@ -101,6 +185,7 @@ window.Conversations = (() => {
   };
 
   const addMessage = (convo, message) => {
+    if (!isPersisted(convo.id)) return;
     convo.messages.push(message);
     convo.updatedAt = Date.now();
     if (convo.messages.length === 1 && message.role === 'user') {
@@ -111,6 +196,7 @@ window.Conversations = (() => {
   };
 
   const saveConvo = (convo) => {
+    if (!isPersisted(convo.id)) return;
     convo.updatedAt = Date.now();
     const all = getAll().map(c => c.id === convo.id ? convo : c);
     set({ conversations: all });
@@ -219,7 +305,7 @@ window.Conversations = (() => {
 
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
-    getModel, setModel, matchesSearch, filterBySearch,
+    getModel, setModel, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
     addMessage, updateMessage, editMessage, deleteMessageFrom, clearAll,
     getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };

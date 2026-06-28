@@ -400,10 +400,40 @@ window.API = (() => {
     }
   };
 
+  const appendImagesAsTextNote = (text, images) => {
+    if (!images?.length) return text || '';
+    const note = images.map((img, i) => img.name || ('Hình ảnh ' + (i + 1))).join(', ');
+    const suffix = '\n\n_[' + images.length + ' hình ảnh đính kèm: ' + note + ' — DeepSeek không hỗ trợ phân tích hình ảnh]_';
+    return text ? text + suffix : suffix.trim();
+  };
+
+  const buildDeepseekMessageContent = (m) => {
+    let text = appendFilesToText(m.content || '', m.files);
+    if (m.role === 'user') {
+      text = appendTranslateInstruction(text, m);
+    }
+    return appendImagesAsTextNote(text, m.images);
+  };
+
+  const buildDeepseekMessages = (convo, systemPrompt) => {
+    const msgs = [];
+    if (systemPrompt && systemPrompt.trim()) {
+      msgs.push({ role: 'system', content: systemPrompt });
+    }
+    const all = convo.messages || [];
+    for (let i = 0; i < all.length; i++) {
+      const m = all[i];
+      if (m.role !== 'user' && m.role !== 'assistant') continue;
+      if (i === all.length - 1 && m.role === 'assistant' && !m.content) continue;
+      msgs.push({ role: m.role, content: buildDeepseekMessageContent(m) });
+    }
+    return msgs;
+  };
+
   const buildDeepseekBody = (model, systemPrompt, convo, thinking) => {
     const body = {
       model,
-      messages: buildMessages(convo, systemPrompt),
+      messages: buildDeepseekMessages(convo, systemPrompt),
       stream: true,
       thinking: { type: thinking ? 'enabled' : 'disabled' }
     };
@@ -414,17 +444,26 @@ window.API = (() => {
     return body;
   };
 
-  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
-    const body = buildDeepseekBody(model, systemPrompt, convo, thinking);
-    if (provider !== 'deepseek') {
-      delete body.thinking;
-      delete body.max_tokens;
-      const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-      if (maxOutputTokens) {
-        body.max_completion_tokens = maxOutputTokens;
-      }
-      if (thinking) body.reasoning_effort = window.APP_CONFIG.REASONING_EFFORT || 'high';
+  const buildOpenAIChatBody = (model, systemPrompt, convo, thinking) => {
+    const body = {
+      model,
+      messages: buildMessages(convo, systemPrompt),
+      stream: true
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_completion_tokens = maxOutputTokens;
     }
+    if (thinking) {
+      body.reasoning_effort = window.APP_CONFIG.REASONING_EFFORT || 'high';
+    }
+    return body;
+  };
+
+  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
+    const body = provider === 'deepseek'
+      ? buildDeepseekBody(model, systemPrompt, convo, thinking)
+      : buildOpenAIChatBody(model, systemPrompt, convo, thinking);
 
     const headers = { 'Content-Type': 'application/json' };
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;

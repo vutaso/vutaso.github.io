@@ -9,8 +9,8 @@ window.APP_CONFIG = {
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
-    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
-    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true },
+    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true }
@@ -80,6 +80,11 @@ window.APP_CONFIG = {
   modelSupportsThinking(modelId) {
     const m = this.MODELS.find((x) => x.id === modelId);
     return !!(m && m.thinking);
+  },
+
+  modelSupportsVision(modelId) {
+    const m = this.MODELS.find((x) => x.id === modelId);
+    return m ? m.vision !== false : true;
   },
 
   modelHasComposerTools(modelId) {

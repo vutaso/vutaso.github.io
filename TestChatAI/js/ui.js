@@ -1,5 +1,5 @@
 window.UI = (() => {
-  const { escapeHTML, formatTime, truncate, copyToClipboard, autoResize } = window.Utils;
+  const { escapeHTML, formatTime, truncate, copyToClipboard, autoResize, highlightSearchText } = window.Utils;
   const { DEFAULT_SYSTEM_PROMPT } = window.APP_CONFIG;
 
   const $ = (sel) => document.querySelector(sel);
@@ -42,9 +42,17 @@ window.UI = (() => {
     els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
     els.guideBody = $('#guideModal')?.querySelector('.guide-body');
     els.downloadConvoBtn = $('#downloadConvoBtn');
+    els.downloadTxtBtn = $('#downloadTxtBtn');
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
-    els.pdfExportBtn = $('#pdfExportBtn');
+
     els.docxExportBtn = $('#docxExportBtn');
+    els.pdfExportBtn = $('#pdfExportBtn');
+    els.toggleExportSelectBtn = $('#toggleExportSelectBtn');
+    els.exportSelectBar = $('#exportSelectBar');
+    els.exportSelectCount = $('#exportSelectCount');
+    els.exportSelectAllBtn = $('#exportSelectAllBtn');
+    els.exportSelectClearBtn = $('#exportSelectClearBtn');
+    els.exitExportSelectBtn = $('#exitExportSelectBtn');
     els.clearAllBtn = $('#clearAllBtn');
     els.clearAllSidebarBtn = $('#clearAllSidebarBtn');
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
@@ -100,12 +108,20 @@ window.UI = (() => {
     els.markdownPreviewContent = $('#markdownPreviewContent');
     els.closeMdPreviewBtn = $('#closeMdPreviewBtn');
     els.mdPreviewOverlay = $('#mdPreviewOverlay');
+    els.imagePreviewOverlay = $('#imagePreviewOverlay');
+    els.imagePreviewImg = $('#imagePreviewImg');
+    els.imagePreviewCaption = $('#imagePreviewCaption');
+    els.closeImagePreviewBtn = $('#closeImagePreviewBtn');
     els.previewPanelIcon = $('#previewPanelIcon');
     els.previewPanelTitle = $('#previewPanelTitle');
     els.renameModal = $('#renameModal');
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
+    els.toggleSidebarSearchBtn = $('#toggleSidebarSearchBtn');
+    els.sidebarSearchWrap = $('#sidebarSearchWrap');
+    els.sidebarSearchInput = $('#sidebarSearchInput');
+    els.sidebarSearchClear = $('#sidebarSearchClear');
   };
 
   const syncComposerToolsUI = (modelId, toolState) => {
@@ -393,7 +409,7 @@ window.UI = (() => {
     return '<div class="message-images message-generated-images">' + images.map((img, i) => {
       const alt = escapeHTML(img.name || 'Hình ảnh AI ' + (i + 1));
       return '<div class="message-image-wrap message-generated-image-wrap">'
-        + '<img src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" />'
+        + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" title="Xem ảnh" />'
         + '<div class="generated-image-actions" aria-label="Thao tác ảnh">'
         + '<button type="button" class="generated-image-btn" data-copy-generated-image title="Sao chép ảnh" aria-label="Sao chép ảnh">'
         + '<i class="fa-solid fa-copy" aria-hidden="true"></i></button>'
@@ -467,7 +483,7 @@ window.UI = (() => {
     if (!images || !images.length) return '';
     return '<div class="message-images">' + images.map((img, i) =>
       '<div class="message-image-wrap">'
-      + '<img src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || 'Hình ảnh ' + (i + 1)) + '" loading="lazy" />'
+      + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || 'Hình ảnh ' + (i + 1)) + '" loading="lazy" title="Xem ảnh" />'
       + '</div>'
     ).join('') + '</div>';
   };
@@ -502,30 +518,220 @@ window.UI = (() => {
     els.themeIcon.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
   };
 
-  const renderConversationList = (conversations, currentId) => {
+  const renderConversationList = (conversations, currentId, searchQuery = '', snippetMap = null) => {
+    const q = (searchQuery || '').trim();
+    const emptyMsg = q
+      ? 'Không tìm thấy cuộc trò chuyện nào'
+      : 'Chưa có cuộc trò chuyện nào';
     const html = conversations.length
-      ? conversations.map(c => `
+      ? conversations.map(c => {
+          const snippet = snippetMap ? (snippetMap.get(c.id) || '') : '';
+          const snippetHTML = snippet
+            ? '<span class="conversation-snippet">' + highlightSearchText(snippet, q) + '</span>'
+            : '';
+          return `
           <li class="conversation-item ${c.id === currentId ? 'active' : ''}" data-id="${c.id}">
             <span class="icon" aria-hidden="true"><i class="fa-solid fa-message"></i></span>
-            <span class="title" title="${escapeHTML(c.title)}">${escapeHTML(c.title)}</span>
+            <span class="conversation-item-body">
+              <span class="title" title="${escapeHTML(c.title)}">${highlightSearchText(c.title, q)}</span>
+              ${snippetHTML}
+            </span>
             <span class="actions">
               <button type="button" class="btn btn-icon" data-action="rename" title="Đổi tên"><i class="fa-solid fa-pen"></i></button>
               <button type="button" class="btn btn-icon" data-action="delete" title="Xoá"><i class="fa-solid fa-trash"></i></button>
             </span>
-          </li>`).join('')
-      : `<li class="conversation-empty" style="padding:12px 16px;color:var(--text-dim);font-size:13px;">Chưa có cuộc trò chuyện nào</li>`;
+          </li>`;
+        }).join('')
+      : `<li class="conversation-empty" style="padding:12px 16px;color:var(--text-dim);font-size:13px;">${emptyMsg}</li>`;
     els.conversationList.innerHTML = html;
   };
 
-  const renderEmpty = () => {
-    closeMarkdownPreview();
-    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>Xin chào!</h2><p class="messages-empty-sub">Tôi có thể giúp gì cho bạn hôm nay? Kéo thả ảnh hoặc tài liệu vào màn hình để phân tích.</p></div>';
+  let conversationSearchQuery = '';
+  let conversationSearchOpen = false;
+  let conversationSearchRenderId = 0;
+
+  let exportSelectMode = false;
+  const exportSelected = new Set();
+
+  const updateExportSelectCount = () => {
+    if (!els.exportSelectCount) return;
+    const n = exportSelected.size;
+    els.exportSelectCount.textContent = n
+      ? 'Đã chọn ' + n + ' tin nhắn'
+      : 'Chọn tin nhắn để xuất';
   };
 
-  const renderMessages = (convo) => {
+  const syncExportSelectOnMessages = () => {
+    els.messages.querySelectorAll('.message[data-idx]').forEach((article) => {
+      const idx = parseInt(article.dataset.idx, 10);
+      if (!exportSelectMode) {
+        article.classList.remove('export-selectable', 'export-selected');
+        article.removeAttribute('aria-selected');
+        return;
+      }
+      article.classList.add('export-selectable');
+      const selected = exportSelected.has(idx);
+      article.classList.toggle('export-selected', selected);
+      article.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
+  };
+
+  const syncExportSelectUI = () => {
+    els.exportSelectBar?.classList.toggle('hidden', !exportSelectMode);
+    els.toggleExportSelectBtn?.setAttribute('aria-pressed', exportSelectMode ? 'true' : 'false');
+    els.app?.classList.toggle('export-select-mode', exportSelectMode);
+    updateExportSelectCount();
+    syncExportSelectOnMessages();
+  };
+
+  const isExportSelectMode = () => exportSelectMode;
+
+  const setExportSelectMode = (enabled) => {
+    exportSelectMode = !!enabled;
+    if (!exportSelectMode) exportSelected.clear();
+    syncExportSelectUI();
+  };
+
+  const toggleExportSelectMode = () => setExportSelectMode(!exportSelectMode);
+
+  const getExportSelectedIndices = () => [...exportSelected].sort((a, b) => a - b);
+
+  const toggleExportSelectIndex = (idx) => {
+    if (!exportSelectMode || isNaN(idx)) return;
+    if (exportSelected.has(idx)) exportSelected.delete(idx);
+    else exportSelected.add(idx);
+    updateExportSelectCount();
+    syncExportSelectOnMessages();
+  };
+
+  const selectAllExportMessages = () => {
+    if (!exportSelectMode) return;
+    els.messages.querySelectorAll('.message[data-idx]').forEach((article) => {
+      const idx = parseInt(article.dataset.idx, 10);
+      if (!isNaN(idx)) exportSelected.add(idx);
+    });
+    updateExportSelectCount();
+    syncExportSelectOnMessages();
+  };
+
+  const clearExportSelection = () => {
+    exportSelected.clear();
+    updateExportSelectCount();
+    syncExportSelectOnMessages();
+  };
+
+  const getConversationSearchQuery = () => conversationSearchQuery;
+
+  const isConversationSearchOpen = () => conversationSearchOpen;
+
+  const syncSearchClearBtn = () => {
+    if (!els.sidebarSearchClear) return;
+    els.sidebarSearchClear.classList.toggle('hidden', !conversationSearchQuery);
+  };
+
+  const refreshConversationList = (currentId) => {
+    const id = currentId !== undefined
+      ? currentId
+      : (window.Conversations.getCurrent()?.id || null);
+    const q = conversationSearchQuery.trim();
+    if (!q) {
+      renderConversationList(window.Conversations.getAll(), id, '');
+      return;
+    }
+    const results = window.Conversations.searchConversations(q);
+    const snippetMap = new Map(results.map((r) => [r.convo.id, r.snippet]));
+    renderConversationList(results.map((r) => r.convo), id, q, snippetMap);
+  };
+
+  const setConversationSearchQuery = (query) => {
+    conversationSearchQuery = query || '';
+    if (els.sidebarSearchInput && els.sidebarSearchInput.value !== conversationSearchQuery) {
+      els.sidebarSearchInput.value = conversationSearchQuery;
+    }
+    syncSearchClearBtn();
+    const renderId = ++conversationSearchRenderId;
+    requestAnimationFrame(() => {
+      if (renderId !== conversationSearchRenderId) return;
+      refreshConversationList();
+    });
+  };
+
+  const toggleConversationSearch = (open) => {
+    const next = open !== undefined ? !!open : !conversationSearchOpen;
+    conversationSearchOpen = next;
+    if (els.sidebarSearchWrap) {
+      els.sidebarSearchWrap.classList.toggle('hidden', !next);
+    }
+    if (els.toggleSidebarSearchBtn) {
+      els.toggleSidebarSearchBtn.classList.toggle('is-active', next);
+      els.toggleSidebarSearchBtn.setAttribute('aria-expanded', next ? 'true' : 'false');
+    }
+    if (next) {
+      els.sidebarSearchInput?.focus();
+    } else if (!conversationSearchQuery) {
+      if (els.sidebarSearchInput) els.sidebarSearchInput.value = '';
+      syncSearchClearBtn();
+    }
+  };
+
+  const clearConversationSearch = () => {
+    conversationSearchQuery = '';
+    if (els.sidebarSearchInput) els.sidebarSearchInput.value = '';
+    syncSearchClearBtn();
+    refreshConversationList();
+  };
+
+  const renderEmpty = (animate = false) => {
+    closeMarkdownPreview();
+    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>Xin chào!</h2><p class="messages-empty-sub">Tôi có thể giúp gì cho bạn hôm nay? Kéo thả ảnh hoặc tài liệu vào màn hình để phân tích.</p></div>';
+    if (!animate) return;
+    const empty = els.messages.querySelector('.messages-empty');
+    if (empty) requestAnimationFrame(() => empty.classList.add('is-entering'));
+  };
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let clearingAll = false;
+
+  const animateClearAll = () => {
+    if (clearingAll) return Promise.resolve(false);
+    const items = [...els.conversationList.querySelectorAll('.conversation-item')];
+    const messages = [...els.messages.querySelectorAll('.message')];
+    if (!items.length && !messages.length) return Promise.resolve(true);
+
+    if (prefersReducedMotion()) return Promise.resolve(true);
+
+    clearingAll = true;
+    const STAGGER = 28;
+    const MAX_STAGGER = 10;
+    const BASE = 260;
+
+    items.forEach((item, i) => {
+      item.style.transitionDelay = Math.min(i, MAX_STAGGER) * STAGGER + 'ms';
+      item.classList.add('is-removing');
+    });
+
+    messages.forEach((msg, i) => {
+      msg.style.transitionDelay = Math.min(i, MAX_STAGGER) * 22 + 'ms';
+      msg.classList.add('is-clearing');
+    });
+
+    const sidebarMs = items.length ? BASE + Math.min(items.length - 1, MAX_STAGGER) * STAGGER : 0;
+    const chatMs = messages.length ? 240 + Math.min(messages.length - 1, MAX_STAGGER) * 22 : 0;
+    const total = Math.max(sidebarMs, chatMs, 180) + 40;
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        clearingAll = false;
+        resolve(true);
+      }, total);
+    });
+  };
+
+  const renderMessages = (convo, { animateEmpty = false } = {}) => {
     closeMarkdownPreview();
     if (!convo || !convo.messages.length) {
-      renderEmpty();
+      renderEmpty(animateEmpty);
       return;
     }
     const shown = convo.messages.map((m, i) => ({ m, i })).filter(({ m }) => {
@@ -537,11 +743,12 @@ window.UI = (() => {
       return true;
     });
     if (!shown.length) {
-      renderEmpty();
+      renderEmpty(animateEmpty);
       return;
     }
     els.messages.innerHTML = shown.map(({ m, i }) => messageHTML(m, i)).join('');
     polishContent(els.messages);
+    if (exportSelectMode) syncExportSelectOnMessages();
     scrollToBottom();
   };
 
@@ -781,6 +988,61 @@ window.UI = (() => {
     if (renderMermaid) window.Markdown.renderMermaid(root);
   };
 
+  const waitForLayout = () =>
+    new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  const preparePdfExportRoot = async (convo) => {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const root = document.createElement('div');
+    root.className = 'pdf-export-root';
+    root.setAttribute('data-theme', theme);
+
+    const sheet = document.createElement('div');
+    sheet.className = 'pdf-export-sheet';
+
+    const titleEl = document.createElement('h1');
+    titleEl.className = 'pdf-export-title';
+    titleEl.textContent = convo.title || 'Cuộc trò chuyện';
+    sheet.appendChild(titleEl);
+
+    const messagesWrap = document.createElement('div');
+    messagesWrap.className = 'pdf-export-messages messages';
+
+    for (const m of convo.messages) {
+      const isUser = m.role === 'user';
+      const article = document.createElement('article');
+      article.className = 'message ' + m.role + ' pdf-export-message';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar ' + (isUser ? 'user-av' : 'assistant-av');
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.innerHTML = isUser ? '<i class="fa-solid fa-user"></i>' : 'V';
+
+      const body = document.createElement('div');
+      body.className = 'body';
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.innerHTML = isUser ? userContentHTML(m) : assistantContentHTML(m);
+
+      body.appendChild(content);
+      article.appendChild(avatar);
+      article.appendChild(body);
+      messagesWrap.appendChild(article);
+    }
+
+    sheet.appendChild(messagesWrap);
+    root.appendChild(sheet);
+    document.body.appendChild(root);
+
+    polishContent(root, { renderMermaid: true });
+    await window.Markdown.renderMermaid(root, { skipIfStreaming: false });
+    await document.fonts.ready;
+    await waitForLayout();
+
+    return root;
+  };
+
   const hasOpenCodeFence = (text) => {
     const count = (text.match(/```/g) || []).length;
     return count % 2 === 1;
@@ -971,9 +1233,41 @@ window.UI = (() => {
     els.composerAttachments.innerHTML = imageHtml + fileHtml;
   };
 
-  const setDragOverlay = (visible) => {
+  const DROP_OVERLAY_KINDS = {
+    image: {
+      icon: 'fa-image',
+      title: 'Thả ảnh vào đây',
+      hint: 'JPEG, PNG, GIF, WebP'
+    },
+    file: {
+      icon: 'fa-file-lines',
+      title: 'Thả tài liệu vào đây',
+      hint: 'PDF, Word, Excel, TXT, JSON...'
+    },
+    mixed: {
+      icon: 'fa-cloud-arrow-up',
+      title: 'Thả để đính kèm',
+      hint: 'Ảnh hoặc tài liệu (PDF, Word, Excel...)'
+    }
+  };
+
+  const setDragOverlay = (visible, kind = 'mixed') => {
+    if (!els.appDropOverlay) return;
+    const meta = DROP_OVERLAY_KINDS[kind] || DROP_OVERLAY_KINDS.mixed;
     els.appDropOverlay.classList.toggle('hidden', !visible);
-    els.composerDropZone.classList.toggle('drag-over', visible);
+    els.appDropOverlay.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    if (visible) {
+      els.appDropOverlay.dataset.kind = kind;
+      const icon = els.appDropOverlay.querySelector('.app-drop-overlay-icon i');
+      const title = els.appDropOverlay.querySelector('.app-drop-overlay-title');
+      const hint = els.appDropOverlay.querySelector('.app-drop-overlay-hint');
+      if (icon) icon.className = 'fa-solid ' + meta.icon;
+      if (title) title.textContent = meta.title;
+      if (hint) hint.textContent = meta.hint;
+    } else {
+      delete els.appDropOverlay.dataset.kind;
+    }
+    if (els.composerDropZone) els.composerDropZone.classList.toggle('drag-over', visible);
   };
 
   const openSettings = (state) => {
@@ -1125,11 +1419,55 @@ window.UI = (() => {
     }
   };
 
+  const openImagePreview = (src, alt = '') => {
+    if (!src || !els.imagePreviewOverlay || !els.imagePreviewImg) return;
+    els.imagePreviewImg.src = src;
+    els.imagePreviewImg.alt = alt || 'Ảnh';
+    if (els.imagePreviewCaption) {
+      const caption = (alt || '').trim();
+      if (caption) {
+        els.imagePreviewCaption.textContent = caption;
+        els.imagePreviewCaption.classList.remove('hidden');
+      } else {
+        els.imagePreviewCaption.textContent = '';
+        els.imagePreviewCaption.classList.add('hidden');
+      }
+    }
+    els.imagePreviewOverlay.classList.remove('hidden');
+    els.imagePreviewOverlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('image-preview-open');
+  };
+
+  const closeImagePreview = () => {
+    if (!els.imagePreviewOverlay) return;
+    els.imagePreviewOverlay.classList.add('hidden');
+    els.imagePreviewOverlay.setAttribute('aria-hidden', 'true');
+    if (els.imagePreviewImg) {
+      els.imagePreviewImg.removeAttribute('src');
+      els.imagePreviewImg.alt = '';
+    }
+    if (els.imagePreviewCaption) {
+      els.imagePreviewCaption.textContent = '';
+      els.imagePreviewCaption.classList.add('hidden');
+    }
+    document.body.classList.remove('image-preview-open');
+  };
+
+  const isImagePreviewOpen = () =>
+    !!(els.imagePreviewOverlay && !els.imagePreviewOverlay.classList.contains('hidden'));
+
   const downloadConversation = (convo) => {
     const { formatConversation, downloadFile } = window.Utils;
     const md = formatConversation(convo);
     const safeName = (convo.title || 'conversation').replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || 'conversation';
     downloadFile(md, safeName + '.md', 'text/markdown');
+  };
+
+  const downloadConversationTxt = (convo) => {
+    const { formatConversationPlainText, downloadFile } = window.Utils;
+    const text = formatConversationPlainText(convo);
+    const safeName = (convo.title || 'conversation').replace(/[^a-zA-Z0-9\u00C0-\u1EF9_\-\s]/g, '').trim() || 'conversation';
+    downloadFile(text, safeName + '.txt', 'text/plain');
   };
 
   let toastTimer;
@@ -1144,14 +1482,22 @@ window.UI = (() => {
     cacheEls, setTheme, initModelSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
-    renderConversationList, renderMessages, renderEmpty,
+    renderConversationList, refreshConversationList, getConversationSearchQuery,
+    setConversationSearchQuery, toggleConversationSearch, clearConversationSearch,
+    renderMessages, renderEmpty, animateClearAll,
     appendMessage, appendStreamingMessage, updateStreamingContent, finalizeStreaming,
-    enterEditMode, exitEditMode, downloadConversation,
+    enterEditMode, exitEditMode, downloadConversation, downloadConversationTxt,
     scrollToBottom, scrollToBottomIfNear, showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
     openSettings, closeSettings, openGuide, closeGuide, isGuideModalOpen,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
-    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, els
+    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,
+    openImagePreview, closeImagePreview, isImagePreviewOpen,
+    isExportSelectMode, toggleExportSelectMode, setExportSelectMode,
+    getExportSelectedIndices, toggleExportSelectIndex,
+    selectAllExportMessages, clearExportSelection,
+    preparePdfExportRoot,
+    els
   };
 })();

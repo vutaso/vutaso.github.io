@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/composer.css" />
   <link rel="stylesheet" href="css/modals.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/pdf-export.css" />
 </head>
 <body>
   <div id="app" class="app" data-sidebar="open">
@@ -34,7 +35,20 @@
           <span class="label">Cuộc trò chuyện mới</span>
         </button>
       </div>
-      <div class="sidebar-section-label">Lịch sử</div>
+      <div class="sidebar-history-head">
+        <div class="sidebar-section-label">Lịch sử</div>
+        <button type="button" id="toggleSidebarSearchBtn" class="btn btn-ghost sidebar-search-toggle" title="Tìm kiếm" aria-expanded="false" aria-controls="sidebarSearchWrap">
+          <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <span class="label">Tìm kiếm</span>
+        </button>
+      </div>
+      <div id="sidebarSearchWrap" class="sidebar-search hidden" role="search">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon" aria-hidden="true"></i>
+        <input id="sidebarSearchInput" type="search" class="sidebar-search-input" placeholder="Tìm trong lịch sử chat..." autocomplete="off" aria-label="Tìm trong lịch sử chat" />
+        <button type="button" id="sidebarSearchClear" class="btn btn-icon sidebar-search-clear hidden" title="Xoá" aria-label="Xoá tìm kiếm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
       <ul id="conversationList" class="conversation-list" role="list"></ul>
       <div class="sidebar-footer">
         <div class="sidebar-footer-primary">
@@ -62,9 +76,13 @@
     <div id="mdPreviewOverlay" class="md-preview-overlay hidden" aria-hidden="true"></div>
 
     <div id="appDropOverlay" class="app-drop-overlay hidden" aria-hidden="true">
+      <div class="app-drop-overlay-backdrop"></div>
       <div class="app-drop-overlay-content">
-        <i class="fa-solid fa-image"></i>
-        <span>Thả ảnh hoặc tài liệu để đính kèm vào tin nhắn</span>
+        <div class="app-drop-overlay-icon" aria-hidden="true">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <p class="app-drop-overlay-title">Thả để đính kèm</p>
+        <p class="app-drop-overlay-hint">Ảnh hoặc tài liệu (PDF, Word, Excel...)</p>
       </div>
     </div>
 
@@ -80,17 +98,24 @@
           <select id="modelSelect" class="select model-select" title="Chọn model" aria-label="Chọn model"></select>
         </div>
         <div class="header-actions">
+          <button type="button" id="toggleExportSelectBtn" class="btn btn-icon" title="Chọn tin để xuất" aria-pressed="false" aria-label="Chọn tin để xuất">
+            <span class="icon"><i class="fa-solid fa-check-double"></i></span>
+          </button>
           <button id="downloadConvoBtn" class="btn btn-icon" title="Tải về Markdown">
             <span class="icon"><i class="fa-solid fa-file-arrow-down"></i></span>
+          </button>
+          <button id="downloadTxtBtn" class="btn btn-icon" title="Tải về TXT">
+            <span class="icon"><i class="fa-solid fa-file-lines"></i></span>
           </button>
           <button id="copyMarkdownBtn" class="btn btn-icon" title="Sao chép Markdown">
             <span class="icon"><i class="fa-solid fa-copy"></i></span>
           </button>
-          <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF">
-            <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
-          </button>
+
           <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
             <span class="icon"><i class="fa-solid fa-file-word"></i></span>
+          </button>
+          <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF (A4)">
+            <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
           </button>
           <button type="button" id="headerGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
             <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
@@ -100,6 +125,17 @@
           </button>
         </div>
       </header>
+
+      <div id="exportSelectBar" class="export-select-bar hidden" role="toolbar" aria-label="Chọn tin nhắn để xuất">
+        <div class="export-select-bar-inner">
+          <span id="exportSelectCount" class="export-select-count">Chọn tin nhắn để xuất</span>
+          <div class="export-select-bar-actions">
+            <button type="button" id="exportSelectAllBtn" class="btn btn-ghost btn-sm">Chọn tất cả</button>
+            <button type="button" id="exportSelectClearBtn" class="btn btn-ghost btn-sm">Bỏ chọn</button>
+            <button type="button" id="exitExportSelectBtn" class="btn btn-primary btn-sm">Xong</button>
+          </div>
+        </div>
+      </div>
 
       <section id="messages" class="messages" aria-live="polite"></section>
 
@@ -451,7 +487,7 @@
           <div class="guide-step-num" aria-hidden="true">8</div>
           <div class="guide-step-body">
             <h3>Xuất &amp; phím tắt khác</h3>
-            <p>Trên header: tải Markdown, sao chép Markdown, xuất PDF, xuất Word (.docx). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid.</p>
+            <p>Trên header: tải Markdown, sao chép Markdown, xuất Word (.docx), xuất PDF (A4). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid.</p>
             <ul>
               <li><kbd>Escape</kbd> — đóng modal, menu, preview; thoát sửa tin</li>
             </ul>
@@ -472,17 +508,27 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
+  <div id="imagePreviewOverlay" class="image-preview-overlay hidden" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
+    <button type="button" id="closeImagePreviewBtn" class="image-preview-close btn btn-icon" title="Đóng" aria-label="Đóng">
+      <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+    </button>
+    <div class="image-preview-stage">
+      <img id="imagePreviewImg" class="image-preview-img" alt="" />
+    </div>
+    <p id="imagePreviewCaption" class="image-preview-caption hidden"></p>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@9.5.0/dist/index.iife.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.2.0/dist/html2canvas-pro.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/files.js"></script>
@@ -491,6 +537,7 @@
   <script src="js/conversations.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/pdf-export.js"></script>
   <script src="js/events.js"></script>
   <script src="js/main.js"></script>
 </body>

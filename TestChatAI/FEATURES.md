@@ -117,9 +117,8 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | Tính năng | Mô tả |
 |-----------|--------|
 | **Tải Markdown** | Xuất toàn bộ hội thoại hiện tại ra file `.md` |
+| **Tải TXT** | Xuất hội thoại dạng văn bản thuần |
 | **Sao chép Markdown** | Copy toàn bộ hội thoại dạng Markdown vào clipboard |
-| **Xuất PDF** | Xuất hội thoại ra PDF (hỗ trợ cả tin đang stream) |
-| **PDF có định dạng** | Tự chọn chế độ raster (html2canvas) khi có code/bảng/toán/ảnh, hoặc text thuần (jsPDF + Noto Sans) |
 | **Xuất Word (.docx)** | Xuất hội thoại ra file `.docx` với định dạng Markdown (tiêu đề, code block, bảng, ảnh đính kèm) |
 | **Sao chép tin nhắn** | Copy nội dung từng tin nhắn (user/assistant) |
 
@@ -181,7 +180,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
   - DeepSeek: Chat Completions (thinking) — gọi trực tiếp từ trình duyệt
   - Google: Gemini `streamGenerateContent` (web search, image gen, thinking)
 - **Lưu trữ:** `localStorage` (key: `testchatai`)
-- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, jsPDF, html2canvas, PDF.js, Mammoth, SheetJS (xlsx), docx
+- **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, PDF.js, Mammoth, SheetJS (xlsx), docx
 - **Tuỳ chỉnh API** (`config.js`): `API_MAX_OUTPUT_TOKENS` (65536), `REASONING_EFFORT` (`high`), `SEARCH_CONTEXT_SIZE` (`high`)
 
 ---
@@ -201,7 +200,7 @@ TestChatAI/
 │   ├── markdown.js     # Render MD, KaTeX, Mermaid
 │   ├── ui.js           # DOM & render giao diện
 │   ├── events.js       # Sự kiện & luồng tương tác
-│   ├── utils.js        # Tiện ích, xuất PDF/DOCX
+│   ├── utils.js        # Tiện ích, xuất DOCX
 │   └── main.js         # Khởi tạo app
 └── assets/             # Favicon
 ```

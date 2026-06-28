@@ -8,8 +8,11 @@ window.Events = (() => {
   const ui = window.UI;
 
   let streamingContext = null;
-  let pdfExporting = false;
+  let streamEndPromise = null;
+  let streamEndResolve = null;
+
   let docxExporting = false;
+  let pdfExporting = false;
   let pendingImages = [];
   let pendingFiles = [];
   let pendingReferenceImage = null;
@@ -173,6 +176,76 @@ window.Events = (() => {
     return { ...convo, messages };
   };
 
+  const isExportableMessage = (m) => {
+    if (!m || (m.role !== 'user' && m.role !== 'assistant')) return false;
+    if (m.role === 'assistant') {
+      const hasText = !!convoMod.getAssistantContent(m);
+      const hasImages = !!(m.generatedImages && m.generatedImages.length);
+      return hasText || hasImages;
+    }
+    return true;
+  };
+
+  const getMessageForExport = (convo, idx) => {
+    const m = convo.messages[idx];
+    if (m && isExportableMessage(m)) return m;
+    if (
+      streamingContext
+      && streamingContext.convo.id === convo.id
+      && streamingContext.messageIndex === idx
+      && streamingContext.buffer
+    ) {
+      const partial = {
+        role: 'assistant',
+        content: streamingContext.buffer,
+        ts: Date.now()
+      };
+      if (streamingContext.reasoningBuffer) partial.reasoningContent = streamingContext.reasoningBuffer;
+      if (streamingContext.generatedImages?.length) {
+        partial.generatedImages = streamingContext.generatedImages.slice();
+      }
+      return partial;
+    }
+    if (m && m.role === 'assistant' && m.generatedImages?.length) return m;
+    return null;
+  };
+
+  const getExportConvoForDownload = () => {
+    const convo = convoMod.getCurrent();
+    if (!convo) return null;
+
+    if (!ui.isExportSelectMode()) {
+      return buildExportConvo();
+    }
+
+    const indices = ui.getExportSelectedIndices();
+    if (!indices.length) return null;
+
+    const messages = [];
+    for (const idx of indices) {
+      const m = getMessageForExport(convo, idx);
+      if (m) messages.push(m);
+    }
+    if (!messages.length) return null;
+
+    return {
+      ...convo,
+      title: (convo.title || 'Cuộc trò chuyện') + ' (đã chọn)',
+      messages
+    };
+  };
+
+  const requireExportConvo = () => {
+    const exportConvo = getExportConvoForDownload();
+    if (exportConvo && exportConvo.messages.length) return exportConvo;
+    if (ui.isExportSelectMode()) {
+      ui.showToast('Chọn ít nhất một tin nhắn để xuất');
+    } else {
+      ui.showToast('Chưa có hội thoại để xuất');
+    }
+    return null;
+  };
+
   const updateSendEnabled = () => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
@@ -187,7 +260,8 @@ window.Events = (() => {
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
-      ui.els.attachImageBtn.disabled = imageGenOn;
+      const visionOn = window.APP_CONFIG.modelSupportsVision(modelId);
+      ui.els.attachImageBtn.disabled = imageGenOn || !visionOn;
       ui.els.attachFileBtn.disabled = imageGenOn;
     }
   };
@@ -201,6 +275,12 @@ window.Events = (() => {
 
   const addPendingImages = async (files) => {
     if (!files || !files.length) return;
+
+    const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    if (!window.APP_CONFIG.modelSupportsVision(modelId)) {
+      ui.showToast('Model hiện tại không hỗ trợ đính kèm hình ảnh');
+      return;
+    }
 
     const imageFiles = Array.from(files).filter(f => ACCEPTED_IMAGE_TYPES.includes(f.type));
     if (!imageFiles.length) {
@@ -289,6 +369,22 @@ window.Events = (() => {
     updateSendEnabled();
   };
 
+  const getStreamingConvoId = () => streamingContext?.convo?.id ?? null;
+
+  const settleActiveStream = async ({ discard = false } = {}) => {
+    if (!window.API.isStreaming()) return;
+    if (streamingContext) streamingContext.discardSave = !!discard;
+    const wait = streamEndPromise || Promise.resolve();
+    apiAbort();
+    await wait;
+  };
+
+  const settleIfStreamingConvo = async (convoId, options = {}) => {
+    if (!window.API.isStreaming()) return;
+    if (getStreamingConvoId() !== convoId) return;
+    await settleActiveStream(options);
+  };
+
   const streamResponse = async (convo, { retryIdx } = {}) => {
     const s = state.get();
     let article;
@@ -323,7 +419,10 @@ window.Events = (() => {
     ui.removeError();
     ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
 
-    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, groundingMetadata, retryIdx };
+    streamEndResolve = null;
+    streamEndPromise = new Promise((resolve) => { streamEndResolve = resolve; });
+
+    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, groundingMetadata, retryIdx, discardSave: false, messageIndex };
 
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const users = convo.messages.filter((m) => m.role === 'user');
@@ -364,6 +463,8 @@ window.Events = (() => {
     };
 
     const saveAssistantResult = (text) => {
+      if (streamingContext?.discardSave) return;
+      if (!convoMod.getById(convo.id)) return;
       const extra = {};
       if (generatedImages.length) extra.generatedImages = generatedImages.slice();
       if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
@@ -387,12 +488,24 @@ window.Events = (() => {
       ui.setStreamingImageStatus(article, null);
 
       const finalMsg = convo.messages[messageIndex];
-      if (!article.dataset.idx && messageIndex !== undefined) {
-        article.dataset.idx = String(messageIndex);
+      const viewingConvo = convoMod.getCurrent();
+      const shouldFinalizeUi = viewingConvo?.id === convo.id && article?.isConnected;
+
+      if (shouldFinalizeUi) {
+        if (!article.dataset.idx && messageIndex !== undefined) {
+          article.dataset.idx = String(messageIndex);
+        }
+        ui.finalizeStreaming(article, buffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
       }
-      ui.finalizeStreaming(article, buffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
+
       ui.setStreaming(false);
       streamingContext = null;
+
+      if (streamEndResolve) {
+        streamEndResolve();
+        streamEndResolve = null;
+        streamEndPromise = null;
+      }
 
       if (useImageGen && generatedImages.length && !aborted) {
         state.set({ imageGenEnabled: false });
@@ -440,30 +553,34 @@ window.Events = (() => {
         refreshStreamingContent();
       },
       onDone: (info) => {
+        const discard = !!(streamingContext && streamingContext.discardSave);
         const msg = convo.messages[messageIndex];
         const hasResult = buffer || generatedImages.length;
         const aborted = !!(info && info.aborted);
         if (aborted) {
-          if (hasResult) {
+          if (hasResult && !discard) {
             saveAssistantResult(buffer);
             ui.showToast('Đã dừng');
-          } else if (retryIdx !== undefined) {
+          } else if (retryIdx !== undefined && !discard) {
             convoMod.cancelRetryVariant(convo, messageIndex);
-            if (msg) ui.updateAssistantMessage(messageIndex, msg);
+            if (msg && convoMod.getById(convo.id)) ui.updateAssistantMessage(messageIndex, msg);
           }
-        } else if (hasResult) {
+        } else if (hasResult && !discard) {
           saveAssistantResult(buffer);
-        } else if (retryIdx !== undefined) {
+        } else if (retryIdx !== undefined && !discard) {
           convoMod.cancelRetryVariant(convo, messageIndex);
         }
 
         finishStreamingResponse(buffer, { aborted });
       },
       onError: (err) => {
-        const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
-        saveAssistantResult(finalText);
-        finishStreamingResponse(finalText);
-        ui.showError(err);
+        const discard = !!(streamingContext && streamingContext.discardSave);
+        if (!discard) {
+          const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
+          saveAssistantResult(finalText);
+          ui.showError(err);
+        }
+        finishStreamingResponse(buffer || '');
       }
     });
   };
@@ -557,7 +674,7 @@ window.Events = (() => {
     autoResize(ui.els.composerInput);
     ui.removeError();
     ui.appendMessage(userMsg, userMsgIdx);
-    ui.renderConversationList(convoMod.getAll(), convo.id);
+    ui.refreshConversationList(convo.id);
     updateSendEnabled();
 
     await streamResponse(convo);
@@ -649,49 +766,118 @@ window.Events = (() => {
       return !settingsOpen && !guideOpen;
     };
 
-    const appEl = ui.els.app;
+    const getDragFileKind = (e) => {
+      const items = e.dataTransfer?.items;
+      if (!items || !items.length) return 'mixed';
+      let hasImage = false;
+      let hasOther = false;
+      for (const item of items) {
+        if (item.kind !== 'file') continue;
+        if (item.type.startsWith('image/')) hasImage = true;
+        else hasOther = true;
+      }
+      if (hasImage && hasOther) return 'mixed';
+      if (hasImage) return 'image';
+      if (hasOther) return 'file';
+      return 'mixed';
+    };
 
-    document.addEventListener('dragover', (e) => {
+    let fileDragOverlayActive = false;
+    let fileDragHideTimer = null;
+
+    const clearFileDragHideTimer = () => {
+      if (fileDragHideTimer) {
+        clearTimeout(fileDragHideTimer);
+        fileDragHideTimer = null;
+      }
+    };
+
+    const hideFileDragOverlay = () => {
+      clearFileDragHideTimer();
+      if (!fileDragOverlayActive) return;
+      fileDragOverlayActive = false;
+      ui.setDragOverlay(false);
+    };
+
+    const keepFileDragOverlay = (e) => {
       if (!hasFileDrag(e) || !canAcceptImageDrop()) return;
-      if (!appEl.contains(e.target)) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
+      clearFileDragHideTimer();
+      if (!fileDragOverlayActive) {
+        fileDragOverlayActive = true;
+        ui.setDragOverlay(true, getDragFileKind(e));
+      }
+      fileDragHideTimer = setTimeout(hideFileDragOverlay, 120);
+    };
+
+    document.addEventListener('dragenter', keepFileDragOverlay, true);
+    document.addEventListener('dragover', keepFileDragOverlay, true);
+
+    document.addEventListener('dragleave', (e) => {
+      if (!fileDragOverlayActive || !hasFileDrag(e)) return;
+      const related = e.relatedTarget;
+      if (related == null || !document.body.contains(related)) {
+        clearFileDragHideTimer();
+        fileDragHideTimer = setTimeout(hideFileDragOverlay, 0);
+      }
     });
 
-    appEl.addEventListener('dragenter', (e) => {
+    document.addEventListener('drop', (e) => {
+      hideFileDragOverlay();
       if (!hasFileDrag(e) || !canAcceptImageDrop()) return;
       e.preventDefault();
-      const related = e.relatedTarget;
-      if (related && appEl.contains(related)) return;
-      ui.setDragOverlay(true);
-    });
-
-    appEl.addEventListener('dragleave', (e) => {
-      if (!hasFileDrag(e)) return;
-      const related = e.relatedTarget;
-      if (related && appEl.contains(related)) return;
-      ui.setDragOverlay(false);
-    });
-
-    appEl.addEventListener('drop', (e) => {
-      if (!hasFileDrag(e) || !canAcceptImageDrop()) return;
-      e.preventDefault();
-      ui.setDragOverlay(false);
       if (e.dataTransfer.files.length) {
         addDroppedFiles(e.dataTransfer.files);
         ui.els.composerInput.focus();
       }
     });
 
+    document.addEventListener('dragend', hideFileDragOverlay);
+    window.addEventListener('blur', hideFileDragOverlay);
+
     ui.els.stopBtn.addEventListener('click', stopStreaming);
 
-    ui.els.newChatBtn.addEventListener('click', () => {
+    ui.els.newChatBtn.addEventListener('click', async () => {
+      await settleActiveStream({ discard: false });
+      ui.setExportSelectMode(false);
       const c = convoMod.create();
       clearPendingAttachments();
-      ui.renderConversationList(convoMod.getAll(), c.id);
+      ui.refreshConversationList(c.id);
       ui.renderMessages(c);
       ui.els.composerInput.focus();
     });
+
+    if (ui.els.toggleSidebarSearchBtn) {
+      ui.els.toggleSidebarSearchBtn.addEventListener('click', () => {
+        ui.toggleConversationSearch();
+      });
+    }
+
+    const onSidebarSearchInput = debounce(() => {
+      ui.setConversationSearchQuery(ui.els.sidebarSearchInput.value);
+    }, 220);
+
+    if (ui.els.sidebarSearchInput) {
+      ui.els.sidebarSearchInput.addEventListener('input', onSidebarSearchInput);
+      ui.els.sidebarSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          if (ui.getConversationSearchQuery()) {
+            ui.clearConversationSearch();
+          } else {
+            ui.toggleConversationSearch(false);
+          }
+        }
+      });
+    }
+
+    if (ui.els.sidebarSearchClear) {
+      ui.els.sidebarSearchClear.addEventListener('click', () => {
+        ui.clearConversationSearch();
+        ui.els.sidebarSearchInput?.focus();
+      });
+    }
 
     ui.els.conversationList.addEventListener('click', async (e) => {
       const item = e.target.closest('.conversation-item');
@@ -701,10 +887,10 @@ window.Events = (() => {
       if (action === 'delete') {
         e.stopPropagation();
         if (!confirm('Bạn có chắc muốn xoá cuộc trò chuyện này?')) return;
+        await settleIfStreamingConvo(id, { discard: true });
         convoMod.remove(id);
-        const list = convoMod.getAll();
         const cur = convoMod.getCurrent();
-        ui.renderConversationList(list, cur ? cur.id : null);
+        ui.refreshConversationList(cur ? cur.id : null);
         ui.renderMessages(cur);
         ui.closeMobileSidebar();
       } else if (action === 'rename') {
@@ -714,73 +900,80 @@ window.Events = (() => {
         const next = await ui.openRenameModal(c.title);
         if (next !== null) {
           convoMod.rename(id, next.trim() || c.title);
-          ui.renderConversationList(convoMod.getAll(), convoMod.getCurrent()?.id || null);
+          ui.refreshConversationList(convoMod.getCurrent()?.id || null);
         }
       } else {
+        const streamingId = getStreamingConvoId();
+        if (window.API.isStreaming() && streamingId && id !== streamingId) {
+          await settleActiveStream({ discard: false });
+        }
+        ui.setExportSelectMode(false);
         const c = convoMod.select(id);
         if (!c) return;
-        ui.renderConversationList(convoMod.getAll(), id);
+        ui.refreshConversationList(id);
         ui.renderMessages(c);
         ui.closeMobileSidebar();
         ui.els.composerInput.focus();
       }
     });
 
+    ui.els.toggleExportSelectBtn?.addEventListener('click', () => {
+      ui.toggleExportSelectMode();
+    });
+
+    ui.els.exportSelectAllBtn?.addEventListener('click', () => {
+      ui.selectAllExportMessages();
+    });
+
+    ui.els.exportSelectClearBtn?.addEventListener('click', () => {
+      ui.clearExportSelection();
+    });
+
+    ui.els.exitExportSelectBtn?.addEventListener('click', () => {
+      ui.setExportSelectMode(false);
+    });
+
+    ui.els.messages.addEventListener('click', (e) => {
+      if (!ui.isExportSelectMode()) return;
+      if (e.target.closest('.generated-image-btn')) return;
+
+      const article = e.target.closest('.message[data-idx]');
+      if (!article) return;
+      const idx = parseInt(article.dataset.idx, 10);
+      if (isNaN(idx)) return;
+      e.preventDefault();
+      ui.toggleExportSelectIndex(idx);
+    });
+
     ui.els.downloadConvoBtn.addEventListener('click', () => {
-      const convo = convoMod.getCurrent();
-      if (!convo || !convo.messages.length) {
-        ui.showToast('Chưa có hội thoại để tải');
-        return;
-      }
-      ui.downloadConversation(convo);
-      ui.showToast('Đã tải về');
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
+      ui.downloadConversation(exportConvo);
+      ui.showToast(ui.isExportSelectMode() ? 'Đã tải phần đã chọn (Markdown)' : 'Đã tải về Markdown');
+    });
+
+    ui.els.downloadTxtBtn.addEventListener('click', () => {
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
+      ui.downloadConversationTxt(exportConvo);
+      ui.showToast(ui.isExportSelectMode() ? 'Đã tải phần đã chọn (TXT)' : 'Đã tải về TXT');
     });
 
     ui.els.copyMarkdownBtn.addEventListener('click', async () => {
-      const convo = convoMod.getCurrent();
-      if (!convo || !convo.messages.length) {
-        ui.showToast('Chưa có hội thoại để sao chép');
-        return;
-      }
-      const md = window.Utils.formatConversation(convo);
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
+      const md = window.Utils.formatConversation(exportConvo);
       if (await copyToClipboard(md)) {
-        ui.showToast('Đã sao chép toàn bộ hội thoại');
+        ui.showToast(ui.isExportSelectMode() ? 'Đã sao chép phần đã chọn' : 'Đã sao chép toàn bộ hội thoại');
       }
     });
 
-    ui.els.pdfExportBtn.addEventListener('click', async () => {
-      if (pdfExporting) return;
-
-      const exportConvo = buildExportConvo();
-      if (!exportConvo || !exportConvo.messages.length) {
-        ui.showToast('Chưa có hội thoại để xuất');
-        return;
-      }
-
-      pdfExporting = true;
-      ui.els.pdfExportBtn.disabled = true;
-      const streaming = window.API.isStreaming();
-      ui.showToast(streaming ? 'Đang xuất PDF (gồm tin đang trả lời)...' : 'Đang xuất PDF...');
-
-      try {
-        await window.Utils.exportToPDF(exportConvo);
-        ui.showToast('Đã xuất PDF thành công');
-      } catch (err) {
-        ui.showToast('Xuất PDF thất bại: ' + (err.message || err));
-      } finally {
-        pdfExporting = false;
-        ui.els.pdfExportBtn.disabled = false;
-      }
-    });
 
     ui.els.docxExportBtn.addEventListener('click', async () => {
       if (docxExporting) return;
 
-      const exportConvo = buildExportConvo();
-      if (!exportConvo || !exportConvo.messages.length) {
-        ui.showToast('Chưa có hội thoại để xuất');
-        return;
-      }
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
 
       docxExporting = true;
       ui.els.docxExportBtn.disabled = true;
@@ -795,6 +988,28 @@ window.Events = (() => {
       } finally {
         docxExporting = false;
         ui.els.docxExportBtn.disabled = false;
+      }
+    });
+
+    ui.els.pdfExportBtn?.addEventListener('click', async () => {
+      if (pdfExporting) return;
+
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
+
+      pdfExporting = true;
+      ui.els.pdfExportBtn.disabled = true;
+      const streaming = window.API.isStreaming();
+      ui.showToast(streaming ? 'Đang xuất PDF A4 (gồm tin đang trả lời)...' : 'Đang xuất PDF A4...');
+
+      try {
+        await window.PdfExport.exportToPdf(exportConvo);
+        ui.showToast('Đã xuất PDF thành công');
+      } catch (err) {
+        ui.showToast('Xuất PDF thất bại: ' + (err.message || err));
+      } finally {
+        pdfExporting = false;
+        ui.els.pdfExportBtn.disabled = false;
       }
     });
 
@@ -822,6 +1037,10 @@ window.Events = (() => {
       if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
       if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
+      if (!window.APP_CONFIG.modelSupportsVision(modelId) && pendingImages.length) {
+        pendingImages = [];
+        ui.renderComposerAttachments(pendingImages, pendingFiles);
+      }
       state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled });
       syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled });
       updateSendEnabled();
@@ -1049,11 +1268,14 @@ window.Events = (() => {
       ui.els.geminiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
-    const handleClearAll = () => {
+    const handleClearAll = async () => {
       if (!confirm('Xoá tất cả hội thoại? Hành động này không thể hoàn tác.')) return;
+      await settleActiveStream({ discard: true });
+      await ui.animateClearAll();
       convoMod.clearAll();
-      ui.renderConversationList([], null);
-      ui.renderMessages(null);
+      ui.clearConversationSearch();
+      ui.refreshConversationList(null);
+      ui.renderMessages(null, { animateEmpty: true });
       ui.showToast('Đã xoá tất cả hội thoại');
     };
 
@@ -1112,6 +1334,11 @@ window.Events = (() => {
           return;
         }
         hideSelectionReplyTooltip();
+        if (ui.isExportSelectMode()) {
+          e.preventDefault();
+          ui.setExportSelectMode(false);
+          return;
+        }
         if (!ui.els.translateLangMenu.classList.contains('hidden')) {
           ui.closeTranslateLangMenu();
           return;
@@ -1134,8 +1361,21 @@ window.Events = (() => {
           ui.closeSettings();
           return;
         }
+        if (ui.isImagePreviewOpen()) {
+          e.preventDefault();
+          ui.closeImagePreview();
+          return;
+        }
         if (ui.els.app.getAttribute('data-md-preview') === 'open') {
           ui.closeMarkdownPreview();
+          return;
+        }
+        if (ui.isConversationSearchOpen()) {
+          if (ui.getConversationSearchQuery()) {
+            ui.clearConversationSearch();
+          } else {
+            ui.toggleConversationSearch(false);
+          }
           return;
         }
         if (ui.els.app.getAttribute('data-sidebar') === 'open') {
@@ -1161,6 +1401,11 @@ window.Events = (() => {
     ui.els.sidebarOverlay.addEventListener('click', () => ui.toggleSidebar(false));
     ui.els.closeMdPreviewBtn.addEventListener('click', () => ui.closeMarkdownPreview());
     ui.els.mdPreviewOverlay?.addEventListener('click', () => ui.closeMarkdownPreview());
+
+    ui.els.closeImagePreviewBtn?.addEventListener('click', () => ui.closeImagePreview());
+    ui.els.imagePreviewOverlay?.addEventListener('click', (e) => {
+      if (e.target === ui.els.imagePreviewOverlay) ui.closeImagePreview();
+    });
 
     document.addEventListener('click', async (e) => {
       const previewMdBtn = e.target.closest('[data-preview-md]');
@@ -1188,6 +1433,12 @@ window.Events = (() => {
             ? '<i class="fa-solid fa-diagram-project"></i>'
             : '<i class="fa-solid fa-code"></i>';
         }
+        return;
+      }
+      const previewMsgImg = e.target.closest('.message-preview-image');
+      if (previewMsgImg && !e.target.closest('.generated-image-btn')) {
+        const src = previewMsgImg.currentSrc || previewMsgImg.src;
+        if (src) ui.openImagePreview(src, previewMsgImg.alt || '');
         return;
       }
       const copyGenImgBtn = e.target.closest('[data-copy-generated-image]');
