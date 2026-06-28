@@ -109,6 +109,9 @@
           <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
             <span class="icon"><i class="fa-solid fa-file-word"></i></span>
           </button>
+          <button id="htmlExportBtn" class="btn btn-icon" title="Xuất HTML (.html)">
+            <span class="icon"><i class="fa-solid fa-file-code"></i></span>
+          </button>
           <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF (A4)">
             <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
           </button>
@@ -152,7 +155,7 @@
           <button type="button" id="attachBtn" class="btn btn-icon composer-attach" title="Đính kèm ảnh hoặc tài liệu" aria-label="Đính kèm ảnh hoặc tài liệu">
             <i class="fa-solid fa-plus"></i>
           </button>
-          <input type="file" id="attachFileInput" accept="image/jpeg,image/png,image/gif,image/webp,.txt,.md,.markdown,.csv,.json,.xml,.html,.htm,.css,.js,.ts,.jsx,.tsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.log,.rtf,.pdf,.docx,.xlsx,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden />
+          <input type="file" id="attachFileInput" accept="image/jpeg,image/png,image/gif,image/webp,text/*,application/pdf" multiple hidden />
           <div class="composer-field">
             <textarea
               id="composerInput"
@@ -265,7 +268,9 @@
             </button>
           </div>
         </div>
-        <p class="composer-hint">Kéo thả ảnh/tài liệu. Enter để gửi, Shift + Enter xuống dòng.</p>
+        <div class="composer-footer-notes">
+          <p class="composer-hint composer-disclaimer">AI can make mistakes. Please double-check responses.</p>
+        </div>
       </form>
       </div>
 
@@ -278,16 +283,25 @@
         </header>
         <div id="markdownPreviewContent" class="md-preview-content"></div>
       </aside>
+
+      <div id="pdfExportOverlay" class="pdf-export-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="pdfExportLoadingTitle" aria-busy="true">
+        <div class="pdf-export-overlay-backdrop"></div>
+        <div class="pdf-export-overlay-content">
+          <div id="pdfExportSpinner" class="pdf-export-spinner" aria-hidden="true"></div>
+          <p id="pdfExportLoadingTitle" class="pdf-export-overlay-title">Đang xuất PDF A4...</p>
+          <p id="pdfExportLoadingText" class="pdf-export-overlay-hint">Vui lòng đợi trong giây lát</p>
+          <button type="button" id="pdfExportDownloadBtn" class="btn btn-primary pdf-export-download-btn hidden">Tải xuống</button>
+        </div>
+      </div>
     </main>
   </div>
 
   <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="modal-backdrop" data-modal-close></div>
-    <div class="modal-content">
+    <div class="modal-content modal-content-settings">
       <header class="modal-header">
         <h2 id="settingsTitle">Cài đặt</h2>
         <div class="modal-header-actions">
-          <button type="submit" form="settingsForm" class="btn btn-primary btn-sm">Lưu</button>
           <button type="button" id="settingsGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn sử dụng">
             <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
           </button>
@@ -296,75 +310,81 @@
           </button>
         </div>
       </header>
-      <form id="settingsForm" class="modal-body">
-        <div class="field">
-          <label for="apiKeyInput">API Key (OpenAI)</label>
-          <div class="input-group">
-            <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." />
-            <button type="button" id="toggleApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
-              <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
-            </button>
+      <form id="settingsForm" class="modal-body settings-form">
+        <section class="settings-section" aria-labelledby="settingsApiKeysLabel">
+          <p id="settingsApiKeysLabel" class="settings-section-label">API Keys</p>
+          <div class="settings-api-grid">
+            <div class="field settings-api-field">
+              <label for="apiKeyInput">OpenAI</label>
+              <div class="input-group">
+                <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
+                <button type="button" id="toggleApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="apiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
+            <div class="field settings-api-field">
+              <label for="anthropicApiKeyInput">Anthropic</label>
+              <div class="input-group">
+                <input id="anthropicApiKeyInput" type="password" class="input" placeholder="sk-ant-..." autocomplete="off" />
+                <button type="button" id="toggleAnthropicApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="anthropicApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
+            <div class="field settings-api-field">
+              <label for="deepseekApiKeyInput">DeepSeek</label>
+              <div class="input-group">
+                <input id="deepseekApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
+                <button type="button" id="toggleDeepseekApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
+            <div class="field settings-api-field">
+              <label for="geminiApiKeyInput">Gemini</label>
+              <div class="input-group">
+                <input id="geminiApiKeyInput" type="password" class="input" placeholder="AIza..." autocomplete="off" />
+                <button type="button" id="toggleGeminiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="geminiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
           </div>
-          <p class="field-hint" data-i18n-key="apiKeyHintOpenAI">Stored locally, sent only to OpenAI.</p>
-        </div>
+          <p class="field-hint settings-api-hint" data-i18n-key="apiKeyHintAll">Stored locally, sent only to the matching provider.</p>
+        </section>
 
-        <div class="field">
-          <label for="anthropicApiKeyInput">API Key (Anthropic)</label>
-          <div class="input-group">
-            <input id="anthropicApiKeyInput" type="password" class="input" placeholder="sk-ant-..." />
-            <button type="button" id="toggleAnthropicApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
-              <span class="icon" id="anthropicApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
-            </button>
+        <section class="settings-section">
+          <div class="field settings-prompt-field">
+            <label for="systemPromptInput">System Prompt</label>
+            <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="2" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
           </div>
-          <p class="field-hint" data-i18n-key="apiKeyHintAnthropic">Stored locally, sent only to Anthropic.</p>
-        </div>
+        </section>
 
-        <div class="field">
-          <label for="deepseekApiKeyInput">API Key (DeepSeek)</label>
-          <div class="input-group">
-            <input id="deepseekApiKeyInput" type="password" class="input" placeholder="sk-..." />
-            <button type="button" id="toggleDeepseekApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
-              <span class="icon" id="deepseekApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
-            </button>
+        <footer class="settings-footer">
+          <div class="settings-footer-prefs">
+            <div class="field field-row settings-pref">
+              <label id="settingsLanguageLabel" for="settingsLocaleSelect">Language</label>
+              <select id="settingsLocaleSelect" name="locale" class="select settings-locale-select" aria-label="Language"></select>
+            </div>
+            <div class="field field-row settings-pref">
+              <label id="settingsThemeLabel">Theme</label>
+              <div class="theme-toggle">
+                <label class="radio"><input type="radio" name="theme" value="dark" /> Dark</label>
+                <label class="radio"><input type="radio" name="theme" value="light" /> Light</label>
+              </div>
+            </div>
           </div>
-          <p class="field-hint" data-i18n-key="apiKeyHintDeepSeek">Stored locally, sent only to DeepSeek.</p>
-        </div>
+          <button type="button" id="clearAllBtn" class="btn btn-danger settings-clear-btn">Xoá tất cả hội thoại</button>
+        </footer>
 
-        <div class="field">
-          <label for="geminiApiKeyInput">API Key (Gemini)</label>
-          <div class="input-group">
-            <input id="geminiApiKeyInput" type="password" class="input" placeholder="AIza..." />
-            <button type="button" id="toggleGeminiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
-              <span class="icon" id="geminiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
-            </button>
-          </div>
-          <p class="field-hint" data-i18n-key="apiKeyHintGemini">Stored locally, sent only to Google.</p>
-        </div>
-
-        <div class="field">
-          <label for="systemPromptInput">System Prompt</label>
-          <textarea id="systemPromptInput" class="input textarea" rows="4" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
-        </div>
-
-        <div class="field field-row">
-          <label id="settingsLanguageLabel">Language</label>
-          <div class="theme-toggle">
-            <label class="radio"><input type="radio" name="locale" value="en" /> EN</label>
-            <label class="radio"><input type="radio" name="locale" value="vi" /> VI</label>
-            <label class="radio"><input type="radio" name="locale" value="jp" /> JP</label>
-          </div>
-        </div>
-
-        <div class="field field-row">
-          <label id="settingsThemeLabel">Theme</label>
-          <div class="theme-toggle">
-            <label class="radio"><input type="radio" name="theme" value="dark" /> Dark</label>
-            <label class="radio"><input type="radio" name="theme" value="light" /> Light</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <button type="button" id="clearAllBtn" class="btn btn-danger">Xoá tất cả hội thoại</button>
+        <div class="settings-legal-footer">
+          <nav class="settings-legal-links" aria-label="Legal">
+            <a href="privacy.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            <span class="settings-legal-sep" aria-hidden="true">·</span>
+            <a href="terms.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+          </nav>
+          <p class="settings-credit">Developed by VUTASO.com. All rights reserved</p>
         </div>
       </form>
     </div>
@@ -498,15 +518,6 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <div id="pdfExportOverlay" class="pdf-export-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="pdfExportLoadingTitle" aria-busy="true">
-    <div class="pdf-export-overlay-backdrop"></div>
-    <div class="pdf-export-overlay-content">
-      <div class="pdf-export-spinner" aria-hidden="true"></div>
-      <p id="pdfExportLoadingTitle" class="pdf-export-overlay-title">Đang xuất PDF A4...</p>
-      <p id="pdfExportLoadingText" class="pdf-export-overlay-hint">Vui lòng đợi trong giây lát</p>
-    </div>
-  </div>
-
   <div id="imagePreviewOverlay" class="image-preview-overlay hidden" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
     <button type="button" id="closeImagePreviewBtn" class="image-preview-close btn btn-icon" title="Đóng" aria-label="Đóng">
       <span class="icon"><i class="fa-solid fa-xmark"></i></span>
@@ -539,6 +550,7 @@
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/pdf-export.js"></script>
+  <script src="js/html-export.js"></script>
   <script src="js/events.js"></script>
   <script src="js/main.js"></script>
 </body>

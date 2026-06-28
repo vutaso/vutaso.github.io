@@ -9,10 +9,36 @@
   background: #ffffff;
   color: #111118;
   font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: auto;
+  text-rendering: geometricPrecision;
+  font-synthesis: none;
   clip-path: inset(100%);
   clip: rect(0 0 0 0);
   overflow: hidden;
+}
+
+.pdf-export-root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-elev: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #f0f2f7;
+  --bg-active: #e4e8f0;
+  --text: #111118;
+  --text-muted: #4a4a58;
+  --text-dim: #7a7a8a;
+  --border: #e2e4ec;
+  --border-strong: #c8ccd8;
+  --user-bubble: #dbeafe;
+  --assistant-bubble: transparent;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-glow: rgba(37, 99, 235, 0.15);
+  --danger: #dc2626;
+  --code-bg: #f6f8fa;
+  --shadow: none;
+  --shadow-sm: none;
+  background: #ffffff;
+  color: #111118;
 }
 
 .pdf-export-root.is-capturing {
@@ -77,6 +103,8 @@
   overflow: visible !important;
   overflow-wrap: anywhere;
   word-break: break-word;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
 .pdf-export-root .message.user .body {
@@ -108,11 +136,54 @@
 }
 
 .pdf-export-root .katex,
-.pdf-export-root .katex-display {
+.pdf-export-root .katex-display,
+.pdf-export-root .math-block .katex,
+.pdf-export-root .math-inline .katex {
+  color: #111118 !important;
+}
+
+.pdf-export-root .content,
+.pdf-export-root .content p,
+.pdf-export-root .content li,
+.pdf-export-root .content h1,
+.pdf-export-root .content h2,
+.pdf-export-root .content h3,
+.pdf-export-root .content h4,
+.pdf-export-root .content h5,
+.pdf-export-root .content h6,
+.pdf-export-root .content blockquote,
+.pdf-export-root .message-reasoning,
+.pdf-export-root .message-reasoning summary,
+.pdf-export-root .grounding-chip,
+.pdf-export-root .grounding-chip-label {
   color: #111118;
 }
 
+.pdf-export-root .content a {
+  color: #2563eb;
+}
+
+.pdf-export-root .content blockquote {
+  border-left-color: #2563eb;
+  color: #4a4a58;
+}
+
+.pdf-export-root .message.user .body {
+  background: #dbeafe;
+  border-color: #c7d9f5;
+  color: #111118;
+}
+
+.pdf-export-root .message .avatar.user-av {
+  background: #e4e8f0;
+  color: #4a4a58;
+  border-color: #e2e4ec;
+}
+
 .pdf-export-root pre {
+  background: #f6f8fa !important;
+  border-color: #e2e4ec !important;
+  color: #111118 !important;
   max-height: none !important;
   height: auto !important;
   overflow: visible !important;
@@ -123,6 +194,63 @@
 
 .pdf-export-root pre .pre-header {
   position: static !important;
+  background: #eef1f6 !important;
+  border-bottom-color: #e2e4ec !important;
+  color: #7a7a8a !important;
+}
+
+.pdf-export-root pre code,
+.pdf-export-root pre code.hljs,
+.pdf-export-root pre code.hljs span {
+  color: #111118 !important;
+  background: transparent !important;
+}
+
+.pdf-export-root .content :not(pre) > code {
+  background: #f0f2f7 !important;
+  border-color: #e2e4ec !important;
+  color: #111118 !important;
+}
+
+.pdf-export-root .table-block,
+.pdf-export-root .mermaid-block {
+  background: #ffffff !important;
+  border-color: #e2e4ec !important;
+}
+
+.pdf-export-root .table-header,
+.pdf-export-root .mermaid-block .pre-header {
+  background: #eef1f6 !important;
+  border-color: #e2e4ec !important;
+  color: #7a7a8a !important;
+}
+
+.pdf-export-root .table-block th {
+  background: #f0f2f7 !important;
+  color: #111118 !important;
+  border-color: #e2e4ec !important;
+}
+
+.pdf-export-root .table-block td {
+  background: #ffffff !important;
+  color: #111118 !important;
+  border-color: #e2e4ec !important;
+}
+
+.pdf-export-root .message-file-chip {
+  background: #eef4ff !important;
+  border-color: #c7d9f5 !important;
+  color: #111118 !important;
+}
+
+.pdf-export-root .message-file-chip > i {
+  color: #2563eb !important;
+}
+
+.pdf-export-root .message-file-size,
+.pdf-export-root .message-translate-label,
+.pdf-export-root .message-imagegen-label {
+  color: #7a7a8a !important;
 }
 
 .pdf-export-root pre code {
@@ -134,6 +262,10 @@
   white-space: pre-wrap !important;
   word-break: break-word;
   overflow-wrap: anywhere;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .pdf-export-root .table-block,

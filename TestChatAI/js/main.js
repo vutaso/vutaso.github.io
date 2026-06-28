@@ -8,6 +8,10 @@
 
   ui.cacheEls();
 
+  if (ui.els.attachFileInput) {
+    ui.els.attachFileInput.accept = window.APP_CONFIG.getAttachFileAccept();
+  }
+
   window.I18n.setLocale(state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
   window.I18n.applyToDOM();
 

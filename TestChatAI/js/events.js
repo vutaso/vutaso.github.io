@@ -13,6 +13,7 @@ window.Events = (() => {
   let streamEndResolve = null;
 
   let docxExporting = false;
+  let htmlExporting = false;
   let pdfExporting = false;
   let pendingImages = [];
   let pendingFiles = [];
@@ -968,16 +969,73 @@ window.Events = (() => {
       docxExporting = true;
       ui.els.docxExportBtn.disabled = true;
       const streaming = window.API.isStreaming();
-      ui.showToast(streaming ? t('toastExportingWordStream') : t('toastExportingWord'));
+      ui.setPdfExportLoading(true, {
+        title: t('toastExportingWord'),
+        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+      });
 
       try {
-        await window.Utils.exportToDocx(exportConvo);
-        ui.showToast(t('toastExportWordOk'));
+        const result = await window.Utils.exportToDocx(exportConvo);
+        const status = ui.finishExportDownload(result, {
+          readyTitle: t('exportDownloadReadyTitle'),
+          readyHint: t('exportDownloadReadyHint'),
+          readyDownloadLabel: t('exportDownloadWordBtn'),
+          kind: 'docx',
+        });
+        if (status === 'downloaded') ui.showToast(t('toastExportWordOk'));
       } catch (err) {
+        ui.setPdfExportLoading(false);
         ui.showToast(t('toastExportWordFail', { err: err.message || err }));
       } finally {
         docxExporting = false;
         ui.els.docxExportBtn.disabled = false;
+      }
+    });
+
+    ui.els.pdfExportDownloadBtn?.addEventListener('click', () => {
+      const pending = ui.consumeExportDownload();
+      if (!pending) return;
+      window.Utils.downloadBlob(pending.blob, pending.filename);
+      ui.setPdfExportLoading(false);
+      const toastKey = pending.kind === 'docx'
+        ? 'toastExportWordOk'
+        : pending.kind === 'html'
+          ? 'toastExportHtmlOk'
+          : 'toastExportPdfOk';
+      ui.showToast(t(toastKey));
+    });
+
+    ui.els.htmlExportBtn?.addEventListener('click', async () => {
+      if (htmlExporting) return;
+
+      const exportConvo = requireExportConvo();
+      if (!exportConvo) return;
+
+      htmlExporting = true;
+      ui.els.htmlExportBtn.disabled = true;
+      const streaming = window.API.isStreaming();
+      ui.setPdfExportLoading(true, {
+        title: t('exportHtmlTitle'),
+        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+      });
+
+      try {
+        const result = await window.HtmlExport.exportToHtml(exportConvo, {
+          onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+        });
+        const status = ui.finishExportDownload(result, {
+          readyTitle: t('exportDownloadReadyTitle'),
+          readyHint: t('exportDownloadReadyHint'),
+          readyDownloadLabel: t('exportDownloadHtmlBtn'),
+          kind: 'html',
+        });
+        if (status === 'downloaded') ui.showToast(t('toastExportHtmlOk'));
+      } catch (err) {
+        ui.setPdfExportLoading(false);
+        ui.showToast(t('toastExportHtmlFail', { err: err.message || err }));
+      } finally {
+        htmlExporting = false;
+        ui.els.htmlExportBtn.disabled = false;
       }
     });
 
@@ -991,21 +1049,27 @@ window.Events = (() => {
       ui.els.pdfExportBtn.disabled = true;
       const streaming = window.API.isStreaming();
       ui.setPdfExportLoading(true, {
-        title: 'Đang xuất PDF A4...',
-        hint: streaming ? 'Gồm cả tin đang trả lời' : 'Vui lòng đợi trong giây lát',
+        title: t('exportPdfTitle'),
+        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
       });
 
       try {
-        await window.PdfExport.exportToPdf(exportConvo, {
+        const result = await window.PdfExport.exportToPdf(exportConvo, {
           onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
         });
-        ui.showToast(t('toastExportPdfOk'));
+        const status = ui.finishExportDownload(result, {
+          readyTitle: t('exportDownloadReadyTitle'),
+          readyHint: t('exportDownloadReadyHint'),
+          readyDownloadLabel: t('exportDownloadPdfBtn'),
+          kind: 'pdf',
+        });
+        if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
       } catch (err) {
+        ui.setPdfExportLoading(false);
         ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
       } finally {
         pdfExporting = false;
         ui.els.pdfExportBtn.disabled = false;
-        ui.setPdfExportLoading(false);
       }
     });
 
@@ -1013,10 +1077,11 @@ window.Events = (() => {
       const trigger = e.target.closest('[data-action="open-guide"], #openGuideBtn, #settingsGuideBtn');
       if (!trigger) return;
       e.preventDefault();
+      if (!ui.els.settingsModal.classList.contains('hidden')) {
+        applySettingsFromForm();
+      }
       ui.openGuide();
     };
-
-    document.addEventListener('click', openGuideFromClick);
 
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.guideOpenSettingsBtn?.addEventListener('click', () => {
@@ -1237,6 +1302,9 @@ window.Events = (() => {
       state.set({ theme: next });
       ui.setTheme(next);
       ui.rerenderMermaid();
+      ui.els.settingsForm?.querySelectorAll('input[name="theme"]').forEach((r) => {
+        r.checked = r.value === next;
+      });
     });
 
     ui.els.toggleApiKeyBtn.addEventListener('click', () => {
@@ -1277,17 +1345,17 @@ window.Events = (() => {
     ui.els.clearAllBtn.addEventListener('click', handleClearAll);
     ui.els.clearAllSidebarBtn.addEventListener('click', handleClearAll);
 
-    ui.els.settingsForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    const applySettingsFromForm = () => {
       const apiKey = ui.els.apiKeyInput.value.trim();
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
       const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
       const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
       const prev = state.get();
-      const locale = ui.els.settingsForm.querySelector('input[name="locale"]:checked')?.value || window.APP_CONFIG.DEFAULT_LOCALE;
+      const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
       let systemPrompt = ui.els.systemPromptInput.value.trim();
       if (!systemPrompt || window.I18n.isDefaultSystemPrompt(systemPrompt)) {
         systemPrompt = window.I18n.getDefaultSystemPrompt(locale);
+        ui.els.systemPromptInput.value = systemPrompt;
       }
       const theme = ui.els.settingsForm.querySelector('input[name="theme"]:checked')?.value || 'dark';
       const prevTheme = prev.theme;
@@ -1297,10 +1365,36 @@ window.Events = (() => {
       if (prevTheme !== theme) ui.rerenderMermaid();
       if (prev.locale !== locale) ui.applyLocale({ ...prev, ...nextState });
       else window.I18n.applyToDOM();
-      ui.closeSettings();
-      ui.showToast(t('toastSettingsSaved'));
       updateSendEnabled();
+    };
+
+    const closeSettingsModal = () => {
+      applySettingsFromForm();
+      ui.closeSettings();
+    };
+
+    ui.els.settingsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      applySettingsFromForm();
     });
+
+    ui.els.settingsLocaleSelect?.addEventListener('change', applySettingsFromForm);
+
+    ui.els.settingsForm.querySelectorAll('input[name="theme"]').forEach((input) => {
+      input.addEventListener('change', applySettingsFromForm);
+    });
+
+    [
+      ui.els.apiKeyInput,
+      ui.els.anthropicApiKeyInput,
+      ui.els.deepseekApiKeyInput,
+      ui.els.geminiApiKeyInput,
+      ui.els.systemPromptInput,
+    ].forEach((input) => {
+      input?.addEventListener('blur', applySettingsFromForm);
+    });
+
+    document.addEventListener('click', openGuideFromClick);
 
     ui.els.renameForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -1323,7 +1417,7 @@ window.Events = (() => {
           return;
         }
         if (el.closest('#settingsModal')) {
-          ui.closeSettings();
+          closeSettingsModal();
         }
       });
     });
@@ -1361,7 +1455,7 @@ window.Events = (() => {
           return;
         }
         if (!ui.els.settingsModal.classList.contains('hidden')) {
-          ui.closeSettings();
+          closeSettingsModal();
           return;
         }
         if (ui.isImagePreviewOpen()) {

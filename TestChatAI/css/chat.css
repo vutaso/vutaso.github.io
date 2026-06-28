@@ -399,9 +399,28 @@
 
 .message.streaming .content pre,
 .message.streaming .content .mermaid-pending,
-.message.streaming .content .mermaid-source {
+.message.streaming .content .mermaid-source,
+.message.streaming .content .mermaid-view {
   overflow-anchor: none;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.message.streaming .content pre::-webkit-scrollbar,
+.message.streaming .content .mermaid-pending::-webkit-scrollbar,
+.message.streaming .content .mermaid-source::-webkit-scrollbar,
+.message.streaming .content .mermaid-view::-webkit-scrollbar {
+  display: none;
+}
+
+.message.streaming .content pre code {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.message.streaming .content pre code::-webkit-scrollbar {
+  display: none;
 }
 
 .message .content pre .pre-header {

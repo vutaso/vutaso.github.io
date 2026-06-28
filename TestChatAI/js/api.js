@@ -6,9 +6,7 @@ window.API = (() => {
 
   const appendFilesToText = (text, files) => {
     if (!files || !files.length) return text || '';
-    const blocks = files.map((f) =>
-      '**Tệp đính kèm: ' + f.name + '**\n```\n' + f.content + '\n```'
-    ).join('\n\n');
+    const blocks = files.map((f) => window.Files.formatFileMarkdown(f)).join('\n\n');
     return text ? text + '\n\n' + blocks : blocks;
   };
 

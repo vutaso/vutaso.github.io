@@ -1,5 +1,10 @@
 window.Files = (() => {
-  const { ACCEPTED_IMAGE_TYPES, ACCEPTED_FILE_EXTENSIONS } = window.APP_CONFIG;
+  const {
+    ACCEPTED_IMAGE_TYPES,
+    ACCEPTED_FILE_EXTENSIONS,
+    CODE_FILE_EXTENSIONS,
+    FILE_EXTENSION_LANGUAGES
+  } = window.APP_CONFIG;
 
   const getExtension = (name) => {
     const idx = name.lastIndexOf('.');
@@ -105,18 +110,31 @@ window.Files = (() => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
+  const getCodeLanguage = (name) => FILE_EXTENSION_LANGUAGES[getExtension(name)] || null;
+
+  const formatFileMarkdown = (file, labelPrefix = 'Tệp đính kèm') => {
+    const lang = getCodeLanguage(file.name);
+    const fence = lang ? '```' + lang : '```';
+    return '**' + labelPrefix + ': ' + file.name + '**\n' + fence + '\n' + file.content + '\n```';
+  };
+
   const getIconClass = (name) => {
     const ext = getExtension(name);
     if (ext === '.pdf') return 'fa-file-pdf';
     if (ext === '.csv') return 'fa-file-csv';
     if (ext === '.xlsx') return 'fa-file-excel';
-    if (['.json', '.xml', '.yaml', '.yml'].includes(ext)) return 'fa-file-code';
-    if (['.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.c', '.cpp', '.h', '.css'].includes(ext)) {
-      return 'fa-file-code';
-    }
+    if (CODE_FILE_EXTENSIONS.includes(ext)) return 'fa-file-code';
     if (['.doc', '.docx'].includes(ext)) return 'fa-file-word';
     return 'fa-file-lines';
   };
 
-  return { getKind, getExtension, extractContent, formatSize, getIconClass };
+  return {
+    getKind,
+    getExtension,
+    extractContent,
+    formatSize,
+    getIconClass,
+    getCodeLanguage,
+    formatFileMarkdown
+  };
 })();

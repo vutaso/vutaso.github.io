@@ -200,7 +200,7 @@ window.Utils = (() => {
           ? '\n\n_[' + msg.images.length + ' hình ảnh đính kèm]_'
           : '';
         const fileNote = msg.files && msg.files.length
-          ? '\n\n' + msg.files.map((f) => '**Tệp: ' + f.name + '**\n```\n' + f.content + '\n```').join('\n\n')
+          ? '\n\n' + msg.files.map((f) => window.Files.formatFileMarkdown(f, 'Tệp')).join('\n\n')
           : '';
         parts.push('**' + (text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh')) + '**' + translateNote + imageGenNote + imgNote + fileNote);
       } else {
@@ -254,15 +254,56 @@ window.Utils = (() => {
     downloadBlob(blob, filename);
   };
 
+  const DOWNLOAD_ALLOWED_KEY = 'testchatai_download_allowed';
+  let downloadAnchor = null;
+
+  const isIOSDevice = () =>
+    /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  const isDownloadAllowed = () => {
+    if (!isIOSDevice()) return true;
+    try {
+      return localStorage.getItem(DOWNLOAD_ALLOWED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  };
+
+  const markDownloadAllowed = () => {
+    if (!isIOSDevice()) return;
+    try {
+      localStorage.setItem(DOWNLOAD_ALLOWED_KEY, '1');
+    } catch {}
+  };
+
   const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
+    if (!downloadAnchor) {
+      downloadAnchor = document.createElement('a');
+      downloadAnchor.style.display = 'none';
+      document.body.appendChild(downloadAnchor);
+    }
+
+    downloadAnchor.href = url;
+    downloadAnchor.download = filename;
+    downloadAnchor.click();
+
+    const revokeDelay = isIOSDevice() ? 120000 : 1000;
+    setTimeout(() => {
+      if (downloadAnchor?.href === url) downloadAnchor.removeAttribute('href');
+      URL.revokeObjectURL(url);
+    }, revokeDelay);
+
+    markDownloadAllowed();
+  };
+
+  const deliverDownload = (blob, filename) => {
+    if (isDownloadAllowed()) {
+      downloadBlob(blob, filename);
+      return 'downloaded';
+    }
+    return 'needs_gesture';
   };
 
 
@@ -639,7 +680,8 @@ window.Utils = (() => {
         ],
       }));
       if (file.content && file.content.trim()) {
-        paragraphs.push(...buildDocxCodeBlockParagraphs(file.content, docxLib));
+        const lang = window.Files.getCodeLanguage(file.name);
+        paragraphs.push(...buildDocxCodeBlockParagraphs(file.content, docxLib, lang || undefined));
       }
     }
 
@@ -692,7 +734,7 @@ window.Utils = (() => {
     });
 
     const blob = await Packer.toBlob(doc);
-    downloadBlob(blob, exportSafeName(convo.title) + '.docx');
+    return { blob, filename: exportSafeName(convo.title) + '.docx' };
   };
 
   const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
@@ -708,6 +750,7 @@ window.Utils = (() => {
     includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
     formatConversation, formatConversationPlainText,
-    downloadFile, downloadBlob, exportToDocx, readFileAsDataUrl
+    downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice,
+    exportToDocx, readFileAsDataUrl
   };
 })();

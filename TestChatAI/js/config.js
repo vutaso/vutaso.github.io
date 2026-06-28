@@ -18,7 +18,7 @@ window.APP_CONFIG = {
 
   DEFAULT_MODEL: 'gemini-3.5-flash',
   DEFAULT_LOCALE: 'en',
-  LOCALES: ['en', 'vi', 'jp'],
+  LOCALES: ['en', 'vi', 'jp', 'zh'],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
   API_MAX_OUTPUT_TOKENS: 65536,
@@ -214,9 +214,66 @@ window.APP_CONFIG = {
 
   ACCEPTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
 
+  CODE_FILE_EXTENSIONS: [
+    '.css', '.scss', '.sass', '.less',
+    '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.vue', '.svelte',
+    '.py', '.pyw', '.pyi', '.java', '.kt', '.kts', '.scala', '.sc',
+    '.c', '.cc', '.cpp', '.cxx', '.h', '.hpp', '.hh', '.hxx',
+    '.m', '.mm', '.swift',
+    '.go', '.rs', '.rb', '.php', '.cs', '.fs', '.vb',
+    '.sh', '.bash', '.zsh', '.ps1',
+    '.sql', '.r', '.lua', '.dart', '.pl', '.pm',
+    '.hs', '.ex', '.exs', '.clj', '.cljs',
+    '.zig', '.nim', '.groovy', '.gradle',
+    '.asm', '.s', '.f', '.f90', '.toml', '.ini'
+  ],
+
+  FILE_EXTENSION_LANGUAGES: {
+    '.css': 'css', '.scss': 'scss', '.sass': 'sass', '.less': 'less',
+    '.js': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript',
+    '.ts': 'typescript', '.tsx': 'tsx', '.jsx': 'jsx', '.vue': 'vue', '.svelte': 'svelte',
+    '.py': 'python', '.pyw': 'python', '.pyi': 'python',
+    '.java': 'java', '.kt': 'kotlin', '.kts': 'kotlin',
+    '.scala': 'scala', '.sc': 'scala',
+    '.c': 'c', '.cc': 'cpp', '.cpp': 'cpp', '.cxx': 'cpp',
+    '.h': 'c', '.hpp': 'cpp', '.hh': 'cpp', '.hxx': 'cpp',
+    '.m': 'objectivec', '.mm': 'objectivec', '.swift': 'swift',
+    '.go': 'go', '.rs': 'rust', '.rb': 'ruby', '.php': 'php',
+    '.cs': 'csharp', '.fs': 'fsharp', '.vb': 'vbnet',
+    '.sh': 'bash', '.bash': 'bash', '.zsh': 'bash', '.ps1': 'powershell',
+    '.sql': 'sql', '.r': 'r', '.lua': 'lua', '.dart': 'dart',
+    '.pl': 'perl', '.pm': 'perl', '.hs': 'haskell',
+    '.ex': 'elixir', '.exs': 'elixir', '.clj': 'clojure', '.cljs': 'clojure',
+    '.zig': 'zig', '.nim': 'nim', '.groovy': 'groovy', '.gradle': 'groovy',
+    '.asm': 'asm', '.s': 'asm', '.f': 'fortran', '.f90': 'fortran',
+    '.json': 'json', '.xml': 'xml', '.html': 'html', '.htm': 'html',
+    '.yaml': 'yaml', '.yml': 'yaml', '.toml': 'toml', '.ini': 'ini',
+    '.md': 'markdown', '.markdown': 'markdown'
+  },
+
   ACCEPTED_FILE_EXTENSIONS: [
     '.txt', '.md', '.markdown', '.csv', '.json', '.xml', '.html', '.htm',
-    '.css', '.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.c', '.cpp', '.h',
-    '.yaml', '.yml', '.log', '.rtf', '.pdf', '.docx', '.xlsx'
-  ]
+    '.yaml', '.yml', '.log', '.rtf', '.pdf', '.docx', '.xlsx',
+    '.css', '.scss', '.sass', '.less',
+    '.js', '.mjs', '.cjs', '.ts', '.jsx', '.tsx', '.vue', '.svelte',
+    '.py', '.pyw', '.pyi', '.java', '.kt', '.kts', '.scala', '.sc',
+    '.c', '.cc', '.cpp', '.cxx', '.h', '.hpp', '.hh', '.hxx',
+    '.m', '.mm', '.swift',
+    '.go', '.rs', '.rb', '.php', '.cs', '.fs', '.vb',
+    '.sh', '.bash', '.zsh', '.ps1',
+    '.sql', '.r', '.lua', '.dart', '.pl', '.pm',
+    '.hs', '.ex', '.exs', '.clj', '.cljs',
+    '.zig', '.nim', '.groovy', '.gradle',
+    '.asm', '.s', '.f', '.f90', '.toml', '.ini'
+  ],
+
+  getAttachFileAccept() {
+    const docTypes = [
+      'text/*',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    return [...this.ACCEPTED_IMAGE_TYPES, ...this.ACCEPTED_FILE_EXTENSIONS, ...docTypes].join(',');
+  }
 };

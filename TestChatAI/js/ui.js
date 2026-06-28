@@ -31,6 +31,7 @@ window.UI = (() => {
     els.geminiApiKeyInput = $('#geminiApiKeyInput');
     els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
+    els.settingsLocaleSelect = $('#settingsLocaleSelect');
     els.settingsForm = $('#settingsForm');
     els.toast = $('#toast');
     els.selectionReplyTooltip = $('#selectionReplyTooltip');
@@ -45,10 +46,13 @@ window.UI = (() => {
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
 
     els.docxExportBtn = $('#docxExportBtn');
+    els.htmlExportBtn = $('#htmlExportBtn');
     els.pdfExportBtn = $('#pdfExportBtn');
     els.pdfExportOverlay = $('#pdfExportOverlay');
     els.pdfExportLoadingTitle = $('#pdfExportLoadingTitle');
     els.pdfExportLoadingText = $('#pdfExportLoadingText');
+    els.pdfExportSpinner = $('#pdfExportSpinner');
+    els.pdfExportDownloadBtn = $('#pdfExportDownloadBtn');
     els.toggleExportSelectBtn = $('#toggleExportSelectBtn');
     els.exportSelectBar = $('#exportSelectBar');
     els.exportSelectCount = $('#exportSelectCount');
@@ -1290,9 +1294,7 @@ window.UI = (() => {
     els.settingsForm.querySelectorAll('input[name="theme"]').forEach((r) => {
       r.checked = r.value === (state.theme || 'dark');
     });
-    els.settingsForm.querySelectorAll('input[name="locale"]').forEach((r) => {
-      r.checked = r.value === (state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
-    });
+    window.I18n.populateLocaleSelect(els.settingsLocaleSelect, state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
     els.apiKeyInput.type = 'password';
     els.apiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.anthropicApiKeyInput.type = 'password';
@@ -1517,21 +1519,60 @@ window.UI = (() => {
     toastTimer = setTimeout(() => els.toast.classList.add('hidden'), 1800);
   };
 
-  const setPdfExportLoading = (visible, { title, hint } = {}) => {
+  let pendingExportDownload = null;
+  let pendingExportKind = null;
+
+  const setPdfExportLoading = (visible, { title, hint, ready = false, downloadLabel } = {}) => {
     if (!els.pdfExportOverlay) return;
     if (visible) {
       if (title && els.pdfExportLoadingTitle) els.pdfExportLoadingTitle.textContent = title;
       if (hint && els.pdfExportLoadingText) els.pdfExportLoadingText.textContent = hint;
+      if (downloadLabel && els.pdfExportDownloadBtn) els.pdfExportDownloadBtn.textContent = downloadLabel;
+      els.pdfExportSpinner?.classList.toggle('hidden', ready);
+      els.pdfExportDownloadBtn?.classList.toggle('hidden', !ready);
       els.pdfExportOverlay.classList.remove('hidden');
       els.pdfExportOverlay.setAttribute('aria-hidden', 'false');
-      els.pdfExportOverlay.setAttribute('aria-busy', 'true');
+      els.pdfExportOverlay.setAttribute('aria-busy', ready ? 'false' : 'true');
       document.body.classList.add('pdf-export-loading');
     } else {
+      pendingExportDownload = null;
+      pendingExportKind = null;
+      els.pdfExportSpinner?.classList.remove('hidden');
+      els.pdfExportDownloadBtn?.classList.add('hidden');
       els.pdfExportOverlay.classList.add('hidden');
       els.pdfExportOverlay.setAttribute('aria-hidden', 'true');
       els.pdfExportOverlay.setAttribute('aria-busy', 'false');
       document.body.classList.remove('pdf-export-loading');
     }
+  };
+
+  const showExportDownloadPrompt = (blob, filename, { title, hint, downloadLabel, kind = 'pdf' }) => {
+    pendingExportDownload = { blob, filename };
+    pendingExportKind = kind;
+    setPdfExportLoading(true, { title, hint, ready: true, downloadLabel });
+  };
+
+  const consumeExportDownload = () => {
+    const pending = pendingExportDownload;
+    const kind = pendingExportKind;
+    pendingExportDownload = null;
+    pendingExportKind = null;
+    return pending ? { ...pending, kind } : null;
+  };
+
+  const finishExportDownload = (result, { readyTitle, readyHint, readyDownloadLabel, kind = 'pdf' }) => {
+    const { deliverDownload } = window.Utils;
+    if (deliverDownload(result.blob, result.filename) === 'downloaded') {
+      setPdfExportLoading(false);
+      return 'downloaded';
+    }
+    showExportDownloadPrompt(result.blob, result.filename, {
+      title: readyTitle,
+      hint: readyHint,
+      downloadLabel: readyDownloadLabel,
+      kind,
+    });
+    return 'needs_gesture';
   };
 
   return {
@@ -1551,6 +1592,7 @@ window.UI = (() => {
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
     setPdfExportLoading,
+    showExportDownloadPrompt, consumeExportDownload, finishExportDownload,
     isExportSelectMode, toggleExportSelectMode, setExportSelectMode,
     getExportSelectedIndices, toggleExportSelectIndex,
     selectAllExportMessages, clearExportSelection,

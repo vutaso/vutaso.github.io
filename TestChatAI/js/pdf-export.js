@@ -3,6 +3,11 @@ window.PdfExport = (() => {
   const BLOCK_GAP_MM = 3;
   const CONTINUATION_GAP_MM = 1;
   const CAPTURE_SCALE = 2;
+  const JPEG_QUALITY = 0.94;
+  const IMAGE_MIME = 'image/jpeg';
+  const IMAGE_FORMAT = 'JPEG';
+  const PDF_IMAGE_COMPRESSION = 'MEDIUM';
+  const MAX_CAPTURE_HEIGHT = 2800;
 
   const SAFE_BREAK_SELECTORS = [
     'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
@@ -28,32 +33,115 @@ window.PdfExport = (() => {
   const waitForLayout = () =>
     new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  const CANVAS_COLOR_PROPS = [
-    'color', 'backgroundColor',
-    'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor',
-    'outlineColor', 'textDecorationColor', 'caretColor', 'fill', 'stroke',
-  ];
+  const PDF_LIGHT = {
+    page: '#ffffff',
+    text: '#111118',
+    textMuted: '#4a4a58',
+    textDim: '#7a7a8a',
+    border: '#e2e4ec',
+    codeBg: '#f6f8fa',
+    codeHeader: '#eef1f6',
+    userBubble: '#dbeafe',
+    tableHead: '#f0f2f7',
+    link: '#2563eb',
+  };
 
-  const sanitizeStylesForCanvas = (root) => {
-    const nodes = [root, ...root.querySelectorAll('*')];
-    for (const el of nodes) {
+  const parseRgb = (color) => {
+    if (!color) return null;
+    const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (!m) return null;
+    return {
+      r: +m[1],
+      g: +m[2],
+      b: +m[3],
+      a: m[4] !== undefined ? +m[4] : 1,
+    };
+  };
+
+  const colorLuminance = (color) => {
+    const rgb = parseRgb(color);
+    if (!rgb || rgb.a === 0) return null;
+    return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+  };
+
+  const isTransparent = (color) =>
+    !color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
+
+  const applyPdfLightStylesForCanvas = (root) => {
+    root.style.backgroundColor = PDF_LIGHT.page;
+    root.style.color = PDF_LIGHT.text;
+
+    for (const el of [root, ...root.querySelectorAll('*')]) {
       if (!(el instanceof HTMLElement)) continue;
-      const computed = getComputedStyle(el);
       const style = el.style;
+      const computed = getComputedStyle(el);
+      const inPre = !!el.closest('pre');
+      const tag = el.tagName.toLowerCase();
 
-      for (const prop of CANVAS_COLOR_PROPS) {
-        const val = computed[prop];
-        if (val && val !== 'initial' && val !== 'inherit' && val !== 'rgba(0, 0, 0, 0)') {
-          style[prop] = val;
-        }
+      if (inPre && (tag === 'span' || el.classList.contains('hljs'))) {
+        style.color = PDF_LIGHT.text;
+        style.backgroundColor = 'transparent';
+        continue;
       }
 
-      style.backgroundColor = computed.backgroundColor;
+      if (tag === 'pre') {
+        style.backgroundColor = PDF_LIGHT.codeBg;
+        style.borderColor = PDF_LIGHT.border;
+        style.color = PDF_LIGHT.text;
+        continue;
+      }
+
+      if (el.classList.contains('pre-header')) {
+        style.backgroundColor = PDF_LIGHT.codeHeader;
+        style.borderColor = PDF_LIGHT.border;
+        style.color = PDF_LIGHT.textDim;
+        continue;
+      }
+
+      if (el.classList.contains('body') && el.closest('.message.user')) {
+        style.backgroundColor = PDF_LIGHT.userBubble;
+        style.borderColor = PDF_LIGHT.border;
+        style.color = PDF_LIGHT.text;
+        continue;
+      }
+
+      if (el.classList.contains('content') || el.classList.contains('pdf-export-title')) {
+        style.color = PDF_LIGHT.text;
+        style.backgroundColor = 'transparent';
+      }
+
+      if (tag === 'a') style.color = PDF_LIGHT.link;
+      if (tag === 'th') {
+        style.backgroundColor = PDF_LIGHT.tableHead;
+        style.color = PDF_LIGHT.text;
+        style.borderColor = PDF_LIGHT.border;
+      }
+      if (tag === 'td') {
+        style.backgroundColor = PDF_LIGHT.page;
+        style.color = PDF_LIGHT.text;
+        style.borderColor = PDF_LIGHT.border;
+      }
+      if (el.classList.contains('katex') || el.closest('.katex-display')) {
+        style.color = PDF_LIGHT.text;
+      }
+
+      const textLum = colorLuminance(computed.color);
+      const bgLum = colorLuminance(computed.backgroundColor);
+
+      if (textLum !== null && textLum > 0.72 && !el.closest('.avatar')) {
+        style.color = PDF_LIGHT.text;
+      }
+
+      if (bgLum !== null && bgLum < 0.35 && !el.closest('.avatar')) {
+        style.backgroundColor = inPre ? PDF_LIGHT.codeBg : PDF_LIGHT.page;
+      }
+
+      if (!isTransparent(computed.borderColor) && bgLum !== null && bgLum < 0.35) {
+        style.borderColor = PDF_LIGHT.border;
+      }
+
       if (computed.boxShadow && computed.boxShadow !== 'none') {
-        style.boxShadow = computed.boxShadow;
-      }
-      if (computed.border && computed.border !== 'none') {
-        style.borderColor = computed.borderColor;
+        style.boxShadow = 'none';
       }
     }
   };
@@ -128,21 +216,63 @@ window.PdfExport = (() => {
     return blocks;
   };
 
-  const captureBlock = async (html2canvas, el, bg, rootWidth) => {
-    const canvas = await html2canvas(el, {
-      scale: CAPTURE_SCALE,
+  const getCaptureScale = () => CAPTURE_SCALE;
+
+  const canvasToDataUrl = (canvas) => canvas.toDataURL(IMAGE_MIME, JPEG_QUALITY);
+
+  const captureBlockSegment = (html2canvas, el, bg, rootWidth, scale, offsetY, segmentHeight) =>
+    html2canvas(el, {
+      scale,
       useCORS: true,
       allowTaint: false,
       backgroundColor: bg,
       logging: false,
       scrollX: 0,
       scrollY: 0,
+      x: 0,
+      y: offsetY,
       width: rootWidth,
-      height: el.scrollHeight,
+      height: segmentHeight,
       windowWidth: rootWidth,
-      windowHeight: el.scrollHeight,
+      windowHeight: segmentHeight,
     });
-    return canvas;
+
+  const stitchCanvasesVertically = (canvases, bg) => {
+    if (!canvases.length) return null;
+    if (canvases.length === 1) return canvases[0];
+
+    const width = canvases[0].width;
+    const totalHeight = canvases.reduce((sum, canvas) => sum + canvas.height, 0);
+    const merged = document.createElement('canvas');
+    merged.width = width;
+    merged.height = totalHeight;
+    const ctx = merged.getContext('2d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, totalHeight);
+    let top = 0;
+    for (const canvas of canvases) {
+      ctx.drawImage(canvas, 0, top);
+      top += canvas.height;
+    }
+    return merged;
+  };
+
+  const captureBlock = async (html2canvas, el, bg, rootWidth) => {
+    const scale = getCaptureScale();
+    const totalHeight = Math.max(1, el.scrollHeight);
+
+    if (totalHeight <= MAX_CAPTURE_HEIGHT) {
+      return captureBlockSegment(html2canvas, el, bg, rootWidth, scale, 0, totalHeight);
+    }
+
+    const segments = [];
+    for (let offsetY = 0; offsetY < totalHeight; offsetY += MAX_CAPTURE_HEIGHT) {
+      const segmentHeight = Math.min(MAX_CAPTURE_HEIGHT, totalHeight - offsetY);
+      segments.push(await captureBlockSegment(
+        html2canvas, el, bg, rootWidth, scale, offsetY, segmentHeight
+      ));
+    }
+    return stitchCanvasesVertically(segments, bg);
   };
 
   const sliceCanvas = (source, offsetPx, heightPx, bg) => {
@@ -156,13 +286,18 @@ window.PdfExport = (() => {
     const ctx = slice.getContext('2d');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, slice.width, slice.height);
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(source, 0, top, source.width, h, 0, 0, source.width, h);
     return slice;
   };
 
   const canvasToImage = (canvas, widthMm, bg) => {
     const heightMm = (canvas.height * widthMm) / canvas.width;
-    return { canvas, widthMm, heightMm, bg, dataUrl: canvas.toDataURL('image/png') };
+    return { canvas, widthMm, heightMm, bg, dataUrl: canvasToDataUrl(canvas) };
+  };
+
+  const addCanvasToPdf = (pdf, dataUrl, x, y, widthMm, heightMm) => {
+    pdf.addImage(dataUrl, IMAGE_FORMAT, x, y, widthMm, heightMm, undefined, PDF_IMAGE_COMPRESSION);
   };
 
   const availableMm = (state, dims) => dims.contentHeight - (state.y - dims.margin);
@@ -213,7 +348,7 @@ window.PdfExport = (() => {
     }
 
     if (heightMm <= availableMm(state, dims)) {
-      pdf.addImage(image.dataUrl, 'PNG', margin, state.y, contentWidth, heightMm);
+      addCanvasToPdf(pdf, image.dataUrl, margin, state.y, contentWidth, heightMm);
       state.y += heightMm + gapAfter;
       return;
     }
@@ -238,7 +373,7 @@ window.PdfExport = (() => {
       const slice = sliceCanvas(canvas, offsetPx, chunkPx, bg);
       const chunkMm = (slice.height / totalPx) * heightMm;
 
-      pdf.addImage(slice.toDataURL('image/png'), 'PNG', margin, state.y, contentWidth, chunkMm);
+      addCanvasToPdf(pdf, canvasToDataUrl(slice), margin, state.y, contentWidth, chunkMm);
 
       offsetPx += slice.height;
       state.y += chunkMm;
@@ -269,7 +404,7 @@ window.PdfExport = (() => {
       await waitForLayout();
       expandScrollablesForExport(root);
       await waitForLayout();
-      sanitizeStylesForCanvas(root);
+      applyPdfLightStylesForCanvas(root);
 
       const rootWidth = root.scrollWidth;
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
@@ -298,7 +433,8 @@ window.PdfExport = (() => {
       }
 
       report('Đang lưu file PDF...', 'Sắp hoàn tất');
-      pdf.save(filename);
+      const blob = pdf.output('blob');
+      return { blob, filename };
     } finally {
       root.remove();
       window.Markdown?.updateMermaidTheme?.();

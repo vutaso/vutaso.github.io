@@ -164,12 +164,13 @@
 }
 
 .pdf-export-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 120;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding: 24px clamp(72px, 12vw, 148px) 24px 32px;
   pointer-events: auto;
 }
 
@@ -180,9 +181,9 @@
 .pdf-export-overlay-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .pdf-export-overlay-content {
@@ -192,15 +193,20 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 32px 40px;
+  padding: 28px 32px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--bg-elev);
   color: var(--text);
   text-align: center;
   box-shadow: var(--shadow);
-  max-width: min(92vw, 360px);
-  animation: app-drop-content-in 140ms ease;
+  width: min(92%, 320px);
+  animation: pdf-export-content-in 180ms ease;
+}
+
+@keyframes pdf-export-content-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .pdf-export-spinner {
@@ -227,17 +233,27 @@
   margin: 0;
 }
 
+.pdf-export-download-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.pdf-export-spinner.hidden {
+  display: none;
+}
+
 @keyframes pdf-export-spin {
   to { transform: rotate(360deg); }
 }
 
-body.pdf-export-loading {
+body.pdf-export-loading .main-shell {
   overflow: hidden;
 }
 
 .main {
   grid-column: 2;
   grid-row: 1;
+  position: relative;
   display: flex;
   flex-direction: row;
   height: 100%;

@@ -451,9 +451,13 @@
   grid-area: 1 / 1;
 }
 
-.composer-hint {
+.composer-footer-notes {
   max-width: var(--content-max-width);
   margin: 10px auto 0;
+}
+
+.composer-hint {
+  margin: 0;
   font-size: 12px;
   color: var(--text-dim);
   text-align: center;
