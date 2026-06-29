@@ -23,6 +23,7 @@
   ui.initSidebar();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
   ui.initModelSelect(state.currentModel);
+  ui.syncSystemPromptModeUI(state);
   ui.initTranslateLangMenu();
   ui.initImageGenMenus();
   ui.syncComposerToolsUI(state.currentModel, {

@@ -199,8 +199,8 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
-:root[data-theme="apple"] .header-title .model-select,
-:root[data-theme="apple-dark"] .header-title .model-select {
+:root[data-theme="apple"] .header-title .header-select,
+:root[data-theme="apple-dark"] .header-title .header-select {
   border-radius: var(--radius-full);
   background-color: var(--bg-hover);
   font-weight: 600;

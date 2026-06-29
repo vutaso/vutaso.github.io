@@ -703,6 +703,11 @@ window.Events = (() => {
         }
 
         finishStreamingResponse(buffer, { aborted });
+        if (info?.usage && !discard) {
+          convoMod.addTokenUsage(convo, modelId, info.usage);
+          ui.updateSettingsTokenUsage(state.get());
+          ui.checkTokenCostWarning(state.get());
+        }
       },
       onError: (err) => {
         const discard = !!(streamingContext && streamingContext.discardSave);
@@ -967,6 +972,7 @@ window.Events = (() => {
       clearPendingAttachments();
       ui.refreshConversationList(c.id);
       ui.renderMessages(c);
+      ui.updateSettingsTokenUsage(state.get());
       ui.els.composerInput.focus();
     });
 
@@ -1034,6 +1040,7 @@ window.Events = (() => {
         if (!c) return;
         ui.refreshConversationList(id);
         ui.renderMessages(c);
+        ui.updateSettingsTokenUsage(state.get());
         ui.closeMobileSidebar();
         ui.els.composerInput.focus();
       }
@@ -1219,6 +1226,10 @@ window.Events = (() => {
       ui.closeGuide();
       ui.openSettings(state.get());
     });
+    ui.els.tokenCostWarningSettingsBtn?.addEventListener('click', () => {
+      ui.closeTokenCostWarning();
+      ui.openSettings(state.get());
+    });
     ui.els.modelSelect.addEventListener('change', () => {
       const modelId = ui.els.modelSelect.value;
       const s = state.get();
@@ -1236,6 +1247,7 @@ window.Events = (() => {
       state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled });
       syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled });
       updateSendEnabled();
+      ui.updateSettingsTokenUsage(state.get());
       const label = ui.els.modelSelect.selectedOptions[0]?.textContent || modelId;
       ui.showToast(t('toastModel', { label }));
     });
@@ -1489,6 +1501,12 @@ window.Events = (() => {
     ui.els.clearAllBtn.addEventListener('click', handleClearAll);
     ui.els.clearAllSidebarBtn.addEventListener('click', handleClearAll);
 
+    let systemPromptSaveTimer = null;
+    const scheduleApplySettingsFromForm = () => {
+      clearTimeout(systemPromptSaveTimer);
+      systemPromptSaveTimer = setTimeout(() => applySettingsFromForm(), 300);
+    };
+
     const applySettingsFromForm = () => {
       const apiKey = ui.els.apiKeyInput.value.trim();
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
@@ -1497,39 +1515,78 @@ window.Events = (() => {
       const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
       const prev = state.get();
       const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
-      const tokenSaveEnabled = !!ui.els.tokenSaveInput?.checked;
+      let mode = ui.els.systemPromptModeSelect?.value || 'default';
       let systemPrompt = ui.els.systemPromptInput.value.trim();
 
-      if (tokenSaveEnabled) {
-        systemPrompt = window.I18n.getTokenSaveSystemPrompt(locale);
+      if (mode !== 'custom' && systemPrompt) {
+        const presetForMode = window.I18n.getSystemPromptForMode(mode, locale);
+        if (systemPrompt !== presetForMode) {
+          mode = 'custom';
+        }
+      }
+
+      if (mode === 'custom') {
+        systemPrompt = ui.els.systemPromptInput.value.trim();
+      } else {
+        systemPrompt = window.I18n.getSystemPromptForMode(mode, locale);
         ui.els.systemPromptInput.value = systemPrompt;
-      } else if (!systemPrompt
-        || window.I18n.isDefaultSystemPrompt(systemPrompt)
-        || window.I18n.isTokenSaveSystemPrompt(systemPrompt)) {
-        systemPrompt = window.I18n.getDefaultSystemPrompt(locale);
-        ui.els.systemPromptInput.value = systemPrompt;
+      }
+
+      if (ui.els.systemPromptModeHint) {
+        ui.els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint(mode);
       }
 
       const theme = ui.els.settingsThemeSelect?.value || 'dark';
       const prevTheme = prev.theme;
       const nextState = {
         apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey,
-        systemPrompt, theme, locale, tokenSaveEnabled
+        systemPrompt, systemPromptMode: mode, theme, locale
       };
       state.set(nextState);
+      window.I18n.populateSystemPromptModeSelect(ui.els.systemPromptModeSelect, mode);
       ui.setTheme(theme);
       if (prevTheme !== theme) ui.rerenderMermaid();
-      if (prev.locale !== locale) ui.applyLocale({ ...prev, ...nextState });
-      else window.I18n.applyToDOM();
+      if (prev.locale !== locale) {
+        ui.applyLocale({ ...prev, ...nextState });
+        ui.syncSystemPromptModeUI({ ...prev, ...nextState });
+      } else {
+        window.I18n.applyToDOM();
+      }
       updateSendEnabled();
     };
 
-    ui.els.tokenSaveInput?.addEventListener('change', () => {
+    ui.els.systemPromptModeSelect?.addEventListener('change', () => {
+      const mode = ui.els.systemPromptModeSelect.value;
+      const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
+      if (mode !== 'custom') {
+        ui.els.systemPromptInput.value = window.I18n.getSystemPromptForMode(mode, locale);
+      }
+      if (ui.els.systemPromptModeHint) {
+        ui.els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint(mode);
+      }
       applySettingsFromForm();
-      ui.showToast(ui.els.tokenSaveInput.checked ? t('toastTokenSaveOn') : t('toastTokenSaveOff'));
+      ui.showToast(t('toastSystemPromptMode', { label: window.I18n.getSystemPromptModeLabel(mode) }));
+    });
+
+    ui.els.systemPromptInput?.addEventListener('input', () => {
+      const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
+      let mode = ui.els.systemPromptModeSelect?.value || 'default';
+      const text = ui.els.systemPromptInput.value.trim();
+      if (mode !== 'custom') {
+        const preset = window.I18n.getSystemPromptForMode(mode, locale);
+        if (text !== preset) {
+          mode = 'custom';
+          window.I18n.populateSystemPromptModeSelect(ui.els.systemPromptModeSelect, 'custom');
+          if (ui.els.systemPromptModeHint) {
+            ui.els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint('custom');
+          }
+        }
+      }
+      scheduleApplySettingsFromForm();
     });
 
     const closeSettingsModal = () => {
+      clearTimeout(systemPromptSaveTimer);
       applySettingsFromForm();
       ui.closeSettings();
     };
@@ -1575,6 +1632,10 @@ window.Events = (() => {
           ui.closeRenameModal(null);
           return;
         }
+        if (el.closest('#tokenCostWarningModal')) {
+          ui.closeTokenCostWarning();
+          return;
+        }
         if (el.closest('#settingsModal')) {
           closeSettingsModal();
         }
@@ -1611,6 +1672,10 @@ window.Events = (() => {
         }
         if (ui.isRenameModalOpen()) {
           ui.closeRenameModal(null);
+          return;
+        }
+        if (ui.isTokenCostWarningOpen()) {
+          ui.closeTokenCostWarning();
           return;
         }
         if (ui.isGuideModalOpen()) {

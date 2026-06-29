@@ -20,6 +20,30 @@ window.APP_CONFIG = {
     { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true }
   ],
 
+  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-06-29
+  // Nguồn: openai.com/developers, platform.claude.com, api-docs.deepseek.com,
+  //        ai.google.dev/gemini-api/docs/pricing, platform.kimi.ai
+  MODEL_PRICING: {
+    'gpt-5.4-nano': { input: 0.20, output: 1.25 },
+    'gpt-5.4-mini': { input: 0.75, output: 4.50 },
+    'gpt-5.4': { input: 2.50, output: 15.00 },
+    'gpt-5.5': { input: 5.00, output: 30.00 },
+    'claude-haiku-4-5': { input: 1.00, output: 5.00 },
+    'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
+    'claude-opus-4-8': { input: 5.00, output: 25.00 },
+    'deepseek-v4-flash': { input: 0.14, output: 0.28 },
+    'deepseek-v4-pro': { input: 0.435, output: 0.87 },
+    'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
+    'gemini-2.5-flash': { input: 0.30, output: 2.50 },
+    'gemini-3.5-flash': { input: 1.50, output: 9.00 },
+    'kimi-k2.5': { input: 0.60, output: 3.00 },
+    'kimi-k2.6': { input: 0.95, output: 4.00 },
+    'kimi-k2.7-code': { input: 0.95, output: 4.00 },
+    'kimi-k2.7-code-highspeed': { input: 1.90, output: 8.00 }
+  },
+
+  TOKEN_COST_WARNING_USD: 1,
+
   DEFAULT_MODEL: 'gemini-3.5-flash',
   DEFAULT_LOCALE: 'en',
   LOCALES: ['en', 'vi', 'jp', 'zh'],
@@ -32,6 +56,21 @@ window.APP_CONFIG = {
   getModel(modelId) {
     const id = modelId || this.DEFAULT_MODEL;
     return this.MODELS.find((m) => m.id === id) || this.MODELS[0];
+  },
+
+  getModelPricing(modelId) {
+    return this.MODEL_PRICING[modelId || this.DEFAULT_MODEL] || null;
+  },
+
+  calcTokenUsageCost(modelId, usage) {
+    const pricing = this.getModelPricing(modelId);
+    if (!pricing || !usage) return null;
+    const prompt = Number(usage.prompt) || 0;
+    const completion = Number(usage.completion) || 0;
+    if (!prompt && !completion) return 0;
+    const inputCost = (prompt / 1_000_000) * pricing.input;
+    const outputCost = (completion / 1_000_000) * pricing.output;
+    return inputCost + outputCost;
   },
 
   getMaxOutputTokens(modelId) {

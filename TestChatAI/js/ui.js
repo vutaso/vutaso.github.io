@@ -75,7 +75,16 @@ window.UI = (() => {
     els.imageGenBtn = $('#imageGenBtn');
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
-    els.tokenSaveInput = $('#tokenSaveInput');
+    els.systemPromptModeSelect = $('#systemPromptModeSelect');
+    els.systemPromptModeHint = $('#systemPromptModeHint');
+    els.settingsTokenUsageModel = $('#settingsTokenUsageModel');
+    els.settingsTokenUsageInput = $('#settingsTokenUsageInput');
+    els.settingsTokenUsageOutput = $('#settingsTokenUsageOutput');
+    els.settingsTokenUsageTotal = $('#settingsTokenUsageTotal');
+    els.settingsTokenUsageCost = $('#settingsTokenUsageCost');
+    els.tokenCostWarningModal = $('#tokenCostWarningModal');
+    els.tokenCostWarningMessage = $('#tokenCostWarningMessage');
+    els.tokenCostWarningSettingsBtn = $('#tokenCostWarningSettingsBtn');
     els.composerTranslateBar = $('#composerTranslateBar');
     els.translateChipClose = $('#translateChipClose');
     els.translateLangBtn = $('#translateLangBtn');
@@ -1348,6 +1357,100 @@ window.UI = (() => {
     if (els.composerDropZone) els.composerDropZone.classList.toggle('drag-over', visible);
   };
 
+  const formatTokenCount = (n) => {
+    const value = Number(n) || 0;
+    return value.toLocaleString();
+  };
+
+  const formatTokenCost = (usd) => {
+    const value = Number(usd) || 0;
+    if (value <= 0) return '$0';
+    if (value >= 1) {
+      return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+    }
+    if (value >= 0.01) {
+      return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+    }
+    if (value >= 0.0001) return '$' + value.toFixed(4);
+    if (value >= 0.000001) return '$' + value.toFixed(6);
+    return '< $0.000001';
+  };
+
+  const updateSettingsTokenUsage = (appState) => {
+    if (!els.settingsTokenUsageModel) return;
+    const modelId = appState?.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const model = window.APP_CONFIG.getModel(modelId);
+    const convo = window.Conversations.getCurrent();
+    const usage = window.Conversations.getTokenUsage(convo, modelId);
+    const cost = window.APP_CONFIG.calcTokenUsageCost(modelId, usage);
+
+    els.settingsTokenUsageModel.textContent = model?.label || modelId;
+    els.settingsTokenUsageInput.textContent = formatTokenCount(usage.prompt);
+    els.settingsTokenUsageOutput.textContent = formatTokenCount(usage.completion);
+    els.settingsTokenUsageTotal.textContent = formatTokenCount(usage.total);
+    if (els.settingsTokenUsageCost) {
+      els.settingsTokenUsageCost.textContent = cost == null ? '—' : formatTokenCost(cost);
+    }
+  };
+
+  const checkTokenCostWarning = (appState) => {
+    const threshold = window.APP_CONFIG.TOKEN_COST_WARNING_USD ?? 1;
+    const modelId = appState?.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const convo = window.Conversations.getCurrent();
+    if (!convo || window.Conversations.isCostWarningShown(convo, modelId)) return;
+
+    const usage = window.Conversations.getTokenUsage(convo, modelId);
+    const cost = window.APP_CONFIG.calcTokenUsageCost(modelId, usage);
+    if (cost == null || cost < threshold) return;
+
+    const model = window.APP_CONFIG.getModel(modelId);
+    window.Conversations.markCostWarningShown(convo, modelId);
+    openTokenCostWarning({
+      cost,
+      threshold,
+      modelLabel: model?.label || modelId,
+      usage
+    });
+  };
+
+  const openTokenCostWarning = ({ cost, threshold, modelLabel, usage }) => {
+    if (!els.tokenCostWarningModal) return;
+    if (els.tokenCostWarningMessage) {
+      els.tokenCostWarningMessage.textContent = t('tokenCostWarningMessage', {
+        cost: formatTokenCost(cost),
+        threshold: formatTokenCost(threshold),
+        model: modelLabel,
+        input: formatTokenCount(usage.prompt),
+        output: formatTokenCount(usage.completion)
+      });
+    }
+    els.tokenCostWarningModal.classList.remove('hidden');
+  };
+
+  const closeTokenCostWarning = () => {
+    if (els.tokenCostWarningModal) els.tokenCostWarningModal.classList.add('hidden');
+  };
+
+  const isTokenCostWarningOpen = () => {
+    return !!(els.tokenCostWarningModal && !els.tokenCostWarningModal.classList.contains('hidden'));
+  };
+
+  const syncSystemPromptModeUI = (appState) => {
+    const locale = appState?.locale || window.APP_CONFIG.DEFAULT_LOCALE;
+    let mode = appState?.systemPromptMode || 'default';
+    const prompt = (appState?.systemPrompt || '').trim();
+    if (mode !== 'custom' && prompt && prompt !== window.I18n.getSystemPromptForMode(mode, locale)) {
+      mode = window.I18n.detectSystemPromptMode(prompt, locale);
+    }
+    if (appState?.systemPromptMode === 'custom') {
+      mode = 'custom';
+    }
+    window.I18n.populateSystemPromptModeSelect(els.systemPromptModeSelect, mode);
+    if (els.systemPromptModeHint) {
+      els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint(mode);
+    }
+  };
+
   const openSettings = (state) => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
@@ -1355,9 +1458,7 @@ window.UI = (() => {
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
-    if (els.tokenSaveInput) {
-      els.tokenSaveInput.checked = !!state.tokenSaveEnabled;
-    }
+    syncSystemPromptModeUI(state);
     window.I18n.populateThemeSelect(els.settingsThemeSelect, state.theme || window.APP_CONFIG.DEFAULT_THEME);
     window.I18n.populateLocaleSelect(els.settingsLocaleSelect, state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
     els.apiKeyInput.type = 'password';
@@ -1370,6 +1471,7 @@ window.UI = (() => {
     els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.kimiApiKeyInput.type = 'password';
     els.kimiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    updateSettingsTokenUsage(state);
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
   };
@@ -1661,7 +1763,9 @@ window.UI = (() => {
     enterEditMode, exitEditMode, downloadConversation, downloadConversationTxt,
     scrollToBottom, scrollToBottomIfNear, showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
-    openSettings, closeSettings, applyLocale, openGuide, closeGuide, isGuideModalOpen,
+    openSettings, closeSettings, updateSettingsTokenUsage, syncSystemPromptModeUI, checkTokenCostWarning,
+    openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
+    applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,

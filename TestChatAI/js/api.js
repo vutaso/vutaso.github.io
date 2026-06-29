@@ -237,12 +237,81 @@ window.API = (() => {
     return new Error(errMsg);
   };
 
+  const emptyUsage = () => ({ prompt: 0, completion: 0, total: 0 });
+
+  const mergeUsageDelta = (acc, delta) => {
+    if (!delta) return acc || emptyUsage();
+    const hasPrompt = (delta.prompt || 0) > 0;
+    const hasCompletion = (delta.completion || 0) > 0;
+    if (hasPrompt && hasCompletion) {
+      const prompt = delta.prompt || 0;
+      const completion = delta.completion || 0;
+      return {
+        prompt,
+        completion,
+        total: delta.total || (prompt + completion)
+      };
+    }
+    const next = acc ? { ...acc } : emptyUsage();
+    next.prompt += delta.prompt || 0;
+    next.completion += delta.completion || 0;
+    next.total = next.prompt + next.completion;
+    if (delta.total && delta.total > next.total) next.total = delta.total;
+    return next;
+  };
+
+  const extractUsage = (json) => {
+    if (!json || typeof json !== 'object') return null;
+    if (json.usage) {
+      const u = json.usage;
+      const prompt = u.prompt_tokens ?? u.input_tokens ?? 0;
+      const completion = u.completion_tokens ?? u.output_tokens ?? 0;
+      const total = u.total_tokens ?? (prompt + completion);
+      if (!prompt && !completion && !total) return null;
+      return { prompt, completion, total };
+    }
+    if (json.type === 'message_start' && json.message?.usage) {
+      const prompt = json.message.usage.input_tokens ?? 0;
+      if (!prompt) return null;
+      return { prompt, completion: 0, total: prompt };
+    }
+    if (json.type === 'message_delta' && json.usage) {
+      const completion = json.usage.output_tokens ?? 0;
+      if (!completion) return null;
+      return { prompt: 0, completion, total: completion };
+    }
+    if (json.usageMetadata) {
+      const u = json.usageMetadata;
+      const prompt = u.promptTokenCount ?? 0;
+      const thoughts = u.thoughtsTokenCount ?? 0;
+      const completion = (u.candidatesTokenCount ?? 0) + thoughts;
+      const total = u.totalTokenCount ?? (prompt + completion);
+      if (!prompt && !completion && !total) return null;
+      return { prompt, completion, total };
+    }
+    if (json.type === 'response.completed' && json.response?.usage) {
+      const u = json.response.usage;
+      const prompt = u.input_tokens ?? 0;
+      const completion = u.output_tokens ?? 0;
+      const total = u.total_tokens ?? (prompt + completion);
+      if (!prompt && !completion && !total) return null;
+      return { prompt, completion, total };
+    }
+    return null;
+  };
+
+  const emitUsage = (handlers, usage) => {
+    if (!usage || !handlers.onUsage) return;
+    handlers.onUsage(usage);
+  };
+
   const handleStreamData = (data, handlers) => {
     if (!data || data === '[DONE]') {
       return data === '[DONE]' ? 'done' : null;
     }
     try {
       const json = JSON.parse(data);
+      emitUsage(handlers, extractUsage(json));
       if (json.type === 'response.output_text.delta' && json.delta) {
         if (handlers.onToken) handlers.onToken(json.delta);
         return null;
@@ -428,13 +497,18 @@ window.API = (() => {
     return msgs;
   };
 
+  const withStreamUsage = (body) => {
+    body.stream_options = { include_usage: true };
+    return body;
+  };
+
   const buildDeepseekBody = (model, systemPrompt, convo, thinking) => {
-    const body = {
+    const body = withStreamUsage({
       model,
       messages: buildDeepseekMessages(convo, systemPrompt),
       stream: true,
       thinking: { type: thinking ? 'enabled' : 'disabled' }
-    };
+    });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
@@ -465,14 +539,14 @@ window.API = (() => {
   const buildKimiBody = (model, systemPrompt, convo, thinking) => {
     const alwaysThinking = window.APP_CONFIG.modelThinkingRequired(model);
     const preserved = window.APP_CONFIG.kimiRequiresPreservedThinking(model);
-    const body = {
+    const body = withStreamUsage({
       model,
       messages: buildKimiMessages(convo, systemPrompt, model),
       stream: true,
       thinking: preserved
         ? { type: 'enabled', keep: 'all' }
         : { type: (alwaysThinking || thinking) ? 'enabled' : 'disabled' }
-    };
+    });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
@@ -481,11 +555,11 @@ window.API = (() => {
   };
 
   const buildOpenAIChatBody = (model, systemPrompt, convo, thinking) => {
-    const body = {
+    const body = withStreamUsage({
       model,
       messages: buildMessages(convo, systemPrompt),
       stream: true
-    };
+    });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_completion_tokens = maxOutputTokens;
@@ -675,7 +749,7 @@ window.API = (() => {
   const send = async ({
     apiKey, model, systemPrompt, convo,
     webSearch, imageGen, thinking,
-    onToken, onReasoningToken, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
+    onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
     if (currentController) {
       throw new Error('Đang có yêu cầu khác đang chạy');
@@ -690,6 +764,7 @@ window.API = (() => {
     const controller = new AbortController();
     currentController = controller;
     let groundingMeta = null;
+    let requestUsage = null;
     const handlers = {
       onToken,
       onReasoningToken,
@@ -700,6 +775,10 @@ window.API = (() => {
       onGroundingMetadata: (meta) => {
         groundingMeta = mergeGroundingMetadata(groundingMeta, meta);
         if (onGroundingMetadata) onGroundingMetadata(groundingMeta);
+      },
+      onUsage: (usage) => {
+        requestUsage = mergeUsageDelta(requestUsage, usage);
+        if (onUsage) onUsage(requestUsage);
       }
     };
     const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(convo) : null;
@@ -726,11 +805,11 @@ window.API = (() => {
         await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking });
       }
       currentController = null;
-      if (onDone) onDone();
+      if (onDone) onDone({ usage: requestUsage });
     } catch (err) {
       currentController = null;
       if (err.name === 'AbortError') {
-        if (onDone) onDone({ aborted: true });
+        if (onDone) onDone({ aborted: true, usage: requestUsage });
         return;
       }
       if (onError) onError(err);

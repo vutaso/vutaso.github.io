@@ -512,10 +512,19 @@ body.pdf-export-loading .main-shell {
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: calc(100% - 140px);
   pointer-events: none;
 }
 
-.header-title .model-select {
+.header-selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.header-title .header-select {
   pointer-events: auto;
   font-size: 13px;
   font-weight: 500;
@@ -523,10 +532,19 @@ body.pdf-export-loading .main-shell {
   background-color: var(--bg-hover);
   padding: 6px 28px 6px 12px;
   background-position: right 8px center;
-  max-width: min(240px, 50vw);
+  min-width: 0;
 }
-.header-title .model-select:hover,
-.header-title .model-select:focus {
+
+.header-title .model-select {
+  max-width: min(200px, 34vw);
+}
+
+.header-title .header-prompt-mode-select {
+  max-width: min(200px, 34vw);
+}
+
+.header-title .header-select:hover,
+.header-title .header-select:focus {
   color: var(--text);
 }
 

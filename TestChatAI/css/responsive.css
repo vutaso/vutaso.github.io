@@ -35,6 +35,21 @@
 
   .header-actions { min-width: auto; }
 
+  .header-title {
+    max-width: calc(100% - 96px);
+  }
+
+  .header-selects {
+    gap: 6px;
+  }
+
+  .header-title .model-select,
+  .header-title .header-prompt-mode-select {
+    max-width: min(140px, 30vw);
+    font-size: 12px;
+    padding: 5px 24px 5px 10px;
+  }
+
   .messages { padding: 4px 0; }
   .message { padding: 12px 16px; gap: 10px; }
   .message .avatar { width: 28px; height: 28px; font-size: 13px; }
@@ -47,8 +62,9 @@
   .modal-content { max-height: 95vh; max-width: 95vw; }
   .modal-body { padding: 16px; }
 
-  .settings-api-grid {
-    grid-template-columns: 1fr;
+  .settings-api-row {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 6px;
   }
 
   .settings-footer {

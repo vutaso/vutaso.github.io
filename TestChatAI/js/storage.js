@@ -23,6 +23,7 @@ window.Storage = (() => {
     translateEnabled: false,
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
     tokenSaveEnabled: false,
+    systemPromptMode: 'default',
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
     theme: window.APP_CONFIG.DEFAULT_THEME,
     locale: window.APP_CONFIG.DEFAULT_LOCALE,
@@ -201,15 +202,20 @@ window.Storage = (() => {
     if (parsed && !('locale' in parsed) && parsed.conversations?.length) {
       state.locale = 'vi';
     }
-    if (state.tokenSaveEnabled) {
-      if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt) || window.I18n?.isTokenSaveSystemPrompt(state.systemPrompt)) {
-        state.systemPrompt = window.I18n.getTokenSaveSystemPrompt(state.locale);
-      }
-    } else if (window.I18n?.isTokenSaveSystemPrompt(state.systemPrompt)) {
-      state.systemPrompt = window.I18n.getDefaultSystemPrompt(state.locale);
-    } else if (window.I18n?.isDefaultSystemPrompt(state.systemPrompt)) {
-      state.systemPrompt = window.I18n.getDefaultSystemPrompt(state.locale);
+    if (!state.systemPromptMode) {
+      state.systemPromptMode = state.tokenSaveEnabled ? 'tokenSave' : 'default';
     }
+    if (!window.I18n.SYSTEM_PROMPT_MODE_IDS.includes(state.systemPromptMode)) {
+      state.systemPromptMode = 'custom';
+    }
+    if (state.systemPromptMode !== 'custom') {
+      if (window.I18n.isPresetSystemPrompt(state.systemPrompt) || !state.systemPrompt?.trim()) {
+        state.systemPrompt = window.I18n.getSystemPromptForMode(state.systemPromptMode, state.locale);
+      } else {
+        state.systemPromptMode = window.I18n.detectSystemPromptMode(state.systemPrompt, state.locale);
+      }
+    }
+    delete state.tokenSaveEnabled;
     return false;
   };
 

@@ -920,19 +920,6 @@
   display: none;
 }
 
-.message.streaming .content::after {
-  content: "▍";
-  display: inline-block;
-  color: var(--accent);
-  opacity: 0.9;
-  animation: blink 1s steps(2) infinite;
-  margin-left: 2px;
-}
-
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
 .error-banner {
   background: color-mix(in srgb, var(--danger) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);

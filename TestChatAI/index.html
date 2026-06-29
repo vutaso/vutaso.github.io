@@ -91,7 +91,10 @@
           <span class="icon"><i class="fa-solid fa-bars"></i></span>
         </button>
         <div class="header-title">
-          <select id="modelSelect" class="select model-select" title="Chọn model" aria-label="Chọn model"></select>
+          <div class="header-selects">
+            <select id="modelSelect" class="select model-select header-select" title="Chọn model" aria-label="Chọn model"></select>
+            <select id="systemPromptModeSelect" class="select header-prompt-mode-select header-select" aria-label="Chế độ"></select>
+          </div>
         </div>
         <div class="header-actions">
           <button type="button" id="toggleExportSelectBtn" class="btn btn-icon" title="Chọn tin để xuất" aria-pressed="false" aria-label="Chọn tin để xuất">
@@ -312,10 +315,10 @@
         </div>
       </header>
       <form id="settingsForm" class="modal-body settings-form">
-        <section class="settings-section" aria-labelledby="settingsApiKeysLabel">
+        <section class="settings-section settings-api-section" aria-labelledby="settingsApiKeysLabel" title="">
           <p id="settingsApiKeysLabel" class="settings-section-label">API Keys</p>
           <div class="settings-api-grid">
-            <div class="field settings-api-field">
+            <div class="settings-api-row">
               <label for="apiKeyInput">OpenAI</label>
               <div class="input-group">
                 <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
@@ -324,7 +327,7 @@
                 </button>
               </div>
             </div>
-            <div class="field settings-api-field">
+            <div class="settings-api-row">
               <label for="anthropicApiKeyInput">Anthropic</label>
               <div class="input-group">
                 <input id="anthropicApiKeyInput" type="password" class="input" placeholder="sk-ant-..." autocomplete="off" />
@@ -333,7 +336,7 @@
                 </button>
               </div>
             </div>
-            <div class="field settings-api-field">
+            <div class="settings-api-row">
               <label for="deepseekApiKeyInput">DeepSeek</label>
               <div class="input-group">
                 <input id="deepseekApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
@@ -342,7 +345,7 @@
                 </button>
               </div>
             </div>
-            <div class="field settings-api-field">
+            <div class="settings-api-row">
               <label for="geminiApiKeyInput">Gemini</label>
               <div class="input-group">
                 <input id="geminiApiKeyInput" type="password" class="input" placeholder="AIza..." autocomplete="off" />
@@ -351,7 +354,7 @@
                 </button>
               </div>
             </div>
-            <div class="field settings-api-field">
+            <div class="settings-api-row">
               <label for="kimiApiKeyInput">Kimi</label>
               <div class="input-group">
                 <input id="kimiApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
@@ -361,21 +364,42 @@
               </div>
             </div>
           </div>
-          <p class="field-hint settings-api-hint" data-i18n-key="apiKeyHintAll">Stored locally, sent only to the matching provider.</p>
         </section>
 
         <section class="settings-section">
           <div class="field settings-prompt-field">
-            <div class="settings-prompt-header">
-              <label for="systemPromptInput">System Prompt</label>
-              <label class="settings-inline-check" for="tokenSaveInput">
-                <input type="checkbox" id="tokenSaveInput" />
-                <span id="tokenSaveLabel">Tiết kiệm token</span>
-              </label>
-            </div>
-            <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="2" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
-            <p class="field-hint settings-token-save-hint" id="tokenSaveHint">Trả lời ngắn gọn để giảm token input/output.</p>
+            <label for="systemPromptInput">System Prompt</label>
+            <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="3" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
+            <p class="field-hint settings-prompt-mode-hint" id="systemPromptModeHint">Trả lời chi tiết, có cấu trúc, kèm ví dụ khi cần.</p>
           </div>
+        </section>
+
+        <section class="settings-section settings-token-usage-section" aria-labelledby="settingsTokenUsageLabel" title="">
+          <div class="settings-token-usage-head">
+            <p id="settingsTokenUsageLabel" class="settings-section-label settings-token-usage-label">Token đã tiêu thụ</p>
+            <span class="settings-token-usage-model" id="settingsTokenUsageModel">—</span>
+          </div>
+          <p class="settings-token-usage-inline" id="settingsTokenUsageHint">
+            <span class="settings-token-usage-item">
+              <span class="settings-token-usage-key" id="settingsTokenUsageInputLabel">In</span>
+              <span class="settings-token-usage-val" id="settingsTokenUsageInput">0</span>
+            </span>
+            <span class="settings-token-usage-sep" aria-hidden="true">·</span>
+            <span class="settings-token-usage-item">
+              <span class="settings-token-usage-key" id="settingsTokenUsageOutputLabel">Out</span>
+              <span class="settings-token-usage-val" id="settingsTokenUsageOutput">0</span>
+            </span>
+            <span class="settings-token-usage-sep" aria-hidden="true">·</span>
+            <span class="settings-token-usage-item settings-token-usage-item-total">
+              <span class="settings-token-usage-key" id="settingsTokenUsageTotalLabel">Tổng</span>
+              <span class="settings-token-usage-val" id="settingsTokenUsageTotal">0</span>
+            </span>
+            <span class="settings-token-usage-sep" aria-hidden="true">·</span>
+            <span class="settings-token-usage-item settings-token-usage-item-cost">
+              <span class="settings-token-usage-key" id="settingsTokenUsageCostLabel">Giá</span>
+              <span class="settings-token-usage-val" id="settingsTokenUsageCost">$0</span>
+            </span>
+          </p>
         </section>
 
         <footer class="settings-footer">
@@ -401,6 +425,23 @@
           <p class="settings-credit">Developed by VUTASO.com. All rights reserved</p>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="tokenCostWarningModal" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="tokenCostWarningTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-content modal-content-sm modal-cost-warning">
+      <header class="modal-header modal-header-stack">
+        <div class="modal-cost-warning-icon" aria-hidden="true">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 id="tokenCostWarningTitle">Chi phí token cao</h2>
+        <p class="modal-subtitle" id="tokenCostWarningMessage">Phiên chat này đã vượt $1.</p>
+      </header>
+      <footer class="modal-footer modal-footer-split modal-body-compact">
+        <button type="button" id="tokenCostWarningSettingsBtn" class="btn btn-ghost">Xem cài đặt</button>
+        <button type="button" class="btn btn-primary" data-modal-close id="tokenCostWarningOkBtn">Đã hiểu</button>
+      </footer>
     </div>
   </div>
 

@@ -299,13 +299,50 @@ window.Conversations = (() => {
     set({ conversations: all });
   };
 
+  const emptyTokenUsage = () => ({ prompt: 0, completion: 0, total: 0 });
+
+  const getTokenUsage = (convo, modelId) => {
+    if (!convo?.tokenUsageByModel) return emptyTokenUsage();
+    const usage = convo.tokenUsageByModel[modelId];
+    if (!usage) return emptyTokenUsage();
+    return {
+      prompt: usage.prompt || 0,
+      completion: usage.completion || 0,
+      total: usage.total || (usage.prompt || 0) + (usage.completion || 0)
+    };
+  };
+
+  const addTokenUsage = (convo, modelId, delta) => {
+    if (!convo || !modelId || !delta) return;
+    if (!isPersisted(convo.id)) return;
+    if (!convo.tokenUsageByModel) convo.tokenUsageByModel = {};
+    const prev = getTokenUsage(convo, modelId);
+    convo.tokenUsageByModel[modelId] = {
+      prompt: prev.prompt + (delta.prompt || 0),
+      completion: prev.completion + (delta.completion || 0),
+      total: prev.total + (delta.total || (delta.prompt || 0) + (delta.completion || 0))
+    };
+    saveConvo(convo);
+  };
+
+  const markCostWarningShown = (convo, modelId) => {
+    if (!convo || !modelId || !isPersisted(convo.id)) return;
+    if (!convo.costWarningShownByModel) convo.costWarningShownByModel = {};
+    convo.costWarningShownByModel[modelId] = true;
+    saveConvo(convo);
+  };
+
+  const isCostWarningShown = (convo, modelId) => {
+    return !!(convo?.costWarningShownByModel?.[modelId]);
+  };
+
   const clearAll = () => {
     set({ conversations: [], currentConversationId: null });
   };
 
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
-    getModel, setModel, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
+    getModel, setModel, getTokenUsage, addTokenUsage, isCostWarningShown, markCostWarningShown, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
     addMessage, updateMessage, editMessage, deleteMessageFrom, clearAll,
     getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };
