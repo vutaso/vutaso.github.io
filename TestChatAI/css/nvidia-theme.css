@@ -1,0 +1,198 @@
+/* NVIDIA — GeForce-inspired dark green tech theme */
+
+:root[data-theme="nvidia"] {
+  font-family: "Exo 2", "Inter", system-ui, sans-serif;
+}
+
+:root[data-theme="nvidia"] body {
+  font-family: inherit;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="nvidia"] .main {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(118, 185, 0, 0.12), transparent),
+    radial-gradient(ellipse 50% 35% at 0% 100%, rgba(118, 185, 0, 0.06), transparent),
+    linear-gradient(180deg, #111111 0%, var(--bg) 100%);
+}
+
+:root[data-theme="nvidia"] .sidebar {
+  background: color-mix(in srgb, var(--bg-elev) 94%, #1a2e00 6%);
+  border-right: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+}
+
+:root[data-theme="nvidia"] .main-header {
+  background: var(--bg-elev);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 15%, var(--border));
+}
+
+:root[data-theme="nvidia"] .sidebar-brand .brand-avatar,
+:root[data-theme="nvidia"] .messages-empty .brand-avatar-lg,
+:root[data-theme="nvidia"] .message .avatar.assistant-av {
+  background: linear-gradient(145deg, var(--accent) 0%, var(--nvidia-green-dim) 100%);
+  color: var(--accent-on);
+  border-radius: 6px;
+  box-shadow: 0 0 18px var(--accent-glow);
+  font-family: "Exo 2", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme="nvidia"] .btn-primary,
+:root[data-theme="nvidia"] .btn-send {
+  background: linear-gradient(180deg, var(--accent-hover) 0%, var(--accent) 100%);
+  color: var(--accent-on);
+  border-radius: 4px;
+  box-shadow: 0 0 14px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  font-family: "Exo 2", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+:root[data-theme="nvidia"] .btn-primary:hover,
+:root[data-theme="nvidia"] .btn-send:hover {
+  background: linear-gradient(180deg, var(--nvidia-green-bright) 0%, var(--accent-hover) 100%);
+  color: var(--accent-on);
+  box-shadow: 0 0 22px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="nvidia"] .btn-icon {
+  border-radius: 4px;
+}
+
+:root[data-theme="nvidia"] .btn-icon:hover {
+  color: var(--accent);
+  box-shadow: 0 0 10px rgba(118, 185, 0, 0.2);
+}
+
+:root[data-theme="nvidia"] .conversation-item {
+  border-radius: 4px;
+  margin: 0 8px;
+  border-left: 2px solid transparent;
+}
+
+:root[data-theme="nvidia"] .conversation-item.active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-hover));
+  border-left-color: var(--accent);
+}
+
+:root[data-theme="nvidia"] .conversation-item.active .icon {
+  color: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
+}
+
+:root[data-theme="nvidia"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+  border-left-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+:root[data-theme="nvidia"] .composer-inner {
+  border-radius: 6px;
+  border-color: var(--border-strong);
+  background: var(--bg-input);
+}
+
+:root[data-theme="nvidia"] .composer-inner:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    var(--composer-shadow),
+    0 0 16px var(--accent-glow);
+}
+
+:root[data-theme="nvidia"] .message.user .body {
+  border-radius: 6px 6px 2px 6px;
+  background: var(--user-bubble);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: inset 0 0 20px rgba(118, 185, 0, 0.04);
+}
+
+:root[data-theme="nvidia"] .messages-empty h2 {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 16px var(--accent-glow);
+}
+
+:root[data-theme="nvidia"] .modal-content {
+  border-radius: 6px;
+  background: var(--bg-elev);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border-strong));
+  box-shadow: 0 0 30px rgba(118, 185, 0, 0.08), 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+:root[data-theme="nvidia"] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+:root[data-theme="nvidia"] .select,
+:root[data-theme="nvidia"] .input {
+  border-radius: 4px;
+  border-color: var(--border-strong);
+  background: var(--bg-input);
+}
+
+:root[data-theme="nvidia"] .select:focus,
+:root[data-theme="nvidia"] .input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(118, 185, 0, 0.25);
+}
+
+:root[data-theme="nvidia"] .header-title .header-select {
+  border-radius: 4px;
+  background-color: var(--bg-hover);
+  font-family: "Exo 2", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+:root[data-theme="nvidia"] .toast {
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+:root[data-theme="nvidia"] .message .content a {
+  color: var(--accent-hover);
+}
+
+:root[data-theme="nvidia"] .message .content blockquote {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+:root[data-theme="nvidia"] .export-select-bar {
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-elev));
+  border-bottom-color: color-mix(in srgb, var(--accent) 18%, var(--border));
+}
+
+:root[data-theme="nvidia"] .composer-tool-btn {
+  border-radius: 4px;
+}
+
+:root[data-theme="nvidia"] .composer-tool-btn:hover,
+:root[data-theme="nvidia"] .composer-tool-btn.active {
+  color: var(--accent);
+  box-shadow: 0 0 8px rgba(118, 185, 0, 0.2);
+}
+
+.sidebar-footer-btn .icon i {
+  color: inherit;
+}
+
+:root[data-theme="nvidia"] .sidebar-footer-btn .icon i {
+  color: var(--text-muted);
+}
+
+:root[data-theme="nvidia"] .sidebar-footer-btn:hover .icon i {
+  color: var(--accent);
+}
+
+:root[data-theme="nvidia"] #themeToggleBtn .icon i {
+  color: var(--accent);
+}

@@ -1,0 +1,190 @@
+/* Cyberpunk Neon — dark neon Tokyo aesthetic */
+
+:root[data-theme="cyberpunk"] {
+  font-family: "Rajdhani", "Inter", system-ui, sans-serif;
+}
+
+:root[data-theme="cyberpunk"] body {
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+:root[data-theme="cyberpunk"] .main {
+  background:
+    radial-gradient(ellipse 70% 45% at 15% -5%, rgba(255, 45, 149, 0.22), transparent),
+    radial-gradient(ellipse 55% 40% at 95% 95%, rgba(0, 240, 255, 0.14), transparent),
+    radial-gradient(ellipse 40% 30% at 80% 10%, rgba(176, 38, 255, 0.12), transparent),
+    var(--bg);
+}
+
+:root[data-theme="cyberpunk"] .sidebar {
+  background: color-mix(in srgb, var(--bg-elev) 92%, #1a1030 8%);
+  border-right: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+  box-shadow: inset -1px 0 24px rgba(255, 45, 149, 0.06);
+}
+
+:root[data-theme="cyberpunk"] .main-header {
+  background: color-mix(in srgb, var(--bg-elev) 90%, #12121f 10%);
+  border-bottom: 1px solid color-mix(in srgb, var(--neon-cyan) 20%, var(--border));
+}
+
+:root[data-theme="cyberpunk"] .sidebar-brand .brand-avatar,
+:root[data-theme="cyberpunk"] .messages-empty .brand-avatar-lg,
+:root[data-theme="cyberpunk"] .message .avatar.assistant-av {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--neon-purple) 50%, var(--neon-cyan) 100%);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    0 0 16px var(--accent-glow),
+    0 0 32px rgba(0, 240, 255, 0.2);
+  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+:root[data-theme="cyberpunk"] .btn-primary,
+:root[data-theme="cyberpunk"] .btn-send {
+  background: linear-gradient(135deg, var(--accent) 0%, #c026d3 100%);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 16px var(--accent-glow), 0 0 4px var(--accent);
+  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+:root[data-theme="cyberpunk"] .btn-primary:hover,
+:root[data-theme="cyberpunk"] .btn-send:hover {
+  background: linear-gradient(135deg, #ff5aad 0%, #d946ef 100%);
+  box-shadow: 0 0 24px var(--accent-glow), 0 0 8px var(--accent);
+  color: #fff;
+}
+
+:root[data-theme="cyberpunk"] .btn-icon {
+  border-radius: var(--radius-sm);
+}
+
+:root[data-theme="cyberpunk"] .btn-icon:hover {
+  color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+:root[data-theme="cyberpunk"] .conversation-item {
+  border-radius: var(--radius-sm);
+  margin: 0 8px;
+  border-left: 2px solid transparent;
+}
+
+:root[data-theme="cyberpunk"] .conversation-item.active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-hover));
+  border-left-color: var(--accent);
+  box-shadow: inset 0 0 20px rgba(255, 45, 149, 0.08);
+}
+
+:root[data-theme="cyberpunk"] .conversation-item.active .icon {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+:root[data-theme="cyberpunk"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+  border-left-color: color-mix(in srgb, var(--neon-cyan) 40%, transparent);
+}
+
+:root[data-theme="cyberpunk"] .composer-inner {
+  border-radius: var(--radius-md);
+  border-color: color-mix(in srgb, var(--neon-cyan) 30%, var(--border-strong));
+  background: color-mix(in srgb, var(--bg-input) 96%, #0a0a12 4%);
+}
+
+:root[data-theme="cyberpunk"] .composer-inner:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    var(--composer-shadow),
+    0 0 20px var(--accent-glow),
+    0 0 8px rgba(0, 240, 255, 0.2);
+}
+
+:root[data-theme="cyberpunk"] .message.user .body {
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-sm) var(--radius-md);
+  background: var(--user-bubble);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 0 14px rgba(255, 45, 149, 0.12);
+}
+
+:root[data-theme="cyberpunk"] .messages-empty h2 {
+  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow:
+    0 0 12px var(--accent-glow),
+    0 0 24px rgba(0, 240, 255, 0.3);
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme="cyberpunk"] .modal-content {
+  border-radius: var(--radius-md);
+  background: var(--bg-elev);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border-strong));
+  box-shadow: 0 0 40px rgba(255, 45, 149, 0.15), 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="cyberpunk"] .modal-backdrop {
+  background: rgba(10, 10, 18, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+:root[data-theme="cyberpunk"] .select,
+:root[data-theme="cyberpunk"] .input {
+  border-radius: var(--radius-sm);
+  border-color: var(--border-strong);
+  background: var(--bg-input);
+}
+
+:root[data-theme="cyberpunk"] .select:focus,
+:root[data-theme="cyberpunk"] .input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.2), 0 0 12px rgba(0, 240, 255, 0.15);
+}
+
+:root[data-theme="cyberpunk"] .header-title .header-select {
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-hover);
+  font-family: "Orbitron", "Rajdhani", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+:root[data-theme="cyberpunk"] .toast {
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+:root[data-theme="cyberpunk"] .message .content a {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+:root[data-theme="cyberpunk"] .message .content blockquote {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  box-shadow: inset 0 0 20px rgba(255, 45, 149, 0.05);
+}
+
+:root[data-theme="cyberpunk"] .export-select-bar {
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-elev));
+  border-bottom-color: color-mix(in srgb, var(--neon-cyan) 20%, var(--border));
+}
+
+:root[data-theme="cyberpunk"] .composer-tool-btn {
+  border-radius: var(--radius-sm);
+}
+
+:root[data-theme="cyberpunk"] .composer-tool-btn:hover,
+:root[data-theme="cyberpunk"] .composer-tool-btn.active {
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}

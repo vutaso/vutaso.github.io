@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Orbitron:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
@@ -23,13 +23,16 @@
   <link rel="stylesheet" href="css/pdf-export.css" />
   <link rel="stylesheet" href="css/docx-export.css" />
   <link rel="stylesheet" href="css/apple-theme.css" />
+  <link rel="stylesheet" href="css/hello-kitty-theme.css" />
+  <link rel="stylesheet" href="css/cyberpunk-theme.css" />
+  <link rel="stylesheet" href="css/nvidia-theme.css" />
+  <link rel="stylesheet" href="css/liquid-glass-theme.css" />
 </head>
 <body>
   <div id="app" class="app" data-sidebar="open">
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-brand">
         <div class="brand-avatar" aria-hidden="true">V</div>
-        <span class="brand-name">VUTASO AI</span>
       </div>
       <div class="sidebar-header">
         <button id="newChatBtn" class="btn btn-primary" title="Cuộc trò chuyện mới">
@@ -53,18 +56,16 @@
       </div>
       <ul id="conversationList" class="conversation-list" role="list"></ul>
       <div class="sidebar-footer">
-        <button type="button" id="openGuideBtn" class="btn btn-ghost sidebar-footer-item" title="Hướng dẫn sử dụng cho người mới" data-action="open-guide">
+        <button type="button" id="openGuideBtn" class="btn btn-icon sidebar-footer-btn" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn" data-action="open-guide">
           <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
-          <span class="label">Hướng dẫn</span>
         </button>
-        <button id="clearAllSidebarBtn" class="btn btn-icon sidebar-footer-action" title="Xoá tất cả hội thoại">
+        <button id="clearAllSidebarBtn" class="btn btn-icon sidebar-footer-btn" title="Xoá tất cả hội thoại" aria-label="Xoá tất cả hội thoại">
           <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
         </button>
-        <button id="openSettingsBtn" class="btn btn-ghost sidebar-footer-item" title="Cài đặt">
+        <button id="openSettingsBtn" class="btn btn-icon sidebar-footer-btn" title="Cài đặt" aria-label="Cài đặt">
           <span class="icon"><i class="fa-solid fa-gear"></i></span>
-          <span class="label">Cài đặt</span>
         </button>
-        <button id="themeToggleBtn" class="btn btn-icon sidebar-footer-action" title="Chuyển theme">
+        <button id="themeToggleBtn" class="btn btn-icon sidebar-footer-btn" title="Chuyển theme" aria-label="Chuyển theme">
           <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
         </button>
       </div>
@@ -118,6 +119,9 @@
           </button>
           <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF (A4)">
             <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
+          </button>
+          <button id="headerNewChatBtn" class="btn btn-icon" title="Cuộc trò chuyện mới" aria-label="Cuộc trò chuyện mới">
+            <span class="icon"><i class="fa-solid fa-plus"></i></span>
           </button>
         </div>
       </header>

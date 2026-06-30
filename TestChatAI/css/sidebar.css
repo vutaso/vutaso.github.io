@@ -11,15 +11,8 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   padding: 16px 16px 8px;
-}
-
-.brand-name {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
 }
 
 .sidebar-header {
@@ -247,11 +240,11 @@
 }
 
 .sidebar-footer {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 2px 4px;
-  padding: 8px 10px;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px 12px;
   border-top: 1px solid var(--border);
   position: relative;
   z-index: 2;
@@ -259,13 +252,8 @@
   margin-top: auto;
 }
 
-.sidebar-footer-item {
-  justify-content: flex-start;
-  min-width: 0;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
-}
-
-.sidebar-footer-action {
-  justify-self: end;
+.sidebar-footer-btn {
+  flex: 1;
+  max-width: 44px;
+  margin: 0 auto;
 }

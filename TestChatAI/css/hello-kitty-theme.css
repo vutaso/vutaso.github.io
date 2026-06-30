@@ -1,0 +1,174 @@
+/* Hello Kitty — feminine pink theme */
+
+:root[data-theme="hello-kitty"] {
+  font-family: "Nunito", "Inter", system-ui, sans-serif;
+}
+
+:root[data-theme="hello-kitty"] body {
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="hello-kitty"] .main {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(255, 182, 213, 0.35), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 192, 203, 0.2), transparent),
+    var(--bg);
+}
+
+:root[data-theme="hello-kitty"] .sidebar,
+:root[data-theme="hello-kitty"] .main-header {
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="hello-kitty"] .sidebar {
+  background: color-mix(in srgb, var(--bg-elev) 94%, #ffb6d9 6%);
+  border-right-color: var(--border);
+}
+
+:root[data-theme="hello-kitty"] .main-header {
+  background: color-mix(in srgb, var(--bg-elev) 90%, #ffe8f2 10%);
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="hello-kitty"] .sidebar-brand .brand-avatar,
+:root[data-theme="hello-kitty"] .messages-empty .brand-avatar-lg,
+:root[data-theme="hello-kitty"] .message .avatar.assistant-av {
+  background: linear-gradient(145deg, #ff6b9d 0%, #ff4d8d 55%, #e40046 100%);
+  box-shadow: 0 3px 14px rgba(255, 77, 141, 0.35);
+  border-radius: 50%;
+}
+
+:root[data-theme="hello-kitty"] .btn-primary,
+:root[data-theme="hello-kitty"] .btn-send {
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff4d8d 100%);
+  color: var(--accent-on);
+  border-radius: var(--radius-full);
+  box-shadow: 0 3px 12px var(--accent-glow);
+  font-weight: 700;
+}
+
+:root[data-theme="hello-kitty"] .btn-primary:hover,
+:root[data-theme="hello-kitty"] .btn-send:hover {
+  background: linear-gradient(135deg, #ff5a90 0%, #ff2d7a 100%);
+  color: var(--accent-on);
+  box-shadow: 0 5px 18px var(--accent-glow);
+}
+
+:root[data-theme="hello-kitty"] .btn-icon,
+:root[data-theme="hello-kitty"] .composer-tool-btn {
+  border-radius: var(--radius-full);
+}
+
+:root[data-theme="hello-kitty"] .btn-icon:hover {
+  color: var(--accent);
+}
+
+:root[data-theme="hello-kitty"] .conversation-item {
+  border-radius: var(--radius-md);
+  margin: 0 8px;
+}
+
+:root[data-theme="hello-kitty"] .conversation-item.active {
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-hover));
+  font-weight: 600;
+}
+
+:root[data-theme="hello-kitty"] .conversation-item.active .icon {
+  color: var(--accent);
+}
+
+:root[data-theme="hello-kitty"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+}
+
+:root[data-theme="hello-kitty"] .composer-inner {
+  border-radius: 24px;
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--bg-input) 96%, #fff5f9 4%);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="hello-kitty"] .composer-inner:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+  box-shadow: var(--composer-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+:root[data-theme="hello-kitty"] .message.user .body {
+  border-radius: 20px 20px 6px 20px;
+  background: var(--user-bubble);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+:root[data-theme="hello-kitty"] .message.assistant .body {
+  padding: 4px 0;
+}
+
+:root[data-theme="hello-kitty"] .messages-empty h2 {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+:root[data-theme="hello-kitty"] .modal-content {
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-elev) 96%, #fff5f9 4%);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 24px 80px rgba(255, 105, 180, 0.15);
+}
+
+:root[data-theme="hello-kitty"] .modal-backdrop {
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  background: rgba(255, 182, 213, 0.25);
+}
+
+:root[data-theme="hello-kitty"] .select,
+:root[data-theme="hello-kitty"] .input {
+  border-radius: var(--radius-md);
+  border-color: var(--border-strong);
+  background: var(--bg-input);
+}
+
+:root[data-theme="hello-kitty"] .select:focus,
+:root[data-theme="hello-kitty"] .input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+:root[data-theme="hello-kitty"] .header-title .header-select {
+  border-radius: var(--radius-full);
+  background-color: color-mix(in srgb, var(--accent) 8%, var(--bg-hover));
+  font-weight: 600;
+}
+
+:root[data-theme="hello-kitty"] .toast {
+  border-radius: var(--radius-full);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+:root[data-theme="hello-kitty"] .export-select-bar {
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-elev));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="hello-kitty"] .sidebar-footer {
+  border-top-color: var(--border);
+}
+
+:root[data-theme="hello-kitty"] .message .content a {
+  color: #e40046;
+}
+
+:root[data-theme="hello-kitty"] .message .content blockquote {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}

@@ -848,6 +848,10 @@ window.Events = (() => {
     });
 
     ui.els.composerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.shiftKey && !e.isComposing) {
+        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+        return;
+      }
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
         sendCurrent();
@@ -856,7 +860,10 @@ window.Events = (() => {
 
     ui.els.composerInput.addEventListener('paste', (e) => {
       const items = e.clipboardData && e.clipboardData.items;
-      if (!items) return;
+      if (!items) {
+        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+        return;
+      }
       const imageFiles = [];
       for (const item of items) {
         if (item.type.startsWith('image/')) {
@@ -864,7 +871,10 @@ window.Events = (() => {
           if (file) imageFiles.push(file);
         }
       }
-      if (!imageFiles.length) return;
+      if (!imageFiles.length) {
+        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+        return;
+      }
       e.preventDefault();
       addPendingImages(imageFiles);
     });
@@ -965,7 +975,7 @@ window.Events = (() => {
 
     ui.els.stopBtn.addEventListener('click', stopStreaming);
 
-    ui.els.newChatBtn.addEventListener('click', async () => {
+    const startNewChat = async () => {
       await settleActiveStream({ discard: false });
       ui.setExportSelectMode(false);
       const c = convoMod.create();
@@ -974,7 +984,10 @@ window.Events = (() => {
       ui.renderMessages(c);
       ui.updateSettingsTokenUsage(state.get());
       ui.els.composerInput.focus();
-    });
+    };
+
+    ui.els.newChatBtn.addEventListener('click', startNewChat);
+    ui.els.headerNewChatBtn?.addEventListener('click', startNewChat);
 
     if (ui.els.toggleSidebarSearchBtn) {
       ui.els.toggleSidebarSearchBtn.addEventListener('click', () => {
@@ -1445,7 +1458,7 @@ window.Events = (() => {
       }
     });
 
-    const THEME_CYCLE = ['dark', 'vs-dark', 'monokai', 'light', 'apple', 'apple-dark'];
+    const THEME_CYCLE = ['dark', 'vs-dark', 'apple', 'apple-dark', 'hello-kitty', 'cyberpunk', 'nvidia', 'liquid-glass'];
 
     ui.els.themeToggleBtn.addEventListener('click', () => {
       const current = state.get().theme || 'dark';

@@ -374,9 +374,36 @@ body.pdf-export-loading .main-shell {
   overflow: auto;
   max-height: min(50vh, 400px);
 }
+.md-preview-content pre .code-block-body {
+  display: flex;
+  align-items: flex-start;
+  min-width: 100%;
+}
+
+.md-preview-content pre .line-numbers {
+  flex-shrink: 0;
+  padding: 14px 10px 14px 14px;
+  margin: 0;
+  text-align: right;
+  user-select: none;
+  color: var(--text-dim);
+  opacity: 0.7;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
+  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-elev) 75%, var(--code-bg));
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
 .md-preview-content pre code {
   display: block;
-  padding: 14px;
+  flex: 1;
+  min-width: max-content;
+  padding: 14px 14px 14px 12px;
   font-family: "SFMono-Regular", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;

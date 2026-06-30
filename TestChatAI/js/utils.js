@@ -177,8 +177,14 @@ window.Utils = (() => {
   };
 
   const autoResize = (el) => {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+    if (!el) return;
+    const style = getComputedStyle(el);
+    const max = parseFloat(style.maxHeight) || 200;
+    const min = parseFloat(style.minHeight) || 0;
+    el.style.height = min + 'px';
+    const next = Math.min(Math.max(el.scrollHeight, min), max);
+    el.style.height = next + 'px';
+    el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
   };
 
   const formatConversation = (convo) => {

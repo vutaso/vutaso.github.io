@@ -51,6 +51,7 @@ window.UI = (() => {
     els.docxExportBtn = $('#docxExportBtn');
     els.htmlExportBtn = $('#htmlExportBtn');
     els.pdfExportBtn = $('#pdfExportBtn');
+    els.headerNewChatBtn = $('#headerNewChatBtn');
     els.pdfExportOverlay = $('#pdfExportOverlay');
     els.pdfExportLoadingTitle = $('#pdfExportLoadingTitle');
     els.pdfExportLoadingText = $('#pdfExportLoadingText');
@@ -536,26 +537,32 @@ window.UI = (() => {
   const THEME_META_COLORS = {
     dark: '#0c0c0e',
     'vs-dark': '#1e1e1e',
-    monokai: '#272822',
-    light: '#f8f9fc',
     apple: '#f5f5f7',
-    'apple-dark': '#1c1c1e'
+    'apple-dark': '#1c1c1e',
+    'hello-kitty': '#fff5f9',
+    cyberpunk: '#0a0a12',
+    nvidia: '#0d0d0d',
+    'liquid-glass': '#1a4a7a'
   };
   const THEME_ICONS = {
     dark: '<i class="fa-solid fa-sun"></i>',
     'vs-dark': '<i class="fa-brands fa-microsoft"></i>',
-    monokai: '<i class="fa-solid fa-palette"></i>',
-    light: '<i class="fa-solid fa-moon"></i>',
     apple: '<i class="fa-brands fa-apple"></i>',
-    'apple-dark': '<i class="fa-solid fa-moon"></i>'
+    'apple-dark': '<i class="fa-solid fa-moon"></i>',
+    'hello-kitty': '<i class="fa-solid fa-heart"></i>',
+    cyberpunk: '<i class="fa-solid fa-bolt"></i>',
+    nvidia: '<i class="fa-solid fa-microchip"></i>',
+    'liquid-glass': '<i class="fa-solid fa-droplet"></i>'
   };
   const HIGHLIGHT_THEMES = {
     dark: 'atom-one-dark',
     'vs-dark': 'vs2015',
-    monokai: 'monokai',
-    light: 'atom-one-light',
     apple: 'atom-one-light',
-    'apple-dark': 'atom-one-dark'
+    'apple-dark': 'atom-one-dark',
+    'hello-kitty': 'atom-one-light',
+    cyberpunk: 'atom-one-dark',
+    nvidia: 'atom-one-dark',
+    'liquid-glass': 'atom-one-dark'
   };
 
   const updateHighlightTheme = (theme) => {

@@ -263,11 +263,34 @@ body {
   font-size: 12px;
 }
 
+.message .content pre .code-block-body {
+  display: flex;
+  align-items: flex-start;
+  min-width: 100%;
+}
+
+.message .content pre .line-numbers {
+  flex-shrink: 0;
+  padding: 14px 10px 14px 14px;
+  margin: 0;
+  text-align: right;
+  user-select: none;
+  color: #9aa0ad !important;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre;
+  border-right: 1px solid #e2e4ec !important;
+  background: #eef1f6 !important;
+}
+
 .message .content pre code,
 .message .content pre code.hljs,
 .message .content pre code.hljs span {
   display: block;
-  padding: 14px;
+  flex: 1;
+  min-width: max-content;
+  padding: 14px 14px 14px 12px;
   color: #111118 !important;
   background: transparent !important;
   max-height: none !important;

@@ -7,10 +7,12 @@
       const themeColors = {
         dark: '#0c0c0e',
         'vs-dark': '#1e1e1e',
-        monokai: '#272822',
-        light: '#f8f9fc',
         apple: '#f5f5f7',
-        'apple-dark': '#1c1c1e'
+        'apple-dark': '#1c1c1e',
+        'hello-kitty': '#fff5f9',
+        cyberpunk: '#0a0a12',
+        nvidia: '#0d0d0d',
+        'liquid-glass': '#1a4a7a'
       };
       if (themeColors[data.theme]) {
         document.documentElement.setAttribute('data-theme', data.theme);

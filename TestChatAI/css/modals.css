@@ -38,6 +38,11 @@
   border-radius: var(--radius-md);
   color: var(--text-muted);
 }
+.btn-icon .icon i,
+.btn-icon .fa-brands,
+.btn-icon .fa-solid {
+  color: currentColor;
+}
 .btn-icon:hover { background: var(--bg-hover); color: var(--text); }
 .btn:disabled,
 .btn[disabled] {

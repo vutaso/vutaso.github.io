@@ -12,6 +12,36 @@ window.Markdown = (() => {
   const HTML_LANG_RE = /^(?:html|htm|xhtml)$/i;
   const isHtmlLang = (lang) => HTML_LANG_RE.test((lang || '').trim());
 
+  const countCodeLines = (code) => {
+    const normalized = String(code ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    if (!normalized) return 1;
+    const lines = normalized.split('\n');
+    if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+    return Math.max(1, lines.length);
+  };
+
+  const lineNumbersText = (code) =>
+    Array.from({ length: countCodeLines(code) }, (_, i) => String(i + 1)).join('\n');
+
+  const codeBlockBodyHTML = (code, highlightedHtml, langClass) =>
+    '<div class="code-block-body">'
+    + '<div class="line-numbers" aria-hidden="true">' + lineNumbersText(code) + '</div>'
+    + '<code class="hljs' + langClass + '">' + highlightedHtml + '</code>'
+    + '</div>';
+
+  const wrapCodeWithLineNumbers = (pre, code) => {
+    if (!pre || !code || pre.querySelector('.code-block-body')) return;
+    const body = document.createElement('div');
+    body.className = 'code-block-body';
+    const lineNums = document.createElement('div');
+    lineNums.className = 'line-numbers';
+    lineNums.setAttribute('aria-hidden', 'true');
+    lineNums.textContent = lineNumbersText(code.textContent || '');
+    code.parentNode.insertBefore(body, code);
+    body.appendChild(lineNums);
+    body.appendChild(code);
+  };
+
   const highlightCode = (code, lang) => {
     const validLang = lang && window.hljs && window.hljs.getLanguage(lang) ? lang : '';
     let html;
@@ -108,7 +138,7 @@ window.Markdown = (() => {
       + '</div>'
       + '</div>'
       + '<div class="mermaid-view"></div>'
-      + '<pre class="mermaid-source hidden"><code>' + escapeHTML(source) + '</code></pre>'
+      + '<pre class="mermaid-source hidden">' + codeBlockBodyHTML(source, escapeHTML(source), '') + '</pre>'
       + '<script type="text/plain" class="mermaid-source-raw">' + source.replace(/<\/script/gi, '<\\/script') + '</script>'
       + '</div>';
   };
@@ -124,7 +154,9 @@ window.Markdown = (() => {
     if (shouldRenderMermaid(lang, code)) return mermaidBlockHTML(code);
     const { html, validLang } = highlightCode(code, lang);
     const label = validLang || lang || '';
-    return '<pre><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang) + '</div><code class="hljs' + (validLang ? ' language-' + validLang : (lang ? ' language-' + lang : '')) + '">' + html + '</code></pre>';
+    const langClass = validLang ? ' language-' + validLang : (lang ? ' language-' + lang : '');
+    return '<pre><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang) + '</div>'
+      + codeBlockBodyHTML(code, html, langClass) + '</pre>';
   };
 
   const parseCodeArgs = (arg, infostring) => {
@@ -223,7 +255,7 @@ window.Markdown = (() => {
 
   const getMermaidTheme = () => {
     const theme = document.documentElement.getAttribute('data-theme');
-    return theme === 'dark' || theme === 'vs-dark' || theme === 'monokai' || theme === 'apple-dark' ? 'dark' : 'default';
+    return theme === 'dark' || theme === 'vs-dark' || theme === 'apple-dark' || theme === 'cyberpunk' || theme === 'nvidia' || theme === 'liquid-glass' ? 'dark' : 'default';
   };
 
   let mermaidReady = false;
@@ -363,19 +395,22 @@ window.Markdown = (() => {
   const enhanceCodeBlocks = (root) => {
     if (!root) return;
     root.querySelectorAll('pre').forEach((pre) => {
-      if (pre.closest('.mermaid-block')) return;
-      if (pre.querySelector('.pre-header')) return;
+      if (pre.closest('.mermaid-block') && !pre.classList.contains('mermaid-source')) return;
       const code = pre.querySelector('code');
       if (!code) return;
 
-      const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
-      const header = document.createElement('div');
-      header.className = 'pre-header';
-      header.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
-      pre.insertBefore(header, code);
+      if (!pre.querySelector('.pre-header')) {
+        const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
+        const header = document.createElement('div');
+        header.className = 'pre-header';
+        header.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
+        pre.insertBefore(header, pre.firstChild);
 
-      if (!code.classList.contains('hljs')) code.classList.add('hljs');
-      if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
+        if (!code.classList.contains('hljs')) code.classList.add('hljs');
+        if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
+      }
+
+      wrapCodeWithLineNumbers(pre, code);
     });
   };
 

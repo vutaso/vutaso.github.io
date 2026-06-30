@@ -1,0 +1,293 @@
+/* Liquid Glass — iOS Control Center glass morphism (no accent gradients) */
+
+:root[data-theme="liquid-glass"] {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+}
+
+:root[data-theme="liquid-glass"] body {
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 90% 70% at 20% 15%, rgba(110, 181, 240, 0.55), transparent),
+    radial-gradient(ellipse 80% 60% at 85% 25%, rgba(58, 143, 217, 0.45), transparent),
+    radial-gradient(ellipse 70% 55% at 50% 90%, rgba(30, 90, 158, 0.5), transparent),
+    linear-gradient(165deg, #2a6cb5 0%, #1a4a7a 45%, #3a8fd9 100%);
+}
+
+:root[data-theme="liquid-glass"] .app {
+  background: transparent;
+}
+
+:root[data-theme="liquid-glass"] .main {
+  background: transparent;
+}
+
+:root[data-theme="liquid-glass"] .sidebar,
+:root[data-theme="liquid-glass"] .main-header {
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+:root[data-theme="liquid-glass"] .sidebar {
+  background: var(--glass-fill);
+  border-right: 0.5px solid var(--border-strong);
+  box-shadow:
+    inset 1px 0 0 var(--glass-shine),
+    inset 0 1px 0 var(--glass-shine);
+}
+
+:root[data-theme="liquid-glass"] .main-header {
+  background: var(--glass-fill);
+  border-bottom: 0.5px solid var(--border-strong);
+  box-shadow: inset 0 1px 0 var(--glass-shine);
+}
+
+:root[data-theme="liquid-glass"] .sidebar-brand .brand-avatar,
+:root[data-theme="liquid-glass"] .messages-empty .brand-avatar-lg,
+:root[data-theme="liquid-glass"] .message .avatar.assistant-av {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: 50%;
+  border: 0.5px solid var(--border-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 10px rgba(0, 20, 60, 0.2);
+}
+
+/* Primary actions — solid white pill, blue label (like active Wi-Fi tile) */
+:root[data-theme="liquid-glass"] .btn-primary,
+:root[data-theme="liquid-glass"] .btn-send {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: var(--radius-full);
+  border: 0.5px solid var(--border-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 10px rgba(0, 20, 60, 0.18);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme="liquid-glass"] .btn-primary:hover,
+:root[data-theme="liquid-glass"] .btn-send:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 4px 14px rgba(0, 20, 60, 0.22);
+}
+
+:root[data-theme="liquid-glass"] .btn-send {
+  border-radius: 50%;
+}
+
+:root[data-theme="liquid-glass"] .btn-icon,
+:root[data-theme="liquid-glass"] .composer-tool-btn {
+  border-radius: 50%;
+  border: 0.5px solid transparent;
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .btn-icon:hover,
+:root[data-theme="liquid-glass"] .composer-tool-btn:hover {
+  background: var(--glass-fill);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .composer-tool-btn.active {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="liquid-glass"] .conversation-item {
+  border-radius: var(--radius-md);
+  margin: 0 8px;
+  border: 0.5px solid transparent;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+:root[data-theme="liquid-glass"] .conversation-item.active {
+  background: var(--glass-fill-strong);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 1px 0 var(--glass-shine);
+  font-weight: 500;
+}
+
+:root[data-theme="liquid-glass"] .conversation-item.active .icon {
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+:root[data-theme="liquid-glass"] .composer-inner {
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--border-strong);
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow:
+    inset 0 1px 0 var(--glass-shine),
+    var(--composer-shadow);
+}
+
+:root[data-theme="liquid-glass"] .composer-inner:focus-within {
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 var(--glass-shine),
+    var(--composer-shadow),
+    0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="liquid-glass"] .composer-input {
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .composer-input::placeholder {
+  color: var(--text-dim);
+}
+
+:root[data-theme="liquid-glass"] .message.user .body {
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-sm) var(--radius-md);
+  background: var(--glass-fill-strong);
+  border: 0.5px solid var(--border-strong);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: inset 0 1px 0 var(--glass-shine);
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .message.assistant .body {
+  padding: 4px 0;
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .messages-empty h2 {
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme="liquid-glass"] .messages-empty p {
+  color: var(--text-muted);
+}
+
+:root[data-theme="liquid-glass"] .modal-content {
+  border-radius: var(--radius-lg);
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 0.5px solid var(--border-strong);
+  box-shadow:
+    inset 0 1px 0 var(--glass-shine),
+    0 24px 80px rgba(0, 20, 60, 0.35);
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .modal-backdrop {
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: rgba(20, 50, 100, 0.45);
+}
+
+:root[data-theme="liquid-glass"] .select,
+:root[data-theme="liquid-glass"] .input {
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border-strong);
+  background: var(--glass-fill);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .select:focus,
+:root[data-theme="liquid-glass"] .input:focus {
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="liquid-glass"] .header-title .header-select {
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  border: 0.5px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+:root[data-theme="liquid-glass"] .toast {
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 0.5px solid var(--border-strong);
+  box-shadow:
+    inset 0 1px 0 var(--glass-shine),
+    var(--shadow);
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .md-preview-panel {
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 0.5px solid var(--border-strong);
+}
+
+:root[data-theme="liquid-glass"] .export-select-bar {
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 0.5px solid var(--border-strong);
+  box-shadow: inset 0 1px 0 var(--glass-shine);
+}
+
+:root[data-theme="liquid-glass"] .sidebar-footer {
+  border-top: 0.5px solid var(--border);
+}
+
+:root[data-theme="liquid-glass"] .sidebar-section-label,
+:root[data-theme="liquid-glass"] .header-title,
+:root[data-theme="liquid-glass"] .modal-header h2 {
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .conversation-item .title {
+  color: var(--text);
+}
+
+:root[data-theme="liquid-glass"] .conversation-item .meta {
+  color: var(--text-muted);
+}
+
+:root[data-theme="liquid-glass"] .message .content a {
+  color: #7ec8ff;
+}
+
+:root[data-theme="liquid-glass"] .message .content blockquote {
+  border-left-color: rgba(255, 255, 255, 0.5);
+  background: var(--glass-fill);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-muted);
+}
+
+:root[data-theme="liquid-glass"] .btn-ghost {
+  color: var(--text-muted);
+}
+
+:root[data-theme="liquid-glass"] .btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
