@@ -568,8 +568,11 @@ window.Events = (() => {
     }
     const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const useImageGen = !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
-    const useThinking = (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
-      && window.APP_CONFIG.modelSupportsThinking(modelId);
+    const isDeepSeek = window.APP_CONFIG.getModelProvider(modelId) === 'deepseek';
+    const useThinking = isDeepSeek
+      ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
+      : (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
+        && window.APP_CONFIG.modelSupportsThinking(modelId);
 
     const refreshStreamingContent = () => {
       const reasoningOpen = !!reasoningBuffer && !buffer;
@@ -655,6 +658,7 @@ window.Events = (() => {
       webSearch: useWebSearch,
       imageGen: useImageGen,
       thinking: useThinking,
+      reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
       onSearchStatus: (status) => {
         if (status === 'searching') ui.setStreamingSearchStatus(article, 'searching');
       },
@@ -1087,18 +1091,131 @@ window.Events = (() => {
       ui.toggleExportSelectIndex(idx);
     });
 
-    ui.els.downloadConvoBtn.addEventListener('click', () => {
-      const exportConvo = requireExportConvo();
-      if (!exportConvo) return;
-      ui.downloadConversation(exportConvo);
-      ui.showToast(ui.isExportSelectMode() ? t('toastDownloadMdSelected') : t('toastDownloadMd'));
+    ui.els.headerDownloadBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleHeaderDownloadMenu();
     });
 
-    ui.els.downloadTxtBtn.addEventListener('click', () => {
-      const exportConvo = requireExportConvo();
-      if (!exportConvo) return;
-      ui.downloadConversationTxt(exportConvo);
-      ui.showToast(ui.isExportSelectMode() ? t('toastDownloadTxtSelected') : t('toastDownloadTxt'));
+    ui.els.headerDownloadMenu?.addEventListener('click', async (e) => {
+      const option = e.target.closest('.header-download-option');
+      if (!option || option.disabled) return;
+      const format = option.dataset.exportFormat;
+      ui.closeHeaderDownloadMenu();
+
+      if (format === 'md') {
+        const exportConvo = requireExportConvo();
+        if (!exportConvo) return;
+        ui.downloadConversation(exportConvo);
+        ui.showToast(ui.isExportSelectMode() ? t('toastDownloadMdSelected') : t('toastDownloadMd'));
+        return;
+      }
+
+      if (format === 'txt') {
+        const exportConvo = requireExportConvo();
+        if (!exportConvo) return;
+        ui.downloadConversationTxt(exportConvo);
+        ui.showToast(ui.isExportSelectMode() ? t('toastDownloadTxtSelected') : t('toastDownloadTxt'));
+        return;
+      }
+
+      if (format === 'docx') {
+        if (docxExporting) return;
+        const exportConvo = requireExportConvo();
+        if (!exportConvo) return;
+
+        docxExporting = true;
+        ui.setHeaderDownloadOptionDisabled('docx', true);
+        const streaming = window.API.isStreaming();
+        ui.setPdfExportLoading(true, {
+          title: t('toastExportingWord'),
+          hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+        });
+
+        try {
+          const result = await window.Utils.exportToDocx(exportConvo);
+          const status = ui.finishExportDownload(result, {
+            readyTitle: t('exportDownloadReadyTitle'),
+            readyHint: t('exportDownloadReadyHint'),
+            readyDownloadLabel: t('exportDownloadWordBtn'),
+            kind: 'docx',
+          });
+          if (status === 'downloaded') ui.showToast(t('toastExportWordOk'));
+        } catch (err) {
+          ui.setPdfExportLoading(false);
+          ui.showToast(t('toastExportWordFail', { err: err.message || err }));
+        } finally {
+          docxExporting = false;
+          ui.setHeaderDownloadOptionDisabled('docx', false);
+        }
+        return;
+      }
+
+      if (format === 'html') {
+        if (htmlExporting) return;
+        const exportConvo = requireExportConvo();
+        if (!exportConvo) return;
+
+        htmlExporting = true;
+        ui.setHeaderDownloadOptionDisabled('html', true);
+        const streaming = window.API.isStreaming();
+        ui.setPdfExportLoading(true, {
+          title: t('exportHtmlTitle'),
+          hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+        });
+
+        try {
+          const result = await window.HtmlExport.exportToHtml(exportConvo, {
+            onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+          });
+          const status = ui.finishExportDownload(result, {
+            readyTitle: t('exportDownloadReadyTitle'),
+            readyHint: t('exportDownloadReadyHint'),
+            readyDownloadLabel: t('exportDownloadHtmlBtn'),
+            kind: 'html',
+          });
+          if (status === 'downloaded') ui.showToast(t('toastExportHtmlOk'));
+        } catch (err) {
+          ui.setPdfExportLoading(false);
+          ui.showToast(t('toastExportHtmlFail', { err: err.message || err }));
+        } finally {
+          htmlExporting = false;
+          ui.setHeaderDownloadOptionDisabled('html', false);
+        }
+        return;
+      }
+
+      if (format === 'pdf') {
+        if (pdfExporting) return;
+        const exportConvo = requireExportConvo();
+        if (!exportConvo) return;
+
+        pdfExporting = true;
+        ui.setHeaderDownloadOptionDisabled('pdf', true);
+        const streaming = window.API.isStreaming();
+        ui.setPdfExportLoading(true, {
+          title: t('exportPdfTitle'),
+          hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+        });
+
+        try {
+          const result = await window.PdfExport.exportToPdf(exportConvo, {
+            onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+          });
+          const status = ui.finishExportDownload(result, {
+            readyTitle: t('exportDownloadReadyTitle'),
+            readyHint: t('exportDownloadReadyHint'),
+            readyDownloadLabel: t('exportDownloadPdfBtn'),
+            kind: 'pdf',
+          });
+          if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
+        } catch (err) {
+          ui.setPdfExportLoading(false);
+          ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
+        } finally {
+          pdfExporting = false;
+          ui.setHeaderDownloadOptionDisabled('pdf', false);
+        }
+      }
     });
 
     ui.els.copyMarkdownBtn.addEventListener('click', async () => {
@@ -1107,39 +1224,6 @@ window.Events = (() => {
       const md = window.Utils.formatConversation(exportConvo);
       if (await copyToClipboard(md)) {
         ui.showToast(ui.isExportSelectMode() ? t('toastCopiedSelected') : t('toastCopied'));
-      }
-    });
-
-
-    ui.els.docxExportBtn.addEventListener('click', async () => {
-      if (docxExporting) return;
-
-      const exportConvo = requireExportConvo();
-      if (!exportConvo) return;
-
-      docxExporting = true;
-      ui.els.docxExportBtn.disabled = true;
-      const streaming = window.API.isStreaming();
-      ui.setPdfExportLoading(true, {
-        title: t('toastExportingWord'),
-        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
-      });
-
-      try {
-        const result = await window.Utils.exportToDocx(exportConvo);
-        const status = ui.finishExportDownload(result, {
-          readyTitle: t('exportDownloadReadyTitle'),
-          readyHint: t('exportDownloadReadyHint'),
-          readyDownloadLabel: t('exportDownloadWordBtn'),
-          kind: 'docx',
-        });
-        if (status === 'downloaded') ui.showToast(t('toastExportWordOk'));
-      } catch (err) {
-        ui.setPdfExportLoading(false);
-        ui.showToast(t('toastExportWordFail', { err: err.message || err }));
-      } finally {
-        docxExporting = false;
-        ui.els.docxExportBtn.disabled = false;
       }
     });
 
@@ -1154,74 +1238,6 @@ window.Events = (() => {
           ? 'toastExportHtmlOk'
           : 'toastExportPdfOk';
       ui.showToast(t(toastKey));
-    });
-
-    ui.els.htmlExportBtn?.addEventListener('click', async () => {
-      if (htmlExporting) return;
-
-      const exportConvo = requireExportConvo();
-      if (!exportConvo) return;
-
-      htmlExporting = true;
-      ui.els.htmlExportBtn.disabled = true;
-      const streaming = window.API.isStreaming();
-      ui.setPdfExportLoading(true, {
-        title: t('exportHtmlTitle'),
-        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
-      });
-
-      try {
-        const result = await window.HtmlExport.exportToHtml(exportConvo, {
-          onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
-        });
-        const status = ui.finishExportDownload(result, {
-          readyTitle: t('exportDownloadReadyTitle'),
-          readyHint: t('exportDownloadReadyHint'),
-          readyDownloadLabel: t('exportDownloadHtmlBtn'),
-          kind: 'html',
-        });
-        if (status === 'downloaded') ui.showToast(t('toastExportHtmlOk'));
-      } catch (err) {
-        ui.setPdfExportLoading(false);
-        ui.showToast(t('toastExportHtmlFail', { err: err.message || err }));
-      } finally {
-        htmlExporting = false;
-        ui.els.htmlExportBtn.disabled = false;
-      }
-    });
-
-    ui.els.pdfExportBtn?.addEventListener('click', async () => {
-      if (pdfExporting) return;
-
-      const exportConvo = requireExportConvo();
-      if (!exportConvo) return;
-
-      pdfExporting = true;
-      ui.els.pdfExportBtn.disabled = true;
-      const streaming = window.API.isStreaming();
-      ui.setPdfExportLoading(true, {
-        title: t('exportPdfTitle'),
-        hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
-      });
-
-      try {
-        const result = await window.PdfExport.exportToPdf(exportConvo, {
-          onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
-        });
-        const status = ui.finishExportDownload(result, {
-          readyTitle: t('exportDownloadReadyTitle'),
-          readyHint: t('exportDownloadReadyHint'),
-          readyDownloadLabel: t('exportDownloadPdfBtn'),
-          kind: 'pdf',
-        });
-        if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
-      } catch (err) {
-        ui.setPdfExportLoading(false);
-        ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
-      } finally {
-        pdfExporting = false;
-        ui.els.pdfExportBtn.disabled = false;
-      }
     });
 
     const openGuideFromClick = (e) => {
@@ -1249,20 +1265,42 @@ window.Events = (() => {
       let webSearchEnabled = s.webSearchEnabled;
       let imageGenEnabled = s.imageGenEnabled;
       let thinkingEnabled = s.thinkingEnabled;
+      let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
       if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
       if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
       if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
+      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+        thinkingEnabled = reasoningEffort !== 'default';
+      }
+      if (window.APP_CONFIG.modelUsesBinaryThinking(modelId)) {
+        if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
+          thinkingEnabled = true;
+        }
+      }
       if (!window.APP_CONFIG.modelSupportsVision(modelId) && pendingImages.length) {
         pendingImages = [];
         ui.renderComposerAttachments(pendingImages, pendingFiles);
       }
-      state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled });
-      syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled });
+      state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
+      syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
       updateSendEnabled();
       ui.updateSettingsTokenUsage(state.get());
       const label = ui.els.modelSelect.selectedOptions[0]?.textContent || modelId;
       ui.showToast(t('toastModel', { label }));
+    });
+
+    ui.els.effortSelect?.addEventListener('change', () => {
+      const effort = ui.els.effortSelect.value;
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { reasoningEffort: effort };
+      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+        patch.thinkingEnabled = effort !== 'default';
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      const label = ui.els.effortSelect.selectedOptions[0]?.textContent || effort;
+      ui.showToast(t('toastEffort', { label }));
     });
 
     ui.els.webSearchBtn.addEventListener('click', () => {
@@ -1281,8 +1319,14 @@ window.Events = (() => {
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) return;
       if (window.APP_CONFIG.modelThinkingRequired(modelId)) return;
       const next = !s.thinkingEnabled;
-      state.set({ thinkingEnabled: next });
-      syncComposerTools(modelId, { thinkingEnabled: next });
+      const patch = { thinkingEnabled: next };
+      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+        patch.reasoningEffort = next
+          ? (s.reasoningEffort === 'default' ? 'high' : s.reasoningEffort)
+          : 'default';
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
       ui.showToast(next ? t('toastThinkingOn') : t('toastThinkingOff'));
     });
 
@@ -1455,6 +1499,9 @@ window.Events = (() => {
       }
       if (!e.target.closest('.msg-export-wrap')) {
         ui.closeAllMsgExportMenus();
+      }
+      if (!e.target.closest('.header-download-wrap')) {
+        ui.closeHeaderDownloadMenu();
       }
     });
 
@@ -1677,6 +1724,10 @@ window.Events = (() => {
           ui.closeAllMsgExportMenus();
           return;
         }
+        if (!ui.els.headerDownloadMenu?.classList.contains('hidden')) {
+          ui.closeHeaderDownloadMenu();
+          return;
+        }
         if (!ui.els.imageGenRatioMenu.classList.contains('hidden')
           || !ui.els.imageGenStyleMenu.classList.contains('hidden')
           || !ui.els.imageGenTemplateMenu.classList.contains('hidden')) {
@@ -1748,15 +1799,15 @@ window.Events = (() => {
     document.addEventListener('click', async (e) => {
       const previewMdBtn = e.target.closest('[data-preview-md]');
       if (previewMdBtn) {
-        const pre = previewMdBtn.closest('pre');
-        const code = pre?.querySelector('code')?.innerText || '';
+        const block = previewMdBtn.closest('.code-block') || previewMdBtn.closest('pre');
+        const code = block?.querySelector('code')?.innerText || '';
         if (code) ui.openMarkdownPreview(code);
         return;
       }
       const previewHtmlBtn = e.target.closest('[data-preview-html]');
       if (previewHtmlBtn) {
-        const pre = previewHtmlBtn.closest('pre');
-        const code = pre?.querySelector('code')?.innerText || '';
+        const block = previewHtmlBtn.closest('.code-block') || previewHtmlBtn.closest('pre');
+        const code = block?.querySelector('code')?.innerText || '';
         if (code) ui.openHtmlPreview(code);
         return;
       }
@@ -1807,7 +1858,7 @@ window.Events = (() => {
         const mermaidBlock = copyBtn.closest('.mermaid-block');
         const code = mermaidBlock
           ? window.Markdown.getMermaidSource(mermaidBlock)
-          : (copyBtn.closest('pre')?.querySelector('code')?.innerText || '');
+          : ((copyBtn.closest('.code-block') || copyBtn.closest('pre'))?.querySelector('code')?.innerText || '');
         if (await copyToClipboard(code)) ui.showToast(t('toastCopyCode'));
         return;
       }

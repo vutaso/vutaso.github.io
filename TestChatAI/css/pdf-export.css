@@ -180,7 +180,8 @@
   border-color: #e2e4ec;
 }
 
-.pdf-export-root pre {
+.pdf-export-root .code-block,
+.pdf-export-root pre:not(.code-block-body pre) {
   background: #f6f8fa !important;
   border-color: #e2e4ec !important;
   color: #111118 !important;
@@ -192,6 +193,7 @@
   overflow-wrap: anywhere;
 }
 
+.pdf-export-root .code-block .pre-header,
 .pdf-export-root pre .pre-header {
   position: static !important;
   background: #eef1f6 !important;
@@ -199,6 +201,40 @@
   color: #7a7a8a !important;
 }
 
+.pdf-export-root .code-block-body {
+  display: flex;
+  align-items: flex-start;
+  min-width: 100%;
+}
+
+.pdf-export-root .code-block-body pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+.pdf-export-root .line-numbers {
+  flex-shrink: 0;
+  padding: 14px 10px 14px 14px;
+  margin: 0;
+  text-align: right;
+  user-select: none;
+  color: #9aa0ad !important;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre;
+  border-right: 1px solid #e2e4ec !important;
+  background: #eef1f6 !important;
+}
+
+.pdf-export-root .code-block-body code,
 .pdf-export-root pre code,
 .pdf-export-root pre code.hljs,
 .pdf-export-root pre code.hljs span {

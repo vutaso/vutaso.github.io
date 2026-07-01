@@ -32,6 +32,7 @@ window.HtmlExport = (() => {
   const sanitizeExportRoot = (root) => {
     root.querySelectorAll('script').forEach((node) => node.remove());
     root.querySelectorAll(HIDDEN_SELECTORS).forEach((node) => node.remove());
+    root.querySelectorAll('.line-numbers').forEach((node) => node.remove());
     root.style.cssText = '';
     root.classList.remove('is-capturing');
   };

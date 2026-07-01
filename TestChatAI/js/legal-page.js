@@ -12,7 +12,7 @@
         'hello-kitty': '#fff5f9',
         cyberpunk: '#0a0a12',
         nvidia: '#0d0d0d',
-        'liquid-glass': '#1a4a7a'
+        'liquid-glass': '#0d0d0f'
       };
       if (themeColors[data.theme]) {
         document.documentElement.setAttribute('data-theme', data.theme);

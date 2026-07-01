@@ -502,13 +502,17 @@ window.API = (() => {
     return body;
   };
 
-  const buildDeepseekBody = (model, systemPrompt, convo, thinking) => {
+  const buildDeepseekBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
     const body = withStreamUsage({
       model,
       messages: buildDeepseekMessages(convo, systemPrompt),
       stream: true,
-      thinking: { type: thinking ? 'enabled' : 'disabled' }
+      thinking: { type: cfg.thinking ? 'enabled' : 'disabled' }
     });
+    if (cfg.reasoning_effort) {
+      body.reasoning_effort = cfg.reasoning_effort;
+    }
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
@@ -537,15 +541,11 @@ window.API = (() => {
   };
 
   const buildKimiBody = (model, systemPrompt, convo, thinking) => {
-    const alwaysThinking = window.APP_CONFIG.modelThinkingRequired(model);
-    const preserved = window.APP_CONFIG.kimiRequiresPreservedThinking(model);
     const body = withStreamUsage({
       model,
       messages: buildKimiMessages(convo, systemPrompt, model),
       stream: true,
-      thinking: preserved
-        ? { type: 'enabled', keep: 'all' }
-        : { type: (alwaysThinking || thinking) ? 'enabled' : 'disabled' }
+      thinking: window.APP_CONFIG.getKimiThinkingConfig(model, thinking)
     });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
@@ -554,7 +554,7 @@ window.API = (() => {
     return body;
   };
 
-  const buildOpenAIChatBody = (model, systemPrompt, convo, thinking) => {
+  const buildOpenAIChatBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
     const body = withStreamUsage({
       model,
       messages: buildMessages(convo, systemPrompt),
@@ -565,17 +565,21 @@ window.API = (() => {
       body.max_completion_tokens = maxOutputTokens;
     }
     if (thinking) {
-      body.reasoning_effort = window.APP_CONFIG.REASONING_EFFORT || 'high';
+      const effort = window.APP_CONFIG.normalizeEffortForModel(
+        reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+        model
+      );
+      body.reasoning_effort = effort;
     }
     return body;
   };
 
-  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking }) => {
+  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
     const body = provider === 'deepseek'
-      ? buildDeepseekBody(model, systemPrompt, convo, thinking)
+      ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
       : provider === 'kimi'
         ? buildKimiBody(model, systemPrompt, convo, thinking)
-        : buildOpenAIChatBody(model, systemPrompt, convo, thinking);
+        : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
 
     const headers = { 'Content-Type': 'application/json' };
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
@@ -595,7 +599,7 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendAnthropic = async ({ apiKey, model, systemPrompt, convo, webSearch, thinking, controller, handlers }) => {
+  const sendAnthropic = async ({ apiKey, model, systemPrompt, convo, webSearch, thinking, reasoningEffort, controller, handlers }) => {
     const messages = buildAnthropicMessages(convo);
     if (!messages.length) {
       throw new Error('Không có tin nhắn để gửi');
@@ -616,7 +620,16 @@ window.API = (() => {
       body.system = systemPrompt.trim();
     }
     if (thinking) {
-      body.thinking = { type: 'enabled' };
+      if (window.APP_CONFIG.modelUsesAnthropicAdaptiveThinking(model)) {
+        const effort = window.APP_CONFIG.normalizeAnthropicApiEffort(model, reasoningEffort);
+        body.thinking = { type: 'adaptive' };
+        body.output_config = { effort };
+      } else if (window.APP_CONFIG.modelUsesAnthropicManualThinking(model)) {
+        body.thinking = {
+          type: 'enabled',
+          budget_tokens: window.APP_CONFIG.getAnthropicHaikuThinkingBudget(model)
+        };
+      }
     }
 
     const res = await fetch(ANTHROPIC_ENDPOINT, {
@@ -639,7 +652,7 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendGemini = async ({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, controller, handlers }) => {
+  const sendGemini = async ({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, reasoningEffort, controller, handlers }) => {
     const contents = buildGeminiContents(convo);
     if (!contents.length) {
       throw new Error('Không có tin nhắn để gửi');
@@ -667,7 +680,10 @@ window.API = (() => {
         body.tools = [{ google_search: {} }];
       }
       if (thinking) {
-        body.generationConfig.thinkingConfig = { includeThoughts: true };
+        body.generationConfig.thinkingConfig = window.APP_CONFIG.getGeminiThinkingConfig(
+          model,
+          reasoningEffort
+        );
       }
     }
     if (systemPrompt && systemPrompt.trim()) {
@@ -692,7 +708,7 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendWithResponsesTools = async ({ apiKey, model, systemPrompt, convo, tools, thinking, controller, handlers }) => {
+  const sendWithResponsesTools = async ({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort, controller, handlers }) => {
     const input = buildConversationMessages(convo, 'responses');
     if (!input.length) {
       throw new Error('Không có tin nhắn để gửi');
@@ -712,7 +728,11 @@ window.API = (() => {
       body.instructions = systemPrompt;
     }
     if (thinking) {
-      body.reasoning = { effort: window.APP_CONFIG.REASONING_EFFORT || 'high' };
+      const effort = window.APP_CONFIG.normalizeEffortForModel(
+        reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+        model
+      );
+      body.reasoning = { effort };
     }
 
     const res = await fetch(RESPONSES_ENDPOINT, {
@@ -748,7 +768,7 @@ window.API = (() => {
 
   const send = async ({
     apiKey, model, systemPrompt, convo,
-    webSearch, imageGen, thinking,
+    webSearch, imageGen, thinking, reasoningEffort,
     onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
     if (currentController) {
@@ -784,15 +804,19 @@ window.API = (() => {
     const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(convo) : null;
     const tools = buildResponsesTools({ webSearch, imageGen, imageGenOptions });
 
+    const effort = window.APP_CONFIG.normalizeEffortForModel(
+      reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+      model
+    );
     try {
       if (provider === 'anthropic') {
-        await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, controller, handlers });
+        await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, reasoningEffort: effort, controller, handlers });
       } else if (provider === 'google') {
-        await sendGemini({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, controller, handlers });
+        await sendGemini({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, reasoningEffort: effort, controller, handlers });
       } else if (provider === 'deepseek') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
-          endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking
+          endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking, reasoningEffort: effort
         });
       } else if (provider === 'kimi') {
         await sendChatCompletions({
@@ -800,9 +824,9 @@ window.API = (() => {
           endpoint: KIMI_ENDPOINT, provider: 'kimi', thinking
         });
       } else if (tools.length || (thinking && provider === 'openai')) {
-        await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, controller, handlers });
+        await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });
       } else {
-        await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking });
+        await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort });
       }
       currentController = null;
       if (onDone) onDone({ usage: requestUsage });

@@ -26,20 +26,23 @@ window.Markdown = (() => {
   const codeBlockBodyHTML = (code, highlightedHtml, langClass) =>
     '<div class="code-block-body">'
     + '<div class="line-numbers" aria-hidden="true">' + lineNumbersText(code) + '</div>'
-    + '<code class="hljs' + langClass + '">' + highlightedHtml + '</code>'
+    + '<pre><code class="hljs' + langClass + '">' + highlightedHtml + '</code></pre>'
     + '</div>';
 
-  const wrapCodeWithLineNumbers = (pre, code) => {
-    if (!pre || !code || pre.querySelector('.code-block-body')) return;
+  const wrapCodeWithLineNumbers = (block, code) => {
+    if (!block || !code || block.querySelector('.code-block-body')) return;
     const body = document.createElement('div');
     body.className = 'code-block-body';
     const lineNums = document.createElement('div');
     lineNums.className = 'line-numbers';
     lineNums.setAttribute('aria-hidden', 'true');
     lineNums.textContent = lineNumbersText(code.textContent || '');
-    code.parentNode.insertBefore(body, code);
+    const innerPre = document.createElement('pre');
+    code.remove();
+    innerPre.appendChild(code);
     body.appendChild(lineNums);
-    body.appendChild(code);
+    body.appendChild(innerPre);
+    block.appendChild(body);
   };
 
   const highlightCode = (code, lang) => {
@@ -138,7 +141,7 @@ window.Markdown = (() => {
       + '</div>'
       + '</div>'
       + '<div class="mermaid-view"></div>'
-      + '<pre class="mermaid-source hidden">' + codeBlockBodyHTML(source, escapeHTML(source), '') + '</pre>'
+      + '<div class="mermaid-source hidden">' + codeBlockBodyHTML(source, escapeHTML(source), '') + '</div>'
       + '<script type="text/plain" class="mermaid-source-raw">' + source.replace(/<\/script/gi, '<\\/script') + '</script>'
       + '</div>';
   };
@@ -155,8 +158,8 @@ window.Markdown = (() => {
     const { html, validLang } = highlightCode(code, lang);
     const label = validLang || lang || '';
     const langClass = validLang ? ' language-' + validLang : (lang ? ' language-' + lang : '');
-    return '<pre><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang) + '</div>'
-      + codeBlockBodyHTML(code, html, langClass) + '</pre>';
+    return '<div class="code-block"><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang) + '</div>'
+      + codeBlockBodyHTML(code, html, langClass) + '</div>';
   };
 
   const parseCodeArgs = (arg, infostring) => {
@@ -392,25 +395,93 @@ window.Markdown = (() => {
     });
   };
 
+  const migrateOrphanCodeBlocks = (root) => {
+    root.querySelectorAll('.code-block-body').forEach((body) => {
+      if (body.closest('.code-block')) return;
+
+      const block = document.createElement('div');
+      block.className = 'code-block';
+      body.parentNode.insertBefore(block, body);
+
+      const prev = block.previousElementSibling;
+      if (prev?.classList.contains('pre-header')) {
+        prev.remove();
+        block.appendChild(prev);
+      }
+
+      const emptyPre = block.previousElementSibling;
+      if (emptyPre?.tagName === 'PRE' && !emptyPre.textContent.trim() && !emptyPre.querySelector('code')) {
+        emptyPre.remove();
+      }
+
+      const code = body.querySelector('code');
+      if (code && !body.querySelector('pre')) {
+        const innerPre = document.createElement('pre');
+        code.remove();
+        innerPre.appendChild(code);
+        body.appendChild(innerPre);
+      }
+
+      body.remove();
+      block.appendChild(body);
+    });
+  };
+
   const enhanceCodeBlocks = (root) => {
     if (!root) return;
+    migrateOrphanCodeBlocks(root);
     root.querySelectorAll('pre').forEach((pre) => {
+      if (pre.closest('.code-block-body')) return;
       if (pre.closest('.mermaid-block') && !pre.classList.contains('mermaid-source')) return;
+
       const code = pre.querySelector('code');
       if (!code) return;
 
-      if (!pre.querySelector('.pre-header')) {
+      let block = pre.closest('.code-block');
+      if (!block) {
+        block = document.createElement('div');
+        block.className = 'code-block';
+        pre.parentNode.insertBefore(block, pre);
+
+        const header = pre.querySelector('.pre-header');
+        if (header) {
+          header.remove();
+          block.appendChild(header);
+        } else {
+          const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
+          const headerEl = document.createElement('div');
+          headerEl.className = 'pre-header';
+          headerEl.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
+          block.appendChild(headerEl);
+          if (!code.classList.contains('hljs')) code.classList.add('hljs');
+          if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
+        }
+
+        const existingBody = pre.querySelector('.code-block-body');
+        if (existingBody) {
+          existingBody.remove();
+          block.appendChild(existingBody);
+        } else {
+          wrapCodeWithLineNumbers(block, code);
+        }
+
+        pre.remove();
+        return;
+      }
+
+      if (!block.querySelector('.pre-header')) {
         const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
         const header = document.createElement('div');
         header.className = 'pre-header';
         header.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
-        pre.insertBefore(header, pre.firstChild);
-
+        block.insertBefore(header, block.firstChild);
         if (!code.classList.contains('hljs')) code.classList.add('hljs');
         if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
       }
 
-      wrapCodeWithLineNumbers(pre, code);
+      if (!block.querySelector('.code-block-body')) {
+        wrapCodeWithLineNumbers(block, code);
+      }
     });
   };
 

@@ -94,6 +94,7 @@
         <div class="header-title">
           <div class="header-selects">
             <select id="modelSelect" class="select model-select header-select" title="Chọn model" aria-label="Chọn model"></select>
+            <select id="effortSelect" class="select header-effort-select header-select" title="Effort" aria-label="Effort"></select>
             <select id="systemPromptModeSelect" class="select header-prompt-mode-select header-select" aria-label="Chế độ"></select>
           </div>
         </div>
@@ -104,22 +105,33 @@
           <button id="copyMarkdownBtn" class="btn btn-icon" title="Sao chép Markdown">
             <span class="icon"><i class="fa-solid fa-copy"></i></span>
           </button>
-          <button id="downloadConvoBtn" class="btn btn-icon" title="Tải về Markdown">
-            <span class="icon"><i class="fa-solid fa-file-arrow-down"></i></span>
-          </button>
-          <button id="downloadTxtBtn" class="btn btn-icon" title="Tải về TXT">
-            <span class="icon"><i class="fa-solid fa-file-lines"></i></span>
-          </button>
-
-          <button id="docxExportBtn" class="btn btn-icon" title="Xuất Word (.docx)">
-            <span class="icon"><i class="fa-solid fa-file-word"></i></span>
-          </button>
-          <button id="htmlExportBtn" class="btn btn-icon" title="Xuất HTML (.html)">
-            <span class="icon"><i class="fa-solid fa-file-code"></i></span>
-          </button>
-          <button id="pdfExportBtn" class="btn btn-icon" title="Xuất PDF (A4)">
-            <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
-          </button>
+          <div id="headerDownloadWrap" class="header-download-wrap">
+            <button type="button" id="headerDownloadBtn" class="btn btn-icon" title="Xuất" aria-haspopup="menu" aria-expanded="false" aria-label="Xuất">
+              <span class="icon"><i class="fa-solid fa-download"></i></span>
+            </button>
+            <div id="headerDownloadMenu" class="header-download-menu hidden" role="menu" aria-label="Xuất">
+              <button type="button" class="header-download-option" data-export-format="md" role="menuitem">
+                <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                <span id="headerDownloadMdLabel">Xuất Markdown</span>
+              </button>
+              <button type="button" class="header-download-option" data-export-format="txt" role="menuitem">
+                <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                <span id="headerDownloadTxtLabel">Xuất TXT</span>
+              </button>
+              <button type="button" class="header-download-option" data-export-format="docx" role="menuitem">
+                <i class="fa-solid fa-file-word" aria-hidden="true"></i>
+                <span id="headerDownloadDocxLabel">Xuất Word (.docx)</span>
+              </button>
+              <button type="button" class="header-download-option" data-export-format="html" role="menuitem">
+                <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+                <span id="headerDownloadHtmlLabel">Xuất HTML (.html)</span>
+              </button>
+              <button type="button" class="header-download-option" data-export-format="pdf" role="menuitem">
+                <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                <span id="headerDownloadPdfLabel">Xuất PDF (A4)</span>
+              </button>
+            </div>
+          </div>
           <button id="headerNewChatBtn" class="btn btn-icon" title="Cuộc trò chuyện mới" aria-label="Cuộc trò chuyện mới">
             <span class="icon"><i class="fa-solid fa-plus"></i></span>
           </button>

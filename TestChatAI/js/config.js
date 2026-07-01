@@ -8,6 +8,7 @@ window.APP_CONFIG = {
     { id: 'gpt-5.5', label: 'GPT-5.5', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
+    { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
@@ -30,6 +31,7 @@ window.APP_CONFIG = {
     'gpt-5.5': { input: 5.00, output: 30.00 },
     'claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
+    'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
@@ -52,6 +54,165 @@ window.APP_CONFIG = {
   API_MAX_OUTPUT_TOKENS: 65536,
   REASONING_EFFORT: 'high',
   SEARCH_CONTEXT_SIZE: 'high',
+
+  DEFAULT_EFFORT: 'high',
+
+  EFFORT_LEVELS: {
+    openai:    ['low', 'medium', 'high'],
+    anthropic: ['low', 'medium', 'high', 'xhigh', 'max'],
+    google:    ['low', 'medium', 'high'],
+    deepseek:  ['default', 'high', 'max'],
+    kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
+  },
+
+  MODEL_EFFORT_LEVELS: {
+    'claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'claude-sonnet-4-6': ['low', 'medium', 'high', 'max'],
+    'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
+    'gemini-2.5-flash-lite': ['low', 'medium', 'high'],
+    'gemini-2.5-flash': ['low', 'medium', 'high'],
+    'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high']
+  },
+
+  ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
+
+  getEffortLevels(modelId) {
+    if (this.modelUsesAnthropicManualThinking(modelId)) {
+      return [];
+    }
+    if (this.modelUsesBinaryThinking(modelId)) {
+      return [];
+    }
+    if (this.MODEL_EFFORT_LEVELS[modelId]) {
+      return this.MODEL_EFFORT_LEVELS[modelId];
+    }
+    const provider = this.getModelProvider(modelId);
+    return this.EFFORT_LEVELS[provider] || [];
+  },
+
+  modelSupportsEffort(modelId) {
+    return this.getEffortLevels(modelId).length > 0;
+  },
+
+  modelEffortDropdownAlwaysEnabled(modelId) {
+    return this.getModelProvider(modelId) === 'deepseek';
+  },
+
+  modelUsesBinaryThinking(modelId) {
+    return this.getModelProvider(modelId) === 'kimi';
+  },
+
+  getKimiThinkingConfig(modelId, thinkingEnabled) {
+    if (this.kimiRequiresPreservedThinking(modelId)) {
+      return { type: 'enabled', keep: 'all' };
+    }
+    if (this.modelThinkingRequired(modelId)) {
+      return { type: 'enabled' };
+    }
+    return { type: thinkingEnabled ? 'enabled' : 'disabled' };
+  },
+
+  normalizeDeepSeekEffort(effort) {
+    if (effort === 'max' || effort === 'xhigh') return 'max';
+    if (effort === 'default') return 'default';
+    return 'high';
+  },
+
+  getDeepSeekThinkingConfig(reasoningEffort, thinkingEnabled) {
+    const effort = this.normalizeDeepSeekEffort(reasoningEffort);
+    if (effort === 'default' || !thinkingEnabled) {
+      return { thinking: false };
+    }
+    return { thinking: true, reasoning_effort: effort };
+  },
+
+  normalizeEffortForModel(effort, modelId) {
+    const levels = this.getEffortLevels(modelId);
+    if (!levels.length) return effort;
+
+    if (this.getModelProvider(modelId) === 'deepseek') {
+      const normalized = this.normalizeDeepSeekEffort(effort);
+      return levels.includes(normalized) ? normalized : 'high';
+    }
+
+    if (effort === 'default') {
+      const preferred = this.getDefaultEffortForModel(modelId);
+      return levels.includes(preferred) ? preferred : levels[0];
+    }
+
+    if (levels.includes(effort)) return effort;
+
+    const provider = this.getModelProvider(modelId);
+    if (provider === 'anthropic') {
+      if (effort === 'xhigh' && levels.includes('max')) return 'max';
+      if ((effort === 'max' || effort === 'xhigh') && levels.includes('high')) return 'high';
+    }
+
+    if (provider === 'openai' || provider === 'google') {
+      if (effort === 'max' || effort === 'xhigh') return this.getDefaultEffortForModel(modelId);
+      if (provider === 'google' && effort === 'minimal' && !levels.includes('minimal') && levels.includes('low')) {
+        return 'low';
+      }
+    }
+
+    return levels.includes(this.getDefaultEffortForModel(modelId))
+      ? this.getDefaultEffortForModel(modelId)
+      : levels[levels.length - 1];
+  },
+
+  getDefaultEffortForModel(modelId) {
+    if (modelId === 'gemini-3.5-flash') return 'medium';
+    return this.DEFAULT_EFFORT;
+  },
+
+  normalizeGeminiEffort(effort, modelId) {
+    return this.normalizeEffortForModel(
+      effort || this.getDefaultEffortForModel(modelId),
+      modelId
+    );
+  },
+
+  getGeminiThinkingConfig(modelId, effort) {
+    const config = { includeThoughts: true };
+    const normalized = this.normalizeGeminiEffort(effort, modelId);
+    if (this.modelUsesGeminiThinkingLevel(modelId)) {
+      config.thinkingLevel = normalized;
+      return config;
+    }
+    config.thinkingBudget = this.getGeminiThinkingBudget(modelId, normalized);
+    return config;
+  },
+
+  normalizeAnthropicApiEffort(modelId, effort) {
+    return this.normalizeEffortForModel(effort || this.DEFAULT_EFFORT, modelId);
+  },
+
+  modelUsesGeminiThinkingLevel(modelId) {
+    return /^gemini-3/.test(modelId || '');
+  },
+
+  modelUsesAnthropicAdaptiveThinking(modelId) {
+    const id = modelId || '';
+    return id === 'claude-sonnet-4-6' || id === 'claude-sonnet-5' || id === 'claude-opus-4-8';
+  },
+
+  modelUsesAnthropicManualThinking(modelId) {
+    return modelId === 'claude-haiku-4-5';
+  },
+
+  getGeminiThinkingBudget(modelId, effort) {
+    const isLite = modelId === 'gemini-2.5-flash-lite';
+    const map = isLite
+      ? { low: 512, medium: -1, high: 24576 }
+      : { low: 4096, medium: -1, high: 24576 };
+    return map[effort] ?? map.high;
+  },
+
+  getAnthropicHaikuThinkingBudget(modelId) {
+    const cap = this.getMaxOutputTokens(modelId) || 64000;
+    const budget = this.ANTHROPIC_HAIKU_THINKING_BUDGET;
+    return Math.min(budget, Math.max(1024, cap - 1));
+  },
 
   getModel(modelId) {
     const id = modelId || this.DEFAULT_MODEL;

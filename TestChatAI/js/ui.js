@@ -44,13 +44,10 @@ window.UI = (() => {
     els.settingsGuideBtn = $('#settingsGuideBtn');
     els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
     els.guideBody = $('#guideModal')?.querySelector('.guide-body');
-    els.downloadConvoBtn = $('#downloadConvoBtn');
-    els.downloadTxtBtn = $('#downloadTxtBtn');
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
-
-    els.docxExportBtn = $('#docxExportBtn');
-    els.htmlExportBtn = $('#htmlExportBtn');
-    els.pdfExportBtn = $('#pdfExportBtn');
+    els.headerDownloadWrap = $('#headerDownloadWrap');
+    els.headerDownloadBtn = $('#headerDownloadBtn');
+    els.headerDownloadMenu = $('#headerDownloadMenu');
     els.headerNewChatBtn = $('#headerNewChatBtn');
     els.pdfExportOverlay = $('#pdfExportOverlay');
     els.pdfExportLoadingTitle = $('#pdfExportLoadingTitle');
@@ -137,6 +134,7 @@ window.UI = (() => {
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
+    els.effortSelect = $('#effortSelect');
     els.toggleSidebarSearchBtn = $('#toggleSidebarSearchBtn');
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
     els.sidebarSearchInput = $('#sidebarSearchInput');
@@ -175,6 +173,9 @@ window.UI = (() => {
       els.thinkingBtn.classList.toggle('is-active', active);
       els.thinkingBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    const thinkingActive = showThinking && (!!thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId));
+    const reasoningEffort = window.Storage.get().reasoningEffort;
+    syncEffortSelect(modelId, reasoningEffort, thinkingActive);
     if (els.translateBtn) {
       const active = !!translateEnabled;
       els.translateBtn.classList.toggle('is-active', active);
@@ -491,6 +492,45 @@ window.UI = (() => {
     ).join('');
   };
 
+  const EFFORT_LABEL_KEYS = {
+    minimal: 'effortMinimal',
+    default: 'effortDefault',
+    low: 'effortLow',
+    medium: 'effortMedium',
+    high: 'effortHigh',
+    xhigh: 'effortXhigh',
+    max: 'effortMax'
+  };
+
+  const initEffortSelect = (modelId, currentEffort, thinkingActive) => {
+    if (!els.effortSelect) return;
+    const levels = window.APP_CONFIG.getEffortLevels(modelId);
+    if (!levels.length) {
+      els.effortSelect.classList.add('hidden');
+      els.effortSelect.disabled = false;
+      return;
+    }
+    els.effortSelect.classList.remove('hidden');
+    const t = window.I18n.t;
+    const fallback = window.APP_CONFIG.getModelProvider(modelId) === 'deepseek'
+      ? 'high'
+      : window.APP_CONFIG.getDefaultEffortForModel(modelId);
+    const normalized = window.APP_CONFIG.normalizeEffortForModel(currentEffort, modelId);
+    const selected = levels.includes(normalized) ? normalized : fallback;
+    els.effortSelect.innerHTML = levels.map((lv) =>
+      '<option value="' + lv + '"' + (lv === selected ? ' selected' : '') + '>'
+      + escapeHTML(t(EFFORT_LABEL_KEYS[lv] || lv)) + '</option>'
+    ).join('');
+    const alwaysEnabled = window.APP_CONFIG.modelEffortDropdownAlwaysEnabled(modelId);
+    const active = alwaysEnabled || thinkingActive !== false;
+    els.effortSelect.disabled = !active;
+    els.effortSelect.classList.toggle('is-disabled', !active);
+  };
+
+  const syncEffortSelect = (modelId, currentEffort, thinkingActive) => {
+    initEffortSelect(modelId, currentEffort, thinkingActive);
+  };
+
   const userFilesHTML = (files) => {
     if (!files || !files.length) return '';
     return '<div class="message-files">' + files.map((f) =>
@@ -542,7 +582,7 @@ window.UI = (() => {
     'hello-kitty': '#fff5f9',
     cyberpunk: '#0a0a12',
     nvidia: '#0d0d0d',
-    'liquid-glass': '#1a4a7a'
+    'liquid-glass': '#0d0d0f'
   };
   const THEME_ICONS = {
     dark: '<i class="fa-solid fa-sun"></i>',
@@ -1230,7 +1270,14 @@ window.UI = (() => {
   const scrollStreamingCodeToEnd = (root, text) => {
     if (!root || !hasOpenCodeFence(text)) return;
 
-    const pres = root.querySelectorAll('pre');
+    const blocks = root.querySelectorAll('.code-block');
+    const lastBlock = blocks[blocks.length - 1];
+    if (lastBlock) {
+      scrollElementToEnd(lastBlock, { streaming: true });
+      return;
+    }
+
+    const pres = root.querySelectorAll('pre:not(.code-block-body pre)');
     const lastPre = pres[pres.length - 1];
     if (!lastPre) return;
 
@@ -1681,6 +1728,24 @@ window.UI = (() => {
     });
   };
 
+  const closeHeaderDownloadMenu = () => {
+    if (!els.headerDownloadMenu) return;
+    els.headerDownloadMenu.classList.add('hidden');
+    if (els.headerDownloadBtn) els.headerDownloadBtn.setAttribute('aria-expanded', 'false');
+  };
+
+  const toggleHeaderDownloadMenu = () => {
+    if (!els.headerDownloadMenu || !els.headerDownloadBtn) return;
+    const open = els.headerDownloadMenu.classList.contains('hidden');
+    els.headerDownloadMenu.classList.toggle('hidden', !open);
+    els.headerDownloadBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  const setHeaderDownloadOptionDisabled = (format, disabled) => {
+    const option = els.headerDownloadMenu?.querySelector(`[data-export-format="${format}"]`);
+    if (option) option.disabled = disabled;
+  };
+
   const downloadConversation = (convo) => {
     const { formatConversation, downloadFile } = window.Utils;
     const md = formatConversation(convo);
@@ -1760,7 +1825,7 @@ window.UI = (() => {
   };
 
   return {
-    cacheEls, setTheme, initModelSelect, initTranslateLangMenu, initImageGenMenus,
+    cacheEls, setTheme, initModelSelect, initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,
@@ -1784,6 +1849,7 @@ window.UI = (() => {
     selectAllExportMessages, clearExportSelection,
     preparePdfExportRoot,
     closeAllMsgExportMenus,
+    closeHeaderDownloadMenu, toggleHeaderDownloadMenu, setHeaderDownloadOptionDisabled,
     els
   };
 })();

@@ -369,9 +369,9 @@
   max-height: min(50vh, 400px);
 }
 
-.message .content .mermaid-block .mermaid-source code {
+.message .content .mermaid-block .mermaid-source .code-block-body code {
   display: block;
-  padding: 14px;
+  padding: 14px 14px 14px 12px;
   font-family: "SFMono-Regular", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
@@ -387,7 +387,7 @@
   display: block;
 }
 
-.message .content pre {
+.message .content .code-block {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -397,6 +397,17 @@
   max-height: min(70vh, 560px);
 }
 
+.message .content pre:not(.code-block-body pre) {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  margin: 14px 0;
+  overflow: auto;
+  max-height: min(70vh, 560px);
+}
+
+.message.streaming .content .code-block,
 .message.streaming .content pre,
 .message.streaming .content .mermaid-pending,
 .message.streaming .content .mermaid-source,
@@ -407,6 +418,7 @@
   -ms-overflow-style: none;
 }
 
+.message.streaming .content .code-block::-webkit-scrollbar,
 .message.streaming .content pre::-webkit-scrollbar,
 .message.streaming .content .mermaid-pending::-webkit-scrollbar,
 .message.streaming .content .mermaid-source::-webkit-scrollbar,
@@ -423,6 +435,7 @@
   display: none;
 }
 
+.message .content .code-block .pre-header,
 .message .content pre .pre-header {
   display: flex;
   justify-content: space-between;
@@ -438,12 +451,14 @@
   flex-shrink: 0;
 }
 
+.message .content .code-block .pre-header-actions,
 .message .content pre .pre-header-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
+.message .content .code-block .preview-md-btn,
 .message .content pre .preview-md-btn {
   background: transparent;
   color: var(--text-dim);
@@ -459,11 +474,13 @@
   justify-content: center;
 }
 
+.message .content .code-block .preview-md-btn:hover,
 .message .content pre .preview-md-btn:hover {
   color: var(--accent);
   background: var(--bg-hover);
 }
 
+.message .content .code-block .copy-code-btn,
 .message .content pre .copy-code-btn {
   background: transparent;
   color: var(--text-dim);
@@ -479,15 +496,27 @@
   align-items: center;
   justify-content: center;
 }
+.message .content .code-block .copy-code-btn:hover,
 .message .content pre .copy-code-btn:hover { color: var(--text); background: var(--bg-hover); }
 
-.message .content pre .code-block-body {
+.message .content .code-block-body {
   display: flex;
   align-items: flex-start;
   min-width: 100%;
 }
 
-.message .content pre .line-numbers {
+.message .content .code-block-body pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  max-height: none;
+}
+
+.message .content .line-numbers {
   flex-shrink: 0;
   padding: 14px 10px 14px 14px;
   margin: 0;
@@ -506,6 +535,7 @@
   z-index: 1;
 }
 
+.message .content .code-block-body code,
 .message .content pre code {
   display: block;
   flex: 1;

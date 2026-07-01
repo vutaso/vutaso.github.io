@@ -84,10 +84,23 @@ window.PdfExport = (() => {
         continue;
       }
 
-      if (tag === 'pre') {
+      if (el.classList.contains('code-block')) {
         style.backgroundColor = PDF_LIGHT.codeBg;
         style.borderColor = PDF_LIGHT.border;
         style.color = PDF_LIGHT.text;
+        continue;
+      }
+
+      if (tag === 'pre') {
+        if (el.closest('.code-block-body')) {
+          style.backgroundColor = 'transparent';
+          style.borderColor = 'transparent';
+          style.color = PDF_LIGHT.text;
+        } else {
+          style.backgroundColor = PDF_LIGHT.codeBg;
+          style.borderColor = PDF_LIGHT.border;
+          style.color = PDF_LIGHT.text;
+        }
         continue;
       }
 
@@ -147,7 +160,7 @@ window.PdfExport = (() => {
   };
 
   const expandScrollablesForExport = (root) => {
-    root.querySelectorAll('pre, pre code, .table-scroll, .mermaid-view, .content').forEach((el) => {
+    root.querySelectorAll('.code-block, pre:not(.code-block-body pre), pre code, .table-scroll, .mermaid-view, .content').forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       el.style.maxHeight = 'none';
       el.style.height = 'auto';
@@ -155,7 +168,7 @@ window.PdfExport = (() => {
       el.style.overflowX = 'visible';
       el.style.overflowY = 'visible';
     });
-    root.querySelectorAll('pre .pre-header').forEach((el) => {
+    root.querySelectorAll('.code-block .pre-header, pre .pre-header').forEach((el) => {
       if (el instanceof HTMLElement) el.style.position = 'static';
     });
   };

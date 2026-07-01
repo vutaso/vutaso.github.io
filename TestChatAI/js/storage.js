@@ -17,6 +17,7 @@ window.Storage = (() => {
     webSearchEnabled: false,
     imageGenEnabled: false,
     thinkingEnabled: false,
+    reasoningEffort: window.APP_CONFIG.DEFAULT_EFFORT,
     imageGenRatio: window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
     imageGenStyle: window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
     imageGenTemplate: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
@@ -195,6 +196,17 @@ window.Storage = (() => {
     const validTemplates = window.APP_CONFIG.IMAGE_GEN_TEMPLATES.map((t) => t.id);
     if (!validTemplates.includes(state.imageGenTemplate)) {
       state.imageGenTemplate = window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE;
+    }
+    const allEfforts = ['minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'default'];
+    if (!allEfforts.includes(state.reasoningEffort)) {
+      state.reasoningEffort = window.APP_CONFIG.DEFAULT_EFFORT;
+    }
+    state.reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(state.reasoningEffort, state.currentModel);
+    if (window.APP_CONFIG.getModelProvider(state.currentModel) === 'deepseek') {
+      state.thinkingEnabled = state.reasoningEffort !== 'default';
+    }
+    if (window.APP_CONFIG.modelThinkingRequired(state.currentModel)) {
+      state.thinkingEnabled = true;
     }
     if (!window.APP_CONFIG.LOCALES.includes(state.locale)) {
       state.locale = window.APP_CONFIG.DEFAULT_LOCALE;
