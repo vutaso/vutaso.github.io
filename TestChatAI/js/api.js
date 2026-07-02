@@ -1,5 +1,5 @@
 window.API = (() => {
-  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
+  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, NVIDIA_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
 
   let currentController = null;
   const isStreaming = () => currentController !== null;
@@ -185,6 +185,14 @@ window.API = (() => {
     return tools;
   };
 
+  const normalizeByteplusResponsesInput = (input) => input.map((msg) => {
+    if (msg.role !== 'user' || typeof msg.content !== 'string' || !msg.content) return msg;
+    return {
+      role: msg.role,
+      content: [{ type: 'input_text', text: msg.content }]
+    };
+  });
+
   const mergeGroundingMetadata = (prev, next) => {
     if (!next) return prev;
     if (!prev) return { ...next };
@@ -228,6 +236,8 @@ window.API = (() => {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
       } else if (provider === 'google' && errJson.error) {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
+      } else if (provider === 'nvidia') {
+        errMsg = errJson.detail || errJson.error?.message || errJson.title || errMsg;
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -520,6 +530,58 @@ window.API = (() => {
     return body;
   };
 
+  const buildByteplusBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const apiModel = window.APP_CONFIG.getApiModel(model);
+    const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
+    const body = withStreamUsage({
+      model: apiModel,
+      messages: buildDeepseekMessages(convo, systemPrompt),
+      stream: true,
+      thinking: { type: cfg.thinking ? 'enabled' : 'disabled' }
+    });
+    if (cfg.reasoning_effort) {
+      body.reasoning_effort = cfg.reasoning_effort;
+    }
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    return body;
+  };
+
+  const buildNvidiaBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      messages: buildMessages(convo, systemPrompt),
+      stream: true
+    };
+    if (window.APP_CONFIG.modelUsesNemotronReasoning(model)) {
+      const effort = thinking
+        ? window.APP_CONFIG.normalizeNemotronEffort(reasoningEffort)
+        : 'default';
+      if (effort === 'default') {
+        body.reasoning_effort = 'none';
+        body.chat_template_kwargs = { enable_thinking: false };
+      } else if (effort === 'medium') {
+        body.reasoning_effort = 'medium';
+        body.chat_template_kwargs = { enable_thinking: true, medium_effort: true };
+      } else {
+        body.reasoning_effort = 'high';
+        body.chat_template_kwargs = { enable_thinking: true };
+      }
+    } else if (!thinking) {
+      body.reasoning_effort = 'none';
+    } else {
+      const effort = window.APP_CONFIG.normalizeDeepSeekEffort(reasoningEffort);
+      body.reasoning_effort = effort === 'max' ? 'max' : 'high';
+    }
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    return body;
+  };
+
   const buildKimiMessages = (convo, systemPrompt, modelId) => {
     const msgs = [];
     if (systemPrompt && systemPrompt.trim()) {
@@ -577,9 +639,13 @@ window.API = (() => {
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
-      : provider === 'kimi'
-        ? buildKimiBody(model, systemPrompt, convo, thinking)
-        : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
+      : provider === 'byteplus'
+        ? buildByteplusBody(model, systemPrompt, convo, thinking, reasoningEffort)
+        : provider === 'nvidia'
+          ? buildNvidiaBody(model, systemPrompt, convo, thinking, reasoningEffort)
+          : provider === 'kimi'
+            ? buildKimiBody(model, systemPrompt, convo, thinking)
+            : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
 
     const headers = { 'Content-Type': 'application/json' };
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
@@ -591,7 +657,7 @@ window.API = (() => {
       signal: controller.signal
     });
 
-    if (!res.ok) throw await parseApiError(res);
+    if (!res.ok) throw await parseApiError(res, provider || 'openai');
     if (!res.body || !res.body.getReader) {
       throw new Error('Trình duyệt không hỗ trợ streaming response');
     }
@@ -701,6 +767,59 @@ window.API = (() => {
     });
 
     if (!res.ok) throw await parseApiError(res, 'google');
+    if (!res.body || !res.body.getReader) {
+      throw new Error('Trình duyệt không hỗ trợ streaming response');
+    }
+
+    await readSseStream(res.body.getReader(), handlers);
+  };
+
+  const sendByteplusResponses = async ({ apiKey, model, systemPrompt, convo, thinking, reasoningEffort, controller, handlers }) => {
+    const input = normalizeByteplusResponsesInput(buildConversationMessages(convo, 'responses'));
+    if (!input.length) {
+      throw new Error('Không có tin nhắn để gửi');
+    }
+
+    const mcpTools = window.APP_CONFIG.getByteplusMcpTools(model);
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      input,
+      stream: true
+    };
+    if (mcpTools.length) {
+      body.tools = mcpTools;
+    }
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_output_tokens = maxOutputTokens;
+    }
+    if (systemPrompt && systemPrompt.trim()) {
+      body.instructions = systemPrompt.trim();
+    }
+    if (thinking) {
+      const effort = window.APP_CONFIG.normalizeEffortForModel(
+        reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+        model
+      );
+      body.reasoning = { effort };
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + apiKey
+    };
+    if (mcpTools.length) {
+      headers['ark-beta-mcp'] = 'true';
+    }
+
+    const res = await fetch(window.APP_CONFIG.getByteplusEndpoint(model), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'byteplus');
     if (!res.body || !res.body.getReader) {
       throw new Error('Trình duyệt không hỗ trợ streaming response');
     }
@@ -818,6 +937,28 @@ window.API = (() => {
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking, reasoningEffort: effort
         });
+      } else if (provider === 'nvidia') {
+        if (window.APP_CONFIG.nvidiaRequiresProxy() && !window.APP_CONFIG.NVIDIA_PROXY_ENDPOINT) {
+          throw new Error(window.APP_CONFIG.getNvidiaProxyRequiredError());
+        }
+        await sendChatCompletions({
+          apiKey, model, systemPrompt, convo, controller, handlers,
+          endpoint: window.APP_CONFIG.getNvidiaEndpoint(), provider: 'nvidia', thinking, reasoningEffort: effort
+        });
+      } else if (provider === 'byteplus') {
+        if (window.APP_CONFIG.byteplusRequiresProxy() && !window.APP_CONFIG.getByteplusProxyEndpoint(model)) {
+          throw new Error(window.APP_CONFIG.getByteplusProxyRequiredError());
+        }
+        if (window.APP_CONFIG.modelUsesByteplusResponses(model)) {
+          await sendByteplusResponses({
+            apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort
+          });
+        } else {
+          await sendChatCompletions({
+            apiKey, model, systemPrompt, convo, controller, handlers,
+            endpoint: window.APP_CONFIG.getByteplusEndpoint(model), provider: 'byteplus', thinking, reasoningEffort: effort
+          });
+        }
       } else if (provider === 'kimi') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
@@ -836,7 +977,7 @@ window.API = (() => {
         if (onDone) onDone({ aborted: true, usage: requestUsage });
         return;
       }
-      if (onError) onError(err);
+      if (onError) onError(new Error(window.APP_CONFIG.formatApiError(err, model)));
     }
   };
 

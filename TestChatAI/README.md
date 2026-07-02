@@ -273,16 +273,26 @@ Chỉnh sửa `js/config.js` nếu cần:
 
 ## Cloudflare Worker (tùy chọn)
 
-Thư mục `worker/` chứa proxy Cloudflare cho DeepSeek (tránh CORS khi cần). Triển khai:
+Thư mục `worker/` chứa proxy Cloudflare:
+
+- **DeepSeek** — tránh CORS khi cần (dùng API key server-side)
+- **NVIDIA** — **bắt buộc** cho model DeepSeek V4 Flash (NVIDIA), vì `integrate.api.nvidia.com` không hỗ trợ CORS từ trình duyệt
+
+Triển khai:
 
 ```bash
 cd worker
 npm install
-npx wrangler secret put DEEPSEEK_API_KEY
+npx wrangler secret put DEEPSEEK_API_KEY   # chỉ cần nếu dùng proxy DeepSeek
 npx wrangler deploy
 ```
 
-Sau khi deploy, cập nhật `DEEPSEEK_PROXY_ENDPOINT` trong `js/config.js` bằng URL workers.dev nhận được.
+Sau khi deploy, cập nhật trong `js/config.js`:
+
+- `DEEPSEEK_PROXY_ENDPOINT` — URL workers.dev (path gốc)
+- `NVIDIA_PROXY_ENDPOINT` — cùng URL + `/nvidia` (ví dụ `https://testchatai-deepseek-proxy.<account>.workers.dev/nvidia`)
+
+API key NVIDIA do người dùng nhập trong Cài đặt; worker chỉ chuyển tiếp header `Authorization`, không lưu key.
 
 ---
 

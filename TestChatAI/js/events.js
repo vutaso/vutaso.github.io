@@ -568,8 +568,8 @@ window.Events = (() => {
     }
     const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const useImageGen = !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
-    const isDeepSeek = window.APP_CONFIG.getModelProvider(modelId) === 'deepseek';
-    const useThinking = isDeepSeek
+    const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
+    const useThinking = isEffortThinking
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
       : (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
         && window.APP_CONFIG.modelSupportsThinking(modelId);
@@ -1270,7 +1270,7 @@ window.Events = (() => {
       if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
       if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
       if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
-      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+      if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
         thinkingEnabled = reasoningEffort !== 'default';
       }
       if (window.APP_CONFIG.modelUsesBinaryThinking(modelId)) {
@@ -1294,7 +1294,7 @@ window.Events = (() => {
       const effort = ui.els.effortSelect.value;
       const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       const patch = { reasoningEffort: effort };
-      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+      if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
         patch.thinkingEnabled = effort !== 'default';
       }
       state.set(patch);
@@ -1320,7 +1320,7 @@ window.Events = (() => {
       if (window.APP_CONFIG.modelThinkingRequired(modelId)) return;
       const next = !s.thinkingEnabled;
       const patch = { thinkingEnabled: next };
-      if (window.APP_CONFIG.getModelProvider(modelId) === 'deepseek') {
+      if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
         patch.reasoningEffort = next
           ? (s.reasoningEffort === 'default' ? 'high' : s.reasoningEffort)
           : 'default';
@@ -1535,6 +1535,18 @@ window.Events = (() => {
       ui.els.deepseekApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
+    ui.els.toggleNvidiaApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.nvidiaApiKeyInput.type === 'password';
+      ui.els.nvidiaApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.nvidiaApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
+    ui.els.toggleByteplusApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.byteplusApiKeyInput.type === 'password';
+      ui.els.byteplusApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.byteplusApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
     ui.els.toggleGeminiApiKeyBtn.addEventListener('click', () => {
       const isPwd = ui.els.geminiApiKeyInput.type === 'password';
       ui.els.geminiApiKeyInput.type = isPwd ? 'text' : 'password';
@@ -1571,6 +1583,8 @@ window.Events = (() => {
       const apiKey = ui.els.apiKeyInput.value.trim();
       const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
       const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
+      const nvidiaApiKey = ui.els.nvidiaApiKeyInput.value.trim();
+      const byteplusApiKey = ui.els.byteplusApiKeyInput.value.trim();
       const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
       const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
       const prev = state.get();
@@ -1599,7 +1613,7 @@ window.Events = (() => {
       const theme = ui.els.settingsThemeSelect?.value || 'dark';
       const prevTheme = prev.theme;
       const nextState = {
-        apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey,
+        apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey,
         systemPrompt, systemPromptMode: mode, theme, locale
       };
       state.set(nextState);
@@ -1663,6 +1677,8 @@ window.Events = (() => {
       ui.els.apiKeyInput,
       ui.els.anthropicApiKeyInput,
       ui.els.deepseekApiKeyInput,
+      ui.els.nvidiaApiKeyInput,
+      ui.els.byteplusApiKeyInput,
       ui.els.geminiApiKeyInput,
       ui.els.kimiApiKeyInput,
       ui.els.systemPromptInput,

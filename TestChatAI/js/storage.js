@@ -11,6 +11,8 @@ window.Storage = (() => {
     apiKey: '',
     anthropicApiKey: '',
     deepseekApiKey: '',
+    nvidiaApiKey: '',
+    byteplusApiKey: '',
     geminiApiKey: '',
     kimiApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
@@ -202,7 +204,7 @@ window.Storage = (() => {
       state.reasoningEffort = window.APP_CONFIG.DEFAULT_EFFORT;
     }
     state.reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(state.reasoningEffort, state.currentModel);
-    if (window.APP_CONFIG.getModelProvider(state.currentModel) === 'deepseek') {
+    if (window.APP_CONFIG.modelUsesEffortLinkedThinking(state.currentModel)) {
       state.thinkingEnabled = state.reasoningEffort !== 'default';
     }
     if (window.APP_CONFIG.modelThinkingRequired(state.currentModel)) {
@@ -354,6 +356,8 @@ window.Storage = (() => {
       apiKey: state.apiKey,
       anthropicApiKey: state.anthropicApiKey,
       deepseekApiKey: state.deepseekApiKey,
+      nvidiaApiKey: state.nvidiaApiKey,
+      byteplusApiKey: state.byteplusApiKey,
       geminiApiKey: state.geminiApiKey,
       kimiApiKey: state.kimiApiKey,
       currentModel: state.currentModel,

@@ -11,6 +11,11 @@ window.APP_CONFIG = {
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'nvidia-deepseek-v4-flash', apiModel: 'deepseek-ai/deepseek-v4-flash', label: 'DeepSeek V4 Flash (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola-Seed-2.0-mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'nvidia-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b', label: 'Nemotron 3 Ultra (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
@@ -34,6 +39,11 @@ window.APP_CONFIG = {
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
+    'nvidia-deepseek-v4-flash': { input: 0.14, output: 0.28 },
+    'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
+    'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
+    'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
+    'nvidia-nemotron-3-ultra-550b-a55b': { input: 0.50, output: 2.20 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
     'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
     'gemini-2.5-flash': { input: 0.30, output: 2.50 },
@@ -62,6 +72,8 @@ window.APP_CONFIG = {
     anthropic: ['low', 'medium', 'high', 'xhigh', 'max'],
     google:    ['low', 'medium', 'high'],
     deepseek:  ['default', 'high', 'max'],
+    nvidia:    ['default', 'high', 'max'],
+    byteplus:  ['default', 'high', 'max'],
     kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
   },
 
@@ -71,7 +83,9 @@ window.APP_CONFIG = {
     'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
     'gemini-2.5-flash-lite': ['low', 'medium', 'high'],
     'gemini-2.5-flash': ['low', 'medium', 'high'],
-    'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high']
+    'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
+    'nvidia-nemotron-3-ultra-550b-a55b': ['default', 'medium', 'high'],
+    'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -95,7 +109,13 @@ window.APP_CONFIG = {
   },
 
   modelEffortDropdownAlwaysEnabled(modelId) {
-    return this.getModelProvider(modelId) === 'deepseek';
+    return this.modelUsesEffortLinkedThinking(modelId);
+  },
+
+  modelUsesEffortLinkedThinking(modelId) {
+    if (this.modelUsesByteplusResponses(modelId)) return false;
+    const provider = this.getModelProvider(modelId);
+    return provider === 'deepseek' || provider === 'nvidia' || provider === 'byteplus';
   },
 
   modelUsesBinaryThinking(modelId) {
@@ -118,6 +138,19 @@ window.APP_CONFIG = {
     return 'high';
   },
 
+  normalizeNemotronEffort(effort) {
+    if (effort === 'default') return 'default';
+    if (effort === 'medium') return 'medium';
+    if (effort === 'high' || effort === 'max' || effort === 'xhigh') return 'high';
+    return 'high';
+  },
+
+  modelUsesNemotronReasoning(modelId) {
+    const model = this.getModel(modelId);
+    const apiModel = model.apiModel || model.id;
+    return /nemotron/i.test(apiModel);
+  },
+
   getDeepSeekThinkingConfig(reasoningEffort, thinkingEnabled) {
     const effort = this.normalizeDeepSeekEffort(reasoningEffort);
     if (effort === 'default' || !thinkingEnabled) {
@@ -130,7 +163,11 @@ window.APP_CONFIG = {
     const levels = this.getEffortLevels(modelId);
     if (!levels.length) return effort;
 
-    if (this.getModelProvider(modelId) === 'deepseek') {
+    if (this.modelUsesEffortLinkedThinking(modelId)) {
+      if (this.modelUsesNemotronReasoning(modelId)) {
+        const normalized = this.normalizeNemotronEffort(effort);
+        return levels.includes(normalized) ? normalized : 'high';
+      }
       const normalized = this.normalizeDeepSeekEffort(effort);
       return levels.includes(normalized) ? normalized : 'high';
     }
@@ -162,6 +199,7 @@ window.APP_CONFIG = {
 
   getDefaultEffortForModel(modelId) {
     if (modelId === 'gemini-3.5-flash') return 'medium';
+    if (modelId === 'byteplus-dola-seed-2-0-mini') return 'medium';
     return this.DEFAULT_EFFORT;
   },
 
@@ -219,6 +257,11 @@ window.APP_CONFIG = {
     return this.MODELS.find((m) => m.id === id) || this.MODELS[0];
   },
 
+  getApiModel(modelId) {
+    const model = this.getModel(modelId);
+    return model.apiModel || model.id;
+  },
+
   getModelPricing(modelId) {
     return this.MODEL_PRICING[modelId || this.DEFAULT_MODEL] || null;
   },
@@ -249,6 +292,8 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
+    if (provider === 'nvidia') return state.nvidiaApiKey || '';
+    if (provider === 'byteplus') return state.byteplusApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
     if (provider === 'kimi') return state.kimiApiKey || '';
     return state.apiKey || '';
@@ -259,6 +304,8 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
+    if (provider === 'nvidia') return 'Enter your NVIDIA API key in Settings first';
+    if (provider === 'byteplus') return 'Enter your Byte Plus API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
     if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
     return 'Enter your API key in Settings first';
@@ -269,9 +316,42 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
+    if (provider === 'nvidia') return 'No NVIDIA API key. Open Settings to enter one.';
+    if (provider === 'byteplus') return 'No Byte Plus API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
     if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
+  },
+
+  getNvidiaProxyRequiredError() {
+    if (window.I18n) return window.I18n.t('nvidiaProxyRequired');
+    return 'NVIDIA API requires a CORS proxy. Deploy worker/ and set NVIDIA_PROXY_ENDPOINT in config.js.';
+  },
+
+  getByteplusProxyRequiredError() {
+    if (window.I18n) return window.I18n.t('byteplusProxyRequired');
+    return 'Byte Plus API requires a CORS proxy. Deploy worker/ and set BYTEPLUS_PROXY_ENDPOINT in config.js.';
+  },
+
+  formatApiError(err, modelId) {
+    const msg = err?.message || String(err || '');
+    const isNetwork = /load failed|failed to fetch|networkerror|network error/i.test(msg);
+    const provider = this.getModelProvider(modelId);
+    if (isNetwork && provider === 'nvidia') {
+      if (!this.NVIDIA_PROXY_ENDPOINT) {
+        return this.getNvidiaProxyRequiredError();
+      }
+      if (window.I18n) return window.I18n.t('nvidiaProxyNetworkError');
+      return 'Could not reach NVIDIA proxy. Check API key, use a local server (not file://), and redeploy worker/.';
+    }
+    if (isNetwork && provider === 'byteplus') {
+      if (!this.getByteplusProxyEndpoint(modelId)) {
+        return this.getByteplusProxyRequiredError();
+      }
+      if (window.I18n) return window.I18n.t('byteplusProxyNetworkError');
+      return 'Could not reach Byte Plus proxy. Check API key, use a local server (not file://), and redeploy worker/.';
+    }
+    return msg;
   },
 
   hasApiKey(state, modelId) {
@@ -407,11 +487,65 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
+  NVIDIA_ENDPOINT: 'https://integrate.api.nvidia.com/v1/chat/completions',
+  // Cloudflare Worker proxy — bắt buộc cho NVIDIA (API không hỗ trợ CORS từ trình duyệt).
+  // Deploy: cd worker && npx wrangler deploy → dán URL + '/nvidia' vào đây.
+  NVIDIA_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/nvidia',
+  BYTEPLUS_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/completions',
+  BYTEPLUS_RESPONSES_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/responses',
+  // Deploy: cd worker && npx wrangler deploy → dán URL + '/byteplus' vào đây.
+  BYTEPLUS_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus',
+  BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus-responses',
+
+  BYTEPLUS_MCP_TOOLS: {
+    'byteplus-dola-seed-2-0-mini': [
+      {
+        type: 'mcp',
+        server_label: 'deepwiki',
+        server_url: 'https://mcp.deepwiki.com/mcp',
+        require_approval: 'never'
+      }
+    ]
+  },
   KIMI_ENDPOINT: 'https://api.moonshot.ai/v1/chat/completions',
   GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
 
   geminiStreamUrl(modelId) {
     return this.GEMINI_API_BASE + '/' + modelId + ':streamGenerateContent?alt=sse';
+  },
+
+  getNvidiaEndpoint() {
+    return this.NVIDIA_PROXY_ENDPOINT || this.NVIDIA_ENDPOINT;
+  },
+
+  nvidiaRequiresProxy() {
+    return true;
+  },
+
+  getByteplusEndpoint(modelId) {
+    if (this.modelUsesByteplusResponses(modelId)) {
+      return this.BYTEPLUS_RESPONSES_PROXY_ENDPOINT || this.BYTEPLUS_RESPONSES_ENDPOINT;
+    }
+    return this.BYTEPLUS_PROXY_ENDPOINT || this.BYTEPLUS_ENDPOINT;
+  },
+
+  getByteplusProxyEndpoint(modelId) {
+    if (this.modelUsesByteplusResponses(modelId)) {
+      return this.BYTEPLUS_RESPONSES_PROXY_ENDPOINT;
+    }
+    return this.BYTEPLUS_PROXY_ENDPOINT;
+  },
+
+  modelUsesByteplusResponses(modelId) {
+    return this.getModel(modelId).apiMode === 'responses';
+  },
+
+  getByteplusMcpTools(modelId) {
+    return this.BYTEPLUS_MCP_TOOLS[modelId] || [];
+  },
+
+  byteplusRequiresProxy() {
+    return true;
   },
 
   // Model chat → model tạo ảnh (Nano Banana) khi bật Tạo hình ảnh

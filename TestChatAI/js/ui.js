@@ -28,6 +28,10 @@ window.UI = (() => {
     els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
     els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
+    els.nvidiaApiKeyInput = $('#nvidiaApiKeyInput');
+    els.nvidiaApiKeyIcon = $('#nvidiaApiKeyIcon');
+    els.byteplusApiKeyInput = $('#byteplusApiKeyInput');
+    els.byteplusApiKeyIcon = $('#byteplusApiKeyIcon');
     els.geminiApiKeyInput = $('#geminiApiKeyInput');
     els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
     els.kimiApiKeyInput = $('#kimiApiKeyInput');
@@ -65,6 +69,8 @@ window.UI = (() => {
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
+    els.toggleNvidiaApiKeyBtn = $('#toggleNvidiaApiKeyBtn');
+    els.toggleByteplusApiKeyBtn = $('#toggleByteplusApiKeyBtn');
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
@@ -512,7 +518,7 @@ window.UI = (() => {
     }
     els.effortSelect.classList.remove('hidden');
     const t = window.I18n.t;
-    const fallback = window.APP_CONFIG.getModelProvider(modelId) === 'deepseek'
+    const fallback = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)
       ? 'high'
       : window.APP_CONFIG.getDefaultEffortForModel(modelId);
     const normalized = window.APP_CONFIG.normalizeEffortForModel(currentEffort, modelId);
@@ -1316,7 +1322,12 @@ window.UI = (() => {
     const div = document.createElement('div');
     div.className = 'error-banner';
     div.id = 'errorBanner';
-    div.textContent = t('toastErrorApiKey', { err: err.message || err });
+    const msg = err?.message || String(err || '');
+    const key = /cors|proxy|load failed|failed to fetch|network/i.test(msg)
+      && !/api key|authorization|forbidden|401|403/i.test(msg)
+      ? 'toastErrorNetwork'
+      : 'toastErrorApiKey';
+    div.textContent = t(key, { err: msg });
     els.composer.insertAdjacentElement('beforebegin', div);
   };
 
@@ -1509,6 +1520,8 @@ window.UI = (() => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
+    els.nvidiaApiKeyInput.value = state.nvidiaApiKey || '';
+    els.byteplusApiKeyInput.value = state.byteplusApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
@@ -1521,6 +1534,10 @@ window.UI = (() => {
     els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.deepseekApiKeyInput.type = 'password';
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.nvidiaApiKeyInput.type = 'password';
+    els.nvidiaApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.byteplusApiKeyInput.type = 'password';
+    els.byteplusApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.geminiApiKeyInput.type = 'password';
     els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.kimiApiKeyInput.type = 'password';
