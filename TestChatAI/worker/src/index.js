@@ -7,8 +7,13 @@ const ALLOWED_NVIDIA_MODELS = new Set([
   'deepseek-ai/deepseek-v4-flash',
   'nvidia/nemotron-3-ultra-550b-a55b'
 ]);
-const ALLOWED_BYTEPLUS_MODELS = new Set(['deepseek-v4-flash-260425', 'glm-5-2-260617']);
-const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set(['seed-2-0-mini-260428']);
+const ALLOWED_BYTEPLUS_MODELS = new Set(['deepseek-v4-flash-260425', 'glm-5-2-260617', 'gpt-oss-120b-250805']);
+const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
+  'seed-2-0-lite-260428',
+  'seed-2-0-mini-260428',
+  'seed-2-0-pro-260328',
+  'seed-2-0-code-preview-260328'
+]);
 
 const DEFAULT_ORIGINS = [
   'https://vutaso.com',

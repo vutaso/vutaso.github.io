@@ -678,6 +678,7 @@ window.Events = (() => {
         refreshStreamingContent();
       },
       onReasoningToken: (delta) => {
+        if (!useThinking) return;
         reasoningBuffer += delta;
         if (streamingContext) streamingContext.reasoningBuffer = reasoningBuffer;
         refreshStreamingContent();
@@ -1580,17 +1581,14 @@ window.Events = (() => {
     };
 
     const applySettingsFromForm = () => {
-      const apiKey = ui.els.apiKeyInput.value.trim();
-      const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
-      const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
-      const nvidiaApiKey = ui.els.nvidiaApiKeyInput.value.trim();
-      const byteplusApiKey = ui.els.byteplusApiKeyInput.value.trim();
-      const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
-      const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
       const prev = state.get();
-      const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
-      let mode = ui.els.systemPromptModeSelect?.value || 'default';
+      const settingsOpen = ui.els.settingsModal && !ui.els.settingsModal.classList.contains('hidden');
+      const locale = settingsOpen
+        ? (ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE)
+        : (prev.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+      let mode = ui.els.systemPromptModeSelect?.value || prev.systemPromptMode || 'default';
       let systemPrompt = ui.els.systemPromptInput.value.trim();
+      let customSystemPrompt = prev.customSystemPrompt || '';
 
       if (mode !== 'custom' && systemPrompt) {
         const presetForMode = window.I18n.getSystemPromptForMode(mode, locale);
@@ -1601,6 +1599,7 @@ window.Events = (() => {
 
       if (mode === 'custom') {
         systemPrompt = ui.els.systemPromptInput.value.trim();
+        customSystemPrompt = systemPrompt;
       } else {
         systemPrompt = window.I18n.getSystemPromptForMode(mode, locale);
         ui.els.systemPromptInput.value = systemPrompt;
@@ -1610,30 +1609,62 @@ window.Events = (() => {
         ui.els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint(mode);
       }
 
-      const theme = ui.els.settingsThemeSelect?.value || 'dark';
+      const promptPatch = { systemPrompt, systemPromptMode: mode, customSystemPrompt };
+      let nextState = promptPatch;
+
+      if (settingsOpen) {
+        const apiKey = ui.els.apiKeyInput.value.trim();
+        const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
+        const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
+        const nvidiaApiKey = ui.els.nvidiaApiKeyInput.value.trim();
+        const byteplusApiKey = ui.els.byteplusApiKeyInput.value.trim();
+        const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
+        const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
+        const theme = ui.els.settingsThemeSelect?.value || 'dark';
+        nextState = {
+          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey,
+          ...promptPatch, theme, locale
+        };
+      }
+
       const prevTheme = prev.theme;
-      const nextState = {
-        apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey,
-        systemPrompt, systemPromptMode: mode, theme, locale
-      };
       state.set(nextState);
       window.I18n.populateSystemPromptModeSelect(ui.els.systemPromptModeSelect, mode);
-      ui.setTheme(theme);
-      if (prevTheme !== theme) ui.rerenderMermaid();
-      if (prev.locale !== locale) {
-        ui.applyLocale({ ...prev, ...nextState });
-        ui.syncSystemPromptModeUI({ ...prev, ...nextState });
-      } else {
-        window.I18n.applyToDOM();
+      if (settingsOpen) {
+        const theme = nextState.theme;
+        ui.setTheme(theme);
+        if (prevTheme !== theme) ui.rerenderMermaid();
+        if (prev.locale !== locale) {
+          ui.applyLocale({ ...prev, ...nextState });
+          ui.syncSystemPromptModeUI({ ...prev, ...nextState });
+        } else {
+          window.I18n.applyToDOM();
+        }
       }
       updateSendEnabled();
     };
 
     ui.els.systemPromptModeSelect?.addEventListener('change', () => {
       const mode = ui.els.systemPromptModeSelect.value;
-      const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
-      if (mode !== 'custom') {
+      const prev = state.get();
+      const settingsOpen = ui.els.settingsModal && !ui.els.settingsModal.classList.contains('hidden');
+      const locale = settingsOpen
+        ? (ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE)
+        : (prev.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+      let customSystemPrompt = prev.customSystemPrompt || '';
+
+      if (prev.systemPromptMode === 'custom' && mode !== 'custom') {
+        const text = ui.els.systemPromptInput.value.trim();
+        if (text) customSystemPrompt = text;
+      }
+
+      if (mode === 'custom') {
+        ui.els.systemPromptInput.value = customSystemPrompt;
+      } else {
         ui.els.systemPromptInput.value = window.I18n.getSystemPromptForMode(mode, locale);
+      }
+      if (customSystemPrompt !== prev.customSystemPrompt) {
+        state.set({ customSystemPrompt });
       }
       if (ui.els.systemPromptModeHint) {
         ui.els.systemPromptModeHint.textContent = window.I18n.getSystemPromptModeHint(mode);
@@ -1806,6 +1837,7 @@ window.Events = (() => {
     ui.els.sidebarOverlay.addEventListener('click', () => ui.toggleSidebar(false));
     ui.els.closeMdPreviewBtn.addEventListener('click', () => ui.closeMarkdownPreview());
     ui.els.mdPreviewOverlay?.addEventListener('click', () => ui.closeMarkdownPreview());
+    ui.bindPreviewResize();
 
     ui.els.closeImagePreviewBtn?.addEventListener('click', () => ui.closeImagePreview());
     ui.els.imagePreviewOverlay?.addEventListener('click', (e) => {

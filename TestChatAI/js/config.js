@@ -14,7 +14,11 @@ window.APP_CONFIG = {
     { id: 'nvidia-deepseek-v4-flash', apiModel: 'deepseek-ai/deepseek-v4-flash', label: 'DeepSeek V4 Flash (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola-Seed-2.0-mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'byteplus-gpt-oss-120b', apiModel: 'gpt-oss-120b-250805', label: 'GPT OSS 120B', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'byteplus-dola-seed-2-0-code', apiModel: 'seed-2-0-code-preview-260328', label: 'Dola Seed 2.0 Code', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'nvidia-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b', label: 'Nemotron 3 Ultra (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
@@ -42,7 +46,11 @@ window.APP_CONFIG = {
     'nvidia-deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
+    'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
+    'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
+    'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
+    'byteplus-dola-seed-2-0-code': { input: 0.50, output: 3.00 },
     'nvidia-nemotron-3-ultra-550b-a55b': { input: 0.50, output: 2.20 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
     'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
@@ -85,7 +93,11 @@ window.APP_CONFIG = {
     'gemini-2.5-flash': ['low', 'medium', 'high'],
     'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
     'nvidia-nemotron-3-ultra-550b-a55b': ['default', 'medium', 'high'],
-    'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high']
+    'byteplus-dola-seed-2-0-lite': ['minimal', 'low', 'medium', 'high'],
+    'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
+    'byteplus-dola-seed-2-0-pro': ['minimal', 'low', 'medium', 'high'],
+    'byteplus-dola-seed-2-0-code': ['minimal', 'low', 'medium', 'high'],
+    'byteplus-gpt-oss-120b': ['low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -114,6 +126,7 @@ window.APP_CONFIG = {
 
   modelUsesEffortLinkedThinking(modelId) {
     if (this.modelUsesByteplusResponses(modelId)) return false;
+    if (this.modelUsesByteplusOpenAIReasoning(modelId)) return false;
     const provider = this.getModelProvider(modelId);
     return provider === 'deepseek' || provider === 'nvidia' || provider === 'byteplus';
   },
@@ -199,7 +212,8 @@ window.APP_CONFIG = {
 
   getDefaultEffortForModel(modelId) {
     if (modelId === 'gemini-3.5-flash') return 'medium';
-    if (modelId === 'byteplus-dola-seed-2-0-mini') return 'medium';
+    if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code') return 'medium';
+    if (modelId === 'byteplus-gpt-oss-120b') return 'medium';
     return this.DEFAULT_EFFORT;
   },
 
@@ -498,7 +512,31 @@ window.APP_CONFIG = {
   BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus-responses',
 
   BYTEPLUS_MCP_TOOLS: {
+    'byteplus-dola-seed-2-0-lite': [
+      {
+        type: 'mcp',
+        server_label: 'deepwiki',
+        server_url: 'https://mcp.deepwiki.com/mcp',
+        require_approval: 'never'
+      }
+    ],
     'byteplus-dola-seed-2-0-mini': [
+      {
+        type: 'mcp',
+        server_label: 'deepwiki',
+        server_url: 'https://mcp.deepwiki.com/mcp',
+        require_approval: 'never'
+      }
+    ],
+    'byteplus-dola-seed-2-0-pro': [
+      {
+        type: 'mcp',
+        server_label: 'deepwiki',
+        server_url: 'https://mcp.deepwiki.com/mcp',
+        require_approval: 'never'
+      }
+    ],
+    'byteplus-dola-seed-2-0-code': [
       {
         type: 'mcp',
         server_label: 'deepwiki',
@@ -540,8 +578,23 @@ window.APP_CONFIG = {
     return this.getModel(modelId).apiMode === 'responses';
   },
 
+  modelUsesByteplusOpenAIReasoning(modelId) {
+    return /^gpt-oss/i.test(this.getApiModel(modelId));
+  },
+
   getByteplusMcpTools(modelId) {
     return this.BYTEPLUS_MCP_TOOLS[modelId] || [];
+  },
+
+  getByteplusResponsesThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {
+    if (!thinkingEnabled) {
+      return { thinking: { type: 'disabled' } };
+    }
+    const effort = this.normalizeEffortForModel(
+      reasoningEffort || this.DEFAULT_EFFORT,
+      modelId
+    );
+    return { reasoning: { effort } };
   },
 
   byteplusRequiresProxy() {

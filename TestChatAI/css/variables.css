@@ -254,6 +254,9 @@
   --radius-full: 9999px;
   --transition: 180ms ease;
   --sidebar-width: 272px;
+  --md-preview-ratio: calc(2 / 3);
+  --md-preview-width: calc((100vw - var(--sidebar-width)) * var(--md-preview-ratio));
+  --md-preview-width-full: calc(100vw * var(--md-preview-ratio));
   --header-height: 56px;
   --composer-max-height: 200px;
   --content-max-width: 768px;

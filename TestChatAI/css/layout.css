@@ -274,6 +274,7 @@ body.pdf-export-loading .main-shell {
 }
 
 .md-preview-panel {
+  position: relative;
   flex-shrink: 0;
   width: 0;
   overflow: hidden;
@@ -281,11 +282,111 @@ body.pdf-export-loading .main-shell {
   flex-direction: column;
   background: var(--bg-elev);
   border-left: 1px solid var(--border);
-  transition: width 220ms ease;
+  transition: width 220ms ease, flex-basis 220ms ease;
 }
 
 .md-preview-panel.is-open {
-  width: min(42vw, 440px);
+  overflow: visible;
+  z-index: 2;
+}
+
+.md-preview-panel.is-open.is-user-sized {
+  width: var(--md-preview-user-width) !important;
+  flex: 0 0 var(--md-preview-user-width) !important;
+  max-width: none;
+}
+
+.md-preview-panel.is-resizing {
+  transition: none;
+  user-select: none;
+}
+
+.md-preview-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20;
+  width: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  transform: translateX(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  color: var(--text-dim);
+  background: transparent;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.md-preview-panel.is-open .md-preview-resize-handle {
+  display: flex;
+}
+
+.md-preview-resize-handle:hover,
+.md-preview-resize-handle:focus-visible,
+.md-preview-panel.is-resizing .md-preview-resize-handle {
+  color: var(--accent);
+}
+
+.md-preview-resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: transparent;
+  transition: background var(--transition);
+}
+
+.md-preview-resize-handle:hover::before,
+.md-preview-resize-handle:focus-visible::before,
+.md-preview-panel.is-resizing .md-preview-resize-handle::before {
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.md-preview-resize-arrows {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 9px;
+  line-height: 1;
+  padding: 8px 3px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-elev) 88%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--bg) 40%, transparent);
+}
+
+.md-preview-resize-arrows i {
+  opacity: 0.85;
+}
+
+.app[data-sidebar="closed"] .md-preview-panel.is-open {
+  width: var(--md-preview-width-full);
+  flex: 0 0 var(--md-preview-width-full);
+}
+
+.md-preview-panel.is-open {
+  width: var(--md-preview-width);
+  flex: 0 0 var(--md-preview-width);
+}
+
+body.md-preview-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+body.md-preview-resizing * {
+  cursor: col-resize !important;
 }
 
 .md-preview-header {
@@ -297,6 +398,13 @@ body.pdf-export-loading .main-shell {
   height: var(--header-height);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.md-preview-header .btn {
+  cursor: pointer;
+  touch-action: auto;
 }
 
 .md-preview-title {
@@ -318,6 +426,7 @@ body.pdf-export-loading .main-shell {
 
 .md-preview-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px;

@@ -532,17 +532,31 @@ window.API = (() => {
 
   const buildByteplusBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
     const apiModel = window.APP_CONFIG.getApiModel(model);
-    const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
     const body = withStreamUsage({
       model: apiModel,
       messages: buildDeepseekMessages(convo, systemPrompt),
-      stream: true,
-      thinking: { type: cfg.thinking ? 'enabled' : 'disabled' }
+      stream: true
     });
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+
+    if (window.APP_CONFIG.modelUsesByteplusOpenAIReasoning(model)) {
+      if (thinking) {
+        body.reasoning_effort = window.APP_CONFIG.normalizeEffortForModel(
+          reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+          model
+        );
+      }
+      if (maxOutputTokens) {
+        body.max_completion_tokens = maxOutputTokens;
+      }
+      return body;
+    }
+
+    const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
+    body.thinking = { type: cfg.thinking ? 'enabled' : 'disabled' };
     if (cfg.reasoning_effort) {
       body.reasoning_effort = cfg.reasoning_effort;
     }
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
     }
@@ -796,13 +810,10 @@ window.API = (() => {
     if (systemPrompt && systemPrompt.trim()) {
       body.instructions = systemPrompt.trim();
     }
-    if (thinking) {
-      const effort = window.APP_CONFIG.normalizeEffortForModel(
-        reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
-        model
-      );
-      body.reasoning = { effort };
-    }
+    Object.assign(
+      body,
+      window.APP_CONFIG.getByteplusResponsesThinkingConfig(model, thinking, reasoningEffort)
+    );
 
     const headers = {
       'Content-Type': 'application/json',

@@ -14,7 +14,8 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(92vw, 440px);
+    width: var(--md-preview-width-full);
+    flex: none;
     z-index: 96;
   }
 

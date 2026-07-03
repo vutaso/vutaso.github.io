@@ -62,11 +62,11 @@
         <button id="clearAllSidebarBtn" class="btn btn-icon sidebar-footer-btn" title="Xoá tất cả hội thoại" aria-label="Xoá tất cả hội thoại">
           <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
         </button>
-        <button id="openSettingsBtn" class="btn btn-icon sidebar-footer-btn" title="Cài đặt" aria-label="Cài đặt">
-          <span class="icon"><i class="fa-solid fa-gear"></i></span>
-        </button>
         <button id="themeToggleBtn" class="btn btn-icon sidebar-footer-btn" title="Chuyển theme" aria-label="Chuyển theme">
           <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
+        </button>
+        <button id="openSettingsBtn" class="btn btn-icon sidebar-footer-btn" title="Cài đặt" aria-label="Cài đặt">
+          <span class="icon"><i class="fa-solid fa-gear"></i></span>
         </button>
       </div>
     </aside>
@@ -295,6 +295,12 @@
       </div>
 
       <aside id="markdownPreviewPanel" class="md-preview-panel" aria-hidden="true" aria-label="Preview">
+        <button type="button" id="mdPreviewResizeHandle" class="md-preview-resize-handle" title="Kéo hoặc vuốt ngang (trackpad) để co dãn preview" aria-label="Kéo hoặc vuốt ngang (trackpad) để co dãn preview">
+          <span class="md-preview-resize-arrows" aria-hidden="true">
+            <i class="fa-solid fa-chevron-left"></i>
+            <i class="fa-solid fa-chevron-right"></i>
+          </span>
+        </button>
         <header class="md-preview-header">
           <span class="md-preview-title"><i id="previewPanelIcon" class="fa-brands fa-markdown" aria-hidden="true"></i> <span id="previewPanelTitle">Preview Markdown</span></span>
           <button type="button" id="closeMdPreviewBtn" class="btn btn-icon" title="Đóng preview" aria-label="Đóng preview">

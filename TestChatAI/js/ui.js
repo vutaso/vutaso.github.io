@@ -128,8 +128,11 @@ window.UI = (() => {
     els.attachFileInput = $('#attachFileInput');
     els.markdownPreviewPanel = $('#markdownPreviewPanel');
     els.markdownPreviewContent = $('#markdownPreviewContent');
+    els.mdPreviewResizeHandle = $('#mdPreviewResizeHandle');
+    els.mdPreviewHeader = $('.md-preview-header');
     els.closeMdPreviewBtn = $('#closeMdPreviewBtn');
     els.mdPreviewOverlay = $('#mdPreviewOverlay');
+    els.main = $('.main');
     els.imagePreviewOverlay = $('#imagePreviewOverlay');
     els.imagePreviewImg = $('#imagePreviewImg');
     els.imagePreviewCaption = $('#imagePreviewCaption');
@@ -145,6 +148,7 @@ window.UI = (() => {
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
     els.sidebarSearchInput = $('#sidebarSearchInput');
     els.sidebarSearchClear = $('#sidebarSearchClear');
+    bindMessagesScroll();
   };
 
   const syncComposerToolsUI = (modelId, toolState) => {
@@ -992,6 +996,9 @@ window.UI = (() => {
   let _latestText = '';
   let _latestImages = null;
   let _streamingCodeScrollTarget = 0;
+  let _stickToBottom = true;
+  let _ignoreScrollEvent = false;
+  let _messagesScrollBound = false;
 
   let _latestReasoning = '';
   let _latestGrounding = null;
@@ -1013,6 +1020,10 @@ window.UI = (() => {
     if (streamThrottle) return;
     streamThrottle = requestAnimationFrame(() => {
       if (_latestCE) {
+        const messagesEl = els.messages;
+        const preserveScroll = !_stickToBottom && messagesEl;
+        const prevTop = preserveScroll ? messagesEl.scrollTop : 0;
+
         _latestCE.innerHTML = renderStreamingAssistantHTML(
           _latestText, _latestImages, _latestReasoning, {
             reasoningOpen: _reasoningOpen,
@@ -1020,6 +1031,11 @@ window.UI = (() => {
           }
         );
         polishContent(_latestCE, { streaming: true });
+
+        if (preserveScroll) {
+          messagesEl.scrollTop = prevTop;
+        }
+
         scrollStreamingCodeToEnd(_latestCE, _latestText);
         scrollToBottomIfNear();
       }
@@ -1302,19 +1318,38 @@ window.UI = (() => {
     scrollElementToEnd(lastPre, { streaming: true });
   };
 
-  const scrollToBottom = () => {
-    requestAnimationFrame(() => {
-      els.messages.scrollTop = els.messages.scrollHeight;
-    });
-  };
+  const SCROLL_NEAR_THRESHOLD = 80;
 
   const isNearBottom = () => {
     const el = els.messages;
-    return el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_NEAR_THRESHOLD;
+  };
+
+  const bindMessagesScroll = () => {
+    if (_messagesScrollBound || !els.messages) return;
+    _messagesScrollBound = true;
+    els.messages.addEventListener('scroll', () => {
+      if (_ignoreScrollEvent) return;
+      _stickToBottom = isNearBottom();
+    }, { passive: true });
+  };
+
+  const scrollToBottom = () => {
+    const el = els.messages;
+    if (!el) return;
+    _stickToBottom = true;
+    _ignoreScrollEvent = true;
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+      requestAnimationFrame(() => {
+        _ignoreScrollEvent = false;
+      });
+    });
   };
 
   const scrollToBottomIfNear = () => {
-    if (isNearBottom()) scrollToBottom();
+    if (_stickToBottom) scrollToBottom();
   };
 
   const showError = (err) => {
@@ -1337,6 +1372,7 @@ window.UI = (() => {
   };
 
   const setStreaming = (on) => {
+    if (on) _stickToBottom = true;
     els.sendBtn.classList.toggle('hidden', on);
     els.stopBtn.classList.toggle('hidden', !on);
     els.composerInput.disabled = on;
@@ -1524,7 +1560,10 @@ window.UI = (() => {
     els.byteplusApiKeyInput.value = state.byteplusApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
-    els.systemPromptInput.value = state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale);
+    const promptForInput = state.systemPromptMode === 'custom'
+      ? (state.customSystemPrompt || state.systemPrompt || '')
+      : (state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale));
+    els.systemPromptInput.value = promptForInput;
     syncSystemPromptModeUI(state);
     window.I18n.populateThemeSelect(els.settingsThemeSelect, state.theme || window.APP_CONFIG.DEFAULT_THEME);
     window.I18n.populateLocaleSelect(els.settingsLocaleSelect, state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
@@ -1611,7 +1650,174 @@ window.UI = (() => {
 
   const isRenameModalOpen = () => !els.renameModal.classList.contains('hidden');
 
+  const PREVIEW_WIDTH_MIN = 260;
+  const PREVIEW_CHAT_MIN = 220;
+
   const isMobileSidebar = () => window.matchMedia('(max-width: 768px)').matches;
+
+  const getPreviewRightEdge = () => {
+    if (isMobileSidebar()) return window.innerWidth;
+    return els.main?.getBoundingClientRect().right ?? window.innerWidth;
+  };
+
+  const clampPreviewWidth = (widthPx) => {
+    const rightEdge = getPreviewRightEdge();
+    const mainWidth = isMobileSidebar()
+      ? window.innerWidth
+      : (els.main?.getBoundingClientRect().width ?? rightEdge);
+    const min = PREVIEW_WIDTH_MIN;
+    const max = Math.max(min, mainWidth - PREVIEW_CHAT_MIN);
+    return Math.min(max, Math.max(min, widthPx));
+  };
+
+  const clearPreviewPanelWidth = () => {
+    if (!els.markdownPreviewPanel) return;
+    els.markdownPreviewPanel.classList.remove('is-user-sized');
+    els.markdownPreviewPanel.style.removeProperty('--md-preview-user-width');
+    els.markdownPreviewPanel.style.width = '';
+    els.markdownPreviewPanel.style.flex = '';
+  };
+
+  const setPreviewPanelWidth = (widthPx, { save = false } = {}) => {
+    if (!els.markdownPreviewPanel) return clampPreviewWidth(widthPx);
+    const w = clampPreviewWidth(widthPx);
+    els.markdownPreviewPanel.classList.add('is-user-sized');
+    els.markdownPreviewPanel.style.setProperty('--md-preview-user-width', `${w}px`);
+    els.markdownPreviewPanel.style.width = `${w}px`;
+    els.markdownPreviewPanel.style.flex = `0 0 ${w}px`;
+    if (save) window.Storage.set({ mdPreviewWidth: w });
+    return w;
+  };
+
+  const applyPreviewPanelWidth = (savedWidth) => {
+    if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
+    const n = Number(savedWidth);
+    if (Number.isFinite(n) && n > 0) {
+      setPreviewPanelWidth(n);
+    } else {
+      clearPreviewPanelWidth();
+    }
+  };
+
+  const getPreviewWidthFromPointer = (clientX) => getPreviewRightEdge() - clientX;
+
+  let previewResizeDragging = false;
+  let previewResizeWheelSaveTimer = null;
+
+  const isPreviewResizeStartTarget = (e) => {
+    if (e.target.closest('#closeMdPreviewBtn')) return false;
+    if (e.target.closest('#mdPreviewResizeHandle')) return true;
+    if (e.target.closest('.md-preview-header')) return true;
+    const panel = els.markdownPreviewPanel;
+    if (!panel?.classList.contains('is-open')) return false;
+    if (!e.target.closest('#markdownPreviewPanel')) return false;
+    const x = e.clientX ?? e.touches?.[0]?.clientX;
+    if (x == null) return false;
+    const rect = panel.getBoundingClientRect();
+    return x - rect.left <= 28;
+  };
+
+  const unbindPreviewResizeDocument = () => {
+    document.removeEventListener('mousemove', onPreviewResizeMove);
+    document.removeEventListener('mouseup', endPreviewResize);
+    document.removeEventListener('touchmove', onPreviewResizeTouchMove);
+    document.removeEventListener('touchend', endPreviewResize);
+    document.removeEventListener('touchcancel', endPreviewResize);
+  };
+
+  const endPreviewResize = () => {
+    if (!previewResizeDragging || !els.markdownPreviewPanel) return;
+    previewResizeDragging = false;
+    els.markdownPreviewPanel.classList.remove('is-resizing');
+    document.body.classList.remove('md-preview-resizing');
+    unbindPreviewResizeDocument();
+    setPreviewPanelWidth(els.markdownPreviewPanel.getBoundingClientRect().width, { save: true });
+  };
+
+  const onPreviewResizeMove = (e) => {
+    if (!previewResizeDragging) return;
+    e.preventDefault();
+    setPreviewPanelWidth(getPreviewWidthFromPointer(e.clientX));
+  };
+
+  const onPreviewResizeTouchMove = (e) => {
+    if (!previewResizeDragging || !e.touches?.length) return;
+    e.preventDefault();
+    setPreviewPanelWidth(getPreviewWidthFromPointer(e.touches[0].clientX));
+  };
+
+  const startPreviewResize = (e) => {
+    if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
+    if (!isPreviewResizeStartTarget(e)) return;
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (previewResizeDragging) return;
+    previewResizeDragging = true;
+    els.markdownPreviewPanel.classList.add('is-resizing');
+    document.body.classList.add('md-preview-resizing');
+    document.addEventListener('mousemove', onPreviewResizeMove);
+    document.addEventListener('mouseup', endPreviewResize);
+    const x = e.clientX ?? e.touches?.[0]?.clientX;
+    if (x != null) setPreviewPanelWidth(getPreviewWidthFromPointer(x));
+  };
+
+  const startPreviewTouchResize = (e) => {
+    if (!isPreviewResizeStartTarget(e)) return;
+    if (e.touches.length !== 1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (previewResizeDragging) return;
+    previewResizeDragging = true;
+    els.markdownPreviewPanel.classList.add('is-resizing');
+    document.body.classList.add('md-preview-resizing');
+    document.addEventListener('touchmove', onPreviewResizeTouchMove, { passive: false });
+    document.addEventListener('touchend', endPreviewResize);
+    document.addEventListener('touchcancel', endPreviewResize);
+    setPreviewPanelWidth(getPreviewWidthFromPointer(e.touches[0].clientX));
+  };
+
+  const onPreviewWheelResize = (e) => {
+    if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
+    const inZone = e.target.closest('#mdPreviewResizeHandle, .md-preview-header')
+      || (e.target.closest('#markdownPreviewPanel') && (e.altKey || e.metaKey));
+    if (!inZone) return;
+
+    let delta = 0;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) delta = e.deltaX;
+    else if (e.shiftKey && Math.abs(e.deltaY) > 0) delta = e.deltaY;
+    if (!delta) return;
+
+    e.preventDefault();
+    const current = els.markdownPreviewPanel.getBoundingClientRect().width;
+    setPreviewPanelWidth(current - delta);
+    clearTimeout(previewResizeWheelSaveTimer);
+    previewResizeWheelSaveTimer = setTimeout(() => {
+      if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
+      setPreviewPanelWidth(els.markdownPreviewPanel.getBoundingClientRect().width, { save: true });
+    }, 280);
+  };
+
+  const bindPreviewResize = () => {
+    const panel = els.markdownPreviewPanel;
+    const handle = els.mdPreviewResizeHandle;
+    const header = els.mdPreviewHeader;
+    if (!panel || !handle) return;
+
+    handle.addEventListener('mousedown', startPreviewResize);
+    handle.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
+    header?.addEventListener('mousedown', startPreviewResize);
+    header?.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
+    panel.addEventListener('mousedown', startPreviewResize);
+    panel.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
+    panel.addEventListener('wheel', onPreviewWheelResize, { passive: false });
+
+    window.addEventListener('resize', () => {
+      if (!panel.classList.contains('is-open')) return;
+      const saved = window.Storage.get().mdPreviewWidth;
+      applyPreviewPanelWidth(saved || panel.getBoundingClientRect().width);
+    });
+  };
 
   const toggleSidebar = (force) => {
     const app = els.app || document.getElementById('app');
@@ -1662,6 +1868,7 @@ window.UI = (() => {
     els.markdownPreviewPanel.setAttribute('aria-hidden', 'false');
     els.app.setAttribute('data-md-preview', 'open');
     if (els.mdPreviewOverlay) els.mdPreviewOverlay.classList.remove('hidden');
+    applyPreviewPanelWidth(window.Storage.get().mdPreviewWidth);
   };
 
   const openMarkdownPreview = (source) => {
@@ -1690,6 +1897,7 @@ window.UI = (() => {
 
   const closeMarkdownPreview = () => {
     if (!els.markdownPreviewPanel) return;
+    endPreviewResize();
     els.markdownPreviewPanel.classList.remove('is-open');
     els.markdownPreviewPanel.setAttribute('aria-hidden', 'true');
     els.app.removeAttribute('data-md-preview');
@@ -1857,7 +2065,7 @@ window.UI = (() => {
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
-    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview,
+    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
     setPdfExportLoading,
     showExportDownloadPrompt, consumeExportDownload, finishExportDownload,

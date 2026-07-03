@@ -28,6 +28,8 @@ window.Storage = (() => {
     tokenSaveEnabled: false,
     systemPromptMode: 'default',
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
+    customSystemPrompt: '',
+    mdPreviewWidth: null,
     theme: window.APP_CONFIG.DEFAULT_THEME,
     locale: window.APP_CONFIG.DEFAULT_LOCALE,
     currentConversationId: null,
@@ -221,6 +223,13 @@ window.Storage = (() => {
     }
     if (!window.I18n.SYSTEM_PROMPT_MODE_IDS.includes(state.systemPromptMode)) {
       state.systemPromptMode = 'custom';
+    }
+    if (!state.customSystemPrompt?.trim()) {
+      if (state.systemPromptMode === 'custom' && state.systemPrompt?.trim()) {
+        state.customSystemPrompt = state.systemPrompt;
+      } else if (state.systemPrompt?.trim() && !window.I18n.isPresetSystemPrompt(state.systemPrompt)) {
+        state.customSystemPrompt = state.systemPrompt;
+      }
     }
     if (state.systemPromptMode !== 'custom') {
       if (window.I18n.isPresetSystemPrompt(state.systemPrompt) || !state.systemPrompt?.trim()) {

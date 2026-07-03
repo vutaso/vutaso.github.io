@@ -407,6 +407,10 @@
   max-height: min(70vh, 560px);
 }
 
+.message.streaming {
+  overflow-anchor: none;
+}
+
 .message.streaming .content .code-block,
 .message.streaming .content pre,
 .message.streaming .content .mermaid-pending,
