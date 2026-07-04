@@ -1107,3 +1107,201 @@
 body.image-preview-open {
   overflow: hidden;
 }
+
+.chat-scroll-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  min-width: 0;
+}
+
+.chat-scroll-wrap > .messages {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.message-scroll-rail {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  bottom: 0;
+  z-index: 4;
+  width: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  pointer-events: none;
+}
+
+.message-scroll-rail.hidden {
+  display: none;
+}
+
+.message-scroll-rail-arrow,
+.message-scroll-rail-ticks,
+.message-scroll-rail-indicator {
+  pointer-events: auto;
+}
+
+.message-scroll-rail-arrow {
+  flex-shrink: 0;
+  width: 24px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--transition), color var(--transition), background var(--transition);
+}
+
+.message-scroll-rail-arrow:hover:not(:disabled) {
+  opacity: 1;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg-hover) 70%, transparent);
+}
+
+.message-scroll-rail-arrow:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.message-scroll-rail-track {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 48px;
+  margin: 4px 0;
+}
+
+.message-scroll-rail-ticks {
+  position: absolute;
+  inset: 0;
+}
+
+.message-scroll-rail-tick {
+  position: absolute;
+  right: 4px;
+  height: 2px;
+  border: 0;
+  padding: 6px 0;
+  margin: -6px 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transform: translateY(-50%);
+}
+
+.message-scroll-rail-tick::after {
+  content: '';
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-dim) 55%, transparent);
+  width: var(--tick-width, 10px);
+  transition: width 160ms ease, background 160ms ease, opacity 160ms ease;
+}
+
+.message-scroll-rail-tick:hover::after,
+.message-scroll-rail-tick.is-active::after {
+  background: var(--text);
+  opacity: 1;
+}
+
+.message-scroll-rail-tick.is-active::after {
+  width: 18px;
+}
+
+.message-scroll-rail-indicator {
+  position: absolute;
+  right: 4px;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 88%, transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: top 80ms linear;
+  z-index: 1;
+}
+
+.message-scroll-rail-indicator.hidden {
+  display: none;
+}
+
+.message-scroll-rail-tooltip {
+  position: fixed;
+  z-index: 180;
+  width: max-content;
+  min-width: 200px;
+  max-width: min(360px, calc(100vw - 56px));
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-elev) 92%, #000);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  transform: translateY(-50%);
+  animation: message-scroll-rail-tooltip-in 140ms ease;
+}
+
+.message-scroll-rail-tooltip.hidden {
+  display: none;
+}
+
+.message-scroll-rail-tooltip-user {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.message-scroll-rail-tooltip-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: min(40vh, 300px);
+  overflow-y: auto;
+}
+
+@keyframes message-scroll-rail-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-50% + 4px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .message-scroll-rail {
+    right: 2px;
+    width: 22px;
+  }
+
+  .message-scroll-rail-tooltip {
+    min-width: 160px;
+    max-width: min(300px, calc(100vw - 40px));
+  }
+}
+
+@media (max-width: 480px) {
+  .message-scroll-rail {
+    display: none !important;
+  }
+}

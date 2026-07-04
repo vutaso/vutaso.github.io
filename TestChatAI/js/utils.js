@@ -750,8 +750,15 @@ window.Utils = (() => {
     reader.readAsDataURL(file);
   });
 
+  const getCodeBlockSource = (block) => {
+    if (!block) return '';
+    const code = block.querySelector('.code-block-body code') || block.querySelector('code');
+    return (code?.textContent ?? '').replace(/\r\n/g, '\n');
+  };
+
   return {
     escapeHTML, formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
+    getCodeBlockSource,
     buildSearchFold, includesSearchFold, findSearchRangeInFold, buildSearchSnippet,
     includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,

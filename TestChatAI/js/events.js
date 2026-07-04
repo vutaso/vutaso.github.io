@@ -1560,6 +1560,12 @@ window.Events = (() => {
       ui.els.kimiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
+    ui.els.toggleOpenrouterApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.openrouterApiKeyInput.type === 'password';
+      ui.els.openrouterApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.openrouterApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
     const handleClearAll = async () => {
       if (!confirm(t('confirmClearAll'))) return;
       await settleActiveStream({ discard: true });
@@ -1620,9 +1626,10 @@ window.Events = (() => {
         const byteplusApiKey = ui.els.byteplusApiKeyInput.value.trim();
         const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
         const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
+        const openrouterApiKey = ui.els.openrouterApiKeyInput.value.trim();
         const theme = ui.els.settingsThemeSelect?.value || 'dark';
         nextState = {
-          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey,
+          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey, openrouterApiKey,
           ...promptPatch, theme, locale
         };
       }
@@ -1712,6 +1719,7 @@ window.Events = (() => {
       ui.els.byteplusApiKeyInput,
       ui.els.geminiApiKeyInput,
       ui.els.kimiApiKeyInput,
+      ui.els.openrouterApiKeyInput,
       ui.els.systemPromptInput,
     ].forEach((input) => {
       input?.addEventListener('blur', applySettingsFromForm);
@@ -1835,7 +1843,11 @@ window.Events = (() => {
 
     ui.els.openSidebarBtn.addEventListener('click', () => ui.toggleSidebar());
     ui.els.sidebarOverlay.addEventListener('click', () => ui.toggleSidebar(false));
-    ui.els.closeMdPreviewBtn.addEventListener('click', () => ui.closeMarkdownPreview());
+    ui.els.closeMdPreviewBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      ui.closeMarkdownPreview();
+    });
     ui.els.mdPreviewOverlay?.addEventListener('click', () => ui.closeMarkdownPreview());
     ui.bindPreviewResize();
 
@@ -1847,16 +1859,20 @@ window.Events = (() => {
     document.addEventListener('click', async (e) => {
       const previewMdBtn = e.target.closest('[data-preview-md]');
       if (previewMdBtn) {
+        e.preventDefault();
+        e.stopPropagation();
         const block = previewMdBtn.closest('.code-block') || previewMdBtn.closest('pre');
-        const code = block?.querySelector('code')?.innerText || '';
-        if (code) ui.openMarkdownPreview(code);
+        const code = window.Utils.getCodeBlockSource(block);
+        if (code.trim()) ui.openMarkdownPreview(code);
         return;
       }
       const previewHtmlBtn = e.target.closest('[data-preview-html]');
       if (previewHtmlBtn) {
+        e.preventDefault();
+        e.stopPropagation();
         const block = previewHtmlBtn.closest('.code-block') || previewHtmlBtn.closest('pre');
-        const code = block?.querySelector('code')?.innerText || '';
-        if (code) ui.openHtmlPreview(code);
+        const code = window.Utils.getCodeBlockSource(block);
+        if (code.trim()) ui.openHtmlPreview(code);
         return;
       }
       const toggleMermaid = e.target.closest('[data-toggle-mermaid]');

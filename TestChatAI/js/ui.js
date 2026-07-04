@@ -36,6 +36,8 @@ window.UI = (() => {
     els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
     els.kimiApiKeyInput = $('#kimiApiKeyInput');
     els.kimiApiKeyIcon = $('#kimiApiKeyIcon');
+    els.openrouterApiKeyInput = $('#openrouterApiKeyInput');
+    els.openrouterApiKeyIcon = $('#openrouterApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsLocaleSelect = $('#settingsLocaleSelect');
     els.settingsThemeSelect = $('#settingsThemeSelect');
@@ -73,6 +75,7 @@ window.UI = (() => {
     els.toggleByteplusApiKeyBtn = $('#toggleByteplusApiKeyBtn');
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
+    els.toggleOpenrouterApiKeyBtn = $('#toggleOpenrouterApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
@@ -148,7 +151,14 @@ window.UI = (() => {
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
     els.sidebarSearchInput = $('#sidebarSearchInput');
     els.sidebarSearchClear = $('#sidebarSearchClear');
+    els.messageScrollRail = $('#messageScrollRail');
+    els.messageScrollRailTicks = $('#messageScrollRailTicks');
+    els.messageScrollRailIndicator = $('#messageScrollRailIndicator');
+    els.messageScrollRailTooltip = $('#messageScrollRailTooltip');
+    els.messageScrollRailPrev = $('#messageScrollRailPrev');
+    els.messageScrollRailNext = $('#messageScrollRailNext');
     bindMessagesScroll();
+    bindMessageScrollRail();
   };
 
   const syncComposerToolsUI = (modelId, toolState) => {
@@ -796,6 +806,7 @@ window.UI = (() => {
   const renderEmpty = (animate = false) => {
     closeMarkdownPreview();
     els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(t('hello')) + '</h2><p class="messages-empty-sub">' + escapeHTML(t('emptySub')) + '</p></div>';
+    updateMessageScrollRail();
     if (!animate) return;
     const empty = els.messages.querySelector('.messages-empty');
     if (empty) requestAnimationFrame(() => empty.classList.add('is-entering'));
@@ -862,6 +873,7 @@ window.UI = (() => {
     polishContent(els.messages);
     if (exportSelectMode) syncExportSelectOnMessages();
     scrollToBottom();
+    updateMessageScrollRail();
   };
 
   const assistantToolbarHTML = (m) => {
@@ -946,6 +958,7 @@ window.UI = (() => {
     const article = div.firstElementChild;
     els.messages.appendChild(article);
     scrollToBottom();
+    updateMessageScrollRail();
     return article;
   };
 
@@ -988,6 +1001,7 @@ window.UI = (() => {
     article.classList.add('streaming');
     const content = article.querySelector('.content');
     if (content) content.innerHTML = '';
+    updateMessageScrollRail();
     return { article, content };
   };
 
@@ -1073,6 +1087,7 @@ window.UI = (() => {
     }
     if (message) setAssistantToolbar(article, message);
     scrollToBottomIfNear();
+    updateMessageScrollRail();
   };
 
   const rerenderMermaid = () => {
@@ -1320,6 +1335,278 @@ window.UI = (() => {
 
   const SCROLL_NEAR_THRESHOLD = 80;
 
+  let _messageScrollRailBound = false;
+  let _messageScrollRailResizeObserver = null;
+  let _messageScrollRailHoverIdx = -1;
+  let _messageScrollRailRaf = null;
+
+  const getUserMessageArticles = () => [...els.messages.querySelectorAll('.message.user')];
+
+  const getUserMessagePreview = (article) => {
+    if (!article) return '';
+    const content = article.querySelector('.content');
+    if (!content) return '';
+    const original = content.querySelector('.message-translate-original');
+    if (original) {
+      return (original.textContent || '').replace(/\s+/g, ' ').trim() || t('scrollRailNoText');
+    }
+    const prompt = content.querySelector('.message-imagegen-prompt');
+    if (prompt) {
+      return (prompt.textContent || '').replace(/\s+/g, ' ').trim() || t('scrollRailNoText');
+    }
+    const firstP = content.querySelector(':scope > p');
+    const text = (firstP?.textContent || content.textContent || '').replace(/\s+/g, ' ').trim();
+    return text || t('scrollRailNoText');
+  };
+
+  const getMessageScrollRatio = (article, messagesEl) => {
+    if (!article || !messagesEl) return 0;
+    const maxScroll = Math.max(messagesEl.scrollHeight - messagesEl.clientHeight, 1);
+    return Math.min(1, Math.max(0, article.offsetTop / maxScroll));
+  };
+
+  const getTickWidth = (preview, maxLen) => {
+    const len = preview.length;
+    if (maxLen <= 0) return 10;
+    const ratio = len / maxLen;
+    if (ratio < 0.35) return 8;
+    if (ratio < 0.7) return 12;
+    return 16;
+  };
+
+  const syncMessageScrollRailI18n = () => {
+    if (!els.messageScrollRail) return;
+    els.messageScrollRail.setAttribute('aria-label', t('scrollRailLabel'));
+    if (els.messageScrollRailPrev) {
+      els.messageScrollRailPrev.title = t('scrollRailPrev');
+      els.messageScrollRailPrev.setAttribute('aria-label', t('scrollRailPrev'));
+    }
+    if (els.messageScrollRailNext) {
+      els.messageScrollRailNext.title = t('scrollRailNext');
+      els.messageScrollRailNext.setAttribute('aria-label', t('scrollRailNext'));
+    }
+    const userLabel = els.messageScrollRailTooltip?.querySelector('.message-scroll-rail-tooltip-user');
+    if (userLabel) userLabel.textContent = t('scrollRailYou');
+  };
+
+  const hideMessageScrollRailTooltip = () => {
+    _messageScrollRailHoverIdx = -1;
+    els.messageScrollRailTooltip?.classList.add('hidden');
+    els.messageScrollRailTooltip?.setAttribute('aria-hidden', 'true');
+  };
+
+  const showMessageScrollRailTooltip = (tickEl, preview) => {
+    const tooltip = els.messageScrollRailTooltip;
+    const rail = els.messageScrollRail;
+    if (!tooltip || !rail || !tickEl) return;
+
+    const idx = parseInt(tickEl.dataset.idx, 10);
+    const users = getUserMessageArticles();
+    const text = !isNaN(idx) && users[idx] ? getUserMessagePreview(users[idx]) : (preview || '');
+
+    const textEl = tooltip.querySelector('.message-scroll-rail-tooltip-text');
+    if (textEl) textEl.textContent = text;
+
+    const tickRect = tickEl.getBoundingClientRect();
+    const railRect = rail.getBoundingClientRect();
+    const gap = 12;
+    const margin = 8;
+
+    tooltip.classList.remove('hidden');
+    tooltip.setAttribute('aria-hidden', 'false');
+    tooltip.style.top = (tickRect.top + tickRect.height / 2) + 'px';
+    tooltip.style.transform = 'translateY(-50%)';
+
+    tooltip.style.left = 'auto';
+    tooltip.style.right = (window.innerWidth - railRect.left + gap) + 'px';
+
+    const tipRect = tooltip.getBoundingClientRect();
+    if (tipRect.left < margin) {
+      tooltip.style.right = 'auto';
+      tooltip.style.left = margin + 'px';
+      tooltip.style.maxWidth = (railRect.left - gap - margin) + 'px';
+    } else {
+      tooltip.style.maxWidth = '';
+    }
+  };
+
+  const updateMessageScrollRailNav = () => {
+    const users = getUserMessageArticles();
+    const activeIdx = users.findIndex((el) => el.classList.contains('is-rail-active'));
+    if (els.messageScrollRailPrev) els.messageScrollRailPrev.disabled = activeIdx <= 0;
+    if (els.messageScrollRailNext) els.messageScrollRailNext.disabled = activeIdx < 0 || activeIdx >= users.length - 1;
+  };
+
+  const updateMessageScrollRailIndicator = () => {
+    const messagesEl = els.messages;
+    const track = els.messageScrollRail?.querySelector('.message-scroll-rail-track');
+    const indicator = els.messageScrollRailIndicator;
+    if (!messagesEl || !track || !indicator) return;
+
+    const trackHeight = track.clientHeight;
+    if (!trackHeight) return;
+
+    const maxScroll = Math.max(messagesEl.scrollHeight - messagesEl.clientHeight, 0);
+    const ratio = maxScroll > 0 ? messagesEl.scrollTop / maxScroll : 0;
+    indicator.style.top = (ratio * trackHeight) + 'px';
+    indicator.classList.toggle('hidden', maxScroll <= 0);
+
+    const users = getUserMessageArticles();
+    if (!users.length) {
+      updateMessageScrollRailNav();
+      return;
+    }
+
+    const anchor = messagesEl.scrollTop + 24;
+    let active = users[0];
+    for (const article of users) {
+      if (article.offsetTop <= anchor) active = article;
+      else break;
+    }
+
+    users.forEach((article) => article.classList.toggle('is-rail-active', article === active));
+    els.messageScrollRailTicks?.querySelectorAll('.message-scroll-rail-tick').forEach((tick) => {
+      const idx = parseInt(tick.dataset.idx, 10);
+      const article = users[idx];
+      tick.classList.toggle('is-active', article === active);
+    });
+
+    if (_messageScrollRailHoverIdx >= 0) {
+      const hovered = els.messageScrollRailTicks?.querySelector('.message-scroll-rail-tick[data-idx="' + _messageScrollRailHoverIdx + '"]');
+      if (hovered) showMessageScrollRailTooltip(hovered);
+    }
+
+    updateMessageScrollRailNav();
+  };
+
+  const scheduleMessageScrollRailIndicator = () => {
+    if (_messageScrollRailRaf) return;
+    _messageScrollRailRaf = requestAnimationFrame(() => {
+      _messageScrollRailRaf = null;
+      updateMessageScrollRailIndicator();
+    });
+  };
+
+  const scrollToUserMessage = (article) => {
+    const messagesEl = els.messages;
+    if (!messagesEl || !article) return;
+    _stickToBottom = false;
+    _ignoreScrollEvent = true;
+    const targetTop = Math.max(0, article.offsetTop - 12);
+    messagesEl.scrollTo({ top: targetTop, behavior: 'smooth' });
+    window.setTimeout(() => {
+      _ignoreScrollEvent = false;
+      updateMessageScrollRailIndicator();
+    }, 450);
+  };
+
+  const scrollToAdjacentUserMessage = (direction) => {
+    const users = getUserMessageArticles();
+    if (!users.length) return;
+    let idx = users.findIndex((el) => el.classList.contains('is-rail-active'));
+    if (idx < 0) idx = 0;
+    const next = Math.min(users.length - 1, Math.max(0, idx + direction));
+    scrollToUserMessage(users[next]);
+  };
+
+  const updateMessageScrollRail = () => {
+    const rail = els.messageScrollRail;
+    const ticksEl = els.messageScrollRailTicks;
+    const messagesEl = els.messages;
+    if (!rail || !ticksEl || !messagesEl) return;
+
+    syncMessageScrollRailI18n();
+    hideMessageScrollRailTooltip();
+
+    const users = getUserMessageArticles();
+    const scrollable = messagesEl.scrollHeight > messagesEl.clientHeight + 4;
+    const show = users.length > 0 && (users.length > 1 || scrollable);
+    rail.classList.toggle('hidden', !show);
+    if (!show) {
+      ticksEl.innerHTML = '';
+      return;
+    }
+
+    const previews = users.map(getUserMessagePreview);
+    const maxLen = Math.max(...previews.map((p) => p.length), 1);
+    const track = rail.querySelector('.message-scroll-rail-track');
+    const trackHeight = track?.clientHeight || 1;
+
+    ticksEl.innerHTML = users.map((article, idx) => {
+      const preview = previews[idx];
+      const ratio = getMessageScrollRatio(article, messagesEl);
+      const top = ratio * trackHeight;
+      const width = getTickWidth(preview, maxLen);
+      return '<button type="button" class="message-scroll-rail-tick" data-idx="' + idx + '"'
+        + ' data-preview="' + escapeHTML(preview) + '"'
+        + ' style="top:' + top + 'px;--tick-width:' + width + 'px"'
+        + ' aria-label="' + escapeHTML(truncate(preview, 80)) + '"></button>';
+    }).join('');
+
+    scheduleMessageScrollRailIndicator();
+  };
+
+  const bindMessageScrollRail = () => {
+    if (_messageScrollRailBound) return;
+    _messageScrollRailBound = true;
+
+    const messagesEl = els.messages;
+    if (!messagesEl || !els.messageScrollRailTicks) return;
+
+    if (els.messageScrollRailTooltip && els.messageScrollRailTooltip.parentElement !== document.body) {
+      document.body.appendChild(els.messageScrollRailTooltip);
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+      let resizeTimer = null;
+      _messageScrollRailResizeObserver = new ResizeObserver(() => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          resizeTimer = null;
+          const hoverIdx = _messageScrollRailHoverIdx;
+          updateMessageScrollRail();
+          if (hoverIdx >= 0) {
+            _messageScrollRailHoverIdx = hoverIdx;
+            const hovered = els.messageScrollRailTicks?.querySelector('.message-scroll-rail-tick[data-idx="' + hoverIdx + '"]');
+            if (hovered) showMessageScrollRailTooltip(hovered);
+          }
+        }, 80);
+      });
+      _messageScrollRailResizeObserver.observe(messagesEl);
+    }
+
+    els.messageScrollRailTicks.addEventListener('mouseover', (e) => {
+      const tick = e.target.closest('.message-scroll-rail-tick');
+      if (!tick) return;
+      _messageScrollRailHoverIdx = parseInt(tick.dataset.idx, 10);
+      showMessageScrollRailTooltip(tick);
+    });
+
+    els.messageScrollRailTicks.addEventListener('mouseout', (e) => {
+      const tick = e.target.closest('.message-scroll-rail-tick');
+      if (!tick) return;
+      const related = e.relatedTarget;
+      if (related && tick.contains(related)) return;
+      hideMessageScrollRailTooltip();
+    });
+
+    els.messageScrollRailTicks.addEventListener('click', (e) => {
+      const tick = e.target.closest('.message-scroll-rail-tick');
+      if (!tick) return;
+      const idx = parseInt(tick.dataset.idx, 10);
+      const users = getUserMessageArticles();
+      if (!isNaN(idx) && users[idx]) scrollToUserMessage(users[idx]);
+    });
+
+    els.messageScrollRailPrev?.addEventListener('click', () => scrollToAdjacentUserMessage(-1));
+    els.messageScrollRailNext?.addEventListener('click', () => scrollToAdjacentUserMessage(1));
+
+    els.messageScrollRail?.addEventListener('mouseleave', (e) => {
+      if (e.relatedTarget && els.messageScrollRail.contains(e.relatedTarget)) return;
+      hideMessageScrollRailTooltip();
+    });
+  };
+
   const isNearBottom = () => {
     const el = els.messages;
     if (!el) return true;
@@ -1332,6 +1619,7 @@ window.UI = (() => {
     els.messages.addEventListener('scroll', () => {
       if (_ignoreScrollEvent) return;
       _stickToBottom = isNearBottom();
+      scheduleMessageScrollRailIndicator();
     }, { passive: true });
   };
 
@@ -1361,7 +1649,9 @@ window.UI = (() => {
     const key = /cors|proxy|load failed|failed to fetch|network/i.test(msg)
       && !/api key|authorization|forbidden|401|403/i.test(msg)
       ? 'toastErrorNetwork'
-      : 'toastErrorApiKey';
+      : /provider returned error|rate.limit|rate-limited|429|temporarily|upstream|credits|can only afford|max_tokens/i.test(msg)
+        ? 'toastErrorNetwork'
+        : 'toastErrorApiKey';
     div.textContent = t(key, { err: msg });
     els.composer.insertAdjacentElement('beforebegin', div);
   };
@@ -1560,6 +1850,7 @@ window.UI = (() => {
     els.byteplusApiKeyInput.value = state.byteplusApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
+    els.openrouterApiKeyInput.value = state.openrouterApiKey || '';
     const promptForInput = state.systemPromptMode === 'custom'
       ? (state.customSystemPrompt || state.systemPrompt || '')
       : (state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale));
@@ -1581,6 +1872,8 @@ window.UI = (() => {
     els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.kimiApiKeyInput.type = 'password';
     els.kimiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.openrouterApiKeyInput.type = 'password';
+    els.openrouterApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     updateSettingsTokenUsage(state);
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
@@ -1611,6 +1904,7 @@ window.UI = (() => {
     if (convo) renderMessages(convo);
     else renderEmpty();
     updateExportSelectCount();
+    syncMessageScrollRailI18n();
   };
 
   const openGuide = () => {
@@ -1685,12 +1979,16 @@ window.UI = (() => {
     els.markdownPreviewPanel.style.setProperty('--md-preview-user-width', `${w}px`);
     els.markdownPreviewPanel.style.width = `${w}px`;
     els.markdownPreviewPanel.style.flex = `0 0 ${w}px`;
-    if (save) window.Storage.set({ mdPreviewWidth: w });
+    if (save && !isMobileSidebar()) window.Storage.set({ mdPreviewWidth: w });
     return w;
   };
 
   const applyPreviewPanelWidth = (savedWidth) => {
     if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
+    if (isMobileSidebar()) {
+      clearPreviewPanelWidth();
+      return;
+    }
     const n = Number(savedWidth);
     if (Number.isFinite(n) && n > 0) {
       setPreviewPanelWidth(n);
@@ -1703,6 +2001,7 @@ window.UI = (() => {
 
   let previewResizeDragging = false;
   let previewResizeWheelSaveTimer = null;
+  let previewResizeCaptureEl = null;
 
   const isPreviewResizeStartTarget = (e) => {
     if (e.target.closest('#closeMdPreviewBtn')) return false;
@@ -1711,26 +2010,30 @@ window.UI = (() => {
     const panel = els.markdownPreviewPanel;
     if (!panel?.classList.contains('is-open')) return false;
     if (!e.target.closest('#markdownPreviewPanel')) return false;
-    const x = e.clientX ?? e.touches?.[0]?.clientX;
+    if (e.target.closest('.html-preview-frame, .md-preview-content')) return false;
+    const x = e.clientX;
     if (x == null) return false;
     const rect = panel.getBoundingClientRect();
     return x - rect.left <= 28;
   };
 
-  const unbindPreviewResizeDocument = () => {
-    document.removeEventListener('mousemove', onPreviewResizeMove);
-    document.removeEventListener('mouseup', endPreviewResize);
-    document.removeEventListener('touchmove', onPreviewResizeTouchMove);
-    document.removeEventListener('touchend', endPreviewResize);
-    document.removeEventListener('touchcancel', endPreviewResize);
+  const unbindPreviewResizePointer = () => {
+    if (!previewResizeCaptureEl) return;
+    previewResizeCaptureEl.removeEventListener('pointermove', onPreviewResizeMove);
+    previewResizeCaptureEl.removeEventListener('pointerup', endPreviewResize);
+    previewResizeCaptureEl.removeEventListener('pointercancel', endPreviewResize);
+    previewResizeCaptureEl = null;
   };
 
-  const endPreviewResize = () => {
+  const endPreviewResize = (e) => {
     if (!previewResizeDragging || !els.markdownPreviewPanel) return;
+    if (e?.pointerId != null && previewResizeCaptureEl?.hasPointerCapture?.(e.pointerId)) {
+      previewResizeCaptureEl.releasePointerCapture(e.pointerId);
+    }
     previewResizeDragging = false;
     els.markdownPreviewPanel.classList.remove('is-resizing');
     document.body.classList.remove('md-preview-resizing');
-    unbindPreviewResizeDocument();
+    unbindPreviewResizePointer();
     setPreviewPanelWidth(els.markdownPreviewPanel.getBoundingClientRect().width, { save: true });
   };
 
@@ -1740,41 +2043,22 @@ window.UI = (() => {
     setPreviewPanelWidth(getPreviewWidthFromPointer(e.clientX));
   };
 
-  const onPreviewResizeTouchMove = (e) => {
-    if (!previewResizeDragging || !e.touches?.length) return;
-    e.preventDefault();
-    setPreviewPanelWidth(getPreviewWidthFromPointer(e.touches[0].clientX));
-  };
-
   const startPreviewResize = (e) => {
     if (!els.markdownPreviewPanel?.classList.contains('is-open')) return;
     if (!isPreviewResizeStartTarget(e)) return;
-    if (e.type === 'mousedown' && e.button !== 0) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     if (previewResizeDragging) return;
     previewResizeDragging = true;
+    previewResizeCaptureEl = e.currentTarget;
     els.markdownPreviewPanel.classList.add('is-resizing');
     document.body.classList.add('md-preview-resizing');
-    document.addEventListener('mousemove', onPreviewResizeMove);
-    document.addEventListener('mouseup', endPreviewResize);
-    const x = e.clientX ?? e.touches?.[0]?.clientX;
-    if (x != null) setPreviewPanelWidth(getPreviewWidthFromPointer(x));
-  };
-
-  const startPreviewTouchResize = (e) => {
-    if (!isPreviewResizeStartTarget(e)) return;
-    if (e.touches.length !== 1) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (previewResizeDragging) return;
-    previewResizeDragging = true;
-    els.markdownPreviewPanel.classList.add('is-resizing');
-    document.body.classList.add('md-preview-resizing');
-    document.addEventListener('touchmove', onPreviewResizeTouchMove, { passive: false });
-    document.addEventListener('touchend', endPreviewResize);
-    document.addEventListener('touchcancel', endPreviewResize);
-    setPreviewPanelWidth(getPreviewWidthFromPointer(e.touches[0].clientX));
+    previewResizeCaptureEl.setPointerCapture(e.pointerId);
+    previewResizeCaptureEl.addEventListener('pointermove', onPreviewResizeMove);
+    previewResizeCaptureEl.addEventListener('pointerup', endPreviewResize);
+    previewResizeCaptureEl.addEventListener('pointercancel', endPreviewResize);
+    setPreviewPanelWidth(getPreviewWidthFromPointer(e.clientX));
   };
 
   const onPreviewWheelResize = (e) => {
@@ -1804,12 +2088,9 @@ window.UI = (() => {
     const header = els.mdPreviewHeader;
     if (!panel || !handle) return;
 
-    handle.addEventListener('mousedown', startPreviewResize);
-    handle.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
-    header?.addEventListener('mousedown', startPreviewResize);
-    header?.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
-    panel.addEventListener('mousedown', startPreviewResize);
-    panel.addEventListener('touchstart', startPreviewTouchResize, { passive: false });
+    handle.addEventListener('pointerdown', startPreviewResize);
+    header?.addEventListener('pointerdown', startPreviewResize);
+    panel.addEventListener('pointerdown', startPreviewResize);
     panel.addEventListener('wheel', onPreviewWheelResize, { passive: false });
 
     window.addEventListener('resize', () => {
@@ -1856,11 +2137,22 @@ window.UI = (() => {
     }
   };
 
+  const HTML_PREVIEW_HEAD = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>';
+
   const wrapHtmlPreview = (source) => {
     const trimmed = (source || '').trim();
-    if (/<!doctype\s+html|<html[\s>]/i.test(trimmed)) return trimmed;
-    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'
-      + trimmed + '</body></html>';
+    if (!trimmed) return '';
+    if (/<!doctype\s+html/i.test(trimmed) || /<html[\s>]/i.test(trimmed)) return trimmed;
+    if (/<head[\s>]/i.test(trimmed)) {
+      if (/<body[\s>]/i.test(trimmed)) {
+        return '<!DOCTYPE html><html>' + trimmed + '</html>';
+      }
+      return '<!DOCTYPE html><html>' + trimmed + '<body></body></html>';
+    }
+    if (/<body[\s>]/i.test(trimmed)) {
+      return '<!DOCTYPE html><html>' + HTML_PREVIEW_HEAD + trimmed + '</html>';
+    }
+    return '<!DOCTYPE html><html>' + HTML_PREVIEW_HEAD + '<body>' + trimmed + '</body></html>';
   };
 
   const openPreviewPanel = () => {
@@ -1882,22 +2174,31 @@ window.UI = (() => {
   };
 
   const openHtmlPreview = (source) => {
-    if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    const trimmed = (source || '').trim();
+    if (!trimmed || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
     setPreviewPanelTitle('html');
-    els.markdownPreviewContent.classList.add('is-html-preview');
+    els.markdownPreviewContent.classList.remove('is-html-preview');
     els.markdownPreviewContent.innerHTML = '';
+    els.markdownPreviewContent.classList.add('is-html-preview');
     const iframe = document.createElement('iframe');
     iframe.className = 'html-preview-frame';
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-modals');
-    iframe.setAttribute('title', 'HTML Preview');
-    iframe.srcdoc = wrapHtmlPreview(source);
+    iframe.setAttribute('title', t('previewHtml'));
+    iframe.srcdoc = wrapHtmlPreview(trimmed);
     els.markdownPreviewContent.appendChild(iframe);
+    els.markdownPreviewContent.scrollTop = 0;
     openPreviewPanel();
   };
 
   const closeMarkdownPreview = () => {
     if (!els.markdownPreviewPanel) return;
-    endPreviewResize();
+    clearTimeout(previewResizeWheelSaveTimer);
+    previewResizeWheelSaveTimer = null;
+    previewResizeDragging = false;
+    unbindPreviewResizePointer();
+    els.markdownPreviewPanel.classList.remove('is-resizing');
+    document.body.classList.remove('md-preview-resizing');
+    clearPreviewPanelWidth();
     els.markdownPreviewPanel.classList.remove('is-open');
     els.markdownPreviewPanel.setAttribute('aria-hidden', 'true');
     els.app.removeAttribute('data-md-preview');

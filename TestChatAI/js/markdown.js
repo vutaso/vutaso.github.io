@@ -3,8 +3,19 @@ window.Markdown = (() => {
 
   const COPY_BTN = '<button type="button" class="copy-code-btn" data-copy-code title="Sao chép" aria-label="Sao chép"><i class="fa-solid fa-copy"></i></button>';
   const COPY_TABLE_BTN = '<button type="button" class="copy-table-btn" data-copy-table title="Sao chép bảng" aria-label="Sao chép bảng"><i class="fa-solid fa-table"></i></button>';
-  const PREVIEW_MD_BTN = '<button type="button" class="preview-md-btn" data-preview-md title="Xem preview Markdown"><i class="fa-solid fa-eye"></i></button>';
-  const PREVIEW_HTML_BTN = '<button type="button" class="preview-md-btn" data-preview-html title="Xem preview HTML"><i class="fa-solid fa-eye"></i></button>';
+  const previewBtnTitle = (key, fallback) => {
+    try {
+      return window.I18n?.t?.(key) || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const previewMdBtn = () =>
+    '<button type="button" class="preview-md-btn" data-preview-md title="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '" aria-label="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '"><i class="fa-solid fa-eye"></i></button>';
+
+  const previewHtmlBtn = () =>
+    '<button type="button" class="preview-md-btn" data-preview-html title="' + escapeHTML(previewBtnTitle('previewHtml', 'Preview HTML')) + '" aria-label="' + escapeHTML(previewBtnTitle('previewHtml', 'Preview HTML')) + '"><i class="fa-solid fa-eye"></i></button>';
 
   const MD_LANG_RE = /^(?:markdown|md|mdown|mkdn)$/i;
   const isMarkdownLang = (lang) => MD_LANG_RE.test((lang || '').trim());
@@ -148,8 +159,8 @@ window.Markdown = (() => {
 
   const codeBlockActions = (lang) => {
     let preview = '';
-    if (isMarkdownLang(lang)) preview = PREVIEW_MD_BTN;
-    else if (isHtmlLang(lang)) preview = PREVIEW_HTML_BTN;
+    if (isMarkdownLang(lang)) preview = previewMdBtn();
+    else if (isHtmlLang(lang)) preview = previewHtmlBtn();
     return '<div class="pre-header-actions">' + preview + COPY_BTN + '</div>';
   };
 

@@ -1,6 +1,5 @@
 window.API = (() => {
   const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, NVIDIA_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
-
   let currentController = null;
   const isStreaming = () => currentController !== null;
 
@@ -238,6 +237,9 @@ window.API = (() => {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
       } else if (provider === 'nvidia') {
         errMsg = errJson.detail || errJson.error?.message || errJson.title || errMsg;
+      } else if (provider === 'openrouter') {
+        const meta = errJson.error?.metadata;
+        errMsg = meta?.raw || meta?.message || errJson.error?.message || errMsg;
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -423,6 +425,12 @@ window.API = (() => {
           if (handlers.onReasoningToken) handlers.onReasoningToken(delta.reasoning_content);
         } else if (delta.reasoning) {
           if (handlers.onReasoningToken) handlers.onReasoningToken(delta.reasoning);
+        } else if (Array.isArray(delta.reasoning_details)) {
+          for (const detail of delta.reasoning_details) {
+            if (detail?.type === 'reasoning.text' && detail.text && handlers.onReasoningToken) {
+              handlers.onReasoningToken(detail.text);
+            }
+          }
         }
         if (delta.content) {
           if (handlers.onToken) handlers.onToken(delta.content);
@@ -650,6 +658,23 @@ window.API = (() => {
     return body;
   };
 
+  const buildOpenRouterBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      messages: buildMessages(convo, systemPrompt),
+      stream: true
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    const reasoning = window.APP_CONFIG.getOpenRouterThinkingConfig(model, thinking, reasoningEffort);
+    if (reasoning) {
+      body.reasoning = reasoning;
+    }
+    return body;
+  };
+
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
@@ -657,12 +682,18 @@ window.API = (() => {
         ? buildByteplusBody(model, systemPrompt, convo, thinking, reasoningEffort)
         : provider === 'nvidia'
           ? buildNvidiaBody(model, systemPrompt, convo, thinking, reasoningEffort)
+          : provider === 'openrouter'
+            ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
             : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
 
     const headers = { 'Content-Type': 'application/json' };
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
+    if (provider === 'openrouter') {
+      headers['HTTP-Referer'] = window.location.origin || 'https://vutaso.github.io';
+      headers['X-Title'] = 'VUTASO AI';
+    }
 
     const res = await fetch(endpoint || OPENAI_ENDPOINT, {
       method: 'POST',
@@ -974,6 +1005,11 @@ window.API = (() => {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: KIMI_ENDPOINT, provider: 'kimi', thinking
+        });
+      } else if (provider === 'openrouter') {
+        await sendChatCompletions({
+          apiKey, model, systemPrompt, convo, controller, handlers,
+          endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
         });
       } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });

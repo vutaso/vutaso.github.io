@@ -15,6 +15,21 @@ window.APP_CONFIG = {
     { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-gpt-oss-120b', apiModel: 'gpt-oss-120b-250805', label: 'GPT OSS 120B', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-gpt-5.4-nano', apiModel: 'openai/gpt-5.4-nano', label: 'GPT-5.4 nano (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-deepseek-v4-flash', apiModel: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
+    { id: 'openrouter-deepseek-v4-pro', apiModel: 'deepseek/deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-glm-5-2', apiModel: 'z-ai/glm-5.2', label: 'GLM 5.2 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-mimo-v2-5', apiModel: 'xiaomi/mimo-v2.5', label: 'MiMo V2.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 32000 },
+    { id: 'openrouter-mimo-v2.5-pro', apiModel: 'xiaomi/mimo-v2.5-pro', label: 'MiMo V2.5 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b:free', label: 'Nemotron 3 Ultra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 65536 },
+    { id: 'openrouter-minimax-m3', apiModel: 'minimax/minimax-m3', label: 'MiniMax M3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
+    { id: 'openrouter-claude-haiku-4-5', apiModel: 'anthropic/claude-haiku-4.5', label: 'Claude Haiku 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
+    { id: 'openrouter-claude-sonnet-5', apiModel: 'anthropic/claude-sonnet-5', label: 'Claude Sonnet 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-gemini-2.5-flash-lite', apiModel: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-gemini-2.5-flash', apiModel: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-gemini-3.5-flash', apiModel: 'google/gemini-3.5-flash', label: 'Gemini 3.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-hy3-preview', apiModel: 'tencent/hy3-preview', label: 'Hy3 Preview (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -47,6 +62,21 @@ window.APP_CONFIG = {
     'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
     'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
+    'openrouter-gpt-oss-120b': { input: 0.03, output: 0.15 },
+    'openrouter-gpt-5.4-nano': { input: 0.20, output: 1.25 },
+    'openrouter-deepseek-v4-flash': { input: 0.09, output: 0.18 },
+    'openrouter-deepseek-v4-pro': { input: 0.435, output: 0.87 },
+    'openrouter-glm-5-2': { input: 0.93, output: 3.00 },
+    'openrouter-mimo-v2-5': { input: 0.105, output: 0.28 },
+    'openrouter-mimo-v2.5-pro': { input: 0.435, output: 0.87 },
+    'openrouter-nemotron-3-ultra-550b-a55b': { input: 0, output: 0 },
+    'openrouter-minimax-m3': { input: 0.30, output: 1.20 },
+    'openrouter-claude-haiku-4-5': { input: 1.00, output: 5.00 },
+    'openrouter-claude-sonnet-5': { input: 2.00, output: 10.00 },
+    'openrouter-gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
+    'openrouter-gemini-2.5-flash': { input: 0.30, output: 2.50 },
+    'openrouter-gemini-3.5-flash': { input: 1.50, output: 9.00 },
+    'openrouter-hy3-preview': { input: 0.066, output: 0.26 },
     'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
@@ -82,6 +112,7 @@ window.APP_CONFIG = {
     deepseek:  ['default', 'high', 'max'],
     nvidia:    ['default', 'high', 'max'],
     byteplus:  ['default', 'high', 'max'],
+    openrouter: ['low', 'medium', 'high'],
     kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
   },
 
@@ -97,7 +128,22 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-pro': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-code': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-gpt-oss-120b': ['low', 'medium', 'high']
+    'byteplus-gpt-oss-120b': ['low', 'medium', 'high'],
+    'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
+    'openrouter-gpt-5.4-nano': ['low', 'medium', 'high'],
+    'openrouter-deepseek-v4-flash': ['high', 'xhigh'],
+    'openrouter-deepseek-v4-pro': ['high', 'xhigh'],
+    'openrouter-glm-5-2': ['high', 'xhigh'],
+    'openrouter-mimo-v2-5': ['low', 'medium', 'high'],
+    'openrouter-mimo-v2.5-pro': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-ultra-550b-a55b': ['medium', 'high'],
+    'openrouter-minimax-m3': ['low', 'medium', 'high'],
+    'openrouter-claude-haiku-4-5': ['low', 'medium', 'high'],
+    'openrouter-claude-sonnet-5': ['low', 'medium', 'high', 'max'],
+    'openrouter-gemini-2.5-flash-lite': ['low', 'medium', 'high'],
+    'openrouter-gemini-2.5-flash': ['low', 'medium', 'high'],
+    'openrouter-gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
+    'openrouter-hy3-preview': ['low', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -127,6 +173,7 @@ window.APP_CONFIG = {
   modelUsesEffortLinkedThinking(modelId) {
     if (this.modelUsesByteplusResponses(modelId)) return false;
     if (this.modelUsesByteplusOpenAIReasoning(modelId)) return false;
+    if (this.modelUsesOpenRouterReasoning(modelId)) return false;
     const provider = this.getModelProvider(modelId);
     return provider === 'deepseek' || provider === 'nvidia' || provider === 'byteplus';
   },
@@ -211,9 +258,15 @@ window.APP_CONFIG = {
   },
 
   getDefaultEffortForModel(modelId) {
-    if (modelId === 'gemini-3.5-flash') return 'medium';
+    if (modelId === 'gemini-3.5-flash' || modelId === 'openrouter-gemini-3.5-flash') return 'medium';
     if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code') return 'medium';
     if (modelId === 'byteplus-gpt-oss-120b') return 'medium';
+    if (modelId === 'openrouter-gpt-oss-120b' || modelId === 'openrouter-gpt-5.4-nano') return 'medium';
+    if (modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
+    if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
+    if (modelId === 'openrouter-nemotron-3-ultra-550b-a55b') return 'high';
+    if (modelId === 'openrouter-minimax-m3') return 'medium';
+    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-hy3-preview') return 'high';
     return this.DEFAULT_EFFORT;
   },
 
@@ -294,6 +347,10 @@ window.APP_CONFIG = {
   getMaxOutputTokens(modelId) {
     const configured = this.API_MAX_OUTPUT_TOKENS;
     if (!configured) return null;
+    if (this.getModelProvider(modelId) === 'openrouter') {
+      // OpenRouter từ chối request nếu max_tokens vượt số credit còn lại — để null = không gửi max_tokens.
+      return this.OPENROUTER_MAX_OUTPUT_TOKENS || null;
+    }
     const cap = this.getModel(modelId).maxOutputTokens;
     return cap ? Math.min(configured, cap) : configured;
   },
@@ -308,6 +365,7 @@ window.APP_CONFIG = {
     if (provider === 'deepseek') return state.deepseekApiKey || '';
     if (provider === 'nvidia') return state.nvidiaApiKey || '';
     if (provider === 'byteplus') return state.byteplusApiKey || '';
+    if (provider === 'openrouter') return state.openrouterApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
     if (provider === 'kimi') return state.kimiApiKey || '';
     return state.apiKey || '';
@@ -320,6 +378,7 @@ window.APP_CONFIG = {
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
     if (provider === 'nvidia') return 'Enter your NVIDIA API key in Settings first';
     if (provider === 'byteplus') return 'Enter your Byte Plus API key in Settings first';
+    if (provider === 'openrouter') return 'Enter your OpenRouter API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
     if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
     return 'Enter your API key in Settings first';
@@ -332,6 +391,7 @@ window.APP_CONFIG = {
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
     if (provider === 'nvidia') return 'No NVIDIA API key. Open Settings to enter one.';
     if (provider === 'byteplus') return 'No Byte Plus API key. Open Settings to enter one.';
+    if (provider === 'openrouter') return 'No OpenRouter API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
     if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
@@ -545,6 +605,9 @@ window.APP_CONFIG = {
       }
     ]
   },
+  OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
+  // Để null: không gửi max_tokens (OpenRouter tự giới hạn theo credit). Đặt số (vd. 8192) nếu tài khoản có đủ credit.
+  OPENROUTER_MAX_OUTPUT_TOKENS: 32768,
   KIMI_ENDPOINT: 'https://api.moonshot.ai/v1/chat/completions',
   GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
 
@@ -580,6 +643,24 @@ window.APP_CONFIG = {
 
   modelUsesByteplusOpenAIReasoning(modelId) {
     return /^gpt-oss/i.test(this.getApiModel(modelId));
+  },
+
+  modelUsesOpenRouterReasoning(modelId) {
+    return this.getModelProvider(modelId) === 'openrouter';
+  },
+
+  getOpenRouterThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {
+    const required = this.modelThinkingRequired(modelId);
+    if (!thinkingEnabled && !required) return null;
+    const effort = this.normalizeEffortForModel(
+      reasoningEffort || this.getDefaultEffortForModel(modelId),
+      modelId
+    );
+    return { enabled: true, effort };
+  },
+
+  getOpenRouterEndpoint() {
+    return this.OPENROUTER_ENDPOINT;
   },
 
   getByteplusMcpTools(modelId) {

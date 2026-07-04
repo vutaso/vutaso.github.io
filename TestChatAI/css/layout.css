@@ -330,6 +330,7 @@ body.pdf-export-loading .main-shell {
 .md-preview-resize-handle:focus-visible,
 .md-preview-panel.is-resizing .md-preview-resize-handle {
   color: var(--accent);
+  z-index: 30;
 }
 
 .md-preview-resize-handle::before {
@@ -440,6 +441,10 @@ body.md-preview-resizing * {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.md-preview-panel.is-resizing .html-preview-frame {
+  pointer-events: none;
 }
 
 .md-preview-content .html-preview-frame {

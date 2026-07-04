@@ -149,7 +149,25 @@
         </div>
       </div>
 
-      <section id="messages" class="messages" aria-live="polite"></section>
+      <div class="chat-scroll-wrap">
+        <section id="messages" class="messages" aria-live="polite"></section>
+        <nav id="messageScrollRail" class="message-scroll-rail hidden" aria-label="Nhảy đến câu hỏi">
+          <button type="button" id="messageScrollRailPrev" class="message-scroll-rail-arrow" title="Câu hỏi trước" aria-label="Câu hỏi trước">
+            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+          </button>
+          <div class="message-scroll-rail-track" role="presentation">
+            <div id="messageScrollRailTicks" class="message-scroll-rail-ticks"></div>
+            <div id="messageScrollRailIndicator" class="message-scroll-rail-indicator" aria-hidden="true"></div>
+          </div>
+          <button type="button" id="messageScrollRailNext" class="message-scroll-rail-arrow" title="Câu hỏi sau" aria-label="Câu hỏi sau">
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+        </nav>
+        <div id="messageScrollRailTooltip" class="message-scroll-rail-tooltip hidden" role="tooltip" aria-hidden="true">
+          <span class="message-scroll-rail-tooltip-user"></span>
+          <p class="message-scroll-rail-tooltip-text"></p>
+        </div>
+      </div>
 
       <form id="composer" class="composer" autocomplete="off">
         <div id="composerAttachments" class="composer-attachments hidden" aria-live="polite"></div>
@@ -400,6 +418,15 @@
                 <input id="kimiApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
                 <button type="button" id="toggleKimiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
                   <span class="icon" id="kimiApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
+                </button>
+              </div>
+            </div>
+            <div class="settings-api-row">
+              <label for="openrouterApiKeyInput">OpenRouter</label>
+              <div class="input-group">
+                <input id="openrouterApiKeyInput" type="password" class="input" placeholder="sk-or-..." autocomplete="off" />
+                <button type="button" id="toggleOpenrouterApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
+                  <span class="icon" id="openrouterApiKeyIcon"><i class="fa-solid fa-eye"></i></span>
                 </button>
               </div>
             </div>
