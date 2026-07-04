@@ -227,6 +227,22 @@ window.API = (() => {
     return 'data:image/png;base64,' + b64;
   };
 
+  const toImageDataUrlFromB64 = (b64, mediaType) => {
+    if (!b64) return '';
+    if (b64.startsWith('data:')) return b64;
+    const mime = mediaType || 'image/png';
+    return 'data:' + mime + ';base64,' + b64;
+  };
+
+  const getOpenRouterImagePromptFromConvo = (convo) => {
+    const users = (convo.messages || []).filter((m) => m.role === 'user');
+    const last = users[users.length - 1];
+    if (!last) return { prompt: '', images: [] };
+    const prompt = (last.content || '').trim();
+    const images = (last.images || []).filter((img) => img?.dataUrl);
+    return { prompt, images };
+  };
+
   const parseApiError = async (res, provider = 'openai') => {
     let errMsg = 'HTTP ' + res.status;
     try {
@@ -592,6 +608,8 @@ window.API = (() => {
     }
     if (window.APP_CONFIG.modelUsesNvidiaDeepSeekChatTemplate(model)) {
       body.chat_template_kwargs = { thinking: !!thinking };
+    } else if (window.APP_CONFIG.modelUsesNvidiaEnableThinkingTemplate(model)) {
+      body.chat_template_kwargs = { enable_thinking: !!thinking };
     } else if (window.APP_CONFIG.modelUsesNemotronReasoning(model)) {
       if (window.APP_CONFIG.modelUsesNemotronBudgetReasoning(model)) {
         if (!thinking) {
@@ -615,8 +633,12 @@ window.API = (() => {
           body.chat_template_kwargs = { enable_thinking: true };
         }
       }
+    } else if (window.APP_CONFIG.modelUsesNvidiaStepModel(model)) {
+      // Step trả reasoning_content mà không cần reasoning_effort.
     } else if (!thinking) {
-      body.reasoning_effort = 'none';
+      // Bỏ qua reasoning_effort — endpoint Step/Mistral và nhiều model NVIDIA khác từ chối 'none'.
+    } else if (window.APP_CONFIG.modelUsesNvidiaLmReasoningEffort(model)) {
+      body.reasoning_effort = window.APP_CONFIG.normalizeNvidiaLmReasoningEffort(reasoningEffort, model);
     } else {
       const effort = window.APP_CONFIG.normalizeDeepSeekEffort(reasoningEffort);
       body.reasoning_effort = effort === 'max' ? 'max' : 'high';
@@ -697,6 +719,57 @@ window.API = (() => {
       body.reasoning = reasoning;
     }
     return body;
+  };
+
+  const sendOpenRouterImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
+    const { prompt, images } = getOpenRouterImagePromptFromConvo(convo);
+    if (!prompt) {
+      throw new Error('Không có mô tả ảnh để tạo');
+    }
+
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      prompt
+    };
+    if (imageGenOptions?.aspectRatio && window.APP_CONFIG.openRouterImagesSupportsAspectRatio(model)) {
+      body.aspect_ratio = imageGenOptions.aspectRatio;
+    }
+    if (images.length) {
+      body.input_references = images.map((img) => ({
+        image_url: { url: img.dataUrl }
+      }));
+    }
+
+    if (handlers.onImageStatus) handlers.onImageStatus('generating');
+
+    const res = await fetch(window.APP_CONFIG.getOpenRouterImagesEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'openrouter');
+
+    const json = await res.json();
+    emitUsage(handlers, extractUsage(json));
+
+    const items = json.data || [];
+    if (!items.length) {
+      throw new Error('API không trả về ảnh');
+    }
+
+    if (handlers.onImageStatus) handlers.onImageStatus('completed');
+    for (const item of items) {
+      if (!item?.b64_json) continue;
+      const dataUrl = toImageDataUrlFromB64(item.b64_json, item.media_type);
+      if (dataUrl && handlers.onImageComplete) {
+        handlers.onImageComplete({ dataUrl });
+      }
+    }
   };
 
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
@@ -1031,10 +1104,16 @@ window.API = (() => {
           endpoint: KIMI_ENDPOINT, provider: 'kimi', thinking
         });
       } else if (provider === 'openrouter') {
-        await sendChatCompletions({
-          apiKey, model, systemPrompt, convo, controller, handlers,
-          endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
-        });
+        if (window.APP_CONFIG.modelUsesOpenRouterImages(model)) {
+          await sendOpenRouterImages({
+            apiKey, model, convo, controller, handlers, imageGenOptions
+          });
+        } else {
+          await sendChatCompletions({
+            apiKey, model, systemPrompt, convo, controller, handlers,
+            endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
+          });
+        }
       } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });
       } else {

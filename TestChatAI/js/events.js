@@ -59,6 +59,7 @@ window.Events = (() => {
     let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
     if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
     if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
+    if (window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) imageGenEnabled = true;
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
     if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
     if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
@@ -600,7 +601,8 @@ window.Events = (() => {
       }
     }
     const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
-    const useImageGen = !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
+    const useImageGen = window.APP_CONFIG.modelUsesOpenRouterImages(modelId)
+      || !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
     const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
     const useThinking = isEffortThinking
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
@@ -790,7 +792,7 @@ window.Events = (() => {
     }
     const text = ui.els.composerInput.value.trim();
     if (window.API.isStreaming()) return;
-    if (s.imageGenEnabled) {
+    if (s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) {
       if (!text) return;
     } else if (!text && !pendingImages.length && !pendingFiles.length) {
       return;
@@ -803,7 +805,7 @@ window.Events = (() => {
       content: text,
       ts: Date.now()
     };
-    if (s.imageGenEnabled && text) {
+    if ((s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) && text) {
       userMsg.imageGen = {
         ratio: s.imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
         style: s.imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,

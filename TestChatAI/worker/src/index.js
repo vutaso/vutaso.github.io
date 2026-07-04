@@ -10,13 +10,18 @@ const ALLOWED_NVIDIA_MODELS = new Set([
   'nvidia/nemotron-3-super-120b-a12b',
   'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
   'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
   'z-ai/glm-5.2',
   'minimaxai/minimax-m3',
+  'minimaxai/minimax-m2.7',
   'stepfun-ai/step-3.7-flash',
+  'stepfun-ai/step-3.5-flash',
   'mistralai/mistral-small-4-119b-2603',
   'mistralai/mistral-medium-3.5-128b',
   'qwen/qwen3.5-397b-a17b',
-  'qwen/qwen3.5-122b-a10b'
+  'qwen/qwen3.5-122b-a10b',
+  'google/gemma-4-31b-it',
+  'google/diffusiongemma-26b-a4b-it'
 ]);
 const ALLOWED_BYTEPLUS_MODELS = new Set(['deepseek-v4-flash-260425', 'glm-5-2-260617', 'gpt-oss-120b-250805']);
 const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
