@@ -146,6 +146,7 @@ window.UI = (() => {
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
+    els.providerSelect = $('#providerSelect');
     els.effortSelect = $('#effortSelect');
     els.toggleSidebarSearchBtn = $('#toggleSidebarSearchBtn');
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
@@ -503,13 +504,46 @@ window.UI = (() => {
       + generatedImagesHTML(m.generatedImages);
   };
 
-  const initModelSelect = (currentModel) => {
-    const { MODELS, DEFAULT_MODEL } = window.APP_CONFIG;
-    const selected = currentModel || DEFAULT_MODEL;
-    els.modelSelect.innerHTML = MODELS.map((m) =>
+  const updateModelSelect = (providerId, selectedModelId) => {
+    if (!els.modelSelect) return;
+    const models = window.APP_CONFIG.getModelsByProvider(providerId);
+    const selected = models.some((m) => m.id === selectedModelId)
+      ? selectedModelId
+      : (models[0]?.id || window.APP_CONFIG.DEFAULT_MODEL);
+    els.modelSelect.innerHTML = models.map((m) =>
       '<option value="' + escapeHTML(m.id) + '"' + (m.id === selected ? ' selected' : '') + '>'
-      + escapeHTML(m.label) + '</option>'
+      + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m)) + '</option>'
     ).join('');
+    els.modelSelect.value = selected;
+    return selected;
+  };
+
+  const syncProviderSelect = (providerId) => {
+    if (!els.providerSelect) return;
+    if (els.providerSelect.value !== providerId) {
+      els.providerSelect.value = providerId;
+    }
+  };
+
+  const initProviderSelects = (currentModel) => {
+    const { DEFAULT_MODEL } = window.APP_CONFIG;
+    const modelId = currentModel || DEFAULT_MODEL;
+    const providerId = window.APP_CONFIG.getModelProvider(modelId);
+
+    if (els.providerSelect) {
+      const providers = window.APP_CONFIG.getProviders();
+      els.providerSelect.innerHTML = providers.map((p) =>
+        '<option value="' + escapeHTML(p.id) + '"' + (p.id === providerId ? ' selected' : '') + '>'
+        + escapeHTML(p.label) + '</option>'
+      ).join('');
+      els.providerSelect.value = providerId;
+    }
+
+    updateModelSelect(providerId, modelId);
+  };
+
+  const initModelSelect = (currentModel) => {
+    initProviderSelects(currentModel);
   };
 
   const EFFORT_LABEL_KEYS = {
@@ -2351,7 +2385,8 @@ window.UI = (() => {
   };
 
   return {
-    cacheEls, setTheme, initModelSelect, initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
+    cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect,
+    initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,

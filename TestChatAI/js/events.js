@@ -51,6 +51,39 @@ window.Events = (() => {
     ui.syncComposerToolsUI(modelId || state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL, getToolState(patch));
   };
 
+  const applyModelChange = (modelId, { showToast = true } = {}) => {
+    const s = state.get();
+    let webSearchEnabled = s.webSearchEnabled;
+    let imageGenEnabled = s.imageGenEnabled;
+    let thinkingEnabled = s.thinkingEnabled;
+    let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
+    if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
+    if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
+    if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
+    if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
+    if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
+      thinkingEnabled = reasoningEffort !== 'default';
+    }
+    if (window.APP_CONFIG.modelUsesBinaryThinking(modelId)) {
+      if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
+        thinkingEnabled = true;
+      }
+    }
+    if (!window.APP_CONFIG.modelSupportsVision(modelId) && pendingImages.length) {
+      pendingImages = [];
+      ui.renderComposerAttachments(pendingImages, pendingFiles);
+    }
+    state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
+    ui.syncProviderSelect(window.APP_CONFIG.getModelProvider(modelId));
+    syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
+    updateSendEnabled();
+    ui.updateSettingsTokenUsage(state.get());
+    if (showToast) {
+      const label = ui.els.modelSelect?.selectedOptions[0]?.textContent || modelId;
+      ui.showToast(t('toastModel', { label }));
+    }
+  };
+
   const getContentFromNode = (node) => {
     if (!node) return null;
     const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
@@ -1260,35 +1293,23 @@ window.Events = (() => {
       ui.closeTokenCostWarning();
       ui.openSettings(state.get());
     });
-    ui.els.modelSelect.addEventListener('change', () => {
-      const modelId = ui.els.modelSelect.value;
+    ui.els.providerSelect?.addEventListener('change', () => {
+      const providerId = ui.els.providerSelect.value;
+      const models = window.APP_CONFIG.getModelsByProvider(providerId);
+      if (!models.length) return;
       const s = state.get();
-      let webSearchEnabled = s.webSearchEnabled;
-      let imageGenEnabled = s.imageGenEnabled;
-      let thinkingEnabled = s.thinkingEnabled;
-      let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
-      if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
-      if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
-      if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
-      if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
-      if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
-        thinkingEnabled = reasoningEffort !== 'default';
-      }
-      if (window.APP_CONFIG.modelUsesBinaryThinking(modelId)) {
-        if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
-          thinkingEnabled = true;
-        }
-      }
-      if (!window.APP_CONFIG.modelSupportsVision(modelId) && pendingImages.length) {
-        pendingImages = [];
-        ui.renderComposerAttachments(pendingImages, pendingFiles);
-      }
-      state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
-      syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
-      updateSendEnabled();
-      ui.updateSettingsTokenUsage(state.get());
-      const label = ui.els.modelSelect.selectedOptions[0]?.textContent || modelId;
-      ui.showToast(t('toastModel', { label }));
+      const currentModel = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const nextModel = models.some((m) => m.id === currentModel)
+        ? currentModel
+        : models[0].id;
+      const selected = ui.updateModelSelect(providerId, nextModel);
+      applyModelChange(selected, { showToast: false });
+      const providerLabel = ui.els.providerSelect.selectedOptions[0]?.textContent || providerId;
+      ui.showToast(t('toastProvider', { label: providerLabel }));
+    });
+
+    ui.els.modelSelect.addEventListener('change', () => {
+      applyModelChange(ui.els.modelSelect.value);
     });
 
     ui.els.effortSelect?.addEventListener('change', () => {

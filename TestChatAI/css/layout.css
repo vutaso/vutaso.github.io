@@ -690,6 +690,10 @@ body.md-preview-resizing * {
   min-width: 0;
 }
 
+.header-title .provider-select {
+  max-width: min(140px, 26vw);
+}
+
 .header-title .model-select {
   max-width: min(200px, 34vw);
 }

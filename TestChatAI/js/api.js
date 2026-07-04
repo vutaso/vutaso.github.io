@@ -577,19 +577,43 @@ window.API = (() => {
       messages: buildMessages(convo, systemPrompt),
       stream: true
     };
-    if (window.APP_CONFIG.modelUsesNemotronReasoning(model)) {
-      const effort = thinking
-        ? window.APP_CONFIG.normalizeNemotronEffort(reasoningEffort)
-        : 'default';
-      if (effort === 'default') {
-        body.reasoning_effort = 'none';
-        body.chat_template_kwargs = { enable_thinking: false };
-      } else if (effort === 'medium') {
-        body.reasoning_effort = 'medium';
-        body.chat_template_kwargs = { enable_thinking: true, medium_effort: true };
+    if (window.APP_CONFIG.modelUsesGptOssReasoning(model)) {
+      if (thinking) {
+        body.reasoning_effort = window.APP_CONFIG.normalizeEffortForModel(
+          reasoningEffort || window.APP_CONFIG.getDefaultEffortForModel(model),
+          model
+        );
+      }
+      const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+      if (maxOutputTokens) {
+        body.max_tokens = maxOutputTokens;
+      }
+      return body;
+    }
+    if (window.APP_CONFIG.modelUsesNvidiaDeepSeekChatTemplate(model)) {
+      body.chat_template_kwargs = { thinking: !!thinking };
+    } else if (window.APP_CONFIG.modelUsesNemotronReasoning(model)) {
+      if (window.APP_CONFIG.modelUsesNemotronBudgetReasoning(model)) {
+        if (!thinking) {
+          body.chat_template_kwargs = { enable_thinking: false };
+        } else {
+          body.reasoning_budget = window.APP_CONFIG.getNemotronReasoningBudget(model);
+          body.chat_template_kwargs = { enable_thinking: true };
+        }
       } else {
-        body.reasoning_effort = 'high';
-        body.chat_template_kwargs = { enable_thinking: true };
+        const effort = thinking
+          ? window.APP_CONFIG.normalizeNemotronEffort(reasoningEffort)
+          : 'default';
+        if (effort === 'default') {
+          body.reasoning_effort = 'none';
+          body.chat_template_kwargs = { enable_thinking: false };
+        } else if (effort === 'medium') {
+          body.reasoning_effort = 'medium';
+          body.chat_template_kwargs = { enable_thinking: true, medium_effort: true };
+        } else {
+          body.reasoning_effort = 'high';
+          body.chat_template_kwargs = { enable_thinking: true };
+        }
       }
     } else if (!thinking) {
       body.reasoning_effort = 'none';
