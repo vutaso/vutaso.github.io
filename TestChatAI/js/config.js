@@ -24,6 +24,7 @@ window.APP_CONFIG = {
     { id: 'openrouter-mimo-v2-5', apiModel: 'xiaomi/mimo-v2.5', label: 'MiMo V2.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 32000 },
     { id: 'openrouter-mimo-v2.5-pro', apiModel: 'xiaomi/mimo-v2.5-pro', label: 'MiMo V2.5 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-minimax-m3', apiModel: 'minimax/minimax-m3', label: 'MiniMax M3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
+    { id: 'openrouter-minimax-m2.7-nitro', apiModel: 'minimax/minimax-m2.7:nitro', label: 'MiniMax M2.7 Nitro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-claude-3-haiku', apiModel: 'anthropic/claude-3-haiku', label: 'Claude 3 Haiku (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: true },
     { id: 'openrouter-claude-haiku-4-5', apiModel: 'anthropic/claude-haiku-4.5', label: 'Claude Haiku 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
     { id: 'openrouter-claude-sonnet-5', apiModel: 'anthropic/claude-sonnet-5', label: 'Claude Sonnet 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -35,7 +36,16 @@ window.APP_CONFIG = {
     { id: 'openrouter-gpt-image-2', apiModel: 'openai/gpt-image-2', label: 'GPT Image 2 (OpenRouter)', provider: 'openrouter', apiMode: 'openrouter-images', webSearch: false, imageGen: true, thinking: false, vision: true },
     { id: 'openrouter-seedream-4-5', apiModel: 'bytedance-seed/seedream-4.5', label: 'Seedream 4.5 (OpenRouter)', provider: 'openrouter', apiMode: 'openrouter-images', webSearch: false, imageGen: true, thinking: false, vision: true },
     { id: 'openrouter-gemma-4-26b', apiModel: 'google/gemma-4-26b-a4b-it', label: 'Gemma 4 26B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-gemma-4-31b-free', apiModel: 'google/gemma-4-31b-it:free', label: 'Gemma 4 31B free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-hy3-preview', apiModel: 'tencent/hy3-preview', label: 'Hy3 Preview (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-north-mini-code', apiModel: 'cohere/north-mini-code:free', label: 'North Mini Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-mistral-nemo', apiModel: 'mistralai/mistral-nemo', label: 'Mistral Nemo (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: false },
+    { id: 'openrouter-mistral-small-3.2-24b', apiModel: 'mistralai/mistral-small-3.2-24b-instruct', label: 'Mistral Small 3.2 24B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: true },
+    { id: 'openrouter-mistral-small-4', apiModel: 'mistralai/mistral-small-2603', label: 'Mistral Small 4 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-nemotron-3-ultra-free', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b:free', label: 'Nemotron 3 Ultra free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-super-free', apiModel: 'nvidia/nemotron-3-super-120b-a12b:free', label: 'Nemotron 3 Super free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
+    { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -93,6 +103,7 @@ window.APP_CONFIG = {
     'openrouter-mimo-v2-5': { input: 0.105, output: 0.28 },
     'openrouter-mimo-v2.5-pro': { input: 0.435, output: 0.87 },
     'openrouter-minimax-m3': { input: 0.30, output: 1.20 },
+    'openrouter-minimax-m2.7-nitro': { input: 0.18, output: 0.72 },
     'openrouter-claude-3-haiku': { input: 0.25, output: 1.25 },
     'openrouter-claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'openrouter-claude-sonnet-5': { input: 2.00, output: 10.00 },
@@ -104,7 +115,16 @@ window.APP_CONFIG = {
     'openrouter-gpt-image-2': { input: 8.00, output: 8.00 },
     'openrouter-seedream-4-5': { input: 0, output: 9.60 },
     'openrouter-gemma-4-26b': { input: 0.06, output: 0.33 },
+    'openrouter-gemma-4-31b-free': { input: 0, output: 0 },
     'openrouter-hy3-preview': { input: 0.066, output: 0.26 },
+    'openrouter-north-mini-code': { input: 0, output: 0 },
+    'openrouter-mistral-nemo': { input: 0.02, output: 0.03 },
+    'openrouter-mistral-small-3.2-24b': { input: 0.075, output: 0.20 },
+    'openrouter-mistral-small-4': { input: 0.15, output: 0.60 },
+    'openrouter-nemotron-3-ultra-free': { input: 0, output: 0 },
+    'openrouter-nemotron-3-super-free': { input: 0, output: 0 },
+    'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
+    'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
     'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
@@ -206,6 +226,7 @@ window.APP_CONFIG = {
     'openrouter-mimo-v2-5': ['low', 'medium', 'high'],
     'openrouter-mimo-v2.5-pro': ['low', 'medium', 'high'],
     'openrouter-minimax-m3': ['low', 'medium', 'high'],
+    'openrouter-minimax-m2.7-nitro': ['low', 'medium', 'high'],
     'openrouter-claude-haiku-4-5': ['low', 'medium', 'high'],
     'openrouter-claude-sonnet-5': ['low', 'medium', 'high', 'max'],
     'openrouter-claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
@@ -213,7 +234,14 @@ window.APP_CONFIG = {
     'openrouter-gemini-2.5-flash': ['low', 'medium', 'high'],
     'openrouter-gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
     'openrouter-gemma-4-26b': ['low', 'medium', 'high'],
-    'openrouter-hy3-preview': ['low', 'high']
+    'openrouter-gemma-4-31b-free': ['low', 'medium', 'high'],
+    'openrouter-hy3-preview': ['low', 'high'],
+    'openrouter-north-mini-code': ['low', 'medium', 'high'],
+    'openrouter-mistral-small-4': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-ultra-free': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-super-free': ['low', 'medium', 'high'],
+    'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
+    'openrouter-kimi-k2.6': ['low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -385,8 +413,8 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
-    if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-gemma-4-26b') return 'medium';
-    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-hy3-preview') return 'high';
+    if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-gemma-4-26b' || modelId === 'openrouter-gemma-4-31b-free' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
+    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-hy3-preview' || modelId === 'openrouter-nemotron-3-ultra-free' || modelId === 'openrouter-nemotron-3-super-free' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6') return 'high';
     return this.DEFAULT_EFFORT;
   },
 

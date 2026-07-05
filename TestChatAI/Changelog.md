@@ -9,6 +9,16 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 ## [Unreleased]
 
 ### Added
+- Model **North Mini Code** (OpenRouter, `cohere/north-mini-code:free`) — agentic coding, reasoning, miễn phí.
+- Model **Mistral Nemo** (OpenRouter, `mistralai/mistral-nemo`) — 12B, context 128K.
+- Model **Mistral Small 3.2 24B** (OpenRouter, `mistralai/mistral-small-3.2-24b-instruct`) — vision, context 128K.
+- Model **Mistral Small 4** (OpenRouter, `mistralai/mistral-small-2603`) — reasoning, vision, context 262K.
+- Model **MiniMax M2.7 Nitro** (OpenRouter, `minimax/minimax-m2.7:nitro`) — reasoning, routing nhanh, context 205K.
+- Model **Nemotron 3 Ultra free** (OpenRouter, `nvidia/nemotron-3-ultra-550b-a55b:free`) — reasoning, context 1M, miễn phí.
+- Model **Nemotron 3 Super free** (OpenRouter, `nvidia/nemotron-3-super-120b-a12b:free`) — reasoning, context 1M, miễn phí.
+- Model **Gemma 4 31B free** (OpenRouter, `google/gemma-4-31b-it:free`) — reasoning, vision, context 262K, miễn phí.
+- Model **Kimi K2.7 Code** (OpenRouter, `moonshotai/kimi-k2.7-code`) — coding, reasoning bắt buộc, vision, context 262K.
+- Model **Kimi K2.6** (OpenRouter, `moonshotai/kimi-k2.6`) — reasoning, vision, context 262K.
 - Model **Claude Sonnet 5** (Anthropic).
 - Dropdown **Reasoning Effort** trên composer — mức suy luận theo từng provider/model (`low` → `max`, `minimal` cho Gemini 3.5).
 - Menu **Tải xuống** trên header — gom các tùy chọn xuất hội thoại.
