@@ -22,20 +22,22 @@ const MB_I18N = {
     // Floating cards
     fc1_label: 'Tiết kiệm tháng này',
     fc2_label: 'Báo cáo sẵn sàng',
+    fc2_val: 'PDF · CSV · Excel',
     // Phone UI
     ph_greeting: 'Xin chào 👋',
     ph_name: 'Tuấn Anh',
     ph_avatar: 'TA',
     ph_balance: 'Số dư hiện tại',
-    ph_change: '▲ +12% so với tháng trước',
-    ph_income: 'Thu nhập',
-    ph_expense: 'Chi tiêu',
+    ph_change_badge: '+12%',
+    ph_chart_label: 'Tuần này',
+    ph_income: 'Thu',
+    ph_expense: 'Chi',
     ph_saving: 'Tiết kiệm',
     ph_txn1: 'Lương tháng 3',
     ph_txn2: 'Shopee - Mua sắm',
     ph_txn3: 'Grab - Di chuyển',
     // Currency amounts
-    fc1_val: '+8.200.000 ₫',
+    fc1_val: '+8.2tr',
     ph_bal_num: '52.400.000 ₫',
     ph_income_val: '+24.5tr',
     ph_expense_val: '-16.1tr',
@@ -135,16 +137,13 @@ const MB_I18N = {
     dl_store: '<small>Tải về từ</small><strong>App Store</strong>',
     dl_qr: 'Quét để tải app',
 
+    nav_qr_free: 'Tạo mã QR Free',
     // Footer
-    ft_tag: 'Ứng dụng quản lý chi tiêu thông minh dành cho iOS. Không cần đăng ký, bắt đầu ngay hôm nay.',
-    ft_feat: 'Tính năng',
-    ft_f1: 'Nhập thu chi', ft_f2: 'Ví tiền', ft_f3: 'Báo cáo biểu đồ', ft_f4: 'Chat AI', ft_f5: 'Đồng bộ iCloud', ft_f6: 'Xuất dữ liệu',
-    ft_wid: 'Tiện ích',
-    ft_w1: 'Quét tài liệu', ft_w2: 'Danh sách mua sắm', ft_w3: 'Nhập từ ảnh', ft_w4: 'Hạn mức chi', ft_w5: 'Sổ Nợ', ft_w6: 'Xem Lịch Âm', ft_w7: 'Chia tiền hóa đơn', ft_w8: 'Chuyển đổi tiền tệ', ft_w9: 'Xem Giá Vàng hôm nay',
-    ft_support: 'Hỗ trợ',
-    ft_s1: 'Trợ giúp', ft_s2: 'Bảng giá', ft_s3: 'Chính sách bảo mật', ft_s4: 'Điều khoản sử dụng', ft_s5: 'Liên hệ',
-    ft_made: 'Được làm với ❤️ tại Việt Nam 🇻🇳',
-    ft_by: 'Một sản phẩm của'
+    ft_desc: 'Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và hiệu quả.',
+    ft_products: 'Sản phẩm', ft_download: 'Tải App', ft_support: 'Hỗ trợ',
+    ft_dl_mb: 'Tải MoneyBay', ft_dl_qr: 'Tải QRBay',
+    ft_privacy: 'Chính sách bảo mật', ft_terms: 'Điều khoản sử dụng',
+    ft_bottom: '&copy; 2025 VUTASO. Make in Vietnam'
   },
   en: {
     // Navbar
@@ -166,15 +165,17 @@ const MB_I18N = {
     // Floating cards
     fc1_label: 'Savings this month',
     fc2_label: 'Report ready',
+    fc2_val: 'PDF · CSV · Excel',
     // Phone UI
     ph_greeting: 'Hello 👋',
     ph_name: 'Alex',
     ph_avatar: 'A',
     ph_balance: 'Current balance',
-    ph_change: '▲ +12% from last month',
-    ph_income: 'Income',
-    ph_expense: 'Expenses',
-    ph_saving: 'Savings',
+    ph_change_badge: '+12%',
+    ph_chart_label: 'This week',
+    ph_income: 'In',
+    ph_expense: 'Out',
+    ph_saving: 'Saved',
     ph_txn1: 'March Salary',
     ph_txn2: 'Shopee - Shopping',
     ph_txn3: 'Grab - Transport',
@@ -279,16 +280,13 @@ const MB_I18N = {
     dl_store: '<small>Download from</small><strong>App Store</strong>',
     dl_qr: 'Scan to download',
 
+    nav_qr_free: 'Free QR Generator',
     // Footer
-    ft_tag: 'Smart expense management app for iOS. No sign-up required, start today.',
-    ft_feat: 'Features',
-    ft_f1: 'Income/Expenses', ft_f2: 'Wallets', ft_f3: 'Chart Reports', ft_f4: 'AI Chat', ft_f5: 'iCloud Sync', ft_f6: 'Export Data',
-    ft_wid: 'Utilities',
-    ft_w1: 'Document Scanner', ft_w2: 'Shopping List', ft_w3: 'Import from Image', ft_w4: 'Spending Limits', ft_w5: 'Debt Book', ft_w6: 'Lunar Calendar', ft_w7: 'Bill Splitter', ft_w8: 'Currency Converter', ft_w9: 'Gold Price Today',
-    ft_support: 'Support',
-    ft_s1: 'Help', ft_s2: 'Pricing', ft_s3: 'Privacy Policy', ft_s4: 'Terms of Service', ft_s5: 'Contact',
-    ft_made: 'Made with ❤️ in Vietnam 🇻🇳',
-    ft_by: 'A product of'
+    ft_desc: 'Developing mobile apps that help users manage daily life smartly and efficiently.',
+    ft_products: 'Products', ft_download: 'Download', ft_support: 'Support',
+    ft_dl_mb: 'Get MoneyBay', ft_dl_qr: 'Get QRBay',
+    ft_privacy: 'Privacy Policy', ft_terms: 'Terms of Service',
+    ft_bottom: '&copy; 2025 VUTASO. Make in Vietnam'
   },
   jp: {
     // Navbar
@@ -310,20 +308,22 @@ const MB_I18N = {
     // Floating cards
     fc1_label: '今月の貯蓄',
     fc2_label: 'レポート準備完了',
+    fc2_val: 'PDF · CSV · Excel',
     // Phone UI
     ph_greeting: 'こんにちは 👋',
     ph_name: 'ゆうき',
     ph_avatar: 'Y',
     ph_balance: '現在の残高',
-    ph_change: '▲ 先月比+12%',
-    ph_income: '収入',
-    ph_expense: '支出',
+    ph_change_badge: '+12%',
+    ph_chart_label: '今週',
+    ph_income: '収',
+    ph_expense: '支',
     ph_saving: '貯蓄',
     ph_txn1: '3月の給料',
     ph_txn2: 'ショッピング',
     ph_txn3: 'タクシー',
     // Currency amounts
-    fc1_val: '+¥50,000',
+    fc1_val: '+¥52K',
     ph_bal_num: '¥320,000',
     ph_income_val: '+¥150K',
     ph_expense_val: '-¥98K',
@@ -423,20 +423,17 @@ const MB_I18N = {
     dl_store: '<small>ダウンロード</small><strong>App Store</strong>',
     dl_qr: 'スキャンしてダウンロード',
 
+    nav_qr_free: '無料QRコード生成',
     // Footer
-    ft_tag: 'iOS向けスマート家計管理アプリ。登録不要、今日から始めましょう。',
-    ft_feat: '機能',
-    ft_f1: '収支入力', ft_f2: 'ウォレット', ft_f3: 'グラフレポート', ft_f4: 'AIチャット', ft_f5: 'iCloud同期', ft_f6: 'データエクスポート',
-    ft_wid: 'ユーティリティ',
-    ft_w1: '書類スキャナー', ft_w2: '買い物リスト', ft_w3: '画像から入力', ft_w4: '支出制限', ft_w5: '借金帳', ft_w6: '旧暦カレンダー', ft_w7: '割り勘', ft_w8: '通貨換算', ft_w9: '本日の金価格',
-    ft_support: 'サポート',
-    ft_s1: 'ヘルプ', ft_s2: '料金', ft_s3: 'プライバシーポリシー', ft_s4: '利用規約', ft_s5: 'お問い合わせ',
-    ft_made: 'ベトナム 🇻🇳 で❤️を込めて作りました',
-    ft_by: '製品提供'
+    ft_desc: 'ユーザーの日常生活をスマートかつ効率的に管理できるモバイルアプリを開発しています。',
+    ft_products: '製品', ft_download: 'ダウンロード', ft_support: 'サポート',
+    ft_dl_mb: 'MoneyBayを入手', ft_dl_qr: 'QRBayを入手',
+    ft_privacy: 'プライバシーポリシー', ft_terms: '利用規約',
+    ft_bottom: '&copy; 2025 VUTASO. Make in Vietnam'
   }
 };
 
-// Typewriter phrases per language
+// Hero title phrases per language
 const MB_TW = {
   vi: [
     'Ghi chép 3 giây. Kiểm soát cả tháng.',
@@ -474,13 +471,11 @@ function switchLang(lang) {
   document.documentElement.lang = lang;
   localStorage.setItem('vutaso-lang', lang);
 
-  // Update typewriter phrases + re-render hero title immediately
+  // Update hero title on language change
   if (MB_TW[lang]) {
     window._twPhrases = MB_TW[lang];
     const el = document.getElementById('tw-el');
-    if (el && el.textContent.trim()) {
-      el.innerHTML = '<span class="gtext">' + MB_TW[lang][0] + '</span>';
-    }
+    if (el) el.innerHTML = '<span class="gtext">' + MB_TW[lang][0] + '</span>';
   }
 }
 

@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoneyBay — Sổ Thu Chi | App Quản Lý Chi Tiêu Cá Nhân Thông Minh Miễn Phí</title>
+  <meta name="description"
+    content="MoneyBay — App sổ thu chi, quản lý chi tiêu cá nhân thông minh miễn phí. Ghi chép thu chi bằng giọng nói & AI, quét hóa đơn tự động, báo cáo biểu đồ trực quan, sổ nợ, hạn mức chi, đồng bộ iCloud. Tải miễn phí trên App Store.">
+  <meta name="keywords"
+    content="sổ thu chi, quản lý chi tiêu, app quản lý chi tiêu, app chi tiêu, ghi chép thu chi, theo dõi chi tiêu, quản lý tài chính cá nhân, app tài chính, sổ chi tiêu, ứng dụng quản lý chi tiêu, MoneyBay, moneybay, app sổ nợ, quản lý ngân sách, app ghi chép chi tiêu, phần mềm quản lý chi tiêu, app thu chi, ứng dụng thu chi, quản lý thu chi, app quản lý tài chính, sổ thu chi cá nhân, app quản lý tiền, theo dõi tài chính, app kiểm soát chi tiêu, expense tracker, money management, budget app, finance app iOS">
+  <meta name="author" content="VUTASO">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#000000">
+  <link rel="canonical" href="https://vutaso.com/moneybay/">
+  <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+
+  <!-- Alternate domains (redirect về trang này) -->
+  <link rel="alternate" href="https://moneybay.app" hreflang="vi">
+  <link rel="alternate" href="https://moneybay.vn" hreflang="vi">
+  <link rel="alternate" href="https://sothuchi.id.vn" hreflang="vi">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vutaso.com/moneybay/">
+  <meta property="og:site_name" content="VUTASO">
+  <meta property="og:title" content="MoneyBay — Sổ Thu Chi | App Quản Lý Chi Tiêu Cá Nhân Miễn Phí">
+  <meta property="og:description"
+    content="App sổ thu chi, quản lý chi tiêu cá nhân thông minh miễn phí. Ghi chép bằng giọng nói & AI, quét hóa đơn, báo cáo biểu đồ, sổ nợ, đồng bộ iCloud.">
+  <meta property="og:image" content="https://vutaso.com/assets/banner_moneybay_1200x750.png">
+  <meta property="og:locale" content="vi_VN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MoneyBay — Sổ Thu Chi | App Quản Lý Chi Tiêu Thông Minh">
+  <meta name="twitter:description"
+    content="App sổ thu chi, quản lý chi tiêu cá nhân miễn phí. Ghi chép bằng giọng nói & AI, quét hóa đơn, báo cáo biểu đồ.">
+  <meta name="twitter:image" content="https://vutaso.com/assets/banner_moneybay_1200x750.png">
+
+  <!-- JSON-LD: SoftwareApplication (Rich Result cho app trên Google) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MoneyBay - Sổ Thu Chi",
+    "alternateName": ["MoneyBay", "App Sổ Thu Chi MoneyBay", "Quản lý chi tiêu MoneyBay"],
+    "description": "MoneyBay — App sổ thu chi, quản lý chi tiêu cá nhân thông minh miễn phí. Ghi chép thu chi bằng giọng nói & AI, quét hóa đơn tự động, báo cáo biểu đồ trực quan, sổ nợ, hạn mức chi tiêu, đồng bộ iCloud.",
+    "url": "https://vutaso.com/moneybay/",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "iOS",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "VND",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "500",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "downloadUrl": "https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi",
+    "softwareVersion": "2.0",
+    "author": {
+      "@type": "Organization",
+      "name": "VUTASO",
+      "url": "https://vutaso.com"
+    },
+    "screenshot": "https://vutaso.com/assets/moneybay_1.png",
+    "featureList": "Ghi chép thu chi bằng giọng nói, Trợ lý AI thông minh, Quét hóa đơn tự động, Báo cáo biểu đồ trực quan, Sổ nợ, Hạn mức chi tiêu, Đồng bộ iCloud, Xuất CSV/PDF/Excel, Đa tiền tệ, Widget iOS"
+  }
+  </script>
+
+  <!-- JSON-LD: FAQPage (hiển thị FAQ trực tiếp trên Google Search) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "MoneyBay có thực sự miễn phí không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MoneyBay hoàn toàn miễn phí với đầy đủ tính năng cốt lõi: ghi chép thu chi, danh mục, biểu đồ. Gói Pro mở khóa thêm tính năng nâng cao như đồng bộ iCloud, xuất file, chat AI không giới hạn."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "MoneyBay có cần đăng ký tài khoản không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Không cần! Bạn chỉ cần tải app về và mở lên là có thể bắt đầu ghi thu chi ngay lập tức. Không cần email, không cần mật khẩu, không cần bất kỳ thông tin cá nhân nào."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Dữ liệu thu chi của tôi có an toàn không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dữ liệu được lưu trực tiếp trên thiết bị của bạn và có thể đồng bộ qua iCloud cá nhân (chỉ bạn mới truy cập được). VUTASO không lưu trữ dữ liệu tài chính cá nhân của bạn trên server."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "MoneyBay có tính năng ghi chép bằng giọng nói không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Có! Bạn chỉ cần nói hoặc gõ câu như 'vừa ăn phở 50 nghìn' hoặc 'nhận lương 15 triệu hôm nay' — AI sẽ tự động phân tích và nhập giao dịch với đúng số tiền, danh mục và ghi chú."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "MoneyBay hỗ trợ xuất dữ liệu không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gói Pro hỗ trợ xuất dữ liệu sang CSV (mở bằng Excel, Google Sheets), PDF (in hoặc lưu trữ), và Excel (.xlsx). Dữ liệu xuất ra bao gồm toàn bộ lịch sử giao dịch với đầy đủ danh mục, ghi chú."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "VUTASO",
+        "item": "https://vutaso.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "MoneyBay - Sổ Thu Chi",
+        "item": "https://vutaso.com/moneybay/"
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/vutaso-home.css">
+  <link rel="stylesheet" href="assets/moneybay-page.css">
+</head>
+
+<body>
+
+  <!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+  <nav id="nav">
+    <div class="n-logo">
+      <img src="assets/images/Logo_MoneyBay.png" alt="MoneyBay Logo" style="width:34px;height:34px;border-radius:20%;">
+      <span class="n-logo-text">MoneyBay</span>
+    </div>
+    <div class="n-links">
+      <a href="#features" data-i18n="nav_feat">Tính năng</a>
+      <a href="#widgets" data-i18n="nav_widgets">Tiện ích</a>
+      <a href="#how" data-i18n="nav_how">Cách dùng</a>
+      <a href="#pricing" data-i18n="nav_pricing">Bảng giá</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="n-right">
+      <div class="lang-toggle">
+        <button class="lang-btn" data-lang="vi" onclick="switchLang('vi')">VI</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" data-lang="jp" onclick="switchLang('jp')">JP</button>
+      </div>
+      <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+        rel="noopener noreferrer" style="text-decoration:none"><button class="btn-nav" onclick="addRipple(event,this)"
+          data-i18n="nav_dl">Tải xuống miễn phí</button></a>
+      <button class="ham" id="ham" aria-label="Menu" onclick="toggleMob()"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mob-menu" id="mob">
+    <a href="#features" onclick="closeMob()" data-i18n="nav_feat">Tính năng</a>
+    <a href="#widgets" onclick="closeMob()" data-i18n="nav_widgets">Tiện ích</a>
+    <a href="#how" onclick="closeMob()" data-i18n="nav_how">Cách dùng</a>
+    <a href="#pricing" onclick="closeMob()" data-i18n="nav_pricing">Bảng giá</a>
+    <a href="#faq" onclick="closeMob()">FAQ</a>
+    <div class="lang-toggle" style="margin-top:12px">
+      <button class="lang-btn" data-lang="vi" onclick="switchLang('vi');closeMob()">VI</button>
+      <button class="lang-btn" data-lang="en" onclick="switchLang('en');closeMob()">EN</button>
+      <button class="lang-btn" data-lang="jp" onclick="switchLang('jp');closeMob()">JP</button>
+    </div>
+    <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+      rel="noopener noreferrer" style="text-decoration:none"><button class="btn-nav"
+        onclick="addRipple(event,this);closeMob()" data-i18n="nav_dl">Tải xuống miễn
+        phí</button></a>
+  </div>
+
+  <!-- ============================================================
+     HERO
+     ============================================================ -->
+  <section id="hero">
+    <div class="hero-left">
+      <div class="hero-badge" data-i18n="hero_badge">
+        <span class="badge-dot"></span>
+        Ứng dụng iOS — Không cần đăng ký
+      </div>
+      <h1 class="hero-title">
+        <span id="tw-el"></span>
+      </h1>
+      <p class="hero-sub vis" id="hsub" data-i18n="hero_sub">
+        Quản lý thu chi cá nhân thông minh. Nhập liệu trong vài giây,
+        báo cáo trực quan, chat AI — tất cả trong một ứng dụng đẹp và đơn giản.
+      </p>
+      <div class="hero-btns vis" id="hbtns">
+        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+          rel="noopener noreferrer" style="text-decoration:none">
+          <button class="btn-main" onclick="addRipple(event,this)" data-i18n="hero_btn_dl">
+            ⬇ Tải App miễn phí
+          </button>
+        </a>
+        <button class="btn-ghost"
+          onclick="addRipple(event,this);document.getElementById('features').scrollIntoView({behavior:'smooth'})"
+          data-i18n="hero_btn_feat">
+          Xem tính năng
+        </button>
+      </div>
+      <div class="hero-stats vis" id="hstats">
+        <div class="hstat" data-i18n="hero_stat1"><span class="hstat-icon">⭐</span><strong>4.9</strong> App Store</div>
+        <div class="hstat" data-i18n="hero_stat2"><span class="hstat-icon">🚫</span>Không cần đăng ký</div>
+        <div class="hstat" data-i18n="hero_stat3"><span class="hstat-icon">🔒</span>Bảo mật 100%</div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <!-- Floating cards around phone -->
+      <div class="fc fc1">
+        <div class="fc-icon">💰</div>
+        <div>
+          <div class="fc-label" data-i18n="fc1_label">Tiết kiệm tháng này</div>
+          <div class="fc-val up" data-i18n="fc1_val">+8.2tr</div>
+        </div>
+      </div>
+      <div class="fc fc2">
+        <div class="fc-icon">📊</div>
+        <div>
+          <div class="fc-label" data-i18n="fc2_label">Báo cáo sẵn sàng</div>
+          <div class="fc-val" data-i18n="fc2_val">PDF · CSV · Excel</div>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-shine"></div>
+            <div class="ph-top">
+              <div class="ph-top-text">
+                <div class="ph-greeting" data-i18n="ph_greeting">Xin chào 👋</div>
+                <div class="ph-name" data-i18n="ph_name">Tuấn Anh</div>
+              </div>
+              <div class="ph-avatar" data-i18n="ph_avatar">TA</div>
+            </div>
+            <div class="ph-balance-card">
+              <div class="ph-bl-top">
+                <span class="ph-bl-label" data-i18n="ph_balance">Số dư hiện tại</span>
+                <span class="ph-bl-badge" data-i18n="ph_change_badge">+12%</span>
+              </div>
+              <div class="ph-bl-num" id="ph-bal" data-i18n="ph_bal_num">52.400.000 ₫</div>
+            </div>
+            <div class="ph-stats-bar">
+              <div class="ph-stat">
+                <div class="ph-stat-val up" data-i18n="ph_income_val">+24.5tr</div>
+                <div class="ph-stat-label" data-i18n="ph_income">Thu</div>
+              </div>
+              <div class="ph-stat">
+                <div class="ph-stat-val dn" data-i18n="ph_expense_val">-16.1tr</div>
+                <div class="ph-stat-label" data-i18n="ph_expense">Chi</div>
+              </div>
+              <div class="ph-stat">
+                <div class="ph-stat-val warn" data-i18n="ph_saving_val">8.4tr</div>
+                <div class="ph-stat-label" data-i18n="ph_saving">Tiết kiệm</div>
+              </div>
+            </div>
+            <div class="ph-chart-box">
+              <div class="ph-chart-head">
+                <span data-i18n="ph_chart_label">Tuần này</span>
+              </div>
+              <div class="ph-chart-wrap" id="ph-chart"></div>
+            </div>
+            <div class="ph-txn-list">
+              <div class="ph-txn">
+                <div class="ph-txn-ic up">↑</div>
+                <div class="ph-txn-info">
+                  <div class="ph-txn-n" data-i18n="ph_txn1">Lương tháng 3</div>
+                  <div class="ph-txn-d">01/03</div>
+                </div>
+                <div class="ph-txn-a up" data-i18n="ph_txn1_val">+20tr</div>
+              </div>
+              <div class="ph-txn">
+                <div class="ph-txn-ic dn">↓</div>
+                <div class="ph-txn-info">
+                  <div class="ph-txn-n" data-i18n="ph_txn2">Shopee - Mua sắm</div>
+                  <div class="ph-txn-d">02/03</div>
+                </div>
+                <div class="ph-txn-a dn" data-i18n="ph_txn2_val">-650k</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     CORE FEATURES
+     ============================================================ -->
+  <section id="features">
+    <div class="tc">
+      <span class="s-label" data-i18n="feat_label" data-i18n="feat_label">Tính năng cốt lõi</span>
+      <h2 class="s-title" data-i18n="feat_title">Mọi thứ bạn cần để<br><span class="gtext">làm chủ tài chính</span></h2>
+      <p class="s-sub" data-i18n="feat_sub" data-i18n="feat_sub">Thiết kế tối giản, thao tác trực quan — bắt đầu ngay mà
+        không cần đăng ký hay học cách dùng.</p>
+    </div>
+    <div class="feat-grid">
+
+      <!-- 1. Dễ sử dụng -->
+      <div class="feat-card rev fu" data-delay="0">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(43,127,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <polyline points="9 12 11 14 15 10" />
+            </svg>
+          </div>
+          <div class="feat-tag" data-i18n="f1_tag">UX</div>
+          <div class="feat-title" data-i18n="f1_title">Dễ sử dụng, giao diện trực quan</div>
+          <div class="feat-desc" data-i18n="f1_desc">Thiết kế đơn giản, dễ dàng thao tác ngay lần đầu sử dụng. Không cần
+            hướng dẫn, không
+            cần học phức tạp.</div>
+        </div>
+      </div>
+
+      <!-- 2. Không cần đăng ký -->
+      <div class="feat-card rev fu" data-delay="80">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(0,229,255,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 8 12 12 14 14" />
+              <path d="M9 3.5A9 9 0 0 1 21 12" />
+            </svg>
+          </div>
+          <div class="feat-tag"
+            style="background:rgba(0,229,255,0.1);color:var(--accent);border-color:rgba(0,229,255,0.2)"
+            data-i18n="f2_tag" data-i18n="f2_tag">Ngay lập tức
+          </div>
+          <div class="feat-title" data-i18n="f2_title">Không cần đăng ký tài khoản</div>
+          <div class="feat-desc" data-i18n="f2_desc">Bạn có thể bắt đầu sử dụng ứng dụng ngay mà không cần tạo tài
+            khoản. Mở app, dùng luôn
+            — đơn giản vậy thôi.</div>
+        </div>
+      </div>
+
+      <!-- 3. Nhập liệu nhanh -->
+      <div class="feat-card rev fu" data-delay="160">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(0,214,143,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </div>
+          <div class="feat-tag"
+            style="background:rgba(0,214,143,0.1);color:var(--success);border-color:rgba(0,214,143,0.2)"
+            data-i18n="f3_tag" data-i18n="f3_tag">Vài giây</div>
+          <div class="feat-title" data-i18n="f3_title">Nhập liệu dễ dàng</div>
+          <div class="feat-desc" data-i18n="f3_desc">Ghi lại các khoản thu hoặc chi chỉ trong vài giây. Giao diện nhập
+            liệu tối ưu cho tốc
+            độ và sự thuận tiện.</div>
+        </div>
+      </div>
+
+      <!-- 4. Báo cáo -->
+      <div class="feat-card rev fu" data-delay="0">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(123,97,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+              <circle cx="18" cy="7" r="3" stroke="#7B61FF" stroke-width="1.5" />
+            </svg>
+          </div>
+          <div class="feat-tag" style="background:rgba(123,97,255,0.1);color:#7B61FF;border-color:rgba(123,97,255,0.2)">
+            <span data-i18n="f4_tag">Phân tích</span>
+          </div>
+          <div class="feat-title" data-i18n="f4_title">Báo cáo tài chính trực quan</div>
+          <div class="feat-desc" data-i18n="f4_desc">Xem báo cáo theo ngày, tháng, năm. Biểu đồ tròn & biểu đồ cột giúp
+            so sánh danh mục và
+            từng tháng một cách trực quan.</div>
+        </div>
+      </div>
+
+      <!-- 5. Chế độ màu -->
+      <div class="feat-card rev fu" data-delay="80">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(255,184,0,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a10 10 0 0 1 0 20" />
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10" />
+            </svg>
+          </div>
+          <div class="feat-tag"
+            style="background:rgba(255,184,0,0.1);color:var(--warning);border-color:rgba(255,184,0,0.2)"
+            data-i18n="f5_tag" data-i18n="f5_tag">Cá nhân hóa
+          </div>
+          <div class="feat-title" data-i18n="f5_title">Chế độ màu sắc ứng dụng</div>
+          <div class="feat-desc" data-i18n="f5_desc">Lựa chọn từ nhiều màu chủ đề ứng dụng phong phú. Tùy biến giao diện
+            theo sở thích riêng
+            của bạn.</div>
+        </div>
+      </div>
+
+      <!-- 6. Xuất dữ liệu -->
+      <div class="feat-card rev fu" data-delay="160">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(43,127,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </div>
+          <div class="feat-tag" data-i18n="f6_tag">Xuất dữ liệu</div>
+          <div class="feat-title" data-i18n="f6_title">Sao lưu & xuất CSV, PDF, Excel</div>
+          <div class="feat-desc" data-i18n="f6_desc">Dễ dàng xuất dữ liệu ra file CSV, PDF, Excel để lưu trữ, phân tích
+            chi tiêu hoặc chia
+            sẻ với người khác.</div>
+        </div>
+      </div>
+
+      <!-- 7. iCloud -->
+      <div class="feat-card rev fu" data-delay="0">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(0,229,255,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+            </svg>
+          </div>
+          <div class="feat-tag"
+            style="background:rgba(0,229,255,0.1);color:var(--accent);border-color:rgba(0,229,255,0.2)"
+            data-i18n="f7_tag">iOS</div>
+          <div class="feat-title" data-i18n="f7_title">Đồng bộ iCloud</div>
+          <div class="feat-desc" data-i18n="f7_desc">Đồng bộ dữ liệu trên tất cả thiết bị iOS qua iCloud. Luôn có bản
+            sao dữ liệu mới nhất
+            mọi lúc, mọi nơi.</div>
+        </div>
+      </div>
+
+      <!-- 8. AI -->
+      <div class="feat-card rev fu" data-delay="80">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(123,97,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <circle cx="9" cy="10" r="1" fill="#7B61FF" />
+              <circle cx="12" cy="10" r="1" fill="#7B61FF" />
+              <circle cx="15" cy="10" r="1" fill="#7B61FF" />
+            </svg>
+          </div>
+          <div class="feat-tag" style="background:rgba(123,97,255,0.1);color:#7B61FF;border-color:rgba(123,97,255,0.2)">
+            AI</div>
+          <div class="feat-title" data-i18n="f8_title">Chat AI & ghi chép bằng giọng nói</div>
+          <div class="feat-desc" data-i18n="f8_desc">Trợ lý AI thông minh giúp bạn ghi chép thu chi nhanh chóng chỉ bằng
+            giọng nói hoặc
+            chat. Thông minh và tiện lợi.</div>
+        </div>
+      </div>
+
+      <!-- 9. Xem Lịch Âm -->
+      <div class="feat-card rev fu" data-delay="160">
+        <div class="feat-spot"></div>
+        <div class="feat-body">
+          <div class="feat-ic" style="background:rgba(255,184,0,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <circle cx="12" cy="16" r="2" fill="#FFB800" stroke="none" />
+            </svg>
+          </div>
+          <div class="feat-tag" style="background:rgba(255,184,0,0.1);color:#FFB800;border-color:rgba(255,184,0,0.2)">
+            Lịch</div>
+          <div class="feat-title" data-i18n="f9_title">Xem Lịch Tháng</div>
+          <div class="feat-desc" data-i18n="f9_desc">Có Lịch hiển thị để xem thu nhập và chi tiêu của bạn trong tháng
+            này theo từng ngày
+            giúp bạn có cái nhìn tổng quan về thu chi của mình.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+     WIDGETS
+     ============================================================ -->
+  <section id="widgets">
+    <div class="tc">
+      <span class="s-label" data-i18n="wid_label" data-i18n="wid_label">Tiện ích mở rộng</span>
+      <h2 class="s-title" data-i18n="wid_title">Hệ sinh thái tiện ích<br><span class="gtext">độc đáo của MoneyBay</span>
+      </h2>
+      <p class="s-sub" data-i18n="wid_sub" data-i18n="wid_sub">Ngoài quản lý chi tiêu, MoneyBay còn tích hợp các tiện
+        ích giúp cuộc sống hàng ngày của bạn dễ
+        dàng hơn.</p>
+    </div>
+    <div class="widgets-grid">
+
+      <!-- Scanner -->
+      <div class="widget-card rev fu" data-delay="0">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,91,91,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5B5B" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="23 7 23 1 17 1" />
+              <line x1="16" y1="8" x2="23" y2="1" />
+              <polyline points="1 17 1 23 7 23" />
+              <line x1="8" y1="16" x2="1" y2="23" />
+              <rect x="5" y="5" width="14" height="14" rx="2" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w1_name">MoneyBay Scanner</div>
+        <div class="wid-desc" data-i18n="w1_desc">Quét tài liệu, hóa đơn, hợp đồng, danh thiếp, giấy tờ... Xuất file PDF
+          không watermark
+          chất lượng cao.</div>
+      </div>
+
+      <!-- Shopping list -->
+      <div class="widget-card rev fu" data-delay="80">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(0,214,143,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w2_name">Danh sách mua sắm</div>
+        <div class="wid-desc" data-i18n="w2_desc">Lập kế hoạch và quản lý hiệu quả các món đồ cần mua. Đảm bảo không bỏ
+          sót món đồ nào khi
+          đi mua sắm.</div>
+      </div>
+
+      <!-- Import from image -->
+      <div class="widget-card rev fu" data-delay="160">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(43,127,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w3_name">Nhập giao dịch từ ảnh</div>
+        <div class="wid-desc" data-i18n="w3_desc">Nhập ảnh chụp hóa đơn, kết quả thanh toán online, lịch sử giao dịch
+          ngân hàng — tự động
+          nhận diện và nhập liệu.</div>
+      </div>
+
+      <!-- Debt book -->
+      <div class="widget-card rev fu" data-delay="240">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,184,0,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w4_name">Sổ Nợ</div>
+        <div class="wid-desc" data-i18n="w4_desc">Ghi chép, quản lý và theo dõi các khoản vay và cho vay hằng ngày. Hữu
+          ích cho cá nhân và
+          hộ kinh doanh nhỏ.</div>
+      </div>
+
+      <!-- Hạn mức chi -->
+      <div class="widget-card rev fu" data-delay="0">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,91,91,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5B5B" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w5_name">Hạn mức chi</div>
+        <div class="wid-desc" data-i18n="w5_desc">Thiết lập giới hạn chi tiêu theo từng danh mục. Nhận cảnh báo khi sắp
+          vượt ngân sách để
+          kiểm soát tài chính hiệu quả.</div>
+      </div>
+
+      <!-- AI Chat -->
+      <div class="widget-card rev fu" data-delay="80">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(0,214,143,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <circle cx="9" cy="10" r="1" fill="#00D68F" stroke="none" />
+              <circle cx="12" cy="10" r="1" fill="#00D68F" stroke="none" />
+              <circle cx="15" cy="10" r="1" fill="#00D68F" stroke="none" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w6_name">AI Chat</div>
+        <div class="wid-desc" data-i18n="w6_desc">Trợ lý AI thông minh hỗ trợ ghi chép thu chi bằng giọng nói hoặc tin
+          nhắn. Chỉ cần nói
+          hoặc gõ tự nhiên, AI lo phần còn lại.</div>
+      </div>
+
+      <!-- Chuyển đổi tiền tệ -->
+      <div class="widget-card rev fu" data-delay="160">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,184,0,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9" />
+              <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+              <polyline points="7 23 3 19 7 15" />
+              <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w7_name">Chuyển đổi tiền tệ</div>
+        <div class="wid-desc" data-i18n="w7_desc">Quy đổi tỷ giá giữa các loại tiền tệ quốc tế theo thời gian thực. Hỗ
+          trợ nhiều loại
+          tiền tệ phổ biến trên thế giới.</div>
+      </div>
+
+      <!-- Chia tiền hóa đơn -->
+      <div class="widget-card rev fu" data-delay="240">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(123,97,255,0.12)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w8_name">Chia tiền hóa đơn</div>
+        <div class="wid-desc" data-i18n="w8_desc">Chia đều hoặc chia theo tỷ lệ hóa đơn khi đi ăn nhóm, du lịch. Nhanh
+          chóng, công bằng,
+          không còn ngại ngùng.</div>
+      </div>
+
+      <!-- Tính lãi suất -->
+      <div class="widget-card rev fu" data-delay="0">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(177,97,255,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#B161FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="19" y1="5" x2="5" y2="19" />
+              <circle cx="6.5" cy="6.5" r="2.5" />
+              <circle cx="17.5" cy="17.5" r="2.5" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w9_name">Tính lãi suất</div>
+        <div class="wid-desc" data-i18n="w9_desc">Tính lãi suất tiết kiệm, lãi suất kép theo kỳ hạn. Hỗ trợ ra quyết
+          định tài chính thông minh.</div>
+      </div>
+
+      <!-- Tính tiền típ -->
+      <div class="widget-card rev fu" data-delay="80">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(0,229,255,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w10_name">Tính tiền típ</div>
+        <div class="wid-desc" data-i18n="w10_desc">Tính tip nhanh theo tỷ lệ phần trăm tùy chọn. Hỗ trợ chia đều tip cho
+          nhóm, tiện lợi khi
+          đi ăn uống, du lịch.</div>
+      </div>
+
+      <!-- Lịch Âm -->
+      <div class="widget-card rev fu" data-delay="160">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,91,91,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5B5B" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <circle cx="12" cy="16" r="2" fill="#FF5B5B" stroke="none" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w11_name">Lịch Âm</div>
+        <div class="wid-desc" data-i18n="w11_desc">Xem lịch âm dương, giờ hoàng đạo, câu quote hằng ngày và các ngày
+          nghỉ lễ, Tết trong năm.
+          Tiện lợi tra cứu mọi lúc.</div>
+      </div>
+
+      <!-- Giá Vàng -->
+      <div class="widget-card rev fu" data-delay="240">
+        <div class="wid-top">
+          <div class="wid-ic" style="background:rgba(255,184,0,0.1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg>
+          </div>
+          <span class="wid-badge" data-i18n="wid_badge">Tiện ích</span>
+        </div>
+        <div class="wid-name" data-i18n="w12_name">Giá Vàng hôm nay</div>
+        <div class="wid-desc" data-i18n="w12_desc">Cập nhật giá vàng SJC, vàng nhẫn, vàng thế giới theo thời gian thực.
+          Theo dõi biến động
+          giá vàng mỗi ngày.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+     HOW IT WORKS
+     ============================================================ -->
+  <section id="how">
+    <div class="tc">
+      <span class="s-label" data-i18n="how_label" data-i18n="how_label">Bắt đầu ngay</span>
+      <h2 class="s-title" data-i18n="how_title">Sẵn sàng trong<br><span class="gtext">3 bước đơn giản</span></h2>
+      <p class="s-sub" data-i18n="how_sub" data-i18n="how_sub">Không phức tạp. Không cần đăng ký. Chỉ 30 giây để bắt
+        đầu.</p>
+    </div>
+    <div class="steps">
+      <div class="step rev fu" data-delay="0">
+        <div class="step-n">01</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2" />
+            <polyline points="12 8 12 12 14 14" />
+          </svg>
+        </div>
+        <div class="step-t" data-i18n="s1_t">Tải App về máy</div>
+        <div class="step-d" data-i18n="s1_d">Tải MoneyBay từ App Store. Miễn phí, không cần tài khoản, mở lên dùng luôn.
+        </div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step rev fu" data-delay="140">
+        <div class="step-n">02</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+        </div>
+        <div class="step-t" data-i18n="s2_t">Ghi thu chi</div>
+        <div class="step-d" data-i18n="s2_d">Nhập khoản thu hoặc chi chỉ trong vài giây. Hoặc dùng giọng nói & AI để ghi
+          nhanh hơn nữa.
+        </div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step rev fu" data-delay="280">
+        <div class="step-n">03</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </div>
+        <div class="step-t" data-i18n="s3_t">Xem báo cáo</div>
+        <div class="step-d" data-i18n="s3_d">Báo cáo trực quan theo ngày/tháng/năm. Biểu đồ đẹp, rõ ràng. Xuất file mọi
+          lúc bạn muốn.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     STATS
+     ============================================================ -->
+  <section id="stats-bar">
+    <div class="stats-g">
+      <div class="stat-i rev fz" data-delay="0">
+        <div class="stat-n"><span class="cu" data-t="10000">0</span>+</div>
+        <div class="stat-l" data-i18n="st1">Lượt tải về</div>
+      </div>
+      <div class="stat-i rev fz" data-delay="120">
+        <div class="stat-n" style="font-size:clamp(1.8rem,3.5vw,3rem)">4.<span class="cu" data-t="9">0</span>★</div>
+        <div class="stat-l" data-i18n="st2">Đánh giá App Store</div>
+      </div>
+      <div class="stat-i rev fz" data-delay="240">
+        <div class="stat-n"><span class="cu" data-t="12">0</span></div>
+        <div class="stat-l" data-i18n="st3">Tiện ích tích hợp</div>
+      </div>
+      <div class="stat-i rev fz" data-delay="360">
+        <div class="stat-n"><span class="cu" data-t="99">0</span>%</div>
+        <div class="stat-l" data-i18n="st4">Hài lòng người dùng</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     PRICING
+     ============================================================ -->
+  <section id="pricing">
+    <div class="tc">
+      <span class="s-label" data-i18n="pr_label">Bảng giá</span>
+      <h2 class="s-title" data-i18n="pr_title">Bắt đầu miễn phí,<br><span class="gtext">nâng cấp khi cần</span></h2>
+    </div>
+    <div class="ptoggle">
+      <!-- <span>Hàng tháng</span>
+      <div class="ptrack" id="pt" onclick="toggleP()">
+        <div class="pthumb"></div>
+      </div> -->
+      <span data-i18n="pr_toggle" data-i18n="pr_toggle">Nâng cấp Trọn đời giảm giá <span
+          class="ybadge">-30%</span></span>
+    </div>
+    <div class="price-grid">
+      <!-- Free -->
+      <div class="price-card rev fz" data-delay="0">
+        <div class="pname" data-i18n="pr_free">Miễn phí</div>
+        <div class="pprice gtext" data-i18n="pr_free_price">0 ₫</div>
+        <div class="pperiod" data-i18n="pr_forever">mãi mãi</div>
+        <div class="pfeats">
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf1">Nhập thu chi không giới hạn</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf2">Báo cáo cơ bản</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf3">Không cần đăng ký</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf4">Đồng bộ iCloud</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf5">Tạo Hạn mức chi / Ngân sách</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf6">Tạo nhiều Ví tiền</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf7">Xem Lịch Âm</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf8">Sổ Nợ</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf9">Tạo Danh sách mua sắm</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf10">Chia tiền hóa đơn</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf11">Xem Giá vàng hôm nay</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pf12">Có quảng cáo</span></div>
+          <div class="pfeat off"><svg viewBox="0 0 15 15" fill="none" stroke="#888" stroke-width="2">
+              <line x1="2" y1="2" x2="13" y2="13" />
+              <line x1="13" y1="2" x2="2" y2="13" />
+            </svg><span data-i18n="pf13">Chat AI</span></div>
+          <div class="pfeat off"><svg viewBox="0 0 15 15" fill="none" stroke="#888" stroke-width="2">
+              <line x1="2" y1="2" x2="13" y2="13" />
+              <line x1="13" y1="2" x2="2" y2="13" />
+            </svg><span data-i18n="pf14">Xuất PDF/Excel</span></div>
+        </div>
+        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+          rel="noopener noreferrer" style="text-decoration:none"><button class="pbtn" onclick="addRipple(event,this)"
+            data-i18n="pr_free_btn">Bắt đầu miễn phí</button></a>
+      </div>
+      <!-- Lifetime -->
+      <div class="price-card pop rev fz" data-delay="150">
+        <div class="pop-tag" data-i18n="pr_pop">✦ Phổ biến nhất</div>
+        <div class="pname" data-i18n="pr_lifetime">Trọn đời</div>
+        <div class="pprice gtext" id="pp" data-i18n="pr_pro_price">499.000 ₫</div>
+        <div class="pperiod" id="pperiod" data-i18n="pr_once">một lần duy nhất</div>
+        <div class="pfeats">
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp1">Tất cả tính năng Free</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp2">Loại bỏ tất cả quảng cáo</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp3">Chat AI & giọng nói</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp4">Xuất CSV / PDF / Excel</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp5">Tạo Hạn mức chi / Ngân sách không giới hạn</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp6">Tạo nhiều Ví tiền không giới hạn</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp7">Quét hóa đơn, tài liệu không giới hạn</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp8">Tất cả tiện ích mở rộng</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp9">Biểu đồ nâng cao</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp10">Không phí hàng tháng</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp11">Cập nhật miễn phí mãi mãi</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp12">Ưu tiên hỗ trợ</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp13">Truy cập tính năng Beta</span></div>
+        </div>
+        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+          rel="noopener noreferrer" style="text-decoration:none"><button class="pbtn fill"
+            onclick="addRipple(event,this)" data-i18n="pr_pro_btn">Nâng cấp Pro ngay</button></a>
+      </div>
+      <!-- Lifetime
+      <div class="price-card rev fz" data-delay="300">
+        <div class="pname" data-i18n="pr_lifetime">Trọn đời</div>
+        <div class="pprice gtext" id="lp">299.000 ₫</div>
+        <div class="pperiod">một lần duy nhất</div>
+        <div class="pfeats">
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg>Tất cả tính năng Pro</div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp10">Không phí hàng tháng</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp11">Cập nhật miễn phí mãi mãi</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp12">Ưu tiên hỗ trợ</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg><span data-i18n="pp13">Truy cập tính năng Beta</span></div>
+          <div class="pfeat"><svg viewBox="0 0 15 15" fill="none" stroke="#00D68F" stroke-width="2">
+              <polyline points="2 7 6 11 13 4" />
+            </svg>Huy hiệu Early Adopter</div>
+        </div>
+        <button class="pbtn" onclick="addRipple(event,this)">Mua trọn đời</button>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- ============================================================
+     REVIEWS
+     ============================================================ -->
+  <section id="reviews">
+    <div class="tc">
+      <span class="s-label" data-i18n="rv_label" data-i18n="rv_label">Đánh giá</span>
+      <h2 class="s-title" data-i18n="rv_title">Người dùng nói gì về<br><span class="gtext">MoneyBay?</span></h2>
+    </div>
+    <div class="reviews-wrap">
+      <div class="reviews-track" id="rtrack">
+        <div class="rev-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+              class="star">★</span><span class="star">★</span></div>
+          <div class="rev-q" data-i18n="rv1">"Cái hay nhất là không cần đăng ký. Mở app lên là dùng luôn. Giao diện cực
+            đẹp và đơn giản,
+            mình dùng được ngay từ lần đầu."</div>
+          <div class="rev-auth">
+            <div class="rev-av" data-i18n="rv1_av">NH</div>
+            <div>
+              <div class="rev-name" data-i18n="rv1_name">Nguyễn Hương</div>
+              <div class="rev-role" data-i18n="rv1_role">Kỹ sư, Hà Nội</div>
+            </div>
+          </div>
+        </div>
+        <div class="rev-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+              class="star">★</span><span class="star">★</span></div>
+          <div class="rev-q" data-i18n="rv2">"Tính năng chat AI ghi chép bằng giọng nói quá xịn. Mình chỉ nói 'vừa uống
+            cà phê 35k' là
+            app tự nhập vào. Tiết kiệm thời gian ghê!"</div>
+          <div class="rev-auth">
+            <div class="rev-av" style="background:linear-gradient(135deg,#7B61FF,#2B7FFF)" data-i18n="rv2_av">TM</div>
+            <div>
+              <div class="rev-name" data-i18n="rv2_name">Trần Minh</div>
+              <div class="rev-role" data-i18n="rv2_role">Designer, TP.HCM</div>
+            </div>
+          </div>
+        </div>
+        <div class="rev-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+              class="star">★</span><span class="star">★</span></div>
+          <div class="rev-q" data-i18n="rv3">"Tiện ích Sổ Nợ rất hữu ích cho shop nhỏ của mình. Theo dõi ai nợ bao
+            nhiêu, khi nào trả
+            rất rõ ràng. Không cần excel nữa rồi!"</div>
+          <div class="rev-auth">
+            <div class="rev-av" style="background:linear-gradient(135deg,#00D68F,#00E5FF)" data-i18n="rv3_av">LT</div>
+            <div>
+              <div class="rev-name" data-i18n="rv3_name">Lê Thảo</div>
+              <div class="rev-role" data-i18n="rv3_role">Chủ shop online, Đà Nẵng</div>
+            </div>
+          </div>
+        </div>
+        <div class="rev-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+              class="star">★</span><span class="star">★</span></div>
+          <div class="rev-q" data-i18n="rv4">"Báo cáo biểu đồ rất đẹp và trực quan. Mình thấy ngay mình đang tốn tiền
+            nhiều nhất vào đâu
+            mỗi tháng để điều chỉnh."</div>
+          <div class="rev-auth">
+            <div class="rev-av" style="background:linear-gradient(135deg,#FFB800,#FF5B5B)" data-i18n="rv4_av">PK</div>
+            <div>
+              <div class="rev-name" data-i18n="rv4_name">Phạm Khoa</div>
+              <div class="rev-role" data-i18n="rv4_role">Kế toán, Hà Nội</div>
+            </div>
+          </div>
+        </div>
+        <div class="rev-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+              class="star">★</span><span class="star">★</span></div>
+          <div class="rev-q" data-i18n="rv5">"MoneyBay Scanner quét hóa đơn rất nhanh, xuất PDF không watermark. Mình
+            dùng để scan giấy
+            tờ hàng ngày, tiện hơn app scan riêng."</div>
+          <div class="rev-auth">
+            <div class="rev-av" style="background:linear-gradient(135deg,#2B7FFF,#7B61FF)" data-i18n="rv5_av">VL</div>
+            <div>
+              <div class="rev-name" data-i18n="rv5_name">Vũ Linh</div>
+              <div class="rev-role" data-i18n="rv5_role">Nhân viên văn phòng, HCM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="car-nav">
+      <button class="car-btn" onclick="carPrev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <polyline points="15 18 9 12 15 6" />
+        </svg></button>
+      <div class="car-dots" id="cdots"></div>
+      <button class="car-btn" onclick="carNext()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <polyline points="9 18 15 12 9 6" />
+        </svg></button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     FAQ
+     ============================================================ -->
+  <section id="faq">
+    <div class="faq-inner">
+      <div class="faq-head tc">
+        <span class="s-label">FAQ</span>
+        <h2 class="s-title" data-i18n="faq_title">Câu hỏi <span class="gtext">thường gặp</span></h2>
+      </div>
+      <div class="faq-wrap">
+        <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-i18n="fq1_q">MoneyBay có thực sự không cần đăng ký tài khoản?</span>
+          <div class="faq-ic"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="5.5" y1="1" x2="5.5" y2="10" />
+              <line x1="1" y1="5.5" x2="10" y2="5.5" />
+            </svg></div>
+        </button>
+        <div class="faq-a" data-i18n="fq1_a">Đúng vậy! Bạn chỉ cần tải app về và mở lên là có thể bắt đầu ghi thu chi
+          ngay lập tức. Không
+          cần email, không cần mật khẩu, không cần bất kỳ thông tin cá nhân nào.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-i18n="fq2_q">Dữ liệu của tôi có được lưu an toàn không?</span>
+          <div class="faq-ic"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="5.5" y1="1" x2="5.5" y2="10" />
+              <line x1="1" y1="5.5" x2="10" y2="5.5" />
+            </svg></div>
+        </button>
+        <div class="faq-a" data-i18n="fq2_a">Dữ liệu được lưu trực tiếp trên thiết bị của bạn và có thể đồng bộ qua
+          iCloud (chỉ bạn mới
+          truy cập được). Chúng tôi không lưu trữ dữ liệu tài chính cá nhân của bạn trên server.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-i18n="fq3_q">iCloud sync hoạt động như thế nào?</span>
+          <div class="faq-ic"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="5.5" y1="1" x2="5.5" y2="10" />
+              <line x1="1" y1="5.5" x2="10" y2="5.5" />
+            </svg></div>
+        </button>
+        <div class="faq-a" data-i18n="fq3_a">Khi bật tính năng iCloud sync (gói Pro), dữ liệu sẽ tự động đồng bộ qua tài
+          khoản iCloud cá
+          nhân của bạn trên tất cả thiết bị iOS như iPhone, iPad, Mac.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-i18n="fq4_q">Tôi có thể xuất dữ liệu ở những định dạng nào?</span>
+          <div class="faq-ic"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="5.5" y1="1" x2="5.5" y2="10" />
+              <line x1="1" y1="5.5" x2="10" y2="5.5" />
+            </svg></div>
+        </button>
+        <div class="faq-a" data-i18n="fq4_a">Gói Pro hỗ trợ xuất dữ liệu sang CSV (mở bằng Excel, Google Sheets), PDF
+          (in hoặc lưu trữ),
+          và Excel (.xlsx). Dữ liệu xuất ra bao gồm toàn bộ lịch sử giao dịch với đầy đủ danh mục, ghi chú.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-i18n="fq5_q">Chat AI và ghi chép bằng giọng nói hoạt động ra sao?</span>
+          <div class="faq-ic"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="5.5" y1="1" x2="5.5" y2="10" />
+              <line x1="1" y1="5.5" x2="10" y2="5.5" />
+            </svg></div>
+        </button>
+        <div class="faq-a" data-i18n="fq5_a">Bạn chỉ cần nói hoặc gõ câu như "vừa ăn phở 50 nghìn" hoặc "nhận lương 15
+          triệu hôm nay" — AI
+          sẽ tự động phân tích và nhập giao dịch với đúng số tiền, danh mục và ghi chú.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     DOWNLOAD
+     ============================================================ -->
+  <section id="dl">
+    <div class="dl-inner">
+      <div class="dl-copy rev fu" data-delay="0">
+        <h2 class="dl-title" data-i18n="dl_title">Bắt đầu ngay hôm nay —<br><span class="gtext">Hoàn toàn miễn
+            phí</span></h2>
+        <p class="dl-sub" data-i18n="dl_sub">Không cần đăng ký. Tải về, mở app, ghi chi tiêu — đơn giản vậy thôi. Hơn
+          10.000 người đã tin
+          dùng.</p>
+      </div>
+      <div class="dl-actions rev fu" data-delay="100">
+        <div class="dl-btns">
+          <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+            rel="noopener noreferrer" style="text-decoration:none">
+            <button class="btn-store" onclick="addRipple(event,this)">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+              </svg>
+              <div class="bst" data-i18n="dl_store"><small>Tải về từ
+                </small><strong>App Store</strong></div>
+            </button>
+          </a>
+        </div>
+        <div class="qr-box rev fz" data-delay="200">
+          <div class="qr-inner">
+            <div class="qr-sl"></div>
+            <img src="assets/images/QRCode_MoneyBay.png" alt="QR Code MoneyBay"
+              style="width:100%;height:100%;object-fit:cover;border-radius:4px;">
+          </div>
+          <div class="qr-label" data-i18n="dl_qr">Quét để tải app</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     FOOTER
+     ============================================================ -->
+  <footer>
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <h4>VUTASO</h4>
+        <p data-i18n="ft_desc">Phát triển ứng dụng di động giúp người dùng quản lý cuộc sống hàng ngày thông minh và
+          hiệu quả.</p>
+        <div class="ft-social">
+          <a href="https://www.facebook.com/moneybayapp" class="soc" title="Facebook" target="_blank"
+            rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+          <a href="https://www.tiktok.com/@moneybay.app" class="soc" title="TikTok" target="_blank"
+            rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path
+                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.77 0 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-6.33 6.34 6.34 6.34 0 0 0 12.67 0V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/@MoneyBayApp" class="soc" title="YouTube" target="_blank"
+            rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path
+                d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z" />
+            </svg>
+          </a>
+          <a href="https://m.me/moneybayapp" class="soc" title="Messenger" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12c0 2.17.69 4.18 1.87 5.82L2 22l4.3-1.84A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm-1 14H9V9h2v7zm4 0h-2V9h2v7z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft_products">Sản phẩm</h5>
+        <a href="https://vutaso.com/moneybay/">MoneyBay</a>
+        <a href="https://vutaso.com/qrbay/">QRBay</a>
+        <a href="https://vutaso.com/qr/" data-i18n="nav_qr_free">Tạo mã QR Free</a>
+        <a href="https://blog.vutaso.com" target="_blank">Blog</a>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft_download">Tải App</h5>
+        <a href="https://apps.apple.com/vn/app/moneybay-s%E1%BB%95-thu-chi/id6737480496?l=vi" target="_blank"
+          data-i18n="ft_dl_mb">Tải MoneyBay</a>
+        <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" data-i18n="ft_dl_qr">Tải
+          QRBay</a>
+      </div>
+      <div class="ft-col">
+        <h5 data-i18n="ft_support">Hỗ trợ</h5>
+        <a href="https://vutaso.com/privacy/" data-i18n="ft_privacy">Chính sách bảo mật</a>
+        <a href="https://vutaso.com/terms/" data-i18n="ft_terms">Điều khoản sử dụng</a>
+        <a href="https://www.facebook.com/moneybayapp" target="_blank">Facebook</a>
+        <a href="mailto:vutaso.com@gmail.com">Email</a>
+      </div>
+    </div>
+    <div class="ft-divider" aria-hidden="true"></div>
+    <div class="ft-giant">
+      <div class="ft-giant-text" aria-hidden="true">
+        <span class="ft-char"><span class="ft-char-inner">V</span></span>
+        <span class="ft-char"><span class="ft-char-inner">U</span></span>
+        <span class="ft-char"><span class="ft-char-inner">T</span></span>
+        <span class="ft-char"><span class="ft-char-inner">A</span></span>
+        <span class="ft-char"><span class="ft-char-inner">S</span></span>
+        <span class="ft-char"><span class="ft-char-inner">O</span></span>
+      </div>
+    </div>
+    <div class="ft-bottom" data-i18n="ft_bottom">&copy; 2025 VUTASO. Make in Vietnam</div>
+  </footer>
+
+  <script src="assets/i18n.js"></script>
+  <script src="assets/moneybay-page.js"></script>
+</body>
+
+</html>
