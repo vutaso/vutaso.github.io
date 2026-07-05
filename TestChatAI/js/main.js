@@ -21,6 +21,8 @@
   });
 
   ui.initSidebar();
+  ui.bindSidebarResize();
+  ui.bindComposerViewport();
   ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
   ui.initModelSelect(state.currentModel);
   ui.syncSystemPromptModeUI(state);
@@ -49,7 +51,7 @@
 
   if (!window.APP_CONFIG.hasApiKey(state, state.currentModel)) {
     setTimeout(() => ui.openSettings(state), 200);
-  } else {
+  } else if (!window.Utils.prefersCoarsePointer()) {
     ui.els.composerInput.focus();
   }
 })();

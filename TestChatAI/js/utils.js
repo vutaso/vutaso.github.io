@@ -267,6 +267,8 @@ window.Utils = (() => {
     /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+  const prefersCoarsePointer = () => window.matchMedia('(pointer: coarse)').matches;
+
   const isDownloadAllowed = () => {
     if (!isIOSDevice()) return true;
     try {
@@ -763,7 +765,7 @@ window.Utils = (() => {
     includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
     formatConversation, formatConversationPlainText,
-    downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice,
+    downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice, prefersCoarsePointer,
     exportToDocx, readFileAsDataUrl
   };
 })();

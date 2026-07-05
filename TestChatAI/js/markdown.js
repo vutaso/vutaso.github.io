@@ -259,12 +259,32 @@ window.Markdown = (() => {
     if (!window.marked) return;
     const renderer = new window.marked.Renderer();
 
+    renderer.link = function (token) {
+      const href = typeof token === 'object' ? token.href : token;
+      const title = typeof token === 'object' ? token.title : arguments[1];
+      const text = typeof token === 'object' && token.tokens
+        ? this.parser.parseInline(token.tokens)
+        : (typeof token === 'object' ? token.text : arguments[2]) || '';
+      let out = '<a href="' + escapeHTML(href) + '" target="_blank" rel="noopener noreferrer"';
+      if (title) out += ' title="' + escapeHTML(title) + '"';
+      out += '>' + text + '</a>';
+      return out;
+    };
+
     renderer.code = (arg, infostring) => {
       const { code, lang } = parseCodeArgs(arg, infostring);
       return codeBlockHTML(code.replace(/\n$/, ''), lang);
     };
 
     window.marked.use({ renderer, breaks: true, gfm: true });
+  };
+
+  const enhanceLinks = (root) => {
+    if (!root) return;
+    root.querySelectorAll('a[href]').forEach((a) => {
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+    });
   };
 
   const getMermaidTheme = () => {
@@ -571,5 +591,5 @@ window.Markdown = (() => {
     initMermaid();
   };
 
-  return { init, render, enhanceCodeBlocks, enhanceTables, tableToMarkdown, typesetMath, renderMermaid, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
+  return { init, render, enhanceCodeBlocks, enhanceTables, enhanceLinks, tableToMarkdown, typesetMath, renderMermaid, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
 })();

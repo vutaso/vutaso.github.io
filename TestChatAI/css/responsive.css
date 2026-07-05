@@ -34,31 +34,50 @@
   .app[data-sidebar="open"]  .sidebar-overlay { display: block; }
   .app[data-sidebar="closed"] .sidebar-overlay { display: none; }
 
-  .header-actions { min-width: auto; }
+  /* Avoid sidebar flash before JS initSidebar() */
+  .app:not([data-sidebar-init]) .sidebar { transform: translateX(-100%); }
+  .app:not([data-sidebar-init]) .sidebar-overlay { display: none !important; }
+
+  .main-header {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .header-actions {
+    min-width: auto;
+    flex-shrink: 0;
+  }
 
   .header-title {
-    max-width: calc(100% - 96px);
+    position: static;
+    transform: none;
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    justify-content: flex-start;
   }
 
   .header-selects {
     gap: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
-  .header-title .provider-select {
-    max-width: min(100px, 22vw);
+  .header-selects::-webkit-scrollbar { display: none; }
+
+  .header-title .provider-select,
+  .header-title .header-effort-select {
+    display: none;
   }
 
   .header-title .model-select,
   .header-title .header-prompt-mode-select {
-    max-width: min(140px, 30vw);
+    max-width: min(150px, 44vw);
     font-size: 12px;
     padding: 5px 24px 5px 10px;
-  }
-
-  .header-title .header-effort-select {
-    max-width: min(90px, 20vw);
-    font-size: 12px;
-    padding: 5px 24px 5px 10px;
+    flex-shrink: 0;
   }
 
   .messages { padding: 4px 0; }
@@ -66,7 +85,10 @@
   .message .avatar { width: 28px; height: 28px; font-size: 13px; }
   .message .toolbar { opacity: 1; }
 
-  .composer { padding: 8px 12px 14px; }
+  .composer {
+    padding: 8px 12px max(14px, env(safe-area-inset-bottom));
+    transition: transform 120ms ease;
+  }
   .composer-inner { padding: 4px 4px 4px 14px; }
   .composer-hint { font-size: 11px; }
 

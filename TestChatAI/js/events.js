@@ -150,36 +150,44 @@ window.Events = (() => {
   };
 
   const bindSelectionReply = () => {
-    ui.els.messages.addEventListener('mousedown', hideSelectionReplyTooltip);
+    ui.els.messages.addEventListener('mousedown', () => {
+      if (window.Utils.prefersCoarsePointer()) return;
+      hideSelectionReplyTooltip();
+    });
 
-    ui.els.messages.addEventListener('mouseup', () => {
+    const onSelectionEnd = () => {
       requestAnimationFrame(() => {
         const info = getMessageSelection();
         if (info) showSelectionReplyTooltip(info);
         else hideSelectionReplyTooltip();
       });
-    });
+    };
 
-    ui.els.messages.addEventListener('touchend', () => {
-      requestAnimationFrame(() => {
-        const info = getMessageSelection();
-        if (info) showSelectionReplyTooltip(info);
-      });
-    });
+    ui.els.messages.addEventListener('mouseup', onSelectionEnd);
+    ui.els.messages.addEventListener('touchend', onSelectionEnd);
 
     ui.els.messages.addEventListener('scroll', hideSelectionReplyTooltip, { passive: true });
 
-    ui.els.selectionReplyTooltip.addEventListener('mousedown', (e) => {
+    const onReplyTap = (e) => {
       if (!e.target.closest('[data-action="selection-reply"]')) return;
       e.preventDefault();
       applySelectionReply();
-    });
+    };
+
+    ui.els.selectionReplyTooltip.addEventListener('mousedown', onReplyTap);
+    ui.els.selectionReplyTooltip.addEventListener('click', onReplyTap);
 
     document.addEventListener('mousedown', (e) => {
       if (e.target.closest('#selectionReplyTooltip')) return;
       if (e.target.closest('#messages')) return;
       hideSelectionReplyTooltip();
     });
+
+    document.addEventListener('touchend', (e) => {
+      if (e.target.closest('#selectionReplyTooltip')) return;
+      if (e.target.closest('#messages')) return;
+      hideSelectionReplyTooltip();
+    }, { passive: true });
 
     document.addEventListener('selectionchange', () => {
       if (ui.els.selectionReplyTooltip.classList.contains('hidden')) return;
@@ -1095,7 +1103,7 @@ window.Events = (() => {
         ui.renderMessages(c);
         ui.updateSettingsTokenUsage(state.get());
         ui.closeMobileSidebar();
-        ui.els.composerInput.focus();
+        if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput.focus();
       }
     });
 

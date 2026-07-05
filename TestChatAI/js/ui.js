@@ -1178,6 +1178,7 @@ window.UI = (() => {
   const polishContent = (root, { renderMermaid = true, streaming = false } = {}) => {
     window.Markdown.enhanceCodeBlocks(root);
     window.Markdown.enhanceTables(root);
+    window.Markdown.enhanceLinks(root);
     if (!streaming) rehighlight(root);
     if (!streaming) window.Markdown.typesetMath(root);
     if (renderMermaid) window.Markdown.renderMermaid(root);
@@ -2154,7 +2155,44 @@ window.UI = (() => {
   };
 
   const initSidebar = () => {
-    if (isMobileSidebar()) toggleSidebar(false);
+    const app = els.app || document.getElementById('app');
+    if (isMobileSidebar()) {
+      toggleSidebar(false);
+    } else if (app.getAttribute('data-sidebar') === 'closed') {
+      toggleSidebar(true);
+    }
+    app.setAttribute('data-sidebar-init', '');
+  };
+
+  let sidebarWasMobile = isMobileSidebar();
+
+  const bindSidebarResize = () => {
+    window.addEventListener('resize', () => {
+      const mobile = isMobileSidebar();
+      if (mobile === sidebarWasMobile) return;
+      sidebarWasMobile = mobile;
+      if (mobile) toggleSidebar(false);
+      else toggleSidebar(true);
+    });
+  };
+
+  const bindComposerViewport = () => {
+    const composer = els.composer;
+    const vv = window.visualViewport;
+    if (!composer || !vv) return;
+
+    const sync = () => {
+      if (!isMobileSidebar()) {
+        composer.style.removeProperty('transform');
+        return;
+      }
+      const gap = window.innerHeight - vv.height - vv.offsetTop;
+      composer.style.transform = gap > 50 ? `translateY(-${gap}px)` : '';
+    };
+
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    window.addEventListener('resize', sync);
   };
 
   const setPreviewPanelTitle = (mode) => {
@@ -2399,7 +2437,7 @@ window.UI = (() => {
     openSettings, closeSettings, updateSettingsTokenUsage, syncSystemPromptModeUI, checkTokenCostWarning,
     openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
-    openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, showToast, rerenderMermaid,
+    openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,

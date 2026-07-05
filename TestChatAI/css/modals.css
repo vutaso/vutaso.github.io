@@ -281,7 +281,8 @@ a.btn {
 }
 
 .modal-content-settings .modal-body {
-  overflow: visible;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .settings-form {

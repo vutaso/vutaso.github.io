@@ -15,7 +15,11 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 - Model **Mistral Small 4** (OpenRouter, `mistralai/mistral-small-2603`) — reasoning, vision, context 262K.
 - Model **MiniMax M2.7 Nitro** (OpenRouter, `minimax/minimax-m2.7:nitro`) — reasoning, routing nhanh, context 205K.
 - Model **Nemotron 3 Ultra free** (OpenRouter, `nvidia/nemotron-3-ultra-550b-a55b:free`) — reasoning, context 1M, miễn phí.
+- Model **Nemotron 3 Ultra** (OpenRouter, `nvidia/nemotron-3-ultra-550b-a55b`) — reasoning, context 1M.
 - Model **Nemotron 3 Super free** (OpenRouter, `nvidia/nemotron-3-super-120b-a12b:free`) — reasoning, context 1M, miễn phí.
+- Model **Nemotron 3 Super** (OpenRouter, `nvidia/nemotron-3-super-120b-a12b`) — reasoning, context 1M.
+- Model **Nemotron 3 Nano free** (OpenRouter, `nvidia/nemotron-3-nano-30b-a3b:free`) — reasoning, context 256K, miễn phí.
+- Model **Nemotron 3 Nano Omni free** (OpenRouter, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`) — reasoning, vision, context 256K, miễn phí.
 - Model **Gemma 4 31B free** (OpenRouter, `google/gemma-4-31b-it:free`) — reasoning, vision, context 262K, miễn phí.
 - Model **Kimi K2.7 Code** (OpenRouter, `moonshotai/kimi-k2.7-code`) — coding, reasoning bắt buộc, vision, context 262K.
 - Model **Kimi K2.6** (OpenRouter, `moonshotai/kimi-k2.6`) — reasoning, vision, context 262K.

@@ -43,7 +43,11 @@ window.APP_CONFIG = {
     { id: 'openrouter-mistral-small-3.2-24b', apiModel: 'mistralai/mistral-small-3.2-24b-instruct', label: 'Mistral Small 3.2 24B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: true },
     { id: 'openrouter-mistral-small-4', apiModel: 'mistralai/mistral-small-2603', label: 'Mistral Small 4 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-nemotron-3-ultra-free', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b:free', label: 'Nemotron 3 Ultra free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-ultra', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b', label: 'Nemotron 3 Ultra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-nemotron-3-super-free', apiModel: 'nvidia/nemotron-3-super-120b-a12b:free', label: 'Nemotron 3 Super free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-super', apiModel: 'nvidia/nemotron-3-super-120b-a12b', label: 'Nemotron 3 Super (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-nano-free', apiModel: 'nvidia/nemotron-3-nano-30b-a3b:free', label: 'Nemotron 3 Nano free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-nemotron-3-nano-omni-free', apiModel: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', label: 'Nemotron 3 Nano Omni free (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
     { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -122,7 +126,11 @@ window.APP_CONFIG = {
     'openrouter-mistral-small-3.2-24b': { input: 0.075, output: 0.20 },
     'openrouter-mistral-small-4': { input: 0.15, output: 0.60 },
     'openrouter-nemotron-3-ultra-free': { input: 0, output: 0 },
+    'openrouter-nemotron-3-ultra': { input: 0.50, output: 2.20 },
     'openrouter-nemotron-3-super-free': { input: 0, output: 0 },
+    'openrouter-nemotron-3-super': { input: 0.08, output: 0.45 },
+    'openrouter-nemotron-3-nano-free': { input: 0, output: 0 },
+    'openrouter-nemotron-3-nano-omni-free': { input: 0, output: 0 },
     'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
     'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
     'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
@@ -239,7 +247,11 @@ window.APP_CONFIG = {
     'openrouter-north-mini-code': ['low', 'medium', 'high'],
     'openrouter-mistral-small-4': ['low', 'medium', 'high'],
     'openrouter-nemotron-3-ultra-free': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-ultra': ['low', 'medium', 'high'],
     'openrouter-nemotron-3-super-free': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-super': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-nano-free': ['low', 'medium', 'high'],
+    'openrouter-nemotron-3-nano-omni-free': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.6': ['low', 'medium', 'high']
   },
@@ -414,7 +426,7 @@ window.APP_CONFIG = {
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-gemma-4-26b' || modelId === 'openrouter-gemma-4-31b-free' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
-    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-hy3-preview' || modelId === 'openrouter-nemotron-3-ultra-free' || modelId === 'openrouter-nemotron-3-super-free' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6') return 'high';
+    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-hy3-preview' || modelId === 'openrouter-nemotron-3-ultra-free' || modelId === 'openrouter-nemotron-3-ultra' || modelId === 'openrouter-nemotron-3-super-free' || modelId === 'openrouter-nemotron-3-super' || modelId === 'openrouter-nemotron-3-nano-free' || modelId === 'openrouter-nemotron-3-nano-omni-free' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6') return 'high';
     return this.DEFAULT_EFFORT;
   },
 
