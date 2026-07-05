@@ -20,6 +20,7 @@ const ALLOWED_NVIDIA_MODELS = new Set([
   'mistralai/mistral-medium-3.5-128b',
   'qwen/qwen3.5-397b-a17b',
   'qwen/qwen3.5-122b-a10b',
+  'qwen/qwen3-next-80b-a3b-instruct',
   'google/gemma-4-31b-it',
   'google/diffusiongemma-26b-a4b-it'
 ]);

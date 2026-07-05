@@ -12,6 +12,11 @@
   user-select: none;
 }
 
+a.btn {
+  text-decoration: none;
+  color: inherit;
+}
+
 .btn .icon { font-size: 16px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
 
 .btn .icon i { font-size: inherit; }

@@ -1683,7 +1683,7 @@ window.UI = (() => {
     const key = /cors|proxy|load failed|failed to fetch|network/i.test(msg)
       && !/api key|authorization|forbidden|401|403/i.test(msg)
       ? 'toastErrorNetwork'
-      : /provider returned error|rate.limit|rate-limited|429|temporarily|upstream|credits|can only afford|max_tokens/i.test(msg)
+      : /provider returned error|rate.limit|rate-limited|429|temporarily|upstream|credits|can only afford|max_tokens|degraded function cannot be invoked/i.test(msg)
         ? 'toastErrorNetwork'
         : 'toastErrorApiKey';
     div.textContent = t(key, { err: msg });

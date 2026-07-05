@@ -23,7 +23,6 @@ window.APP_CONFIG = {
     { id: 'openrouter-glm-5-2', apiModel: 'z-ai/glm-5.2', label: 'GLM 5.2 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-mimo-v2-5', apiModel: 'xiaomi/mimo-v2.5', label: 'MiMo V2.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 32000 },
     { id: 'openrouter-mimo-v2.5-pro', apiModel: 'xiaomi/mimo-v2.5-pro', label: 'MiMo V2.5 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b:free', label: 'Nemotron 3 Ultra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 65536 },
     { id: 'openrouter-minimax-m3', apiModel: 'minimax/minimax-m3', label: 'MiniMax M3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
     { id: 'openrouter-claude-3-haiku', apiModel: 'anthropic/claude-3-haiku', label: 'Claude 3 Haiku (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: true },
     { id: 'openrouter-claude-haiku-4-5', apiModel: 'anthropic/claude-haiku-4.5', label: 'Claude Haiku 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
@@ -55,6 +54,7 @@ window.APP_CONFIG = {
     { id: 'nvidia-mistral-medium-3-5-128b', apiModel: 'mistralai/mistral-medium-3.5-128b', label: 'Mistral Medium 3.5 128B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'nvidia-qwen3-5-vlm', apiModel: 'qwen/qwen3.5-397b-a17b', label: 'Qwen 3.5 VLM (400B MoE) (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'nvidia-qwen3-5-122b', apiModel: 'qwen/qwen3.5-122b-a10b', label: 'Qwen 3.5 122B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'nvidia-qwen3-next-80b-instruct', apiModel: 'qwen/qwen3-next-80b-a3b-instruct', label: 'Qwen3-Next Instruct (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: false, vision: false },
     { id: 'nvidia-gemma-4-31b', apiModel: 'google/gemma-4-31b-it', label: 'Gemma 4 31B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'nvidia-diffusiongemma-26b', apiModel: 'google/diffusiongemma-26b-a4b-it', label: 'Diffusion Gemma 26B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
@@ -80,8 +80,8 @@ window.APP_CONFIG = {
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
-    'nvidia-deepseek-v4-flash': { input: 0.14, output: 0.28 },
-    'nvidia-deepseek-v4-pro': { input: 0.435, output: 0.87 },
+    'nvidia-deepseek-v4-flash': { input: 0, output: 0 },
+    'nvidia-deepseek-v4-pro': { input: 0, output: 0 },
     'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
     'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
@@ -92,7 +92,6 @@ window.APP_CONFIG = {
     'openrouter-glm-5-2': { input: 0.93, output: 3.00 },
     'openrouter-mimo-v2-5': { input: 0.105, output: 0.28 },
     'openrouter-mimo-v2.5-pro': { input: 0.435, output: 0.87 },
-    'openrouter-nemotron-3-ultra-550b-a55b': { input: 0, output: 0 },
     'openrouter-minimax-m3': { input: 0.30, output: 1.20 },
     'openrouter-claude-3-haiku': { input: 0.25, output: 1.25 },
     'openrouter-claude-haiku-4-5': { input: 1.00, output: 5.00 },
@@ -110,22 +109,23 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
     'byteplus-dola-seed-2-0-code': { input: 0.50, output: 3.00 },
-    'nvidia-nemotron-3-ultra-550b-a55b': { input: 0.50, output: 2.20 },
-    'nvidia-nemotron-3-super': { input: 0.50, output: 2.20 },
-    'nvidia-nemotron-3-nano-omni': { input: 0.20, output: 0.80 },
+    'nvidia-nemotron-3-ultra-550b-a55b': { input: 0, output: 0 },
+    'nvidia-nemotron-3-super': { input: 0, output: 0 },
+    'nvidia-nemotron-3-nano-omni': { input: 0, output: 0 },
     'nvidia-gpt-oss-120b': { input: 0, output: 0 },
     'nvidia-gpt-oss-20b': { input: 0, output: 0 },
-    'nvidia-glm-5-2': { input: 0.93, output: 3.00 },
-    'nvidia-minimax-m3': { input: 0.30, output: 1.20 },
-    'nvidia-minimax-m2-7': { input: 0.25, output: 1.00 },
-    'nvidia-step-3-7-flash': { input: 0.14, output: 0.28 },
-    'nvidia-step-3-5-flash': { input: 0.12, output: 0.24 },
-    'nvidia-mistral-small-4': { input: 0.20, output: 0.60 },
-    'nvidia-mistral-medium-3-5-128b': { input: 0.40, output: 1.20 },
-    'nvidia-qwen3-5-vlm': { input: 0.50, output: 1.50 },
-    'nvidia-qwen3-5-122b': { input: 0.30, output: 1.00 },
-    'nvidia-gemma-4-31b': { input: 0.15, output: 0.50 },
-    'nvidia-diffusiongemma-26b': { input: 0.12, output: 0.40 },
+    'nvidia-glm-5-2': { input: 0, output: 0 },
+    'nvidia-minimax-m3': { input: 0, output: 0 },
+    'nvidia-minimax-m2-7': { input: 0, output: 0 },
+    'nvidia-step-3-7-flash': { input: 0, output: 0 },
+    'nvidia-step-3-5-flash': { input: 0, output: 0 },
+    'nvidia-mistral-small-4': { input: 0, output: 0 },
+    'nvidia-mistral-medium-3-5-128b': { input: 0, output: 0 },
+    'nvidia-qwen3-5-vlm': { input: 0, output: 0 },
+    'nvidia-qwen3-5-122b': { input: 0, output: 0 },
+    'nvidia-qwen3-next-80b-instruct': { input: 0, output: 0 },
+    'nvidia-gemma-4-31b': { input: 0, output: 0 },
+    'nvidia-diffusiongemma-26b': { input: 0, output: 0 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
     'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
     'gemini-2.5-flash': { input: 0.30, output: 2.50 },
@@ -148,8 +148,8 @@ window.APP_CONFIG = {
     { id: 'google', label: 'Gemini' },
     { id: 'deepseek', label: 'DeepSeek' },
     { id: 'kimi', label: 'Kimi' },
-    { id: 'nvidia', label: 'NVIDIA' },
     { id: 'byteplus', label: 'Byte Plus' },
+    { id: 'nvidia', label: 'NVIDIA' },
     { id: 'openrouter', label: 'OpenRouter' }
   ],
 
@@ -191,6 +191,7 @@ window.APP_CONFIG = {
     'nvidia-mistral-small-4': ['low', 'medium', 'high'],
     'nvidia-mistral-medium-3-5-128b': ['low', 'medium', 'high'],
     'nvidia-gemma-4-31b': [],
+    'nvidia-qwen3-next-80b-instruct': [],
     'nvidia-diffusiongemma-26b': [],
     'byteplus-dola-seed-2-0-lite': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
@@ -204,7 +205,6 @@ window.APP_CONFIG = {
     'openrouter-glm-5-2': ['high', 'xhigh'],
     'openrouter-mimo-v2-5': ['low', 'medium', 'high'],
     'openrouter-mimo-v2.5-pro': ['low', 'medium', 'high'],
-    'openrouter-nemotron-3-ultra-550b-a55b': ['medium', 'high'],
     'openrouter-minimax-m3': ['low', 'medium', 'high'],
     'openrouter-claude-haiku-4-5': ['low', 'medium', 'high'],
     'openrouter-claude-sonnet-5': ['low', 'medium', 'high', 'max'],
@@ -383,7 +383,6 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-gpt-oss-120b' || modelId === 'openrouter-gpt-5.4-nano') return 'medium';
     if (modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
     if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
-    if (modelId === 'openrouter-nemotron-3-ultra-550b-a55b') return 'high';
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-gemma-4-26b') return 'medium';
@@ -480,6 +479,26 @@ window.APP_CONFIG = {
     return inputCost + outputCost;
   },
 
+  getSortedModelPricing() {
+    const providerLabel = (id) => this.PROVIDERS.find((p) => p.id === id)?.label || id;
+    return this.MODELS
+      .map((m) => ({ model: m, pricing: this.MODEL_PRICING[m.id] }))
+      .filter((row) => row.pricing)
+      .sort((a, b) => {
+        const diff = a.pricing.input - b.pricing.input;
+        if (diff !== 0) return diff;
+        return a.pricing.output - b.pricing.output;
+      })
+      .map((row) => ({
+        id: row.model.id,
+        label: row.model.label,
+        provider: row.model.provider,
+        providerLabel: providerLabel(row.model.provider),
+        input: row.pricing.input,
+        output: row.pricing.output
+      }));
+  },
+
   getMaxOutputTokens(modelId) {
     const configured = this.API_MAX_OUTPUT_TOKENS;
     if (!configured) return null;
@@ -563,6 +582,10 @@ window.APP_CONFIG = {
       }
       if (window.I18n) return window.I18n.t('byteplusProxyNetworkError');
       return 'Could not reach Byte Plus proxy. Check API key, use a local server (not file://), and redeploy worker/.';
+    }
+    if (/DEGRADED function cannot be invoked/i.test(msg) && provider === 'nvidia') {
+      if (window.I18n) return window.I18n.t('nvidiaDegradedError');
+      return 'Endpoint NVIDIA đang degraded (quá tải hoặc bảo trì). Thử lại sau hoặc dùng DeepSeek V4 Flash qua OpenRouter/Byte Plus.';
     }
     return msg;
   },

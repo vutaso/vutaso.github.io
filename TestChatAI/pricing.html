@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="legal-html">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c0c0e" />
+  <meta name="description" content="Model pricing comparison for VUTASO AI — input and output cost per 1M tokens (USD)." />
+  <title>Model Pricing — VUTASO AI</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/legal.css" />
+  <link rel="stylesheet" href="css/pricing.css" />
+</head>
+<body class="legal-page pricing-page">
+  <div class="legal-shell pricing-shell">
+    <div class="legal-topbar">
+      <a class="legal-back" href="index.html"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span id="pricingBackText">Back to VUTASO AI</span></a>
+      <div class="legal-brand"><span class="legal-brand-avatar" aria-hidden="true">V</span> VUTASO AI</div>
+    </div>
+
+    <header class="legal-header">
+      <h1 id="pricingTitle">Model Pricing</h1>
+      <p class="legal-updated" id="pricingSubtitle">USD per 1M tokens — standard API rates (cache-miss input). Sorted by input price, lowest first.</p>
+      <p class="legal-updated pricing-updated" id="pricingUpdated"></p>
+    </header>
+
+    <main class="pricing-main">
+      <div class="pricing-table-wrap" role="region" aria-labelledby="pricingTitle" tabindex="0">
+        <table class="pricing-table" id="pricingTable">
+          <thead>
+            <tr>
+              <th scope="col" class="pricing-col-rank" id="pricingColRank">#</th>
+              <th scope="col" id="pricingColModel">Model</th>
+              <th scope="col" id="pricingColProvider">Provider</th>
+              <th scope="col" class="pricing-col-price" id="pricingColInput">Input / 1M</th>
+              <th scope="col" class="pricing-col-price" id="pricingColOutput">Output / 1M</th>
+            </tr>
+          </thead>
+          <tbody id="pricingTableBody"></tbody>
+        </table>
+      </div>
+      <p class="pricing-note" id="pricingNote"></p>
+    </main>
+
+    <footer class="legal-footer">
+      <nav class="legal-footer-links" aria-label="Legal">
+        <a href="pricing.html" id="pricingFooterLink">Model Pricing</a>
+        <a href="privacy.html" id="privacyFooterLink">Privacy Policy</a>
+        <a href="terms.html" id="termsFooterLink">Terms of Service</a>
+        <a href="index.html">VUTASO AI</a>
+      </nav>
+      <p>© VUTASO.com. All rights reserved.</p>
+    </footer>
+  </div>
+  <script src="js/config.js"></script>
+  <script src="js/pricing-page.js"></script>
+</body>
+</html>
