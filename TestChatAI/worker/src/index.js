@@ -4,25 +4,16 @@ const BYTEPLUS_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/comple
 const BYTEPLUS_RESPONSES_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/responses';
 const ALLOWED_DEEPSEEK_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
 const ALLOWED_NVIDIA_MODELS = new Set([
-  'deepseek-ai/deepseek-v4-flash',
-  'deepseek-ai/deepseek-v4-pro',
   'nvidia/nemotron-3-ultra-550b-a55b',
   'nvidia/nemotron-3-super-120b-a12b',
   'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
   'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
   'z-ai/glm-5.2',
   'minimaxai/minimax-m3',
   'minimaxai/minimax-m2.7',
   'stepfun-ai/step-3.7-flash',
-  'stepfun-ai/step-3.5-flash',
   'mistralai/mistral-small-4-119b-2603',
-  'mistralai/mistral-medium-3.5-128b',
-  'qwen/qwen3.5-397b-a17b',
-  'qwen/qwen3.5-122b-a10b',
-  'qwen/qwen3-next-80b-a3b-instruct',
-  'google/gemma-4-31b-it',
-  'google/diffusiongemma-26b-a4b-it'
+  'mistralai/mistral-medium-3.5-128b'
 ]);
 const ALLOWED_BYTEPLUS_MODELS = new Set(['deepseek-v4-flash-260425', 'glm-5-2-260617', 'gpt-oss-120b-250805']);
 const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
