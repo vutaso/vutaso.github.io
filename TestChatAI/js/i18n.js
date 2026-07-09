@@ -1710,7 +1710,7 @@ window.I18n = (() => {
     { sel: '#shareCopyLabel', key: 'shareCopy' },
     { sel: '#shareHint', key: 'shareHint' },
     { sel: '#shareCloseBtn', key: 'shareClose' },
-    { sel: '#shareViewBannerText', key: 'shareViewBanner' },
+    { sel: '#shareViewReadonlyText', key: 'shareViewBanner' },
     { sel: '#shareViewOpenApp', key: 'shareOpenApp' },
     { sel: '#headerDownloadBtn', attr: 'title', key: 'downloadMenu' },
     { sel: '#headerDownloadBtn', attr: 'aria-label', key: 'downloadMenu' },

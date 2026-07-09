@@ -58,7 +58,11 @@ window.UI = (() => {
     els.shareError = $('#shareError');
     els.shareLinkInput = $('#shareLinkInput');
     els.shareCopyBtn = $('#shareCopyBtn');
-    els.shareViewBanner = $('#shareViewBanner');
+    els.shareViewHeader = $('#shareViewHeader');
+    els.shareViewTitle = $('#shareViewTitle');
+    els.shareViewModelPill = $('#shareViewModelPill');
+    els.shareViewReadonlyText = $('#shareViewReadonlyText');
+    els.shareViewOpenApp = $('#shareViewOpenApp');
     els.headerDownloadWrap = $('#headerDownloadWrap');
     els.headerDownloadBtn = $('#headerDownloadBtn');
     els.headerDownloadMenu = $('#headerDownloadMenu');
@@ -2070,15 +2074,37 @@ window.UI = (() => {
 
   const isShareModalOpen = () => !!(els.shareModal && !els.shareModal.classList.contains('hidden'));
 
-  const enterShareViewMode = (snapshot) => {
+  const applyShareViewChrome = () => {
     document.body.classList.add('share-view-mode');
-    els.shareViewBanner?.classList.remove('hidden');
+    els.shareViewHeader?.classList.remove('hidden');
+    els.shareViewHeader?.removeAttribute('aria-hidden');
+    els.shareViewOpenApp?.classList.remove('hidden');
     if (els.shareChatBtn) els.shareChatBtn.classList.add('hidden');
     if (els.composer) els.composer.classList.add('hidden');
     if (els.sidebar) els.sidebar.classList.add('share-view-hidden');
     if (els.openSidebarBtn) els.openSidebarBtn.classList.add('hidden');
     if (els.headerNewChatBtn) els.headerNewChatBtn.classList.add('hidden');
     if (els.toggleExportSelectBtn) els.toggleExportSelectBtn.classList.add('hidden');
+  };
+
+  const enterShareLoadingMode = () => {
+    applyShareViewChrome();
+    if (els.shareViewTitle) {
+      els.shareViewTitle.textContent = t('shareLoadingView');
+      els.shareViewTitle.classList.add('is-loading');
+    }
+    if (els.shareViewModelPill) els.shareViewModelPill.classList.add('hidden');
+    if (els.shareViewReadonlyText) els.shareViewReadonlyText.textContent = t('shareViewBanner');
+    if (els.messages) {
+      els.messages.innerHTML = '<div class="messages-empty share-loading-state">'
+        + '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>'
+        + '<p>' + escapeHTML(t('shareLoadingView')) + '</p>'
+        + '</div>';
+    }
+  };
+
+  const enterShareViewMode = (snapshot) => {
+    applyShareViewChrome();
 
     const convo = {
       id: 'shared',
@@ -2088,17 +2114,33 @@ window.UI = (() => {
       createdAt: snapshot.createdAt || Date.now(),
       updatedAt: snapshot.createdAt || Date.now()
     };
-    renderMessages(convo);
-    if (snapshot.model && els.modelSelect) {
-      try { els.modelSelect.value = snapshot.model; } catch {}
+
+    if (els.shareViewTitle) {
+      els.shareViewTitle.textContent = convo.title;
+      els.shareViewTitle.classList.remove('is-loading');
     }
+    if (els.shareViewModelPill) {
+      const model = snapshot.model ? window.APP_CONFIG.getModel(snapshot.model) : null;
+      const modelLabel = model ? window.APP_CONFIG.getModelDisplayLabel(model) : '';
+      if (modelLabel) {
+        els.shareViewModelPill.textContent = modelLabel;
+        els.shareViewModelPill.classList.remove('hidden');
+      } else {
+        els.shareViewModelPill.classList.add('hidden');
+      }
+    }
+    if (els.shareViewReadonlyText) els.shareViewReadonlyText.textContent = t('shareViewBanner');
+
+    renderMessages(convo);
   };
 
   const showShareLoadError = (message) => {
-    document.body.classList.add('share-view-mode');
-    els.shareViewBanner?.classList.remove('hidden');
-    if (els.composer) els.composer.classList.add('hidden');
-    if (els.sidebar) els.sidebar.classList.add('share-view-hidden');
+    applyShareViewChrome();
+    if (els.shareViewTitle) {
+      els.shareViewTitle.textContent = t('shareLoadError');
+      els.shareViewTitle.classList.add('is-loading');
+    }
+    if (els.shareViewModelPill) els.shareViewModelPill.classList.add('hidden');
     if (els.messages) {
       els.messages.innerHTML = '<div class="messages-empty share-load-error">'
         + '<h2>' + escapeHTML(message || t('shareLoadError')) + '</h2>'
@@ -2592,7 +2634,7 @@ window.UI = (() => {
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openShareModal, closeShareModal, isShareModalOpen,
     setShareModalLoading, setShareModalResult, setShareModalError,
-    enterShareViewMode, showShareLoadError,
+    enterShareLoadingMode, enterShareViewMode, showShareLoadError,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,

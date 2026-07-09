@@ -72,6 +72,22 @@
     display: none;
   }
 
+  body.share-view-mode .share-view-readonly-badge span {
+    display: none;
+  }
+
+  body.share-view-mode .share-view-model-pill {
+    display: none !important;
+  }
+
+  body.share-view-mode .share-view-header {
+    gap: 8px;
+  }
+
+  body.share-view-mode .share-view-readonly-badge {
+    padding: 5px 8px;
+  }
+
   .header-title .model-select,
   .header-title .header-prompt-mode-select {
     max-width: min(150px, 44vw);

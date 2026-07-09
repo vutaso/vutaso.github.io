@@ -45,8 +45,8 @@
 
   const shareId = window.Share?.getShareIdFromLocation?.();
   if (shareId) {
+    ui.enterShareLoadingMode();
     window.Events.bind();
-    ui.els.messages.innerHTML = '<div class="messages-empty"><p>' + (window.I18n.t('shareLoadingView')) + '</p></div>';
     try {
       const snapshot = await window.Share.fetchShare(shareId);
       ui.enterShareViewMode(snapshot);

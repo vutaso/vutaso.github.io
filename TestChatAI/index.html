@@ -102,6 +102,19 @@
             <select id="systemPromptModeSelect" class="select header-prompt-mode-select header-select" aria-label="Chế độ"></select>
           </div>
         </div>
+        <div id="shareViewHeader" class="share-view-header hidden" aria-hidden="true">
+          <div class="share-view-header-start">
+            <div class="brand-avatar brand-avatar-sm" aria-hidden="true">V</div>
+            <div class="share-view-header-text">
+              <p id="shareViewTitle" class="share-view-title"></p>
+              <span id="shareViewModelPill" class="share-view-model-pill hidden"></span>
+            </div>
+          </div>
+          <span class="share-view-readonly-badge">
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+            <span id="shareViewReadonlyText">Đang xem bản chia sẻ (chỉ đọc)</span>
+          </span>
+        </div>
         <div class="header-actions">
           <button type="button" id="toggleExportSelectBtn" class="btn btn-icon" title="Chọn tin để xuất" aria-pressed="false" aria-label="Chọn tin để xuất">
             <span class="icon"><i class="fa-solid fa-check-double"></i></span>
@@ -142,6 +155,7 @@
           <button id="headerNewChatBtn" class="btn btn-icon" title="Cuộc trò chuyện mới" aria-label="Cuộc trò chuyện mới">
             <span class="icon"><i class="fa-solid fa-plus"></i></span>
           </button>
+          <a id="shareViewOpenApp" class="btn btn-primary btn-sm share-view-open-app hidden" href="./index.html">Mở app</a>
         </div>
       </header>
 
@@ -553,14 +567,6 @@
           <button type="button" class="btn btn-ghost" data-modal-close id="shareCloseBtn">Đóng</button>
         </footer>
       </div>
-    </div>
-  </div>
-
-  <div id="shareViewBanner" class="share-view-banner hidden" role="status">
-    <div class="share-view-banner-inner">
-      <i class="fa-solid fa-eye" aria-hidden="true"></i>
-      <span id="shareViewBannerText">Đang xem bản chia sẻ (chỉ đọc)</span>
-      <a id="shareViewOpenApp" class="btn btn-ghost btn-sm" href="./index.html">Mở app</a>
     </div>
   </div>
 
