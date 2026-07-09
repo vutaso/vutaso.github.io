@@ -9,6 +9,7 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 ## [Unreleased]
 
 ### Added
+- Model **Grok 4.5** (OpenRouter, `x-ai/grok-4.5`) — reasoning, vision, context 500K.
 - Model **North Mini Code** (OpenRouter, `cohere/north-mini-code:free`) — agentic coding, reasoning, miễn phí.
 - Model **Mistral Nemo** (OpenRouter, `mistralai/mistral-nemo`) — 12B, context 128K.
 - Model **Mistral Small 4** (OpenRouter, `mistralai/mistral-small-2603`) — reasoning, vision, context 262K.

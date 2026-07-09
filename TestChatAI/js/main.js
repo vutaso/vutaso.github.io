@@ -43,6 +43,19 @@
     referenceImage: null
   });
 
+  const shareId = window.Share?.getShareIdFromLocation?.();
+  if (shareId) {
+    window.Events.bind();
+    ui.els.messages.innerHTML = '<div class="messages-empty"><p>' + (window.I18n.t('shareLoadingView')) + '</p></div>';
+    try {
+      const snapshot = await window.Share.fetchShare(shareId);
+      ui.enterShareViewMode(snapshot);
+    } catch (err) {
+      ui.showShareLoadError(err?.message || window.I18n.t('shareLoadError'));
+    }
+    return;
+  }
+
   const current = convoMod.getCurrent();
   ui.refreshConversationList(current ? current.id : null);
   ui.renderMessages(current);

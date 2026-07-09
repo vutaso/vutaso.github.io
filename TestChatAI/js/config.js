@@ -34,6 +34,7 @@ window.APP_CONFIG = {
     { id: 'openrouter-mistral-small-4', apiModel: 'mistralai/mistral-small-2603', label: 'Mistral Small 4 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
     { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-grok-4.5', apiModel: 'x-ai/grok-4.5', label: 'Grok 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -94,6 +95,7 @@ window.APP_CONFIG = {
     'openrouter-mistral-small-4': { input: 0.15, output: 0.60 },
     'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
     'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
+    'openrouter-grok-4.5': { input: 2.00, output: 6.00 },
     'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
@@ -192,7 +194,8 @@ window.APP_CONFIG = {
     'openrouter-north-mini-code': ['low', 'medium', 'high'],
     'openrouter-mistral-small-4': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
-    'openrouter-kimi-k2.6': ['low', 'medium', 'high']
+    'openrouter-kimi-k2.6': ['low', 'medium', 'high'],
+    'openrouter-grok-4.5': ['low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -365,7 +368,7 @@ window.APP_CONFIG = {
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
-    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6') return 'high';
+    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5') return 'high';
     return this.DEFAULT_EFFORT;
   },
 
@@ -711,6 +714,8 @@ window.APP_CONFIG = {
   // Deploy: cd worker && npx wrangler deploy → dán URL + '/byteplus' vào đây.
   BYTEPLUS_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus',
   BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus-responses',
+  // Share snapshots: POST create / GET /share/:id (Cloudflare KV)
+  SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/share',
 
   BYTEPLUS_MCP_TOOLS: {
     'byteplus-dola-seed-2-0-lite': [

@@ -1271,6 +1271,33 @@ window.Events = (() => {
       }
     });
 
+    ui.els.shareChatBtn?.addEventListener('click', async () => {
+      if (document.body.classList.contains('share-view-mode')) return;
+      if (!window.Share?.isConfigured()) {
+        ui.showToast(t('shareNotConfigured'));
+        return;
+      }
+      const convo = convoMod.getCurrent();
+      if (!convo || !convo.messages?.length) {
+        ui.showToast(t('shareEmpty'));
+        return;
+      }
+      ui.openShareModal();
+      ui.setShareModalLoading();
+      try {
+        const result = await window.Share.create(convo);
+        ui.setShareModalResult(result.url);
+      } catch (err) {
+        ui.setShareModalError(err?.message || t('shareError'));
+      }
+    });
+
+    ui.els.shareCopyBtn?.addEventListener('click', async () => {
+      const url = ui.els.shareLinkInput?.value || '';
+      if (!url) return;
+      if (await copyToClipboard(url)) ui.showToast(t('shareCopied'));
+    });
+
     ui.els.pdfExportDownloadBtn?.addEventListener('click', () => {
       const pending = ui.consumeExportDownload();
       if (!pending) return;
@@ -1774,6 +1801,10 @@ window.Events = (() => {
           ui.closeGuide();
           return;
         }
+        if (el.closest('#shareModal')) {
+          ui.closeShareModal();
+          return;
+        }
         if (el.closest('#renameModal')) {
           ui.closeRenameModal(null);
           return;
@@ -1822,6 +1853,10 @@ window.Events = (() => {
         }
         if (ui.isRenameModalOpen()) {
           ui.closeRenameModal(null);
+          return;
+        }
+        if (ui.isShareModalOpen()) {
+          ui.closeShareModal();
           return;
         }
         if (ui.isTokenCostWarningOpen()) {
@@ -1970,6 +2005,18 @@ window.Events = (() => {
         const msg = msgCopy.closest('.message');
         const txt = msg?.querySelector('.content')?.innerText || '';
         if (await copyToClipboard(txt)) ui.showToast(t('toastCopyMessage'));
+        return;
+      }
+      const scrollMsgTop = e.target.closest('[data-action="scroll-msg-top"]');
+      if (scrollMsgTop) {
+        const msg = scrollMsgTop.closest('.message');
+        if (msg) ui.scrollMessageToTop(msg);
+        return;
+      }
+      const scrollMsgBottom = e.target.closest('[data-action="scroll-msg-bottom"]');
+      if (scrollMsgBottom) {
+        const msg = scrollMsgBottom.closest('.message');
+        if (msg) ui.scrollMessageToBottom(msg);
         return;
       }
       const retryBtn = e.target.closest('[data-action="retry"]');

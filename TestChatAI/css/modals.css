@@ -719,3 +719,113 @@ a.btn {
   from { opacity: 0; transform: translate(-50%, 8px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
+
+/* Share conversation */
+.share-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 8px 0 16px;
+}
+
+.share-loading.hidden,
+.share-result.hidden,
+.share-error.hidden {
+  display: none;
+}
+
+.share-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  margin-top: 6px;
+}
+
+.share-link-row .input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.share-link-row .btn {
+  flex-shrink: 0;
+}
+
+.share-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.share-error {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #f87171;
+  font-size: 13px;
+}
+
+.share-view-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-elev));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  padding: 8px 16px;
+}
+
+.share-view-banner.hidden {
+  display: none;
+}
+
+.share-view-banner-inner {
+  max-width: var(--content-max-width, 820px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.share-view-banner-inner i {
+  color: var(--accent);
+}
+
+.share-view-banner-inner span {
+  flex: 1;
+  min-width: 0;
+}
+
+body.share-view-mode .main-header {
+  margin-top: 40px;
+}
+
+body.share-view-mode .share-view-hidden {
+  display: none !important;
+}
+
+body.share-view-mode .app {
+  --sidebar-w: 0px;
+}
+
+body.share-view-mode .composer,
+body.share-view-mode .sidebar-overlay {
+  display: none !important;
+}
+
+body.share-view-mode .message .toolbar,
+body.share-view-mode .msg-edge-scroll,
+body.share-view-mode .message-scroll-rail {
+  display: none !important;
+}
+
+.share-load-error a {
+  color: var(--accent);
+}

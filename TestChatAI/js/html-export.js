@@ -4,6 +4,7 @@ window.HtmlExport = (() => {
 
   const HIDDEN_SELECTORS = [
     '.toolbar',
+    '.msg-edge-scroll',
     '.copy-code-btn',
     '.copy-table-btn',
     '.preview-md-btn',

@@ -277,6 +277,7 @@ Thư mục `worker/` chứa proxy Cloudflare:
 
 - **DeepSeek** — tránh CORS khi cần (dùng API key server-side)
 - **NVIDIA** — **bắt buộc** cho model DeepSeek V4 Flash (NVIDIA), vì `integrate.api.nvidia.com` không hỗ trợ CORS từ trình duyệt
+- **Share** — lưu snapshot hội thoại vào KV (`POST/GET /share`), link `?share=id` xem được trên trình duyệt ẩn danh (chỉ đọc, hết hạn 30 ngày)
 
 Triển khai:
 
@@ -291,6 +292,7 @@ Sau khi deploy, cập nhật trong `js/config.js`:
 
 - `DEEPSEEK_PROXY_ENDPOINT` — URL workers.dev (path gốc)
 - `NVIDIA_PROXY_ENDPOINT` — cùng URL + `/nvidia` (ví dụ `https://testchatai-deepseek-proxy.<account>.workers.dev/nvidia`)
+- `SHARE_ENDPOINT` — cùng URL + `/share`
 
 API key NVIDIA do người dùng nhập trong Cài đặt; worker chỉ chuyển tiếp header `Authorization`, không lưu key.
 

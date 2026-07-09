@@ -51,6 +51,14 @@ window.UI = (() => {
     els.guideOpenSettingsBtn = $('#guideOpenSettingsBtn');
     els.guideBody = $('#guideModal')?.querySelector('.guide-body');
     els.copyMarkdownBtn = $('#copyMarkdownBtn');
+    els.shareChatBtn = $('#shareChatBtn');
+    els.shareModal = $('#shareModal');
+    els.shareLoading = $('#shareLoading');
+    els.shareResult = $('#shareResult');
+    els.shareError = $('#shareError');
+    els.shareLinkInput = $('#shareLinkInput');
+    els.shareCopyBtn = $('#shareCopyBtn');
+    els.shareViewBanner = $('#shareViewBanner');
     els.headerDownloadWrap = $('#headerDownloadWrap');
     els.headerDownloadBtn = $('#headerDownloadBtn');
     els.headerDownloadMenu = $('#headerDownloadMenu');
@@ -910,6 +918,13 @@ window.UI = (() => {
     updateMessageScrollRail();
   };
 
+  const messageEdgeScrollBtnsHTML = () => (
+    '<button type="button" class="msg-edge-scroll msg-edge-scroll-bottom" data-action="scroll-msg-bottom" title="' + escapeHTML(t('scrollMsgBottom')) + '" aria-label="' + escapeHTML(t('scrollMsgBottom')) + '">'
+      + '<i class="fa-solid fa-chevron-down"></i></button>'
+    + '<button type="button" class="msg-edge-scroll msg-edge-scroll-top" data-action="scroll-msg-top" title="' + escapeHTML(t('scrollMsgTop')) + '" aria-label="' + escapeHTML(t('scrollMsgTop')) + '">'
+      + '<i class="fa-solid fa-chevron-up"></i></button>'
+  );
+
   const assistantToolbarHTML = (m) => {
     const variants = m.variants && m.variants.length ? m.variants : (m.content ? [m.content] : []);
     const variantIndex = m.variantIndex ?? 0;
@@ -961,7 +976,6 @@ window.UI = (() => {
     const avatar = isUser
       ? '<div class="avatar user-av"><i class="fa-solid fa-user"></i></div>'
       : '<div class="avatar assistant-av">V</div>';
-    const assistantText = isUser ? '' : window.Conversations.getAssistantContent(m);
     const body = isUser
       ? '<div class="content">' + userContentHTML(m) + '</div>'
       : '<div class="content">' + assistantContentHTML(m) + '</div>';
@@ -979,7 +993,9 @@ window.UI = (() => {
       : assistantToolbarHTML(m);
     return '<article class="message ' + m.role + '" data-role="' + m.role + '"' + idxAttr + '>'
       + avatar
-      + '<div class="body">' + body
+      + '<div class="body">'
+      + messageEdgeScrollBtnsHTML()
+      + body
       + '<div class="toolbar">' + toolbar + '</div>'
       + '</div></article>';
   };
@@ -1081,11 +1097,12 @@ window.UI = (() => {
         polishContent(_latestCE, { streaming: true });
 
         if (preserveScroll) {
+          // Keep reading position stable while tokens append below.
           messagesEl.scrollTop = prevTop;
+        } else {
+          scrollStreamingCodeToEnd(_latestCE, _latestText);
+          scrollToBottomIfNear();
         }
-
-        scrollStreamingCodeToEnd(_latestCE, _latestText);
-        scrollToBottomIfNear();
       }
       streamThrottle = null;
     });
@@ -1368,7 +1385,8 @@ window.UI = (() => {
     scrollElementToEnd(lastPre, { streaming: true });
   };
 
-  const SCROLL_NEAR_THRESHOLD = 80;
+  const SCROLL_UNPIN_THRESHOLD = 48;
+  const SCROLL_REPIN_THRESHOLD = 24;
 
   let _messageScrollRailBound = false;
   let _messageScrollRailResizeObserver = null;
@@ -1535,6 +1553,29 @@ window.UI = (() => {
     }, 450);
   };
 
+  const scrollMessageEdge = (article, edge) => {
+    const messagesEl = els.messages;
+    if (!messagesEl || !article) return;
+    _stickToBottom = false;
+    _ignoreScrollEvent = true;
+    const pad = 12;
+    let targetTop;
+    if (edge === 'bottom') {
+      targetTop = Math.max(0, article.offsetTop + article.offsetHeight - messagesEl.clientHeight + pad);
+    } else {
+      targetTop = Math.max(0, article.offsetTop - pad);
+    }
+    const maxTop = Math.max(0, messagesEl.scrollHeight - messagesEl.clientHeight);
+    messagesEl.scrollTo({ top: Math.min(targetTop, maxTop), behavior: 'smooth' });
+    window.setTimeout(() => {
+      _ignoreScrollEvent = false;
+      updateMessageScrollRailIndicator();
+    }, 450);
+  };
+
+  const scrollMessageToTop = (article) => scrollMessageEdge(article, 'top');
+  const scrollMessageToBottom = (article) => scrollMessageEdge(article, 'bottom');
+
   const scrollToAdjacentUserMessage = (direction) => {
     const users = getUserMessageArticles();
     if (!users.length) return;
@@ -1642,28 +1683,60 @@ window.UI = (() => {
     });
   };
 
-  const isNearBottom = () => {
+  const distanceFromBottom = () => {
     const el = els.messages;
-    if (!el) return true;
-    return el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_NEAR_THRESHOLD;
+    if (!el) return 0;
+    return el.scrollHeight - el.scrollTop - el.clientHeight;
+  };
+
+  const unpinFromBottom = () => {
+    _stickToBottom = false;
   };
 
   const bindMessagesScroll = () => {
     if (_messagesScrollBound || !els.messages) return;
     _messagesScrollBound = true;
-    els.messages.addEventListener('scroll', () => {
+    const el = els.messages;
+
+    el.addEventListener('scroll', () => {
       if (_ignoreScrollEvent) return;
-      _stickToBottom = isNearBottom();
+      const dist = distanceFromBottom();
+      if (_stickToBottom) {
+        if (dist > SCROLL_UNPIN_THRESHOLD) unpinFromBottom();
+      } else if (dist < SCROLL_REPIN_THRESHOLD) {
+        _stickToBottom = true;
+      }
       scheduleMessageScrollRailIndicator();
+    }, { passive: true });
+
+    // Unpin immediately on intentional upward scroll so streaming cannot yank the view back down.
+    el.addEventListener('wheel', (e) => {
+      if (e.deltaY < 0) unpinFromBottom();
+    }, { passive: true });
+
+    let touchY = null;
+    el.addEventListener('touchstart', (e) => {
+      touchY = e.touches[0]?.clientY ?? null;
+    }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+      const y = e.touches[0]?.clientY;
+      if (touchY != null && y != null && y - touchY > 6) unpinFromBottom();
+      touchY = y ?? touchY;
     }, { passive: true });
   };
 
-  const scrollToBottom = () => {
+  const scrollToBottom = ({ stick = true } = {}) => {
     const el = els.messages;
     if (!el) return;
-    _stickToBottom = true;
+    if (stick) _stickToBottom = true;
+    else if (!_stickToBottom) return;
     _ignoreScrollEvent = true;
     requestAnimationFrame(() => {
+      // User may have scrolled away while this frame was pending.
+      if (!_stickToBottom) {
+        _ignoreScrollEvent = false;
+        return;
+      }
       el.scrollTop = el.scrollHeight;
       requestAnimationFrame(() => {
         _ignoreScrollEvent = false;
@@ -1672,7 +1745,9 @@ window.UI = (() => {
   };
 
   const scrollToBottomIfNear = () => {
-    if (_stickToBottom) scrollToBottom();
+    if (!_stickToBottom) return;
+    // Follow the bottom without re-forcing stick (avoids fighting user scroll-up).
+    scrollToBottom({ stick: false });
   };
 
   const showError = (err) => {
@@ -1954,6 +2029,83 @@ window.UI = (() => {
   };
 
   const isGuideModalOpen = () => !!(els.guideModal && !els.guideModal.classList.contains('hidden'));
+
+  const openShareModal = () => {
+    if (!els.shareModal) return;
+    els.shareLoading?.classList.add('hidden');
+    els.shareResult?.classList.add('hidden');
+    els.shareError?.classList.add('hidden');
+    if (els.shareLinkInput) els.shareLinkInput.value = '';
+    if (els.shareError) els.shareError.textContent = '';
+    els.shareModal.classList.remove('hidden');
+  };
+
+  const setShareModalLoading = () => {
+    els.shareLoading?.classList.remove('hidden');
+    els.shareResult?.classList.add('hidden');
+    els.shareError?.classList.add('hidden');
+  };
+
+  const setShareModalResult = (url) => {
+    els.shareLoading?.classList.add('hidden');
+    els.shareError?.classList.add('hidden');
+    els.shareResult?.classList.remove('hidden');
+    if (els.shareLinkInput) {
+      els.shareLinkInput.value = url || '';
+      els.shareLinkInput.focus();
+      els.shareLinkInput.select();
+    }
+  };
+
+  const setShareModalError = (message) => {
+    els.shareLoading?.classList.add('hidden');
+    els.shareResult?.classList.add('hidden');
+    els.shareError?.classList.remove('hidden');
+    if (els.shareError) els.shareError.textContent = message || t('shareError');
+  };
+
+  const closeShareModal = () => {
+    if (els.shareModal) els.shareModal.classList.add('hidden');
+  };
+
+  const isShareModalOpen = () => !!(els.shareModal && !els.shareModal.classList.contains('hidden'));
+
+  const enterShareViewMode = (snapshot) => {
+    document.body.classList.add('share-view-mode');
+    els.shareViewBanner?.classList.remove('hidden');
+    if (els.shareChatBtn) els.shareChatBtn.classList.add('hidden');
+    if (els.composer) els.composer.classList.add('hidden');
+    if (els.sidebar) els.sidebar.classList.add('share-view-hidden');
+    if (els.openSidebarBtn) els.openSidebarBtn.classList.add('hidden');
+    if (els.headerNewChatBtn) els.headerNewChatBtn.classList.add('hidden');
+    if (els.toggleExportSelectBtn) els.toggleExportSelectBtn.classList.add('hidden');
+
+    const convo = {
+      id: 'shared',
+      title: snapshot.title || t('shareTitle'),
+      model: snapshot.model || '',
+      messages: snapshot.messages || [],
+      createdAt: snapshot.createdAt || Date.now(),
+      updatedAt: snapshot.createdAt || Date.now()
+    };
+    renderMessages(convo);
+    if (snapshot.model && els.modelSelect) {
+      try { els.modelSelect.value = snapshot.model; } catch {}
+    }
+  };
+
+  const showShareLoadError = (message) => {
+    document.body.classList.add('share-view-mode');
+    els.shareViewBanner?.classList.remove('hidden');
+    if (els.composer) els.composer.classList.add('hidden');
+    if (els.sidebar) els.sidebar.classList.add('share-view-hidden');
+    if (els.messages) {
+      els.messages.innerHTML = '<div class="messages-empty share-load-error">'
+        + '<h2>' + escapeHTML(message || t('shareLoadError')) + '</h2>'
+        + '<p><a href="./index.html">' + escapeHTML(t('shareOpenApp')) + '</a></p>'
+        + '</div>';
+    }
+  };
 
   let renameResolve = null;
 
@@ -2432,11 +2584,15 @@ window.UI = (() => {
     renderMessages, renderEmpty, animateClearAll,
     appendMessage, appendStreamingMessage, updateStreamingContent, finalizeStreaming,
     enterEditMode, exitEditMode, downloadConversation, downloadConversationTxt,
-    scrollToBottom, scrollToBottomIfNear, showError, removeError, setStreaming,
+    scrollToBottom, scrollToBottomIfNear, scrollMessageToTop, scrollMessageToBottom,
+    showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
     openSettings, closeSettings, updateSettingsTokenUsage, syncSystemPromptModeUI, checkTokenCostWarning,
     openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
+    openShareModal, closeShareModal, isShareModalOpen,
+    setShareModalLoading, setShareModalResult, setShareModalError,
+    enterShareViewMode, showShareLoadError,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,

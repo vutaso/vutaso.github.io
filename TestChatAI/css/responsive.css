@@ -83,7 +83,8 @@
   .messages { padding: 4px 0; }
   .message { padding: 12px 16px; gap: 10px; }
   .message .avatar { width: 28px; height: 28px; font-size: 13px; }
-  .message .toolbar { opacity: 1; }
+  .message .toolbar,
+  .message .msg-edge-scroll { opacity: 1; pointer-events: auto; }
 
   .composer {
     padding: 8px 12px max(14px, env(safe-area-inset-bottom));
