@@ -2074,6 +2074,12 @@ window.UI = (() => {
 
   const isShareModalOpen = () => !!(els.shareModal && !els.shareModal.classList.contains('hidden'));
 
+  let shareViewConvo = null;
+
+  const getShareViewConvo = () => shareViewConvo;
+
+  const isShareViewMode = () => document.body.classList.contains('share-view-mode');
+
   const applyShareViewChrome = () => {
     document.body.classList.add('share-view-mode');
     els.shareViewHeader?.classList.remove('hidden');
@@ -2088,6 +2094,7 @@ window.UI = (() => {
   };
 
   const enterShareLoadingMode = () => {
+    shareViewConvo = null;
     applyShareViewChrome();
     if (els.shareViewTitle) {
       els.shareViewTitle.textContent = t('shareLoadingView');
@@ -2131,6 +2138,7 @@ window.UI = (() => {
     }
     if (els.shareViewReadonlyText) els.shareViewReadonlyText.textContent = t('shareViewBanner');
 
+    shareViewConvo = convo;
     renderMessages(convo);
   };
 
@@ -2634,7 +2642,7 @@ window.UI = (() => {
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openShareModal, closeShareModal, isShareModalOpen,
     setShareModalLoading, setShareModalResult, setShareModalError,
-    enterShareLoadingMode, enterShareViewMode, showShareLoadError,
+    enterShareLoadingMode, enterShareViewMode, showShareLoadError, getShareViewConvo, isShareViewMode,
     openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,

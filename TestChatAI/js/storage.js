@@ -19,7 +19,8 @@ window.Storage = (() => {
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
     imageGenEnabled: false,
-    thinkingEnabled: false,
+    thinkingEnabled: window.APP_CONFIG.DEFAULT_EFFORT !== 'default'
+      && window.APP_CONFIG.modelUsesEffortLinkedThinking(window.APP_CONFIG.DEFAULT_MODEL),
     reasoningEffort: window.APP_CONFIG.DEFAULT_EFFORT,
     imageGenRatio: window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
     imageGenStyle: window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,

@@ -122,7 +122,7 @@ window.APP_CONFIG = {
 
   TOKEN_COST_WARNING_USD: 1,
 
-  DEFAULT_MODEL: 'gemini-3.5-flash',
+  DEFAULT_MODEL: 'nvidia-mistral-small-4',
   DEFAULT_LOCALE: 'en',
   LOCALES: ['en', 'vi', 'jp', 'zh'],
 

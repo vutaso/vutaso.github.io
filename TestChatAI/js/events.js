@@ -196,8 +196,13 @@ window.Events = (() => {
     });
   };
 
+  const getConvoForExport = () => {
+    if (ui.isShareViewMode()) return ui.getShareViewConvo();
+    return convoMod.getCurrent();
+  };
+
   const buildExportConvo = () => {
-    const convo = convoMod.getCurrent();
+    const convo = getConvoForExport();
     if (!convo) return null;
 
     const messages = convo.messages.filter((m) => {
@@ -254,7 +259,7 @@ window.Events = (() => {
   };
 
   const getExportConvoForDownload = () => {
-    const convo = convoMod.getCurrent();
+    const convo = getConvoForExport();
     if (!convo) return null;
 
     if (!ui.isExportSelectMode()) {
@@ -290,7 +295,7 @@ window.Events = (() => {
   };
 
   const buildSingleMessageExportConvo = (idx) => {
-    const convo = convoMod.getCurrent();
+    const convo = getConvoForExport();
     if (!convo) return null;
     const m = getMessageForExport(convo, idx);
     if (!m) return null;
@@ -330,7 +335,7 @@ window.Events = (() => {
   };
 
   const exportSingleMessageImages = async (idx) => {
-    const convo = convoMod.getCurrent();
+    const convo = getConvoForExport();
     if (!convo) {
       ui.showToast(t('toastNoConvoExport'));
       return;
