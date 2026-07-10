@@ -1,7 +1,7 @@
 window.API = (() => {
   const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, NVIDIA_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
-  let currentController = null;
-  const isStreaming = () => currentController !== null;
+  const activeControllers = new Set();
+  const isStreaming = () => activeControllers.size > 0;
 
   const appendFilesToText = (text, files) => {
     if (!files || !files.length) return text || '';
@@ -1027,9 +1027,10 @@ window.API = (() => {
   const send = async ({
     apiKey, model, systemPrompt, convo,
     webSearch, imageGen, thinking, reasoningEffort,
+    allowConcurrent = false,
     onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
-    if (currentController) {
+    if (!allowConcurrent && activeControllers.size > 0) {
       throw new Error('Đang có yêu cầu khác đang chạy');
     }
 
@@ -1040,7 +1041,8 @@ window.API = (() => {
     }
 
     const controller = new AbortController();
-    currentController = controller;
+    activeControllers.add(controller);
+    const releaseController = () => { activeControllers.delete(controller); };
     let groundingMeta = null;
     let requestUsage = null;
     const handlers = {
@@ -1119,10 +1121,10 @@ window.API = (() => {
       } else {
         await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort });
       }
-      currentController = null;
+      releaseController();
       if (onDone) onDone({ usage: requestUsage });
     } catch (err) {
-      currentController = null;
+      releaseController();
       if (err.name === 'AbortError') {
         if (onDone) onDone({ aborted: true, usage: requestUsage });
         return;
@@ -1132,10 +1134,10 @@ window.API = (() => {
   };
 
   const abort = () => {
-    if (currentController) {
-      currentController.abort();
-      currentController = null;
+    for (const controller of activeControllers) {
+      try { controller.abort(); } catch { /* ignore */ }
     }
+    activeControllers.clear();
   };
 
   return { send, abort, isStreaming };

@@ -35,6 +35,9 @@ window.APP_CONFIG = {
     { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
     { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-grok-4.5', apiModel: 'x-ai/grok-4.5', label: 'Grok 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-gpt-5.6-sol', apiModel: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-5.6-terra', apiModel: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-5.6-luna', apiModel: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -96,6 +99,9 @@ window.APP_CONFIG = {
     'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
     'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
     'openrouter-grok-4.5': { input: 2.00, output: 6.00 },
+    'openrouter-gpt-5.6-sol': { input: 5.00, output: 30.00 },
+    'openrouter-gpt-5.6-terra': { input: 2.50, output: 15.00 },
+    'openrouter-gpt-5.6-luna': { input: 1.00, output: 6.00 },
     'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
@@ -121,6 +127,13 @@ window.APP_CONFIG = {
   },
 
   TOKEN_COST_WARNING_USD: 1,
+
+  COMPRESS_MIN_MESSAGES: 10,
+  COMPRESS_KEEP_RECENT_MESSAGES: 4,
+  COMPRESS_MAX_TRANSCRIPT_CHARS: 100000,
+
+  COMPARE_MIN_MODELS: 2,
+  COMPARE_MAX_MODELS: 3,
 
   DEFAULT_MODEL: 'nvidia-mistral-small-4',
   DEFAULT_LOCALE: 'en',
@@ -195,7 +208,10 @@ window.APP_CONFIG = {
     'openrouter-mistral-small-4': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.6': ['low', 'medium', 'high'],
-    'openrouter-grok-4.5': ['low', 'medium', 'high']
+    'openrouter-grok-4.5': ['low', 'medium', 'high'],
+    'openrouter-gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -368,7 +384,9 @@ window.APP_CONFIG = {
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
-    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5') return 'high';
+    if (modelId === 'openrouter-gpt-5.6-luna') return 'low';
+    if (modelId === 'openrouter-gpt-5.6-terra') return 'medium';
+    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
     return this.DEFAULT_EFFORT;
   },
 

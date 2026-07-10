@@ -35,7 +35,11 @@ window.Storage = (() => {
     theme: window.APP_CONFIG.DEFAULT_THEME,
     locale: window.APP_CONFIG.DEFAULT_LOCALE,
     currentConversationId: null,
-    conversations: []
+    conversations: [],
+    promptSnippets: [],
+    promptSnippetsSeeded: false,
+    compareEnabled: false,
+    compareModels: []
   });
 
   let state = defaultState();

@@ -74,6 +74,20 @@ window.UI = (() => {
     els.pdfExportDownloadBtn = $('#pdfExportDownloadBtn');
     els.toggleExportSelectBtn = $('#toggleExportSelectBtn');
     els.exportSelectBar = $('#exportSelectBar');
+    els.compressContextBar = $('#compressContextBar');
+    els.compressContextHint = $('#compressContextHint');
+    els.compressContextBtn = $('#compressContextBtn');
+    els.compareBar = $('#compareBar');
+    els.compareBarHint = $('#compareBarHint');
+    els.compareBarCount = $('#compareBarCount');
+    els.compareModelPickers = $('#compareModelPickers');
+    els.compareAddModelBtn = $('#compareAddModelBtn');
+    els.compareBtn = $('#compareBtn');
+    els.modelCompareOverlay = $('#modelCompareOverlay');
+    els.modelCompareQuestion = $('#modelCompareQuestion');
+    els.modelCompareQuestionText = $('#modelCompareQuestionText');
+    els.modelCompareColumns = $('#modelCompareColumns');
+    els.closeModelCompareBtn = $('#closeModelCompareBtn');
     els.exportSelectCount = $('#exportSelectCount');
     els.exportSelectAllBtn = $('#exportSelectAllBtn');
     els.exportSelectClearBtn = $('#exportSelectClearBtn');
@@ -140,6 +154,23 @@ window.UI = (() => {
     els.appDropOverlay = $('#appDropOverlay');
     els.app = $('#app');
     els.attachBtn = $('#attachBtn');
+    els.micBtn = $('#micBtn');
+    els.snippetsBtn = $('#snippetsBtn');
+    els.snippetsMenu = $('#snippetsMenu');
+    els.snippetsMenuSearch = $('#snippetsMenuSearch');
+    els.snippetsMenuList = $('#snippetsMenuList');
+    els.snippetsManageBtn = $('#snippetsManageBtn');
+    els.snippetsModal = $('#snippetsModal');
+    els.snippetsModalSearch = $('#snippetsModalSearch');
+    els.snippetsModalList = $('#snippetsModalList');
+    els.snippetsListView = $('#snippetsListView');
+    els.snippetsAddBtn = $('#snippetsAddBtn');
+    els.snippetsSaveFromComposerBtn = $('#snippetsSaveFromComposerBtn');
+    els.snippetForm = $('#snippetForm');
+    els.snippetTitleInput = $('#snippetTitleInput');
+    els.snippetContentInput = $('#snippetContentInput');
+    els.snippetFormCancelBtn = $('#snippetFormCancelBtn');
+    els.snippetsListFooter = $('#snippetsListFooter');
     els.attachFileInput = $('#attachFileInput');
     els.markdownPreviewPanel = $('#markdownPreviewPanel');
     els.markdownPreviewContent = $('#markdownPreviewContent');
@@ -214,6 +245,12 @@ window.UI = (() => {
       els.translateBtn.classList.toggle('is-active', active);
       els.translateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    if (els.compareBtn) {
+      const compareOn = !!window.Storage.get().compareEnabled;
+      els.compareBtn.classList.toggle('is-active', compareOn);
+      els.compareBtn.setAttribute('aria-pressed', compareOn ? 'true' : 'false');
+    }
+    syncCompareBar(window.Storage.get());
     syncTranslateUI({ translateEnabled, translateTargetLang: translateTargetLang || stateTranslateLang });
     syncImageGenUI({
       imageGenEnabled: showImageGen && !!imageGenEnabled,
@@ -633,6 +670,10 @@ window.UI = (() => {
         if (templateId !== 'none') parts.push(t('templatePrefix') + window.I18n.imageGenLabel('template', templateId).toLowerCase());
         text = '<p class="message-imagegen-prompt">' + escaped + '</p>'
           + '<p class="message-imagegen-label">' + escapeHTML(parts.join(' · ')) + '</p>';
+      } else if (m.contextSummary) {
+        text = '<div class="context-summary-badge"><i class="fa-solid fa-compress" aria-hidden="true"></i> '
+          + escapeHTML(t('compressSummaryBadge')) + '</div>'
+          + '<div class="context-summary-body">' + window.Markdown.render(m.content || '') + '</div>';
       } else {
         text = '<p>' + escaped + '</p>';
       }
@@ -752,6 +793,201 @@ window.UI = (() => {
     syncExportSelectOnMessages();
   };
 
+  const syncCompressContextBar = (convo) => {
+    if (!els.compressContextBar) return;
+    if (isShareViewMode() || exportSelectMode) {
+      els.compressContextBar.classList.add('hidden');
+      return;
+    }
+    const c = convo !== undefined ? convo : window.Conversations.getCurrent();
+    const show = !!(c && window.ContextCompress?.shouldOfferCompress?.(c));
+    els.compressContextBar.classList.toggle('hidden', !show);
+    if (show && els.compressContextHint) {
+      els.compressContextHint.textContent = t('compressContextHint', { n: c.messages.length });
+    }
+    if (els.compressContextBtn) {
+      els.compressContextBtn.disabled = !!window.API?.isStreaming?.();
+    }
+  };
+
+  const buildCompareModelOptionsHTML = (selectedId) => {
+    const { MODELS } = window.APP_CONFIG;
+    return MODELS.map((m) =>
+      '<option value="' + escapeHTML(m.id) + '"' + (m.id === selectedId ? ' selected' : '') + '>'
+      + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m))
+      + '</option>'
+    ).join('');
+  };
+
+  const COMPARE_SLOT_LABELS = ['A', 'B', 'C'];
+
+  const getCompareProviderId = (modelId) => {
+    const model = window.APP_CONFIG.getModel(modelId);
+    return model?.provider || 'openai';
+  };
+
+  const syncCompareBar = (appState) => {
+    if (!els.compareBar) return;
+    if (isShareViewMode() || exportSelectMode) {
+      els.compareBar.classList.add('hidden');
+      return;
+    }
+    const enabled = !!appState?.compareEnabled;
+    els.compareBar.classList.toggle('hidden', !enabled);
+    if (!enabled) return;
+
+    let models = window.ModelCompare.normalizeModelList(appState.compareModels);
+    if (models.length < window.ModelCompare.COMPARE_MIN_MODELS) {
+      models = window.ModelCompare.getDefaultModels(appState.currentModel);
+    }
+
+    if (els.compareBarHint) {
+      els.compareBarHint.textContent = t('compareBarMode');
+    }
+    if (els.compareBarCount) {
+      els.compareBarCount.textContent = String(models.length);
+      els.compareBarCount.setAttribute('aria-label', t('compareBarHint', { n: models.length }));
+    }
+    if (els.compareAddModelBtn) {
+      const canAdd = models.length < window.ModelCompare.COMPARE_MAX_MODELS;
+      els.compareAddModelBtn.classList.toggle('hidden', !canAdd);
+      els.compareAddModelBtn.title = t('compareAddModel');
+      els.compareAddModelBtn.setAttribute('aria-label', t('compareAddModel'));
+    }
+
+    if (!els.compareModelPickers) return;
+    const streaming = !!window.API?.isStreaming?.();
+    els.compareModelPickers.innerHTML = models.map((modelId, i) => {
+      const canRemove = models.length > window.ModelCompare.COMPARE_MIN_MODELS;
+      const providerId = getCompareProviderId(modelId);
+      const slot = COMPARE_SLOT_LABELS[i] || String(i + 1);
+      return '<div class="compare-model-chip" data-idx="' + i + '" data-provider="' + escapeHTML(providerId) + '">'
+        + '<span class="compare-chip-slot" aria-hidden="true">' + slot + '</span>'
+        + '<span class="compare-chip-dot" aria-hidden="true"></span>'
+        + '<select class="compare-model-select" data-idx="' + i + '" aria-label="' + escapeHTML(t('compareModelSlot', { n: i + 1 })) + '"'
+        + (streaming ? ' disabled' : '') + '>'
+        + buildCompareModelOptionsHTML(modelId)
+        + '</select>'
+        + (canRemove
+          ? '<button type="button" class="compare-model-remove" data-idx="' + i + '" title="' + escapeHTML(t('compareRemoveModel')) + '" aria-label="' + escapeHTML(t('compareRemoveModel')) + '"' + (streaming ? ' disabled' : '') + '>'
+            + '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>'
+          : '')
+        + '</div>';
+    }).join('');
+  };
+
+  let compareOverlayModels = [];
+
+  const getCompareProviderLabel = (providerId) => {
+    return window.APP_CONFIG.PROVIDERS.find((p) => p.id === providerId)?.label || providerId;
+  };
+
+  const buildCompareColumnHTML = (modelId) => {
+    const model = window.APP_CONFIG.getModel(modelId);
+    const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : modelId;
+    const providerId = getCompareProviderId(modelId);
+    const providerLabel = getCompareProviderLabel(providerId);
+    return '<article class="model-compare-col" data-model-id="' + escapeHTML(modelId) + '" data-provider="' + escapeHTML(providerId) + '" data-status="compareStatusStreaming">'
+      + '<header class="model-compare-col-header">'
+      + '<div class="model-compare-col-brand">'
+      + '<span class="model-compare-col-dot" aria-hidden="true"></span>'
+      + '<div class="model-compare-col-titles">'
+      + '<span class="model-compare-col-title">' + escapeHTML(label) + '</span>'
+      + '<span class="model-compare-col-provider">' + escapeHTML(providerLabel) + '</span>'
+      + '</div>'
+      + '</div>'
+      + '<span class="model-compare-col-status is-streaming">'
+      + '<span class="model-compare-status-dot" aria-hidden="true"></span>'
+      + '<span class="model-compare-status-text">' + escapeHTML(t('compareStatusStreaming')) + '</span>'
+      + '</span>'
+      + '</header>'
+      + '<div class="model-compare-col-error" role="alert"></div>'
+      + '<div class="model-compare-col-body content"></div>'
+      + '<footer class="model-compare-col-footer">'
+      + '<button type="button" class="btn btn-primary model-compare-pick-btn" data-model-id="' + escapeHTML(modelId) + '" disabled>'
+      + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+      + '<span>' + escapeHTML(t('comparePick')) + '</span>'
+      + '</button>'
+      + '</footer>'
+      + '</article>';
+  };
+
+  const openModelCompareOverlay = (question, modelIds) => {
+    if (!els.modelCompareOverlay || !els.modelCompareColumns) return;
+    compareOverlayModels = modelIds.slice();
+    els.modelCompareOverlay.classList.remove('hidden');
+    document.body.classList.add('model-compare-open');
+
+    if (els.modelCompareQuestion && els.modelCompareQuestionText) {
+      const q = (question || '').trim();
+      els.modelCompareQuestion.classList.toggle('hidden', !q);
+      els.modelCompareQuestionText.textContent = q;
+    }
+
+    els.modelCompareColumns.style.setProperty('--compare-cols', String(modelIds.length));
+    els.modelCompareColumns.innerHTML = modelIds.map((id) => buildCompareColumnHTML(id)).join('');
+  };
+
+  const closeModelCompareOverlay = () => {
+    if (!els.modelCompareOverlay) return;
+    els.modelCompareOverlay.classList.add('hidden');
+    document.body.classList.remove('model-compare-open');
+    if (els.modelCompareColumns) els.modelCompareColumns.innerHTML = '';
+    compareOverlayModels = [];
+  };
+
+  const isModelCompareOpen = () => {
+    return !!(els.modelCompareOverlay && !els.modelCompareOverlay.classList.contains('hidden'));
+  };
+
+  const getModelCompareColumns = () => {
+    if (!els.modelCompareColumns) return [];
+    return Array.from(els.modelCompareColumns.querySelectorAll('.model-compare-col'));
+  };
+
+  const updateCompareColumnContent = (contentEl, text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
+    if (!contentEl) return;
+    contentEl.innerHTML = renderStreamingAssistantHTML(text, images, reasoning, { reasoningOpen, groundingMetadata });
+    polishContent(contentEl, { streaming: true });
+  };
+
+  const finalizeCompareColumn = (columnEl, text, { generatedImages, reasoningContent, groundingMetadata } = {}) => {
+    if (!columnEl) return;
+    const contentEl = columnEl.querySelector('.model-compare-col-body');
+    if (contentEl) {
+      contentEl.innerHTML = renderStreamingAssistantHTML(
+        text, generatedImages, reasoningContent, {
+          reasoningOpen: false,
+          groundingMetadata
+        }
+      );
+      polishContent(contentEl, { renderMermaid: true });
+    }
+  };
+
+  const syncComparePickButtons = () => {
+    getModelCompareColumns().forEach((col) => {
+      const btn = col.querySelector('.model-compare-pick-btn');
+      const body = col.querySelector('.model-compare-col-body');
+      const hasText = !!(body && body.textContent.trim());
+      const streaming = col.classList.contains('is-streaming');
+      if (btn) btn.disabled = streaming || !hasText;
+    });
+  };
+
+  const markCompareColumnPicked = (modelId) => {
+    getModelCompareColumns().forEach((col) => {
+      const picked = col.dataset.modelId === modelId;
+      col.classList.toggle('is-picked', picked);
+      const statusEl = col.querySelector('.model-compare-col-status');
+      const statusText = col.querySelector('.model-compare-status-text');
+      if (picked && statusEl && statusText) {
+        statusEl.className = 'model-compare-col-status is-picked';
+        statusText.textContent = t('compareStatusPicked');
+      }
+    });
+  };
+
   const isExportSelectMode = () => exportSelectMode;
 
   const setExportSelectMode = (enabled) => {
@@ -851,6 +1087,7 @@ window.UI = (() => {
 
   const renderEmpty = (animate = false) => {
     closeMarkdownPreview();
+    syncCompressContextBar(null);
     els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(t('hello')) + '</h2><p class="messages-empty-sub">' + escapeHTML(t('emptySub')) + '</p></div>';
     updateMessageScrollRail();
     if (!animate) return;
@@ -918,6 +1155,7 @@ window.UI = (() => {
     els.messages.innerHTML = shown.map(({ m, i }) => messageHTML(m, i)).join('');
     polishContent(els.messages);
     if (exportSelectMode) syncExportSelectOnMessages();
+    syncCompressContextBar(convo);
     scrollToBottom();
     updateMessageScrollRail();
   };
@@ -969,7 +1207,8 @@ window.UI = (() => {
       + imageExportOption
       + '</div></div>';
 
-    return '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
+    return '<button type="button" class="tb-btn" data-action="speak" title="' + escapeHTML(t('speak')) + '" aria-label="' + escapeHTML(t('speak')) + '"><i class="fa-solid fa-volume-high"></i></button>'
+      + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
       + '<button type="button" class="tb-btn" data-action="retry" title="' + escapeHTML(t('retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>'
       + exportMenu
       + pager;
@@ -984,6 +1223,7 @@ window.UI = (() => {
       ? '<div class="content">' + userContentHTML(m) + '</div>'
       : '<div class="content">' + assistantContentHTML(m) + '</div>';
     const idxAttr = idx !== undefined ? ' data-idx="' + idx + '"' : '';
+    const summaryClass = isUser && m.contextSummary ? ' context-summary' : '';
     const editBtn = isUser
       ? '<button type="button" class="tb-btn" data-action="edit" title="' + escapeHTML(t('edit')) + '"><i class="fa-solid fa-pen-to-square"></i></button>'
       : '';
@@ -995,7 +1235,7 @@ window.UI = (() => {
         + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
         + delBtn
       : assistantToolbarHTML(m);
-    return '<article class="message ' + m.role + '" data-role="' + m.role + '"' + idxAttr + '>'
+    return '<article class="message ' + m.role + summaryClass + '" data-role="' + m.role + '"' + idxAttr + '>'
       + avatar
       + '<div class="body">'
       + messageEdgeScrollBtnsHTML()
@@ -1776,11 +2016,18 @@ window.UI = (() => {
   };
 
   const setStreaming = (on) => {
-    if (on) _stickToBottom = true;
+    if (on) {
+      _stickToBottom = true;
+      window.Speech?.stopListening?.();
+      window.Speech?.stopSpeaking?.();
+    }
+    syncCompressContextBar();
     els.sendBtn.classList.toggle('hidden', on);
     els.stopBtn.classList.toggle('hidden', !on);
     els.composerInput.disabled = on;
     els.attachBtn.disabled = on;
+    if (els.micBtn) els.micBtn.disabled = on;
+    if (els.snippetsBtn) els.snippetsBtn.disabled = on;
     if (els.webSearchBtn) els.webSearchBtn.disabled = on;
     if (els.imageGenBtn) els.imageGenBtn.disabled = on;
     if (els.translateBtn) els.translateBtn.disabled = on;
@@ -1794,6 +2041,11 @@ window.UI = (() => {
     if (els.imageGenRatioChipClear) els.imageGenRatioChipClear.disabled = on;
     if (els.imageGenStyleChipClear) els.imageGenStyleChipClear.disabled = on;
     if (els.imageGenTemplateChipClear) els.imageGenTemplateChipClear.disabled = on;
+    if (els.compareBtn) els.compareBtn.disabled = on;
+    if (els.compareAddModelBtn) els.compareAddModelBtn.disabled = on;
+    if (els.compareModelPickers) {
+      els.compareModelPickers.querySelectorAll('select, button').forEach((el) => { el.disabled = on; });
+    }
     els.messages.classList.toggle('is-streaming', on);
   };
 
@@ -1996,6 +2248,8 @@ window.UI = (() => {
   const closeSettings = () => els.settingsModal.classList.add('hidden');
 
   const applyLocale = (appState) => {
+    window.Speech?.stopListening?.();
+    window.Speech?.stopSpeaking?.();
     window.I18n.setLocale(appState.locale || window.APP_CONFIG.DEFAULT_LOCALE);
     window.I18n.applyToDOM();
     initImageGenMenus();
@@ -2019,6 +2273,7 @@ window.UI = (() => {
     else renderEmpty();
     updateExportSelectCount();
     syncMessageScrollRailI18n();
+    syncCompressContextBar(convo);
   };
 
   const openGuide = () => {
@@ -2180,6 +2435,153 @@ window.UI = (() => {
   };
 
   const isRenameModalOpen = () => !els.renameModal.classList.contains('hidden');
+
+  let editingSnippetId = null;
+
+  const truncateSnippetPreview = (text, max = 96) => {
+    const oneLine = (text || '').replace(/\s+/g, ' ').trim();
+    if (oneLine.length <= max) return oneLine;
+    return oneLine.slice(0, max - 1) + '…';
+  };
+
+  const renderSnippetMenuItems = (items) => {
+    if (!els.snippetsMenuList) return;
+    if (!items.length) {
+      els.snippetsMenuList.innerHTML = '<p class="snippets-menu-empty">' + escapeHTML(t('snippetsEmpty')) + '</p>';
+      return;
+    }
+    els.snippetsMenuList.innerHTML = items.map((s) =>
+      '<button type="button" class="snippets-menu-item" role="menuitem" data-snippet-id="' + escapeHTML(s.id) + '">'
+      + '<span class="snippets-menu-item-title">' + escapeHTML(s.title) + '</span>'
+      + '<span class="snippets-menu-item-preview">' + escapeHTML(truncateSnippetPreview(s.content)) + '</span>'
+      + '</button>'
+    ).join('');
+  };
+
+  const renderSnippetModalItems = (items) => {
+    if (!els.snippetsModalList) return;
+    if (!items.length) {
+      els.snippetsModalList.innerHTML = '<p class="snippets-menu-empty">' + escapeHTML(t('snippetsEmpty')) + '</p>';
+      return;
+    }
+    els.snippetsModalList.innerHTML = items.map((s) =>
+      '<div class="snippets-modal-item" role="listitem" data-snippet-id="' + escapeHTML(s.id) + '">'
+      + '<button type="button" class="snippets-modal-item-main" data-action="snippet-insert" data-snippet-id="' + escapeHTML(s.id) + '">'
+      + '<span class="snippets-menu-item-title">' + escapeHTML(s.title) + '</span>'
+      + '<span class="snippets-menu-item-preview">' + escapeHTML(truncateSnippetPreview(s.content, 120)) + '</span>'
+      + '</button>'
+      + '<div class="snippets-modal-item-actions">'
+      + '<button type="button" class="btn btn-icon" data-action="snippet-edit" data-snippet-id="' + escapeHTML(s.id) + '" title="' + escapeHTML(t('snippetsEdit')) + '" aria-label="' + escapeHTML(t('snippetsEdit')) + '"><i class="fa-solid fa-pen"></i></button>'
+      + '<button type="button" class="btn btn-icon" data-action="snippet-delete" data-snippet-id="' + escapeHTML(s.id) + '" title="' + escapeHTML(t('snippetsDelete')) + '" aria-label="' + escapeHTML(t('snippetsDelete')) + '"><i class="fa-solid fa-trash"></i></button>'
+      + '</div></div>'
+    ).join('');
+  };
+
+  const refreshSnippetsViews = () => {
+    const menuQ = els.snippetsMenuSearch?.value || '';
+    const modalQ = els.snippetsModalSearch?.value || '';
+    renderSnippetMenuItems(window.Snippets.search(menuQ));
+    renderSnippetModalItems(window.Snippets.search(modalQ));
+  };
+
+  const insertSnippetIntoComposer = (content, { closeMenus = true } = {}) => {
+    const text = (content || '').trim();
+    if (!text || !els.composerInput) return false;
+    const current = els.composerInput.value;
+    if (!current.trim()) {
+      els.composerInput.value = text;
+    } else {
+      const sep = /\n$/.test(current) ? '\n' : '\n\n';
+      els.composerInput.value = current + sep + text;
+    }
+    autoResize(els.composerInput);
+    els.composerInput.focus();
+    if (closeMenus) {
+      closeSnippetsMenu();
+      closeSnippetsModal();
+    }
+    return true;
+  };
+
+  const openSnippetsMenu = () => {
+    if (!els.snippetsMenu || !els.snippetsBtn) return;
+    closeImageGenMenus();
+    closeTranslateLangMenu();
+    refreshSnippetsViews();
+    els.snippetsMenu.classList.remove('hidden');
+    els.snippetsBtn.classList.add('is-open');
+    els.snippetsBtn.setAttribute('aria-expanded', 'true');
+    if (els.snippetsMenuSearch) {
+      els.snippetsMenuSearch.value = '';
+      renderSnippetMenuItems(window.Snippets.getAll());
+    }
+  };
+
+  const closeSnippetsMenu = () => {
+    if (!els.snippetsMenu || !els.snippetsBtn) return;
+    els.snippetsMenu.classList.add('hidden');
+    els.snippetsBtn.classList.remove('is-open');
+    els.snippetsBtn.setAttribute('aria-expanded', 'false');
+    if (els.snippetsMenuSearch) els.snippetsMenuSearch.value = '';
+  };
+
+  const toggleSnippetsMenu = () => {
+    if (!els.snippetsMenu) return;
+    if (els.snippetsMenu.classList.contains('hidden')) openSnippetsMenu();
+    else closeSnippetsMenu();
+  };
+
+  const isSnippetsMenuOpen = () => els.snippetsMenu && !els.snippetsMenu.classList.contains('hidden');
+
+  const showSnippetForm = (snippet = null) => {
+    editingSnippetId = snippet?.id || null;
+    if (els.snippetsListView) els.snippetsListView.classList.add('hidden');
+    if (els.snippetsListFooter) els.snippetsListFooter.classList.add('hidden');
+    if (els.snippetForm) els.snippetForm.classList.remove('hidden');
+    if (els.snippetTitleInput) els.snippetTitleInput.value = snippet?.title || '';
+    if (els.snippetContentInput) els.snippetContentInput.value = snippet?.content || '';
+    setTimeout(() => (snippet?.content ? els.snippetContentInput : els.snippetTitleInput)?.focus(), 50);
+  };
+
+  const showSnippetListView = () => {
+    editingSnippetId = null;
+    if (els.snippetForm) els.snippetForm.classList.add('hidden');
+    if (els.snippetsListView) els.snippetsListView.classList.remove('hidden');
+    if (els.snippetsListFooter) els.snippetsListFooter.classList.remove('hidden');
+    refreshSnippetsViews();
+  };
+
+  const openSnippetsModal = () => {
+    closeSnippetsMenu();
+    if (!els.snippetsModal) return;
+    showSnippetListView();
+    if (els.snippetsModalSearch) els.snippetsModalSearch.value = '';
+    els.snippetsModal.classList.remove('hidden');
+    refreshSnippetsViews();
+  };
+
+  const closeSnippetsModal = () => {
+    if (!els.snippetsModal) return;
+    els.snippetsModal.classList.add('hidden');
+    showSnippetListView();
+  };
+
+  const isSnippetsModalOpen = () => els.snippetsModal && !els.snippetsModal.classList.contains('hidden');
+
+  const getEditingSnippetId = () => editingSnippetId;
+
+  const saveSnippetFromForm = () => {
+    const title = els.snippetTitleInput?.value || '';
+    const content = els.snippetContentInput?.value || '';
+    if (editingSnippetId) {
+      if (!window.Snippets.update(editingSnippetId, { title, content })) return false;
+    } else if (!window.Snippets.add({ title, content })) {
+      return false;
+    }
+    showSnippetListView();
+    refreshSnippetsViews();
+    return true;
+  };
 
   const PREVIEW_WIDTH_MIN = 260;
   const PREVIEW_CHAT_MIN = 220;
@@ -2643,13 +3045,22 @@ window.UI = (() => {
     openShareModal, closeShareModal, isShareModalOpen,
     setShareModalLoading, setShareModalResult, setShareModalError,
     enterShareLoadingMode, enterShareViewMode, showShareLoadError, getShareViewConvo, isShareViewMode,
-    openRenameModal, closeRenameModal, isRenameModalOpen, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
+    openRenameModal, closeRenameModal, isRenameModalOpen,
+    toggleSnippetsMenu, closeSnippetsMenu, isSnippetsMenuOpen,
+    openSnippetsModal, closeSnippetsModal, isSnippetsModalOpen,
+    insertSnippetIntoComposer, refreshSnippetsViews, showSnippetForm, showSnippetListView,
+    getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
     openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
     setPdfExportLoading,
     showExportDownloadPrompt, consumeExportDownload, finishExportDownload,
     isExportSelectMode, toggleExportSelectMode, setExportSelectMode,
+    syncCompressContextBar,
+    syncCompareBar,
+    openModelCompareOverlay, closeModelCompareOverlay, isModelCompareOpen,
+    getModelCompareColumns, updateCompareColumnContent, finalizeCompareColumn,
+    syncComparePickButtons, markCompareColumnPicked,
     getExportSelectedIndices, toggleExportSelectIndex,
     selectAllExportMessages, clearExportSelection,
     preparePdfExportRoot,

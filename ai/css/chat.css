@@ -793,6 +793,16 @@
   opacity: 0.35;
 }
 
+.message .toolbar .tb-btn.is-speaking {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.message .toolbar .tb-btn.is-speaking:hover {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
 .msg-export-wrap {
   position: relative;
 }

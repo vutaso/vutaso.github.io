@@ -13,6 +13,7 @@
   }
 
   window.I18n.setLocale(state.locale || window.APP_CONFIG.DEFAULT_LOCALE);
+  window.Snippets.ensureSeeded();
   window.I18n.applyToDOM();
 
   window.addEventListener('app-storage-notify', (e) => {
@@ -42,6 +43,7 @@
     imageGenTemplatePicked: false,
     referenceImage: null
   });
+  ui.syncCompareBar(state);
 
   const shareId = window.Share?.getShareIdFromLocation?.();
   if (shareId) {

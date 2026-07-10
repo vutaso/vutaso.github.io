@@ -281,6 +281,48 @@
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
+.composer-mic {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  border-radius: 50%;
+}
+
+.composer-mic:hover:not(:disabled) {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.composer-mic.is-listening {
+  color: #e74c3c;
+  background: color-mix(in srgb, #e74c3c 14%, transparent);
+  animation: composer-mic-pulse 1.2s ease-in-out infinite;
+}
+
+.composer-mic.is-listening:hover:not(:disabled) {
+  color: #e74c3c;
+  background: color-mix(in srgb, #e74c3c 20%, transparent);
+}
+
+@keyframes composer-mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, #e74c3c 35%, transparent); }
+  50% { box-shadow: 0 0 0 5px transparent; }
+}
+
+.composer-input.is-voice-interim {
+  color: var(--text);
+}
+
+.composer-input.is-voice-interim::placeholder {
+  opacity: 0.5;
+}
+
+.composer-mic.is-listening ~ .composer-field .composer-input,
+.composer-inner:has(.composer-mic.is-listening) .composer-input {
+  caret-color: #e74c3c;
+}
+
 .composer-attachments {
   display: flex;
   flex-wrap: wrap;

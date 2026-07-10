@@ -15,6 +15,7 @@ window.Events = (() => {
   let docxExporting = false;
   let htmlExporting = false;
   let pdfExporting = false;
+  let compressing = false;
   let pendingImages = [];
   let pendingFiles = [];
   let pendingReferenceImage = null;
@@ -22,6 +23,7 @@ window.Events = (() => {
   let imageGenStylePicked = false;
   let imageGenTemplatePicked = false;
   let pendingReplyText = '';
+  let compareContext = null;
 
   const getToolState = (patch = {}) => {
     const s = { ...state.get(), ...patch };
@@ -428,10 +430,16 @@ window.Events = (() => {
   const updateSendEnabled = () => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-    const hasKey = window.APP_CONFIG.hasApiKey(s, modelId);
+    const compareMode = !!s.compareEnabled;
+    let hasKey;
+    if (compareMode) {
+      hasKey = getCompareModels().every((id) => window.APP_CONFIG.hasApiKey(s, id));
+    } else {
+      hasKey = window.APP_CONFIG.hasApiKey(s, modelId);
+    }
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
-    if (s.imageGenEnabled) {
+    if (compareMode || s.imageGenEnabled) {
       ui.els.sendBtn.disabled = !hasKey || !hasText;
     } else {
       ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
@@ -439,7 +447,9 @@ window.Events = (() => {
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
-      ui.els.attachBtn.disabled = imageGenOn;
+      const compareOn = !!s.compareEnabled;
+      ui.els.attachBtn.disabled = imageGenOn || compareOn;
+      if (ui.els.micBtn) ui.els.micBtn.disabled = imageGenOn;
     }
   };
 
@@ -560,6 +570,101 @@ window.Events = (() => {
     if (!window.API.isStreaming()) return;
     if (getStreamingConvoId() !== convoId) return;
     await settleActiveStream(options);
+  };
+
+  const getCompareModels = () => {
+    const s = state.get();
+    let models = window.ModelCompare.normalizeModelList(s.compareModels);
+    if (models.length < window.ModelCompare.COMPARE_MIN_MODELS) {
+      models = window.ModelCompare.getDefaultModels(s.currentModel);
+    }
+    return models;
+  };
+
+  const closeCompareOverlay = ({ toastKey } = {}) => {
+    if (!ui.isModelCompareOpen()) return;
+    ui.closeModelCompareOverlay();
+    compareContext = null;
+    ui.setStreaming(false);
+    updateSendEnabled();
+    if (toastKey) ui.showToast(t(toastKey));
+  };
+
+  const pickCompareResult = (modelId) => {
+    if (!compareContext || compareContext.picked) return;
+    const data = compareContext.columns?.[modelId];
+    const text = (data?.text || '').trim();
+    if (!text) return;
+
+    const convo = convoMod.getById(compareContext.convoId);
+    if (!convo) {
+      closeCompareOverlay();
+      return;
+    }
+
+    compareContext.picked = true;
+    if (window.API.isStreaming()) apiAbort();
+
+    const extra = {};
+    if (data.generatedImages?.length) extra.generatedImages = data.generatedImages.slice();
+    if (data.reasoning) extra.reasoningContent = data.reasoning;
+    if (data.groundingMetadata) extra.groundingMetadata = data.groundingMetadata;
+
+    convoMod.addMessage(convo, {
+      role: 'assistant',
+      content: text,
+      variants: [text],
+      variantIndex: 0,
+      ts: Date.now(),
+      responseModel: modelId,
+      ...extra,
+    });
+    const msgIdx = convo.messages.length - 1;
+    ui.markCompareColumnPicked(modelId);
+    ui.appendMessage(convo.messages[msgIdx], msgIdx);
+    ui.refreshConversationList(convo.id);
+    ui.updateSettingsTokenUsage(state.get());
+    ui.showToast(t('comparePicked'));
+    closeCompareOverlay();
+  };
+
+  const sendCompareResponse = async (convo, question) => {
+    const s = state.get();
+    const modelIds = getCompareModels();
+
+    for (const id of modelIds) {
+      if (!window.APP_CONFIG.hasApiKey(s, id)) {
+        ui.openSettings(s);
+        ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(id));
+        return;
+      }
+    }
+
+    compareContext = {
+      convoId: convo.id,
+      question,
+      modelIds,
+      columns: {},
+      picked: false,
+    };
+
+    try {
+      await window.ModelCompare.run({
+        convo,
+        modelIds,
+        question,
+        settings: s,
+        columnData: compareContext.columns,
+      });
+    } catch (err) {
+      ui.showError(err);
+      closeCompareOverlay();
+      return;
+    }
+
+    if (!compareContext?.picked) {
+      ui.syncComparePickButtons();
+    }
   };
 
   const streamResponse = async (convo, { retryIdx } = {}) => {
@@ -798,14 +903,33 @@ window.Events = (() => {
   const sendCurrent = async () => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-    if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
+    const compareMode = !!s.compareEnabled;
+
+    if (compareMode) {
+      const modelIds = getCompareModels();
+      for (const id of modelIds) {
+        if (!window.APP_CONFIG.hasApiKey(s, id)) {
+          ui.openSettings(s);
+          ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(id));
+          return;
+        }
+      }
+    } else if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
       ui.openSettings(s);
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
+
     const text = ui.els.composerInput.value.trim();
     if (window.API.isStreaming()) return;
-    if (s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) {
+
+    if (compareMode) {
+      if (!text) return;
+      if (pendingImages.length || pendingFiles.length || s.imageGenEnabled || s.translateEnabled || s.webSearchEnabled) {
+        ui.showToast(t('compareTextOnly'));
+        return;
+      }
+    } else if (s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) {
       if (!text) return;
     } else if (!text && !pendingImages.length && !pendingFiles.length) {
       return;
@@ -818,7 +942,7 @@ window.Events = (() => {
       content: text,
       ts: Date.now()
     };
-    if ((s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) && text) {
+    if (!compareMode && (s.imageGenEnabled || window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) && text) {
       userMsg.imageGen = {
         ratio: s.imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
         style: s.imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
@@ -832,7 +956,7 @@ window.Events = (() => {
           reference: true
         }];
       }
-    } else {
+    } else if (!compareMode) {
       if (pendingImages.length) {
         userMsg.images = pendingImages.map(img => ({
           dataUrl: img.dataUrl,
@@ -856,6 +980,8 @@ window.Events = (() => {
     const userMsgIdx = convo.messages.length - 1;
 
     ui.els.composerInput.value = '';
+    window.Speech?.stopListening?.();
+    window.Speech?.stopSpeaking?.();
     clearPendingAttachments();
     pendingReferenceImage = null;
     resetImageGenPicked();
@@ -866,12 +992,20 @@ window.Events = (() => {
     ui.refreshConversationList(convo.id);
     updateSendEnabled();
 
+    if (compareMode) {
+      await sendCompareResponse(convo, text);
+      return;
+    }
+
     await streamResponse(convo);
   };
 
   const stopStreaming = () => {
     if (!window.API.isStreaming()) return;
     apiAbort();
+    if (ui.isModelCompareOpen()) {
+      ui.syncComparePickButtons();
+    }
   };
 
   const saveEdit = (msg) => {
@@ -934,6 +1068,100 @@ window.Events = (() => {
 
     ui.els.attachBtn.addEventListener('click', () => {
       ui.els.attachFileInput.click();
+    });
+
+    window.Speech?.init?.({
+      micButton: ui.els.micBtn,
+      input: ui.els.composerInput,
+      getLocale: () => state.get().locale || window.I18n.getLocale(),
+      onTranscript: () => {
+        autoResize(ui.els.composerInput);
+        updateSendEnabled();
+      },
+      onError: (msg) => ui.showToast(msg),
+    });
+
+    ui.els.micBtn?.addEventListener('click', () => {
+      window.Speech?.toggleListening?.();
+    });
+
+    ui.els.snippetsBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleSnippetsMenu();
+    });
+
+    ui.els.snippetsMenuSearch?.addEventListener('input', () => {
+      ui.refreshSnippetsViews();
+    });
+
+    ui.els.snippetsMenuList?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-snippet-id]');
+      if (!btn || btn.dataset.action) return;
+      const snippet = window.Snippets.getById(btn.dataset.snippetId);
+      if (!snippet) return;
+      if (ui.insertSnippetIntoComposer(snippet.content)) {
+        ui.showToast(t('snippetsInserted'));
+        if (typeof updateSendEnabled === 'function') updateSendEnabled();
+      }
+    });
+
+    ui.els.snippetsManageBtn?.addEventListener('click', () => {
+      ui.openSnippetsModal();
+    });
+
+    ui.els.snippetsModalSearch?.addEventListener('input', () => {
+      ui.refreshSnippetsViews();
+    });
+
+    ui.els.snippetsAddBtn?.addEventListener('click', () => {
+      ui.showSnippetForm(null);
+    });
+
+    ui.els.snippetsSaveFromComposerBtn?.addEventListener('click', () => {
+      const content = ui.els.composerInput?.value?.trim() || '';
+      if (!content) {
+        ui.showToast(t('snippetsSaveComposerEmpty'));
+        return;
+      }
+      ui.showSnippetForm({ title: '', content });
+    });
+
+    ui.els.snippetFormCancelBtn?.addEventListener('click', () => {
+      ui.showSnippetListView();
+    });
+
+    ui.els.snippetForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (ui.saveSnippetFromForm()) {
+        ui.showToast(t('snippetsSaved'));
+      }
+    });
+
+    ui.els.snippetsModalList?.addEventListener('click', (e) => {
+      const insertBtn = e.target.closest('[data-action="snippet-insert"]');
+      if (insertBtn) {
+        const snippet = window.Snippets.getById(insertBtn.dataset.snippetId);
+        if (snippet && ui.insertSnippetIntoComposer(snippet.content)) {
+          ui.showToast(t('snippetsInserted'));
+          ui.closeSnippetsModal();
+          if (typeof updateSendEnabled === 'function') updateSendEnabled();
+        }
+        return;
+      }
+      const editBtn = e.target.closest('[data-action="snippet-edit"]');
+      if (editBtn) {
+        const snippet = window.Snippets.getById(editBtn.dataset.snippetId);
+        if (snippet) ui.showSnippetForm(snippet);
+        return;
+      }
+      const delBtn = e.target.closest('[data-action="snippet-delete"]');
+      if (delBtn) {
+        if (!confirm(t('confirmDeleteSnippet'))) return;
+        if (window.Snippets.remove(delBtn.dataset.snippetId)) {
+          ui.refreshSnippetsViews();
+          ui.showToast(t('snippetsDeleted'));
+        }
+      }
     });
 
     ui.els.attachFileInput.addEventListener('change', () => {
@@ -1316,6 +1544,47 @@ window.Events = (() => {
       ui.showToast(t(toastKey));
     });
 
+    ui.els.compressContextBtn?.addEventListener('click', async () => {
+      if (compressing || window.API.isStreaming()) return;
+      const convo = convoMod.getCurrent();
+      if (!convo || !window.ContextCompress.shouldOfferCompress(convo)) return;
+
+      const n = window.ContextCompress.getCompressibleCount(convo);
+      const keep = window.ContextCompress.getKeepRecent();
+      if (!confirm(t('compressConfirm', { n, keep }))) return;
+
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
+        ui.openSettings(s);
+        return;
+      }
+
+      compressing = true;
+      ui.els.compressContextBtn.disabled = true;
+      ui.setPdfExportLoading(true, {
+        title: t('compressContextTitle'),
+        hint: t('compressContextProgress'),
+      });
+
+      try {
+        const result = await window.ContextCompress.compressConversation(convo, {
+          modelId,
+          apiKey: window.APP_CONFIG.getApiKey(s, modelId),
+          locale: s.locale || window.I18n.getLocale(),
+        });
+        ui.setPdfExportLoading(false);
+        ui.renderMessages(convoMod.getCurrent());
+        ui.showToast(t('compressSuccess', { n: result.removedCount }));
+      } catch (err) {
+        ui.setPdfExportLoading(false);
+        ui.showToast(t('compressFailed', { err: err.message || err }));
+      } finally {
+        compressing = false;
+        ui.syncCompressContextBar();
+      }
+    });
+
     const openGuideFromClick = (e) => {
       const trigger = e.target.closest('[data-action="open-guide"], #openGuideBtn, #settingsGuideBtn');
       if (!trigger) return;
@@ -1392,6 +1661,83 @@ window.Events = (() => {
       state.set(patch);
       syncComposerTools(modelId, patch);
       ui.showToast(next ? t('toastThinkingOn') : t('toastThinkingOff'));
+    });
+
+    const setCompareEnabled = (enabled) => {
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      let compareModels = window.ModelCompare.normalizeModelList(s.compareModels);
+      if (enabled && compareModels.length < window.ModelCompare.COMPARE_MIN_MODELS) {
+        compareModels = window.ModelCompare.getDefaultModels(modelId);
+      }
+      const patch = {
+        compareEnabled: enabled,
+        compareModels,
+      };
+      if (enabled) {
+        patch.webSearchEnabled = false;
+        patch.imageGenEnabled = false;
+        patch.translateEnabled = false;
+        clearPendingAttachments();
+        pendingReferenceImage = null;
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      ui.syncCompareBar({ ...s, ...patch });
+      updateSendEnabled();
+      ui.showToast(enabled ? t('compareOn') : t('compareOff'));
+    };
+
+    ui.els.compareBtn?.addEventListener('click', () => {
+      setCompareEnabled(!state.get().compareEnabled);
+    });
+
+    ui.els.compareAddModelBtn?.addEventListener('click', () => {
+      const s = state.get();
+      let models = getCompareModels();
+      if (models.length >= window.ModelCompare.COMPARE_MAX_MODELS) return;
+      const extras = window.ModelCompare.getDefaultModels(s.currentModel)
+        .filter((id) => !models.includes(id));
+      const nextId = extras[0] || window.APP_CONFIG.MODELS.find((m) => !models.includes(m.id))?.id;
+      if (!nextId) return;
+      models = [...models, nextId];
+      state.set({ compareModels: models });
+      ui.syncCompareBar({ ...s, compareModels: models });
+    });
+
+    ui.els.compareModelPickers?.addEventListener('change', (e) => {
+      const select = e.target.closest('.compare-model-select');
+      if (!select) return;
+      const idx = parseInt(select.dataset.idx, 10);
+      if (isNaN(idx)) return;
+      const models = getCompareModels();
+      models[idx] = select.value;
+      state.set({ compareModels: window.ModelCompare.normalizeModelList(models) });
+      ui.syncCompareBar(state.get());
+    });
+
+    ui.els.compareModelPickers?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.compare-model-remove');
+      if (!btn) return;
+      const idx = parseInt(btn.dataset.idx, 10);
+      if (isNaN(idx)) return;
+      let models = getCompareModels();
+      if (models.length <= window.ModelCompare.COMPARE_MIN_MODELS) return;
+      models.splice(idx, 1);
+      state.set({ compareModels: models });
+      ui.syncCompareBar(state.get());
+    });
+
+    ui.els.modelCompareColumns?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.model-compare-pick-btn');
+      if (!btn || btn.disabled) return;
+      pickCompareResult(btn.dataset.modelId);
+    });
+
+    ui.els.closeModelCompareBtn?.addEventListener('click', () => {
+      if (window.API.isStreaming()) apiAbort();
+      closeCompareOverlay({ toastKey: 'compareClosed' });
     });
 
     const setImageGenEnabled = (enabled) => {
@@ -1560,6 +1906,9 @@ window.Events = (() => {
       }
       if (!e.target.closest('.composer-dropdown-wrap')) {
         ui.closeImageGenMenus();
+      }
+      if (!e.target.closest('.composer-snippets-wrap')) {
+        ui.closeSnippetsMenu();
       }
       if (!e.target.closest('.msg-export-wrap')) {
         ui.closeAllMsgExportMenus();
@@ -1814,6 +2163,10 @@ window.Events = (() => {
           ui.closeRenameModal(null);
           return;
         }
+        if (el.closest('#snippetsModal')) {
+          ui.closeSnippetsModal();
+          return;
+        }
         if (el.closest('#tokenCostWarningModal')) {
           ui.closeTokenCostWarning();
           return;
@@ -1840,6 +2193,18 @@ window.Events = (() => {
         }
         if (!ui.els.translateLangMenu.classList.contains('hidden')) {
           ui.closeTranslateLangMenu();
+          return;
+        }
+        if (ui.isSnippetsMenuOpen()) {
+          ui.closeSnippetsMenu();
+          return;
+        }
+        if (ui.isSnippetsModalOpen()) {
+          if (!ui.els.snippetForm?.classList.contains('hidden')) {
+            ui.showSnippetListView();
+            return;
+          }
+          ui.closeSnippetsModal();
           return;
         }
         if (document.querySelector('.msg-export-menu:not(.hidden)')) {
@@ -1879,6 +2244,12 @@ window.Events = (() => {
         if (ui.isImagePreviewOpen()) {
           e.preventDefault();
           ui.closeImagePreview();
+          return;
+        }
+        if (ui.isModelCompareOpen()) {
+          e.preventDefault();
+          if (window.API.isStreaming()) apiAbort();
+          closeCompareOverlay({ toastKey: 'compareClosed' });
           return;
         }
         if (ui.els.app.getAttribute('data-md-preview') === 'open') {
@@ -2003,6 +2374,18 @@ window.Events = (() => {
         if (table && await copyToClipboard(window.Markdown.tableToMarkdown(table))) {
           ui.showToast(t('toastCopyTable'));
         }
+        return;
+      }
+      const speakBtn = e.target.closest('[data-action="speak"]');
+      if (speakBtn) {
+        const msg = speakBtn.closest('.message');
+        const txt = msg?.querySelector('.content')?.innerText?.trim() || '';
+        if (!txt) {
+          ui.showToast(t('toastSpeechEmpty'));
+          return;
+        }
+        const locale = state.get().locale || window.I18n.getLocale();
+        window.Speech?.toggleSpeak?.(txt, speakBtn, locale);
         return;
       }
       const msgCopy = e.target.closest('[data-action="copy"]');

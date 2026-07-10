@@ -299,6 +299,27 @@ window.Conversations = (() => {
     set({ conversations: all });
   };
 
+  const compressWithSummary = (convo, summary, keepRecent = window.APP_CONFIG.COMPRESS_KEEP_RECENT_MESSAGES) => {
+    if (!convo || !summary?.trim()) return false;
+    const messages = convo.messages || [];
+    const keep = Math.max(0, keepRecent || 0);
+    if (messages.length <= keep) return false;
+
+    const toCompress = messages.slice(0, messages.length - keep);
+    const recent = messages.slice(-keep);
+    const summaryMsg = {
+      role: 'user',
+      content: summary.trim(),
+      contextSummary: true,
+      compressedAt: Date.now(),
+      compressedMessageCount: toCompress.length,
+      ts: Date.now()
+    };
+    convo.messages = [summaryMsg, ...recent];
+    saveConvo(convo);
+    return true;
+  };
+
   const emptyTokenUsage = () => ({ prompt: 0, completion: 0, total: 0 });
 
   const getTokenUsage = (convo, modelId) => {
@@ -343,7 +364,7 @@ window.Conversations = (() => {
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
     getModel, setModel, getTokenUsage, addTokenUsage, isCostWarningShown, markCostWarningShown, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
-    addMessage, updateMessage, editMessage, deleteMessageFrom, clearAll,
+    addMessage, updateMessage, editMessage, deleteMessageFrom, compressWithSummary, clearAll,
     getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };
 })();

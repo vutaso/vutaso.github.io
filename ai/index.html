@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="css/sidebar.css" />
   <link rel="stylesheet" href="css/chat.css" />
   <link rel="stylesheet" href="css/composer.css" />
+  <link rel="stylesheet" href="css/snippets.css" />
+  <link rel="stylesheet" href="css/compress.css" />
+  <link rel="stylesheet" href="css/model-compare.css" />
   <link rel="stylesheet" href="css/modals.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/pdf-export.css" />
@@ -170,6 +173,34 @@
         </div>
       </div>
 
+      <div id="compressContextBar" class="compress-context-bar hidden" role="region" aria-label="Nén context hội thoại">
+        <div class="compress-context-bar-inner">
+          <span id="compressContextHint" class="compress-context-hint"></span>
+          <button type="button" id="compressContextBtn" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-compress" aria-hidden="true"></i>
+            <span id="compressContextBtnLabel">Tóm tắt & tiếp tục</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="compareBar" class="compare-bar hidden" role="region" aria-label="So sánh model">
+        <div class="compare-bar-inner">
+          <div class="compare-bar-mode">
+            <span class="compare-bar-mode-icon" aria-hidden="true">
+              <i class="fa-solid fa-columns"></i>
+            </span>
+            <span id="compareBarHint" class="compare-bar-mode-label">So sánh</span>
+            <span id="compareBarCount" class="compare-bar-count">3</span>
+          </div>
+          <div class="compare-bar-controls">
+            <div id="compareModelPickers" class="compare-model-pickers" aria-label="Chọn model so sánh"></div>
+            <button type="button" id="compareAddModelBtn" class="compare-add-model-btn hidden" title="Thêm model" aria-label="Thêm model">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="chat-scroll-wrap">
         <section id="messages" class="messages" aria-live="polite"></section>
         <nav id="messageScrollRail" class="message-scroll-rail hidden" aria-label="Nhảy đến câu hỏi">
@@ -209,11 +240,35 @@
             <i class="fa-solid fa-language" aria-hidden="true"></i>
             <span>Dịch</span>
           </button>
+          <button type="button" id="compareBtn" class="composer-tool-btn" title="So sánh 2–3 model song song" aria-label="So sánh model" aria-pressed="false">
+            <i class="fa-solid fa-columns" aria-hidden="true"></i>
+            <span id="compareBtnLabel">So sánh</span>
+          </button>
         </div>
         <div id="composerDropZone" class="composer-inner">
           <button type="button" id="attachBtn" class="btn btn-icon composer-attach" title="Đính kèm ảnh hoặc tài liệu" aria-label="Đính kèm ảnh hoặc tài liệu">
             <i class="fa-solid fa-plus"></i>
           </button>
+          <button type="button" id="micBtn" class="btn btn-icon composer-mic hidden" title="Nhập bằng giọng nói" aria-label="Nhập bằng giọng nói" aria-pressed="false">
+            <i class="fa-solid fa-microphone" aria-hidden="true"></i>
+          </button>
+          <div id="snippetsWrap" class="composer-snippets-wrap composer-dropdown-wrap">
+            <button type="button" id="snippetsBtn" class="btn btn-icon composer-snippets" title="Thư viện prompt" aria-label="Thư viện prompt" aria-haspopup="menu" aria-expanded="false">
+              <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
+            </button>
+            <div id="snippetsMenu" class="composer-snippets-menu hidden" role="menu" aria-label="Thư viện prompt">
+              <div id="snippetsMenuTitle" class="composer-dropdown-header">Thư viện prompt</div>
+              <div class="snippets-menu-search-wrap">
+                <i class="fa-solid fa-magnifying-glass snippets-menu-search-icon" aria-hidden="true"></i>
+                <input type="search" id="snippetsMenuSearch" class="snippets-menu-search" placeholder="Tìm prompt..." autocomplete="off" aria-label="Tìm prompt" />
+              </div>
+              <div id="snippetsMenuList" class="snippets-menu-list" role="presentation"></div>
+              <button type="button" id="snippetsManageBtn" class="snippets-manage-btn">
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                <span id="snippetsManageBtnLabel">Quản lý prompt</span>
+              </button>
+            </div>
+          </div>
           <input type="file" id="attachFileInput" accept="image/jpeg,image/png,image/gif,image/webp,text/*,application/pdf" multiple hidden />
           <div class="composer-field">
             <textarea
@@ -570,6 +625,53 @@
     </div>
   </div>
 
+  <div id="snippetsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="snippetsModalTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-content modal-content-snippets">
+      <header class="modal-header modal-header-stack">
+        <div class="modal-badge-inline" aria-hidden="true">
+          <div class="brand-avatar brand-avatar-sm">V</div>
+        </div>
+        <h2 id="snippetsModalTitle">Thư viện Prompt</h2>
+        <p id="snippetsModalSubtitle" class="modal-subtitle">Lưu và tái sử dụng các câu lệnh hay dùng</p>
+      </header>
+      <div id="snippetsListView" class="modal-body modal-body-compact snippets-modal-body">
+        <div class="snippets-modal-toolbar">
+          <div class="snippets-modal-search-wrap">
+            <i class="fa-solid fa-magnifying-glass snippets-menu-search-icon" aria-hidden="true"></i>
+            <input type="search" id="snippetsModalSearch" class="snippets-menu-search" placeholder="Tìm prompt..." autocomplete="off" aria-label="Tìm prompt" />
+          </div>
+          <button type="button" id="snippetsAddBtn" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span id="snippetsAddBtnLabel">Thêm prompt</span>
+          </button>
+        </div>
+        <div id="snippetsModalList" class="snippets-modal-list" role="list"></div>
+        <button type="button" id="snippetsSaveFromComposerBtn" class="btn btn-ghost btn-sm snippets-save-composer-btn">
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+          <span id="snippetsSaveFromComposerLabel">Lưu nội dung ô nhập</span>
+        </button>
+      </div>
+      <form id="snippetForm" class="modal-body modal-body-compact snippets-form hidden">
+        <div class="field">
+          <label for="snippetTitleInput" id="snippetTitleLabel">Tiêu đề</label>
+          <input id="snippetTitleInput" type="text" class="input" autocomplete="off" required />
+        </div>
+        <div class="field">
+          <label for="snippetContentInput" id="snippetContentLabel">Nội dung prompt</label>
+          <textarea id="snippetContentInput" class="input textarea snippets-content-input" rows="6" required></textarea>
+        </div>
+        <footer class="modal-footer modal-footer-split">
+          <button type="button" id="snippetFormCancelBtn" class="btn btn-ghost">Huỷ</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </footer>
+      </form>
+      <footer id="snippetsListFooter" class="modal-footer modal-footer-split">
+        <button type="button" class="btn btn-ghost" data-modal-close id="snippetsCloseBtn">Đóng</button>
+      </footer>
+    </div>
+  </div>
+
   <div id="renameModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="renameTitle">
     <div class="modal-backdrop" data-modal-close></div>
     <div class="modal-content modal-content-sm">
@@ -698,6 +800,37 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
+  <div id="modelCompareOverlay" class="model-compare-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modelCompareTitle">
+    <header class="model-compare-header">
+      <div class="model-compare-header-start">
+        <span class="model-compare-header-icon" aria-hidden="true">
+          <i class="fa-solid fa-columns"></i>
+        </span>
+        <div class="model-compare-header-text">
+          <h2 id="modelCompareTitle" class="model-compare-title">So sánh model</h2>
+          <p id="modelCompareHeaderHint" class="model-compare-header-hint">Chọn bản trả lời tốt nhất để thêm vào hội thoại</p>
+        </div>
+      </div>
+      <button type="button" id="closeModelCompareBtn" class="btn btn-icon model-compare-close-btn" title="Đóng" aria-label="Đóng">
+        <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+      </button>
+    </header>
+    <div class="model-compare-main">
+      <div id="modelCompareQuestion" class="model-compare-question hidden">
+        <div class="model-compare-question-card">
+          <span id="modelCompareQuestionLabel" class="model-compare-question-label">
+            <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
+            <span>Câu hỏi</span>
+          </span>
+          <p id="modelCompareQuestionText" class="model-compare-question-text"></p>
+        </div>
+      </div>
+      <div class="model-compare-columns-wrap">
+        <div id="modelCompareColumns" class="model-compare-columns"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="imagePreviewOverlay" class="image-preview-overlay hidden" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
     <button type="button" id="closeImagePreviewBtn" class="image-preview-close btn btn-icon" title="Đóng" aria-label="Đóng">
       <span class="icon"><i class="fa-solid fa-xmark"></i></span>
@@ -729,6 +862,10 @@
   <script src="js/conversations.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/snippets.js"></script>
+  <script src="js/context-compress.js"></script>
+  <script src="js/model-compare.js"></script>
+  <script src="js/speech.js"></script>
   <script src="js/pdf-export.js"></script>
   <script src="js/html-export.js"></script>
   <script src="js/share.js"></script>
