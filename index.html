@@ -115,6 +115,12 @@
       },
       {
         "@type": "SiteNavigationElement",
+        "name": "Vutaso AI",
+        "description": "Chat AI trên trình duyệt — đa model, lưu cục bộ, không cần cài đặt.",
+        "url": "https://vutaso.com/ai/"
+      },
+      {
+        "@type": "SiteNavigationElement",
         "name": "Blog",
         "description": "Blog VUTASO — Chia sẻ kiến thức, hướng dẫn sử dụng ứng dụng và tin tức mới nhất.",
         "url": "https://blog.vutaso.com"
@@ -147,20 +153,21 @@
   <!-- MOBILE MENU -->
   <div class="mob-menu" id="mob">
     <a href="#products" onclick="closeMob()" data-i18n="nav_products">Sản phẩm</a>
-    <a href="#why" onclick="closeMob()" data-i18n="nav_why">Tại sao VUTASO</a>
-    <a href="#faq" onclick="closeMob()">FAQ</a>
-    <a href="https://blog.vutaso.com" target="_blank" onclick="closeMob()">Blog</a>
     <div class="mob-utils" id="mob-utils-wrap">
       <button type="button" class="mob-utils-toggle" onclick="toggleMobUtils()" aria-expanded="false">
-        <span data-i18n="nav_utils">Tiện ích</span>
+        <span data-i18n="nav_utils">Ứng dụng Web</span>
         <svg class="n-drop-chevron" viewBox="0 0 24 24" aria-hidden="true">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
       <div class="mob-utils-menu" id="mob-utils-menu">
+        <a href="https://vutaso.com/ai/" onclick="closeMob()" data-i18n="nav_ai">Vutaso AI</a>
         <a href="https://vutaso.com/qr/" onclick="closeMob()" data-i18n="nav_qr_free">Tạo mã QR Free</a>
       </div>
     </div>
+    <a href="#why" onclick="closeMob()" data-i18n="nav_why">Tại sao VUTASO</a>
+    <a href="#faq" onclick="closeMob()">FAQ</a>
+    <a href="https://blog.vutaso.com" target="_blank" onclick="closeMob()">Blog</a>
     <div class="lang-toggle" style="margin-top:12px">
       <button class="lang-btn" data-lang="vi" onclick="switchLang('vi');closeMob()">VI</button>
       <button class="lang-btn" data-lang="en" onclick="switchLang('en');closeMob()">EN</button>
@@ -174,19 +181,20 @@
     </a>
     <div class="n-links">
       <a href="#products" data-i18n="nav_products">Sản phẩm</a>
-      <a href="#why" data-i18n="nav_why">Tại sao VUTASO</a>
-      <a href="#faq">FAQ</a>
       <div class="n-dropdown" id="nav-utils">
         <button type="button" class="n-drop-toggle" aria-expanded="false" aria-haspopup="true">
-          <span data-i18n="nav_utils">Tiện ích</span>
+          <span data-i18n="nav_utils">Ứng dụng Web</span>
           <svg class="n-drop-chevron" viewBox="0 0 24 24" aria-hidden="true">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
         <div class="n-drop-menu" role="menu">
+          <a href="https://vutaso.com/ai/" role="menuitem" data-i18n="nav_ai">Vutaso AI</a>
           <a href="https://vutaso.com/qr/" role="menuitem" data-i18n="nav_qr_free">Tạo mã QR Free</a>
         </div>
       </div>
+      <a href="#why" data-i18n="nav_why">Tại sao VUTASO</a>
+      <a href="#faq">FAQ</a>
       <a href="https://blog.vutaso.com" target="_blank">Blog</a>
     </div>
     <div class="n-right">
@@ -285,7 +293,7 @@
             </tr>
             <tr>
               <td class="mock-name">Vutaso AI</td>
-              <td><span class="mock-status run"><span class="dot"></span> <span data-i18n="mock_soon">Sắp ra mắt</span></span></td>
+              <td><span class="mock-status done"><span class="dot"></span> <span data-i18n="mock_live">Hoạt động</span></span></td>
               <td>—</td>
               <td>—</td>
               <td data-i18n="mock_now">Hiện tại</td>
@@ -412,6 +420,50 @@
           <a href="https://apps.apple.com/vn/app/qrbay/id6499323043?l=vi" target="_blank" class="btn-prod btn-prod-fill"
             onclick="addRipple(event)" data-i18n="qr_dl">Tải QRBay</a>
           <a href="https://vutaso.com/qrbay/" class="btn-prod btn-prod-ghost" data-i18n="prod_more">Tìm hiểu thêm →</a>
+        </div>
+      </div>
+
+      <!-- Vutaso AI -->
+      <div class="prod-card violet rev" data-delay="0.4">
+        <div class="prod-glow"></div>
+        <div class="prod-icon prod-icon-ai" aria-hidden="true"><span>V</span></div>
+        <div class="prod-title-row">
+          <h3>Vutaso AI</h3>
+          <span class="prod-badge" data-i18n="ai_new_badge">Mới ra mắt</span>
+        </div>
+        <p class="tagline" data-i18n="ai_tagline">Chat AI trên trình duyệt — đa model, lưu cục bộ, không cần cài đặt. Hỗ trợ
+          OpenAI, Claude, Gemini, DeepSeek &amp; Kimi.</p>
+        <div class="chip-row">
+          <span class="chip" data-i18n="ai_chip1">Đa model</span>
+          <span class="chip" data-i18n="ai_chip2">Streaming</span>
+          <span class="chip" data-i18n="ai_chip3">Vision</span>
+          <span class="chip" data-i18n="ai_chip4">Lưu cục bộ</span>
+          <span class="chip" data-i18n="ai_chip5">Đa ngôn ngữ</span>
+          <span class="chip" data-i18n="ai_chip6">Export</span>
+        </div>
+        <div class="prod-btns">
+          <a href="https://vutaso.com/ai/" class="btn-prod btn-prod-fill" onclick="addRipple(event)"
+            data-i18n="ai_dl">Dùng ngay</a>
+        </div>
+      </div>
+
+      <!-- Tạo mã QR Free -->
+      <div class="prod-card green rev" data-delay="0.5">
+        <div class="prod-glow"></div>
+        <div class="prod-icon prod-icon-qr" aria-hidden="true"><span>QR</span></div>
+        <h3 data-i18n="qrfree_name">Tạo mã QR Free</h3>
+        <p class="tagline" data-i18n="qrfree_tagline">Tạo mã QR đẹp, miễn phí trên trình duyệt — URL, WiFi, vCard, email, mạng xã hội và 12+ loại. Xuất PNG, SVG, JPEG, PDF.</p>
+        <div class="chip-row">
+          <span class="chip" data-i18n="qrfree_chip1">12+ loại</span>
+          <span class="chip" data-i18n="qrfree_chip2">Tùy chỉnh</span>
+          <span class="chip" data-i18n="qrfree_chip3">Batch</span>
+          <span class="chip" data-i18n="qrfree_chip4">Đa định dạng</span>
+          <span class="chip" data-i18n="qrfree_chip5">Miễn phí</span>
+          <span class="chip" data-i18n="qrfree_chip6">Trình duyệt</span>
+        </div>
+        <div class="prod-btns">
+          <a href="https://vutaso.com/qr/" class="btn-prod btn-prod-fill" onclick="addRipple(event)"
+            data-i18n="qrfree_dl">Dùng ngay</a>
         </div>
       </div>
     </div>
@@ -633,8 +685,8 @@
         <h5 data-i18n="ft_products">Sản phẩm</h5>
         <a href="https://vutaso.com/moneybay/">MoneyBay</a>
         <a href="https://vutaso.com/qrbay/">QRBay</a>
+        <a href="https://vutaso.com/ai/">Vutaso AI</a>
         <a href="https://vutaso.com/qr/" data-i18n="nav_qr_free">Tạo mã QR Free</a>
-        <a href="https://blog.vutaso.com" target="_blank">Blog</a>
       </div>
       <div class="ft-col">
         <h5 data-i18n="ft_download">Tải App</h5>
@@ -648,6 +700,7 @@
         <h5 data-i18n="ft_support">Hỗ trợ</h5>
         <a href="https://vutaso.com/privacy/" target="_blank" data-i18n="ft_privacy">Chính sách bảo mật</a>
         <a href="https://vutaso.com/terms/" target="_blank" data-i18n="ft_terms">Điều khoản sử dụng</a>
+        <a href="https://blog.vutaso.com" target="_blank">Blog</a>
         <a href="https://www.facebook.com/moneybayapp" target="_blank">Facebook</a>
         <a href="mailto:vutaso.com@gmail.com">Email</a>
       </div>
