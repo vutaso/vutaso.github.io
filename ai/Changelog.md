@@ -9,6 +9,64 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 ## [Unreleased]
 
 ### Added
+
+#### Giọng nói — STT & TTS (`js/speech.js`)
+**Ý nghĩa:** Nhập tin nhắn bằng giọng nói (Speech-to-Text) và nghe phản hồi AI (Text-to-Speech), giúp chat hands-free hoặc khi khó gõ.
+
+**Cách dùng:**
+- **STT:** Bấm nút mic cạnh nút đính kèm trong composer → nói → văn bản hiện trực tiếp trong ô nhập (có bản nháp interim khi đang nói). Bấm lại để dừng.
+- **TTS:** Trên toolbar tin assistant, bấm **Phát âm** → trình duyệt đọc nội dung tin đó. Gửi tin mới hoặc bấm Stop sẽ dừng đọc.
+- Ngôn ngữ STT map theo locale app (`vi` → `vi-VN`, `jp` → `ja-JP`, …).
+
+---
+
+#### Thư viện prompt / Snippets (`js/snippets.js`)
+**Ý nghĩa:** Lưu và tái sử dụng các prompt hay dùng (review code, tóm tắt, viết email, …) thay vì gõ lại mỗi lần.
+
+**Cách dùng:**
+- Bấm nút **bookmark** cạnh composer → chọn prompt trong menu để chèn vào ô nhập.
+- **Quản lý prompt:** Trong menu → *Quản lý prompt* → thêm / sửa / xóa snippet.
+- **Lưu từ composer:** Trong modal quản lý → *Lưu nội dung composer* (cần có text trong ô nhập).
+- Lần đầu mở app tự seed 5 prompt mẫu. Dữ liệu lưu trong `localStorage` / IndexedDB.
+
+---
+
+#### Nén context hội thoại dài (`js/context-compress.js`)
+**Ý nghĩa:** Khi chat quá dài, tóm tắt các tin cũ thành một khối context gọn để tiết kiệm token nhưng vẫn giữ ý chính cho các tin tiếp theo.
+
+**Cách dùng:**
+- Khi hội thoại đủ dài (≥ 10 tin), thanh **Tóm tắt & tiếp tục** xuất hiện phía trên vùng chat.
+- Bấm nút → xác nhận → AI tóm tắt tin cũ; giữ lại N tin gần nhất (mặc định 4).
+- Tin tóm tắt hiển thị với badge **Context đã nén** trong luồng chat.
+- Không dùng khi đang streaming phản hồi.
+
+---
+
+#### So sánh model A/B (`js/model-compare.js`)
+**Ý nghĩa:** Gửi **cùng một câu hỏi** tới 2–3 model **song song**, xem kết quả cạnh nhau và chọn bản trả lời tốt nhất — hữu ích khi so sánh chất lượng model hoặc brainstorm.
+
+**Cách dùng:**
+1. Bấm **So sánh** trên thanh công cụ composer.
+2. Trên thanh phía trên chat, chọn model (chip A / B / C); có thể thêm hoặc xóa cột (2–3 model).
+3. Gõ câu hỏi (chỉ **text**, không đính kèm / web search / tạo ảnh / dịch) → Gửi.
+4. Overlay full-screen hiển thị từng cột streaming song song.
+5. Khi xong, bấm **Chọn bản này** trên cột ưng ý → câu trả lời được thêm vào chat; **Escape** hoặc **Đóng** để thoát (tin user vẫn giữ).
+6. **Dừng** hủy tất cả stream; vẫn có thể chọn cột đã có nội dung một phần.
+
+---
+
+#### Nhánh hội thoại — Branch (`js/conversations.js`)
+**Ý nghĩa:** Từ bất kỳ tin user hoặc assistant, tạo **cuộc chat mới** giữ nguyên context đến tin đó để thử hướng khác — bước tiếp theo tự nhiên sau regenerate / variant `1/N` khi brainstorm hoặc debug.
+
+**Cách dùng:**
+- Trên toolbar tin **user** hoặc **assistant**, bấm **Tạo nhánh mới** (icon nhánh `⎇`).
+- App tạo hội thoại mới (cuộc gốc không đổi), copy toàn bộ tin từ đầu đến tin được chọn.
+- Chuyển sang nhánh mới ngay — gõ tiếp để tiếp tục theo hướng khác.
+- Sidebar: nhánh có icon nhánh, badge **Nhánh**, tiêu đề dạng `Nhánh · {gợi ý}`.
+- Variant assistant đang xem được gộp thành một bản trong nhánh mới.
+
+---
+
 - Model **Grok 4.5** (OpenRouter, `x-ai/grok-4.5`) — reasoning, vision, context 500K.
 - Model **North Mini Code** (OpenRouter, `cohere/north-mini-code:free`) — agentic coding, reasoning, miễn phí.
 - Model **Mistral Nemo** (OpenRouter, `mistralai/mistral-nemo`) — 12B, context 128K.
@@ -26,6 +84,7 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 - NVIDIA: DeepSeek V4 Flash/Pro, GPT OSS 20B, Step 3.5 Flash, toàn bộ Qwen, Gemma 4 31B, Diffusion Gemma 26B.
 
 ### Changed
+- **UI so sánh model:** thanh chọn model gọn (chip A/B/C), overlay split-pane dạng card với badge trạng thái và màu theo provider.
 - Giảm `OPENROUTER_MAX_OUTPUT_TOKENS` từ 32K xuống **16K** (tránh lỗi vượt credit còn lại).
 - Cải thiện xuất **PDF** và **HTML** (layout, phân trang, theme).
 - Cấu hình thinking nâng cao cho Anthropic (adaptive thinking, Haiku manual budget).

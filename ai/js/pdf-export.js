@@ -397,18 +397,16 @@ window.PdfExport = (() => {
     state.y += gapAfter;
   };
 
-  const exportToPdf = async (convo, { onProgress } = {}) => {
-    if (!convo?.messages?.length) throw new Error('Không có tin nhắn để xuất');
+  const exportRootToPdf = async (root, { filename, onProgress } = {}) => {
+    if (!root) throw new Error('Không có nội dung để xuất PDF');
 
     const report = (title, hint) => {
       if (typeof onProgress === 'function') onProgress({ title, hint });
     };
 
     const { html2canvas, jsPDF } = getLibs();
-    report('Đang chuẩn bị PDF...', 'Đang render nội dung và công thức toán');
-    const root = await window.UI.preparePdfExportRoot(convo);
-    const filename = safeFilename(convo.title) + '.pdf';
     const bg = getThemeBg();
+    const outputName = filename || safeFilename('document') + '.pdf';
 
     root.classList.add('is-capturing');
 
@@ -447,12 +445,30 @@ window.PdfExport = (() => {
 
       report('Đang lưu file PDF...', 'Sắp hoàn tất');
       const blob = pdf.output('blob');
-      return { blob, filename };
+      return { blob, filename: outputName };
+    } finally {
+      root.classList.remove('is-capturing');
+    }
+  };
+
+  const exportToPdf = async (convo, { onProgress } = {}) => {
+    if (!convo?.messages?.length) throw new Error('Không có tin nhắn để xuất');
+
+    const report = (title, hint) => {
+      if (typeof onProgress === 'function') onProgress({ title, hint });
+    };
+
+    report('Đang chuẩn bị PDF...', 'Đang render nội dung và công thức toán');
+    const root = await window.UI.preparePdfExportRoot(convo);
+    const filename = safeFilename(convo.title) + '.pdf';
+
+    try {
+      return await exportRootToPdf(root, { filename, onProgress });
     } finally {
       root.remove();
       window.Markdown?.updateMermaidTheme?.();
     }
   };
 
-  return { exportToPdf };
+  return { exportToPdf, exportRootToPdf };
 })();

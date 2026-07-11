@@ -235,6 +235,28 @@
 
 .message .content p { margin: 4px 0; }
 
+.message-model-label {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  user-select: none;
+  line-height: 1.4;
+}
+
+.message-model-label[data-provider="openai"] { color: color-mix(in srgb, #10a37f 72%, var(--text-muted)); }
+.message-model-label[data-provider="anthropic"] { color: color-mix(in srgb, #d97757 72%, var(--text-muted)); }
+.message-model-label[data-provider="google"] { color: color-mix(in srgb, #4285f4 72%, var(--text-muted)); }
+.message-model-label[data-provider="deepseek"] { color: color-mix(in srgb, #4d6bfe 72%, var(--text-muted)); }
+.message-model-label[data-provider="kimi"] { color: color-mix(in srgb, #6366f1 72%, var(--text-muted)); }
+.message-model-label[data-provider="byteplus"] { color: color-mix(in srgb, #8b5cf6 72%, var(--text-muted)); }
+.message-model-label[data-provider="nvidia"] { color: color-mix(in srgb, #76b900 72%, var(--text-muted)); }
+.message-model-label[data-provider="openrouter"] { color: color-mix(in srgb, #a78bfa 72%, var(--text-muted)); }
+
+.message.streaming .message-model-label {
+  opacity: 0.85;
+}
+
 .message-translate-original {
   margin: 0 0 6px;
   padding-left: 10px;
@@ -255,6 +277,279 @@
   margin: 0;
   font-size: 13px;
   color: var(--text-dim);
+}
+
+.message-slides-prompt {
+  margin: 0 0 6px;
+}
+
+.message-slides-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.message-slides-label i {
+  margin-right: 4px;
+  color: #d24726;
+}
+
+.slides-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #d24726 35%, var(--border));
+  background: color-mix(in srgb, #d24726 8%, var(--bg-elev));
+}
+
+.slides-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.slides-download-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #d24726 16%, var(--bg));
+  color: #d24726;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.slides-download-text {
+  min-width: 0;
+}
+
+.slides-download-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slides-download-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.slides-download-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.message-excel-prompt {
+  margin: 0 0 6px;
+}
+
+.message-excel-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.message-excel-label i {
+  margin-right: 4px;
+  color: #217346;
+}
+
+.excel-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #217346 35%, var(--border));
+  background: color-mix(in srgb, #217346 8%, var(--bg-elev));
+}
+
+.excel-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.excel-download-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #217346 16%, var(--bg));
+  color: #217346;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.excel-download-text {
+  min-width: 0;
+}
+
+.excel-download-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-download-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.excel-download-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.message-document-prompt {
+  margin: 0 0 6px;
+}
+
+.message-document-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.message-document-label i {
+  margin-right: 4px;
+  color: #2b579a;
+}
+
+.document-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #2b579a 35%, var(--border));
+  background: color-mix(in srgb, #2b579a 8%, var(--bg-elev));
+}
+
+.document-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.document-download-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #2b579a 16%, var(--bg));
+  color: #2b579a;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.document-download-text {
+  min-width: 0;
+}
+
+.document-download-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-download-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.document-download-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pdf-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #e74c3c 35%, var(--border));
+  background: color-mix(in srgb, #e74c3c 8%, var(--bg-elev));
+}
+
+.pdf-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pdf-download-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #e74c3c 16%, var(--bg));
+  color: #e74c3c;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.pdf-download-text {
+  min-width: 0;
+}
+
+.pdf-download-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-download-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.pdf-download-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .message-images {
@@ -544,7 +839,9 @@
 }
 
 .message .content .code-block .preview-md-btn,
-.message .content pre .preview-md-btn {
+.message .content .code-block .preview-artifact-btn,
+.message .content pre .preview-md-btn,
+.message .content pre .preview-artifact-btn {
   background: transparent;
   color: var(--text-dim);
   width: 28px;
@@ -560,11 +857,20 @@
 }
 
 .message .content .code-block .preview-md-btn:hover,
-.message .content pre .preview-md-btn:hover {
+.message .content .code-block .preview-artifact-btn:hover,
+.message .content pre .preview-md-btn:hover,
+.message .content pre .preview-artifact-btn:hover {
   color: var(--accent);
   background: var(--bg-hover);
 }
 
+.message .content .preview-artifact-btn .fa-react {
+  color: #61dafb;
+}
+
+.message .content .preview-artifact-btn:hover .fa-react {
+  color: #7ee8ff;
+}
 .message .content .code-block .copy-code-btn,
 .message .content pre .copy-code-btn {
   background: transparent;
@@ -713,6 +1019,12 @@
   color: var(--text-dim);
 }
 
+.message .content .table-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .message .content .copy-table-btn {
   background: transparent;
   color: var(--text-dim);
@@ -812,12 +1124,15 @@
   bottom: calc(100% + 6px);
   left: 0;
   min-width: 148px;
-  background: var(--bg-elev);
+  background: var(--popup-bg);
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   z-index: 25;
   padding: 4px 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
 }
 
 .msg-export-menu.hidden {

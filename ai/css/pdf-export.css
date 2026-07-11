@@ -143,6 +143,21 @@
   color: #111118 !important;
 }
 
+.pdf-export-root .math-block {
+  margin: 12px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.pdf-export-root .math-block .katex-display {
+  margin: 0;
+}
+
+.pdf-export-root .math-inline {
+  display: inline;
+  white-space: normal;
+}
+
 .pdf-export-root .content,
 .pdf-export-root .content p,
 .pdf-export-root .content li,

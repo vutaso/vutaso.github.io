@@ -108,6 +108,18 @@ window.UI = (() => {
     els.imageGenBtn = $('#imageGenBtn');
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
+    els.createFileBtn = $('#createFileBtn');
+    els.createFileBtnLabel = $('#createFileBtnLabel');
+    els.createFileBtnIcon = $('#createFileBtnIcon');
+    els.createFileMenu = $('#createFileMenu');
+    els.composerSlidesBar = $('#composerSlidesBar');
+    els.slidesChipClose = $('#slidesChipClose');
+    els.composerExcelBar = $('#composerExcelBar');
+    els.excelChipClose = $('#excelChipClose');
+    els.composerDocumentBar = $('#composerDocumentBar');
+    els.composerPdfBar = $('#composerPdfBar');
+    els.pdfChipClose = $('#pdfChipClose');
+    els.documentChipClose = $('#documentChipClose');
     els.systemPromptModeSelect = $('#systemPromptModeSelect');
     els.systemPromptModeHint = $('#systemPromptModeHint');
     els.settingsTokenUsageModel = $('#settingsTokenUsageModel');
@@ -185,6 +197,9 @@ window.UI = (() => {
     els.closeImagePreviewBtn = $('#closeImagePreviewBtn');
     els.previewPanelIcon = $('#previewPanelIcon');
     els.previewPanelTitle = $('#previewPanelTitle');
+    els.artifactPreviewToolbar = $('#artifactPreviewToolbar');
+    els.artifactRefreshBtn = $('#artifactRefreshBtn');
+    els.artifactOpenTabBtn = $('#artifactOpenTabBtn');
     els.renameModal = $('#renameModal');
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
@@ -207,7 +222,7 @@ window.UI = (() => {
 
   const syncComposerToolsUI = (modelId, toolState) => {
     const {
-      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
+      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled, translateTargetLang,
       imageGenRatio, imageGenStyle, imageGenTemplate
     } = toolState;
     const showWebSearch = window.APP_CONFIG.modelSupportsWebSearch(modelId);
@@ -245,6 +260,7 @@ window.UI = (() => {
       els.translateBtn.classList.toggle('is-active', active);
       els.translateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    syncCreateFileUI({ slidesEnabled, excelEnabled, documentEnabled, pdfEnabled });
     if (els.compareBtn) {
       const compareOn = !!window.Storage.get().compareEnabled;
       els.compareBtn.classList.toggle('is-active', compareOn);
@@ -252,6 +268,10 @@ window.UI = (() => {
     }
     syncCompareBar(window.Storage.get());
     syncTranslateUI({ translateEnabled, translateTargetLang: translateTargetLang || stateTranslateLang });
+    syncSlidesUI({ slidesEnabled });
+    syncExcelUI({ excelEnabled });
+    syncDocumentUI({ documentEnabled });
+    syncPdfUI({ pdfEnabled });
     syncImageGenUI({
       imageGenEnabled: showImageGen && !!imageGenEnabled,
       imageGenRatio,
@@ -262,7 +282,7 @@ window.UI = (() => {
       imageGenStylePicked: toolState.imageGenStylePicked,
       imageGenTemplatePicked: toolState.imageGenTemplatePicked
     });
-    syncComposerPlaceholder({ imageGenEnabled, translateEnabled });
+    syncComposerPlaceholder({ imageGenEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled });
   };
 
   let stateTranslateLang = window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
@@ -309,11 +329,114 @@ window.UI = (() => {
     closeTranslateLangMenu();
   };
 
-  const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled }) => {
+  const closeCreateFileMenu = () => {
+    if (!els.createFileMenu) return;
+    els.createFileMenu.classList.add('hidden');
+    if (els.createFileBtn) els.createFileBtn.setAttribute('aria-expanded', 'false');
+  };
+
+  const toggleCreateFileMenu = () => {
+    if (!els.createFileMenu || !els.createFileBtn) return;
+    const open = els.createFileMenu.classList.contains('hidden');
+    closeImageGenMenus();
+    closeTranslateLangMenu();
+    if (open) {
+      els.createFileMenu.classList.remove('hidden');
+      els.createFileBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      closeCreateFileMenu();
+    }
+  };
+
+  const syncCreateFileUI = ({ slidesEnabled, excelEnabled, documentEnabled, pdfEnabled }) => {
+    if (!els.createFileBtn) return;
+    const active = !!(slidesEnabled || excelEnabled || documentEnabled || pdfEnabled);
+    els.createFileBtn.classList.toggle('is-active', active);
+    els.createFileBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+
+    let label = t('createFile');
+    let iconClass = 'fa-solid fa-file-circle-plus';
+    let activeMode = '';
+    if (slidesEnabled) {
+      label = t('slides');
+      iconClass = 'fa-solid fa-file-powerpoint';
+      activeMode = 'slides';
+    } else if (excelEnabled) {
+      label = t('excel');
+      iconClass = 'fa-solid fa-file-excel';
+      activeMode = 'excel';
+    } else if (documentEnabled) {
+      label = t('document');
+      iconClass = 'fa-solid fa-file-word';
+      activeMode = 'document';
+    } else if (pdfEnabled) {
+      label = t('pdf');
+      iconClass = 'fa-solid fa-file-pdf';
+      activeMode = 'pdf';
+    }
+
+    if (els.createFileBtnLabel) els.createFileBtnLabel.textContent = label;
+    if (els.createFileBtnIcon) {
+      els.createFileBtnIcon.className = iconClass;
+      els.createFileBtnIcon.setAttribute('aria-hidden', 'true');
+    }
+
+    if (els.createFileMenu) {
+      els.createFileMenu.querySelectorAll('.create-file-option').forEach((btn) => {
+        btn.classList.toggle('is-selected', !!activeMode && btn.dataset.createFile === activeMode);
+      });
+    }
+  };
+
+  const syncSlidesUI = ({ slidesEnabled }) => {
+    if (els.composerSlidesBar) {
+      const on = !!slidesEnabled;
+      els.composerSlidesBar.classList.toggle('hidden', !on);
+      els.composerSlidesBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+  };
+
+  const syncExcelUI = ({ excelEnabled }) => {
+    if (els.composerExcelBar) {
+      const on = !!excelEnabled;
+      els.composerExcelBar.classList.toggle('hidden', !on);
+      els.composerExcelBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+  };
+
+  const syncDocumentUI = ({ documentEnabled }) => {
+    if (els.composerDocumentBar) {
+      const on = !!documentEnabled;
+      els.composerDocumentBar.classList.toggle('hidden', !on);
+      els.composerDocumentBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+  };
+
+  const syncPdfUI = ({ pdfEnabled }) => {
+    if (els.composerPdfBar) {
+      const on = !!pdfEnabled;
+      els.composerPdfBar.classList.toggle('hidden', !on);
+      els.composerPdfBar.setAttribute('aria-hidden', on ? 'false' : 'true');
+    }
+  };
+
+  const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled }) => {
     if (!els.composerInput) return;
     if (imageGenEnabled) {
       els.composerInput.placeholder = t('composerPlaceholderImageGen');
       els.composerInput.dataset.mode = 'imagegen';
+    } else if (pdfEnabled) {
+      els.composerInput.placeholder = t('composerPlaceholderPdf');
+      els.composerInput.dataset.mode = 'pdf';
+    } else if (documentEnabled) {
+      els.composerInput.placeholder = t('composerPlaceholderDocument');
+      els.composerInput.dataset.mode = 'document';
+    } else if (excelEnabled) {
+      els.composerInput.placeholder = t('composerPlaceholderExcel');
+      els.composerInput.dataset.mode = 'excel';
+    } else if (slidesEnabled) {
+      els.composerInput.placeholder = t('composerPlaceholderSlides');
+      els.composerInput.dataset.mode = 'slides';
     } else if (translateEnabled) {
       els.composerInput.placeholder = t('composerPlaceholderTranslate');
       els.composerInput.dataset.mode = 'translate';
@@ -545,12 +668,120 @@ window.UI = (() => {
     return html;
   };
 
+  const slidesDownloadHTML = (m) => {
+    if (!m.slidesData?.slides?.length) return '';
+    const title = escapeHTML(m.slidesData.title || t('slidesDefaultTitle'));
+    const count = m.slidesData.slides.length;
+    const filename = escapeHTML(window.PptxExport?.buildFilename?.(m.slidesData) || 'presentation.pptx');
+    return '<div class="slides-download-card">'
+      + '<div class="slides-download-info">'
+      + '<span class="slides-download-icon" aria-hidden="true"><i class="fa-solid fa-file-powerpoint"></i></span>'
+      + '<div class="slides-download-text">'
+      + '<p class="slides-download-title">' + title + '</p>'
+      + '<p class="slides-download-meta">' + escapeHTML(t('slidesCount', { n: count })) + ' · ' + filename + '</p>'
+      + '</div></div>'
+      + '<button type="button" class="btn btn-primary btn-sm slides-download-btn" data-download-slides title="' + escapeHTML(t('slidesDownloadBtn')) + '">'
+      + '<i class="fa-solid fa-download" aria-hidden="true"></i> '
+      + escapeHTML(t('slidesDownloadBtn'))
+      + '</button></div>';
+  };
+
+  const excelDownloadHTML = (m) => {
+    if (!m.excelData?.sheets?.length) return '';
+    const title = escapeHTML(m.excelData.title || t('excelDefaultTitle'));
+    const filename = escapeHTML(window.XlsxExport?.buildFilename?.(m.excelData) || 'spreadsheet.xlsx');
+    const meta = escapeHTML(t('excelCount', {
+      sheets: m.excelData.sheetCount,
+      rows: m.excelData.totalRows,
+    }));
+    return '<div class="excel-download-card">'
+      + '<div class="excel-download-info">'
+      + '<span class="excel-download-icon" aria-hidden="true"><i class="fa-solid fa-file-excel"></i></span>'
+      + '<div class="excel-download-text">'
+      + '<p class="excel-download-title">' + title + '</p>'
+      + '<p class="excel-download-meta">' + meta + ' · ' + filename + '</p>'
+      + '</div></div>'
+      + '<button type="button" class="btn btn-primary btn-sm excel-download-btn" data-download-excel title="' + escapeHTML(t('excelDownloadBtn')) + '">'
+      + '<i class="fa-solid fa-download" aria-hidden="true"></i> '
+      + escapeHTML(t('excelDownloadBtn'))
+      + '</button></div>';
+  };
+
+  const documentDownloadHTML = (m) => {
+    if (!m.documentData?.blocks?.length) return '';
+    const title = escapeHTML(m.documentData.title || t('documentDefaultTitle'));
+    const filename = escapeHTML(window.DocxCreate?.buildFilename?.(m.documentData) || 'document.docx');
+    const meta = escapeHTML(t('documentCount', { n: m.documentData.blockCount }));
+    return '<div class="document-download-card">'
+      + '<div class="document-download-info">'
+      + '<span class="document-download-icon" aria-hidden="true"><i class="fa-solid fa-file-word"></i></span>'
+      + '<div class="document-download-text">'
+      + '<p class="document-download-title">' + title + '</p>'
+      + '<p class="document-download-meta">' + meta + ' · ' + filename + '</p>'
+      + '</div></div>'
+      + '<button type="button" class="btn btn-primary btn-sm document-download-btn" data-download-document title="' + escapeHTML(t('documentDownloadBtn')) + '">'
+      + '<i class="fa-solid fa-download" aria-hidden="true"></i> '
+      + escapeHTML(t('documentDownloadBtn'))
+      + '</button></div>';
+  };
+
+  const pdfDownloadHTML = (m) => {
+    if (!m.pdfData?.blocks?.length) return '';
+    const title = escapeHTML(m.pdfData.title || t('pdfDefaultTitle'));
+    const filename = escapeHTML(window.PdfCreate?.buildFilename?.(m.pdfData) || 'document.pdf');
+    const meta = escapeHTML(t('pdfCount', { n: m.pdfData.blockCount }));
+    return '<div class="pdf-download-card">'
+      + '<div class="pdf-download-info">'
+      + '<span class="pdf-download-icon" aria-hidden="true"><i class="fa-solid fa-file-pdf"></i></span>'
+      + '<div class="pdf-download-text">'
+      + '<p class="pdf-download-title">' + title + '</p>'
+      + '<p class="pdf-download-meta">' + meta + ' · ' + filename + '</p>'
+      + '</div></div>'
+      + '<button type="button" class="btn btn-primary btn-sm pdf-download-btn" data-download-pdf title="' + escapeHTML(t('pdfDownloadBtn')) + '">'
+      + '<i class="fa-solid fa-download" aria-hidden="true"></i> '
+      + escapeHTML(t('pdfDownloadBtn'))
+      + '</button></div>';
+  };
+
+  const messageModelLabelHTML = (m) => {
+    if (!m || m.role !== 'assistant') return '';
+    const modelId = window.Conversations.getResponseModel(m);
+    if (!modelId) return '';
+    const model = window.APP_CONFIG.getModel(modelId);
+    const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : modelId;
+    const providerId = model?.provider || window.APP_CONFIG.getModelProvider(modelId) || '';
+    return '<div class="message-model-label" data-provider="' + escapeHTML(providerId) + '" title="' + escapeHTML(modelId) + '">'
+      + escapeHTML(t('responseModelLabel', { model: label }))
+      + '</div>';
+  };
+
+  const syncMessageModelLabel = (article, m) => {
+    if (!article) return;
+    const html = messageModelLabelHTML(m);
+    let labelEl = article.querySelector('.message-model-label');
+    if (!html) {
+      labelEl?.remove();
+      return;
+    }
+    if (labelEl) {
+      labelEl.outerHTML = html;
+      return;
+    }
+    const toolbar = article.querySelector('.toolbar');
+    if (!toolbar) return;
+    toolbar.insertAdjacentHTML('beforebegin', html);
+  };
+
   const assistantContentHTML = (m) => {
     const text = window.Conversations.getAssistantContent(m);
     return reasoningHTML(m.reasoningContent)
       + groundingHTML(m.groundingMetadata)
       + window.Markdown.render(text)
-      + generatedImagesHTML(m.generatedImages);
+      + generatedImagesHTML(m.generatedImages)
+      + slidesDownloadHTML(m)
+      + excelDownloadHTML(m)
+      + documentDownloadHTML(m)
+      + pdfDownloadHTML(m);
   };
 
   const updateModelSelect = (providerId, selectedModelId) => {
@@ -670,6 +901,18 @@ window.UI = (() => {
         if (templateId !== 'none') parts.push(t('templatePrefix') + window.I18n.imageGenLabel('template', templateId).toLowerCase());
         text = '<p class="message-imagegen-prompt">' + escaped + '</p>'
           + '<p class="message-imagegen-label">' + escapeHTML(parts.join(' · ')) + '</p>';
+      } else if (m.slides) {
+        text = '<p class="message-slides-prompt">' + escaped + '</p>'
+          + '<p class="message-slides-label"><i class="fa-solid fa-file-powerpoint" aria-hidden="true"></i> '
+          + escapeHTML(t('slidesModeLabel')) + '</p>';
+      } else if (m.excel) {
+        text = '<p class="message-excel-prompt">' + escaped + '</p>'
+          + '<p class="message-excel-label"><i class="fa-solid fa-file-excel" aria-hidden="true"></i> '
+          + escapeHTML(t('excelModeLabel')) + '</p>';
+      } else if (m.document) {
+        text = '<p class="message-document-prompt">' + escaped + '</p>'
+          + '<p class="message-document-label"><i class="fa-solid fa-file-word" aria-hidden="true"></i> '
+          + escapeHTML(t('documentModeLabel')) + '</p>';
       } else if (m.contextSummary) {
         text = '<div class="context-summary-badge"><i class="fa-solid fa-compress" aria-hidden="true"></i> '
           + escapeHTML(t('compressSummaryBadge')) + '</div>'
@@ -738,11 +981,17 @@ window.UI = (() => {
           const snippetHTML = snippet
             ? '<span class="conversation-snippet">' + highlightSearchText(snippet, q) + '</span>'
             : '';
+          const isBranchConvo = window.Conversations.isBranch(c);
+          const branchMeta = isBranchConvo
+            ? '<span class="conversation-branch-meta">' + escapeHTML(t('branchBadge')) + '</span>'
+            : '';
+          const iconClass = isBranchConvo ? 'fa-code-branch' : 'fa-message';
           return `
-          <li class="conversation-item ${c.id === currentId ? 'active' : ''}" data-id="${c.id}">
-            <span class="icon" aria-hidden="true"><i class="fa-solid fa-message"></i></span>
+          <li class="conversation-item ${c.id === currentId ? 'active' : ''}${isBranchConvo ? ' is-branch' : ''}" data-id="${c.id}">
+            <span class="icon" aria-hidden="true"><i class="fa-solid ${iconClass}"></i></span>
             <span class="conversation-item-body">
               <span class="title" title="${escapeHTML(c.title)}">${highlightSearchText(c.title, q)}</span>
+              ${branchMeta}
               ${snippetHTML}
             </span>
             <span class="actions">
@@ -810,16 +1059,24 @@ window.UI = (() => {
     }
   };
 
-  const buildCompareModelOptionsHTML = (selectedId) => {
+  const buildCompareModelOptionsHTML = (selectedId, takenIds = []) => {
     const { MODELS } = window.APP_CONFIG;
-    return MODELS.map((m) =>
-      '<option value="' + escapeHTML(m.id) + '"' + (m.id === selectedId ? ' selected' : '') + '>'
-      + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m))
-      + '</option>'
-    ).join('');
+    const taken = new Set(takenIds || []);
+    return MODELS.map((m) => {
+      const selected = m.id === selectedId;
+      const disabled = !selected && taken.has(m.id);
+      return '<option value="' + escapeHTML(m.id) + '"'
+        + (selected ? ' selected' : '')
+        + (disabled ? ' disabled' : '')
+        + '>'
+        + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m))
+        + '</option>';
+    }).join('');
   };
 
   const COMPARE_SLOT_LABELS = ['A', 'B', 'C'];
+  const COMPARE_SCROLL_NEAR_PX = 96;
+  const compareStreamPending = new WeakMap();
 
   const getCompareProviderId = (modelId) => {
     const model = window.APP_CONFIG.getModel(modelId);
@@ -866,7 +1123,7 @@ window.UI = (() => {
         + '<span class="compare-chip-dot" aria-hidden="true"></span>'
         + '<select class="compare-model-select" data-idx="' + i + '" aria-label="' + escapeHTML(t('compareModelSlot', { n: i + 1 })) + '"'
         + (streaming ? ' disabled' : '') + '>'
-        + buildCompareModelOptionsHTML(modelId)
+        + buildCompareModelOptionsHTML(modelId, models)
         + '</select>'
         + (canRemove
           ? '<button type="button" class="compare-model-remove" data-idx="' + i + '" title="' + escapeHTML(t('compareRemoveModel')) + '" aria-label="' + escapeHTML(t('compareRemoveModel')) + '"' + (streaming ? ' disabled' : '') + '>'
@@ -887,7 +1144,7 @@ window.UI = (() => {
     const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : modelId;
     const providerId = getCompareProviderId(modelId);
     const providerLabel = getCompareProviderLabel(providerId);
-    return '<article class="model-compare-col" data-model-id="' + escapeHTML(modelId) + '" data-provider="' + escapeHTML(providerId) + '" data-status="compareStatusStreaming">'
+    return '<article class="model-compare-col" data-model-id="' + escapeHTML(modelId) + '" data-provider="' + escapeHTML(providerId) + '" data-status="compareStatusStreaming" data-pickable="0">'
       + '<header class="model-compare-col-header">'
       + '<div class="model-compare-col-brand">'
       + '<span class="model-compare-col-dot" aria-hidden="true"></span>'
@@ -945,16 +1202,68 @@ window.UI = (() => {
     return Array.from(els.modelCompareColumns.querySelectorAll('.model-compare-col'));
   };
 
+  const setCompareColumnPickable = (columnEl, pickable) => {
+    if (!columnEl) return;
+    columnEl.dataset.pickable = pickable ? '1' : '0';
+  };
+
+  const scrollCompareBodyIfNear = (contentEl, { force = false } = {}) => {
+    if (!contentEl) return;
+    const dist = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight;
+    if (force || dist < COMPARE_SCROLL_NEAR_PX) {
+      contentEl.scrollTop = contentEl.scrollHeight;
+    }
+  };
+
+  const flushCompareColumnContent = (contentEl) => {
+    const pending = compareStreamPending.get(contentEl);
+    if (!pending) return;
+    compareStreamPending.delete(contentEl);
+    if (pending.raf) cancelAnimationFrame(pending.raf);
+    const stick = pending.stickToBottom;
+    contentEl.innerHTML = renderStreamingAssistantHTML(
+      pending.text, pending.images, pending.reasoning, {
+        reasoningOpen: pending.reasoningOpen,
+        groundingMetadata: pending.groundingMetadata,
+      }
+    );
+    polishContent(contentEl, { streaming: true });
+    if (stick) scrollCompareBodyIfNear(contentEl, { force: true });
+    else scrollCompareBodyIfNear(contentEl);
+  };
+
   const updateCompareColumnContent = (contentEl, text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
     if (!contentEl) return;
-    contentEl.innerHTML = renderStreamingAssistantHTML(text, images, reasoning, { reasoningOpen, groundingMetadata });
-    polishContent(contentEl, { streaming: true });
+    const dist = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight;
+    const stickToBottom = dist < COMPARE_SCROLL_NEAR_PX;
+    let pending = compareStreamPending.get(contentEl);
+    if (!pending) {
+      pending = { raf: 0 };
+      compareStreamPending.set(contentEl, pending);
+    }
+    pending.text = text;
+    pending.images = images;
+    pending.reasoning = reasoning;
+    pending.reasoningOpen = reasoningOpen;
+    pending.groundingMetadata = groundingMetadata;
+    pending.stickToBottom = stickToBottom;
+    if (pending.raf) return;
+    pending.raf = requestAnimationFrame(() => {
+      pending.raf = 0;
+      flushCompareColumnContent(contentEl);
+    });
   };
 
   const finalizeCompareColumn = (columnEl, text, { generatedImages, reasoningContent, groundingMetadata } = {}) => {
     if (!columnEl) return;
     const contentEl = columnEl.querySelector('.model-compare-col-body');
     if (contentEl) {
+      const pending = compareStreamPending.get(contentEl);
+      if (pending?.raf) {
+        cancelAnimationFrame(pending.raf);
+        compareStreamPending.delete(contentEl);
+      }
+      const stick = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < COMPARE_SCROLL_NEAR_PX;
       contentEl.innerHTML = renderStreamingAssistantHTML(
         text, generatedImages, reasoningContent, {
           reasoningOpen: false,
@@ -962,16 +1271,17 @@ window.UI = (() => {
         }
       );
       polishContent(contentEl, { renderMermaid: true });
+      if (stick) scrollCompareBodyIfNear(contentEl, { force: true });
     }
+    setCompareColumnPickable(columnEl, !!(String(text || '').trim() || (generatedImages && generatedImages.length)));
   };
 
   const syncComparePickButtons = () => {
     getModelCompareColumns().forEach((col) => {
       const btn = col.querySelector('.model-compare-pick-btn');
-      const body = col.querySelector('.model-compare-col-body');
-      const hasText = !!(body && body.textContent.trim());
+      const pickable = col.dataset.pickable === '1';
       const streaming = col.classList.contains('is-streaming');
-      if (btn) btn.disabled = streaming || !hasText;
+      if (btn) btn.disabled = streaming || !pickable;
     });
   };
 
@@ -1167,6 +1477,11 @@ window.UI = (() => {
       + '<i class="fa-solid fa-chevron-up"></i></button>'
   );
 
+  const branchToolbarBtnHTML = () => {
+    if (isShareViewMode()) return '';
+    return '<button type="button" class="tb-btn" data-action="branch" title="' + escapeHTML(t('branch')) + '" aria-label="' + escapeHTML(t('branch')) + '"><i class="fa-solid fa-code-branch"></i></button>';
+  };
+
   const assistantToolbarHTML = (m) => {
     const variants = m.variants && m.variants.length ? m.variants : (m.content ? [m.content] : []);
     const variantIndex = m.variantIndex ?? 0;
@@ -1210,6 +1525,7 @@ window.UI = (() => {
     return '<button type="button" class="tb-btn" data-action="speak" title="' + escapeHTML(t('speak')) + '" aria-label="' + escapeHTML(t('speak')) + '"><i class="fa-solid fa-volume-high"></i></button>'
       + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
       + '<button type="button" class="tb-btn" data-action="retry" title="' + escapeHTML(t('retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>'
+      + branchToolbarBtnHTML()
       + exportMenu
       + pager;
   };
@@ -1232,6 +1548,7 @@ window.UI = (() => {
       : '';
     const toolbar = isUser
       ? editBtn
+        + branchToolbarBtnHTML()
         + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
         + delBtn
       : assistantToolbarHTML(m);
@@ -1240,6 +1557,7 @@ window.UI = (() => {
       + '<div class="body">'
       + messageEdgeScrollBtnsHTML()
       + body
+      + (isUser ? '' : messageModelLabelHTML(m))
       + '<div class="toolbar">' + toolbar + '</div>'
       + '</div></article>';
   };
@@ -1256,11 +1574,21 @@ window.UI = (() => {
     return article;
   };
 
-  const appendStreamingMessage = (idx) => {
+  const appendStreamingMessage = (idx, modelId) => {
     resetStreamingCodeScroll();
     const empty = els.messages.querySelector('.messages-empty');
     if (empty) empty.remove();
-    const article = appendMessage({ role: 'assistant', content: '', variants: [''], variantIndex: 0, ts: Date.now() }, idx);
+    const draft = {
+      role: 'assistant',
+      content: '',
+      variants: [''],
+      variantModels: modelId ? [modelId] : [],
+      variantIndex: 0,
+      responseModel: modelId || '',
+      ts: Date.now()
+    };
+    const article = appendMessage(draft, idx);
+    if (modelId) syncMessageModelLabel(article, draft);
     article.classList.add('streaming');
     const content = article.querySelector('.content');
     return { article, content };
@@ -1279,6 +1607,7 @@ window.UI = (() => {
       content.innerHTML = assistantContentHTML(m);
       polishContent(content, { renderMermaid: true });
     }
+    syncMessageModelLabel(article, m);
     setAssistantToolbar(article, m);
   };
 
@@ -1372,14 +1701,17 @@ window.UI = (() => {
     article.classList.remove('streaming');
     const content = article.querySelector('.content');
     if (content) {
-      content.innerHTML = renderStreamingAssistantHTML(
-        text, message?.generatedImages, message?.reasoningContent, {
-          reasoningOpen: false,
-          groundingMetadata: message?.groundingMetadata
-        }
-      );
+      content.innerHTML = message
+        ? assistantContentHTML(message)
+        : renderStreamingAssistantHTML(
+          text, message?.generatedImages, message?.reasoningContent, {
+            reasoningOpen: false,
+            groundingMetadata: message?.groundingMetadata
+          }
+        );
       polishContent(content, { renderMermaid: true });
     }
+    if (message) syncMessageModelLabel(article, message);
     if (message) setAssistantToolbar(article, message);
     scrollToBottomIfNear();
     updateMessageScrollRail();
@@ -1391,7 +1723,7 @@ window.UI = (() => {
     window.Markdown.renderMermaid(els.messages, { skipIfStreaming: false });
     if (els.markdownPreviewPanel?.classList.contains('is-open')
       && els.markdownPreviewContent
-      && !els.markdownPreviewContent.classList.contains('is-html-preview')) {
+      && !els.markdownPreviewContent.classList.contains('is-artifact-preview')) {
       window.Markdown.resetMermaidBlocks(els.markdownPreviewContent);
       window.Markdown.renderMermaid(els.markdownPreviewContent, { skipIfStreaming: false });
     }
@@ -2258,6 +2590,10 @@ window.UI = (() => {
       imageGenEnabled: appState.imageGenEnabled,
       thinkingEnabled: appState.thinkingEnabled,
       translateEnabled: appState.translateEnabled,
+      slidesEnabled: appState.slidesEnabled,
+      excelEnabled: appState.excelEnabled,
+      documentEnabled: appState.documentEnabled,
+      pdfEnabled: appState.pdfEnabled,
       translateTargetLang: appState.translateTargetLang,
       imageGenRatio: appState.imageGenRatio,
       imageGenStyle: appState.imageGenStyle,
@@ -2274,6 +2610,7 @@ window.UI = (() => {
     updateExportSelectCount();
     syncMessageScrollRailI18n();
     syncCompressContextBar(convo);
+    if (currentPreviewMode) setPreviewPanelTitle(currentPreviewMode);
   };
 
   const openGuide = () => {
@@ -2641,15 +2978,19 @@ window.UI = (() => {
   let previewResizeDragging = false;
   let previewResizeWheelSaveTimer = null;
   let previewResizeCaptureEl = null;
+  let currentPreviewMode = null;
+  let currentArtifactPreview = null;
 
   const isPreviewResizeStartTarget = (e) => {
-    if (e.target.closest('#closeMdPreviewBtn')) return false;
+    if (e.target.closest('.md-preview-header button, .md-preview-header a, .md-preview-header input, .md-preview-header select, .md-preview-header textarea, .md-preview-header [role="menuitem"]')) {
+      return false;
+    }
     if (e.target.closest('#mdPreviewResizeHandle')) return true;
     if (e.target.closest('.md-preview-header')) return true;
     const panel = els.markdownPreviewPanel;
     if (!panel?.classList.contains('is-open')) return false;
     if (!e.target.closest('#markdownPreviewPanel')) return false;
-    if (e.target.closest('.html-preview-frame, .md-preview-content')) return false;
+    if (e.target.closest('.html-preview-frame, .artifact-preview-frame, .md-preview-content')) return false;
     const x = e.clientX;
     if (x == null) return false;
     const rect = panel.getBoundingClientRect();
@@ -2799,36 +3140,158 @@ window.UI = (() => {
     window.addEventListener('resize', sync);
   };
 
+  const PREVIEW_TITLE_KEYS = {
+    markdown: 'previewMarkdown',
+    html: 'previewHtml',
+    react: 'previewReact',
+    svg: 'previewSvg',
+    mermaid: 'previewMermaid',
+    css: 'previewCss',
+    json: 'previewJson',
+    yaml: 'previewYaml',
+    vue: 'previewVue',
+    svelte: 'previewSvelte',
+    graphviz: 'previewGraphviz',
+    csv: 'previewCsv',
+    openapi: 'previewOpenapi',
+    chart: 'previewChart',
+    python: 'previewPython',
+    sql: 'previewSql'
+  };
+
+  const PREVIEW_ICONS = {
+    markdown: 'fa-brands fa-markdown',
+    html: 'fa-brands fa-html5',
+    react: 'fa-brands fa-react',
+    svg: 'fa-solid fa-bezier-curve',
+    mermaid: 'fa-solid fa-diagram-project',
+    css: 'fa-brands fa-css3-alt',
+    json: 'fa-solid fa-code',
+    yaml: 'fa-solid fa-file-lines',
+    vue: 'fa-brands fa-vuejs',
+    svelte: 'fa-solid fa-bolt',
+    graphviz: 'fa-solid fa-share-nodes',
+    csv: 'fa-solid fa-table',
+    openapi: 'fa-solid fa-book',
+    chart: 'fa-solid fa-chart-column',
+    python: 'fa-brands fa-python',
+    sql: 'fa-solid fa-database'
+  };
+
+  const isIframeArtifactType = (type) => window.ArtifactPreview?.isIframeArtifact?.(type)
+    ?? (type === 'html' || type === 'react' || type === 'svg' || type === 'css'
+      || type === 'vue' || type === 'svelte' || type === 'chart' || type === 'python');
+  const isDomArtifactType = (type) => window.ArtifactPreview?.isDomArtifact?.(type)
+    ?? (type === 'mermaid' || type === 'json' || type === 'yaml' || type === 'graphviz'
+      || type === 'csv' || type === 'openapi' || type === 'sql');
+
   const setPreviewPanelTitle = (mode) => {
+    currentPreviewMode = mode || null;
+    const showToolbar = isIframeArtifactType(mode) || isDomArtifactType(mode);
+    const showOpenTab = isIframeArtifactType(mode);
     if (els.previewPanelIcon) {
-      els.previewPanelIcon.className = mode === 'html'
-        ? 'fa-brands fa-html5'
-        : 'fa-brands fa-markdown';
+      els.previewPanelIcon.className = PREVIEW_ICONS[mode] || PREVIEW_ICONS.markdown;
     }
     if (els.previewPanelTitle) {
-      els.previewPanelTitle.textContent = mode === 'html' ? t('previewHtml') : t('previewMarkdown');
+      const key = PREVIEW_TITLE_KEYS[mode] || PREVIEW_TITLE_KEYS.markdown;
+      els.previewPanelTitle.textContent = t(key);
     }
     if (els.markdownPreviewPanel) {
-      els.markdownPreviewPanel.setAttribute('aria-label', mode === 'html' ? t('previewHtml') : t('previewMarkdown'));
+      const key = PREVIEW_TITLE_KEYS[mode] || PREVIEW_TITLE_KEYS.markdown;
+      els.markdownPreviewPanel.setAttribute('aria-label', t(key));
+    }
+    if (els.artifactPreviewToolbar) {
+      els.artifactPreviewToolbar.classList.toggle('hidden', !showToolbar);
+    }
+    if (els.artifactOpenTabBtn) {
+      els.artifactOpenTabBtn.classList.toggle('hidden', !showOpenTab);
     }
   };
 
-  const HTML_PREVIEW_HEAD = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>';
+  const clearArtifactPreviewContent = () => {
+    els.markdownPreviewContent.classList.remove(
+      'is-html-preview', 'is-artifact-preview', 'is-dom-artifact-preview',
+      'is-mermaid-preview', 'is-json-preview', 'is-yaml-preview',
+      'is-graphviz-preview', 'is-csv-preview', 'is-openapi-preview', 'is-python-preview', 'is-sql-preview'
+    );
+    els.markdownPreviewContent.innerHTML = '';
+  };
 
-  const wrapHtmlPreview = (source) => {
+  const renderArtifactPreviewFrame = (srcdoc) => {
+    clearArtifactPreviewContent();
+    els.markdownPreviewContent.classList.add('is-html-preview', 'is-artifact-preview');
+    const iframe = document.createElement('iframe');
+    iframe.className = 'html-preview-frame artifact-preview-frame';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-modals');
+    iframe.setAttribute('title', t(PREVIEW_TITLE_KEYS[currentPreviewMode] || 'previewHtml'));
+    iframe.srcdoc = srcdoc;
+    els.markdownPreviewContent.appendChild(iframe);
+    els.markdownPreviewContent.scrollTop = 0;
+  };
+
+  const renderDomArtifactPreview = async (source, type, lang = '') => {
+    clearArtifactPreviewContent();
+    els.markdownPreviewContent.classList.add('is-dom-artifact-preview', 'is-artifact-preview');
+    if (type === 'mermaid') {
+      els.markdownPreviewContent.classList.add('is-mermaid-preview');
+      await window.Markdown.renderMermaidPreview(source, els.markdownPreviewContent);
+    } else if (type === 'graphviz') {
+      els.markdownPreviewContent.classList.add('is-graphviz-preview');
+      await window.ArtifactPreview.renderGraphvizPreview(els.markdownPreviewContent, source);
+    } else if (type === 'csv') {
+      els.markdownPreviewContent.classList.add('is-csv-preview');
+      els.markdownPreviewContent.innerHTML = window.ArtifactPreview.buildDomHtml(source, type, lang);
+      window.ArtifactPreview.bindCsvTableSort(els.markdownPreviewContent);
+    } else if (type === 'openapi') {
+      els.markdownPreviewContent.classList.add('is-openapi-preview');
+      els.markdownPreviewContent.innerHTML = window.ArtifactPreview.buildDomHtml(source, type, lang);
+      window.ArtifactPreview.bindOpenApiDocToggles(els.markdownPreviewContent);
+    } else if (type === 'sql') {
+      els.markdownPreviewContent.classList.add('is-sql-preview');
+      await window.ArtifactPreview.renderSqlPreview(els.markdownPreviewContent, source);
+    } else {
+      els.markdownPreviewContent.classList.add(type === 'yaml' ? 'is-yaml-preview' : 'is-json-preview');
+      els.markdownPreviewContent.innerHTML = window.ArtifactPreview.buildDomHtml(source, type, lang);
+      window.ArtifactPreview.bindJsonTreeToggles(els.markdownPreviewContent);
+    }
+    els.markdownPreviewContent.scrollTop = 0;
+  };
+
+  const openArtifactPreview = async (source, type, lang = '') => {
     const trimmed = (source || '').trim();
-    if (!trimmed) return '';
-    if (/<!doctype\s+html/i.test(trimmed) || /<html[\s>]/i.test(trimmed)) return trimmed;
-    if (/<head[\s>]/i.test(trimmed)) {
-      if (/<body[\s>]/i.test(trimmed)) {
-        return '<!DOCTYPE html><html>' + trimmed + '</html>';
-      }
-      return '<!DOCTYPE html><html>' + trimmed + '<body></body></html>';
+    const artifactType = type || window.ArtifactPreview?.detectArtifactType?.(lang, trimmed) || 'html';
+    if (!trimmed || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    setPreviewPanelTitle(artifactType);
+    if (isDomArtifactType(artifactType)) {
+      currentArtifactPreview = { source: trimmed, type: artifactType, lang, srcdoc: null };
+      await renderDomArtifactPreview(trimmed, artifactType, lang);
+    } else {
+      const srcdoc = window.ArtifactPreview.buildSrcdoc(trimmed, artifactType, lang);
+      currentArtifactPreview = { source: trimmed, type: artifactType, lang, srcdoc };
+      if (artifactType === 'python') els.markdownPreviewContent.classList.add('is-python-preview');
+      renderArtifactPreviewFrame(srcdoc);
     }
-    if (/<body[\s>]/i.test(trimmed)) {
-      return '<!DOCTYPE html><html>' + HTML_PREVIEW_HEAD + trimmed + '</html>';
-    }
-    return '<!DOCTYPE html><html>' + HTML_PREVIEW_HEAD + '<body>' + trimmed + '</body></html>';
+    openPreviewPanel();
+  };
+
+  const refreshArtifactPreview = () => {
+    if (!currentArtifactPreview) return;
+    const { source, type, lang } = currentArtifactPreview;
+    openArtifactPreview(source, type, lang);
+  };
+
+  const openArtifactPreviewInNewTab = () => {
+    if (!currentArtifactPreview) return false;
+    const srcdoc = currentArtifactPreview.srcdoc
+      || (currentArtifactPreview.source
+        ? window.ArtifactPreview.buildSrcdoc(
+          currentArtifactPreview.source,
+          currentArtifactPreview.type,
+          currentArtifactPreview.lang
+        )
+        : '');
+    if (!srcdoc) return false;
+    return window.ArtifactPreview.openInNewTab(srcdoc);
   };
 
   const openPreviewPanel = () => {
@@ -2841,30 +3304,16 @@ window.UI = (() => {
 
   const openMarkdownPreview = (source) => {
     if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    currentArtifactPreview = null;
     setPreviewPanelTitle('markdown');
-    els.markdownPreviewContent.classList.remove('is-html-preview');
+    clearArtifactPreviewContent();
     els.markdownPreviewContent.innerHTML = window.Markdown.render(source);
     polishContent(els.markdownPreviewContent, { renderMermaid: true });
     els.markdownPreviewContent.scrollTop = 0;
     openPreviewPanel();
   };
 
-  const openHtmlPreview = (source) => {
-    const trimmed = (source || '').trim();
-    if (!trimmed || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
-    setPreviewPanelTitle('html');
-    els.markdownPreviewContent.classList.remove('is-html-preview');
-    els.markdownPreviewContent.innerHTML = '';
-    els.markdownPreviewContent.classList.add('is-html-preview');
-    const iframe = document.createElement('iframe');
-    iframe.className = 'html-preview-frame';
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-modals');
-    iframe.setAttribute('title', t('previewHtml'));
-    iframe.srcdoc = wrapHtmlPreview(trimmed);
-    els.markdownPreviewContent.appendChild(iframe);
-    els.markdownPreviewContent.scrollTop = 0;
-    openPreviewPanel();
-  };
+  const openHtmlPreview = (source) => openArtifactPreview(source, 'html');
 
   const closeMarkdownPreview = () => {
     if (!els.markdownPreviewPanel) return;
@@ -2880,9 +3329,10 @@ window.UI = (() => {
     els.app.removeAttribute('data-md-preview');
     if (els.mdPreviewOverlay) els.mdPreviewOverlay.classList.add('hidden');
     if (els.markdownPreviewContent) {
-      els.markdownPreviewContent.classList.remove('is-html-preview');
-      els.markdownPreviewContent.innerHTML = '';
+      clearArtifactPreviewContent();
     }
+    currentArtifactPreview = null;
+    currentPreviewMode = null;
   };
 
   const openImagePreview = (src, alt = '') => {
@@ -3029,7 +3479,7 @@ window.UI = (() => {
   return {
     cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect,
     initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
-    syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
+    syncComposerToolsUI, syncTranslateUI, syncSlidesUI, syncExcelUI, syncDocumentUI, syncPdfUI, syncCreateFileUI, closeCreateFileMenu, toggleCreateFileMenu, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,
     setConversationSearchQuery, toggleConversationSearch, clearConversationSearch,
@@ -3050,8 +3500,9 @@ window.UI = (() => {
     openSnippetsModal, closeSnippetsModal, isSnippetsModalOpen,
     insertSnippetIntoComposer, refreshSnippetsViews, showSnippetForm, showSnippetListView,
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
-    setAssistantToolbar, updateAssistantMessage, beginRetryStreaming,
-    openMarkdownPreview, openHtmlPreview, closeMarkdownPreview, bindPreviewResize,
+    setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming,
+    openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
+    closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
     setPdfExportLoading,
     showExportDownloadPrompt, consumeExportDownload, finishExportDownload,
@@ -3060,7 +3511,7 @@ window.UI = (() => {
     syncCompareBar,
     openModelCompareOverlay, closeModelCompareOverlay, isModelCompareOpen,
     getModelCompareColumns, updateCompareColumnContent, finalizeCompareColumn,
-    syncComparePickButtons, markCompareColumnPicked,
+    syncComparePickButtons, setCompareColumnPickable, markCompareColumnPicked,
     getExportSelectedIndices, toggleExportSelectIndex,
     selectAllExportMessages, clearExportSelection,
     preparePdfExportRoot,

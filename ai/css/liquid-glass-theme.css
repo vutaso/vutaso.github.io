@@ -263,14 +263,15 @@
 }
 
 :root[data-theme="liquid-glass"] .composer-dropdown-menu,
-:root[data-theme="liquid-glass"] .translate-lang-menu {
-  background: rgba(22, 22, 24, 0.82);
-  backdrop-filter: saturate(180%) blur(40px);
-  -webkit-backdrop-filter: saturate(180%) blur(40px);
+:root[data-theme="liquid-glass"] .translate-lang-menu,
+:root[data-theme="liquid-glass"] .composer-snippets-menu,
+:root[data-theme="liquid-glass"] .msg-export-menu {
+  background: var(--popup-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border: 0.5px solid var(--border-strong);
   border-radius: var(--radius-md);
   box-shadow:
-    inset 0 1px 0 var(--glass-shine),
     0 12px 40px rgba(0, 0, 0, 0.5);
   isolation: isolate;
 }

@@ -357,6 +357,8 @@ body.model-compare-open {
   color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: min(28vh, 220px);
+  overflow: auto;
 }
 
 .model-compare-columns-wrap {

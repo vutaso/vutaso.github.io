@@ -140,14 +140,14 @@ window.APP_CONFIG = {
   LOCALES: ['en', 'vi', 'jp', 'zh'],
 
   PROVIDERS: [
+    { id: 'nvidia', label: 'NVIDIA' },
+    { id: 'openrouter', label: 'OpenRouter' },
+    { id: 'deepseek', label: 'DeepSeek' },
+    { id: 'byteplus', label: 'Byte Plus' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'google', label: 'Gemini' },
-    { id: 'deepseek', label: 'DeepSeek' },
-    { id: 'kimi', label: 'Kimi' },
-    { id: 'byteplus', label: 'Byte Plus' },
-    { id: 'nvidia', label: 'NVIDIA' },
-    { id: 'openrouter', label: 'OpenRouter' }
+    { id: 'kimi', label: 'Kimi' }
   ],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)

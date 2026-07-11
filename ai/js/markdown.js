@@ -2,7 +2,6 @@ window.Markdown = (() => {
   const { escapeHTML } = window.Utils;
 
   const COPY_BTN = '<button type="button" class="copy-code-btn" data-copy-code title="Sao chép" aria-label="Sao chép"><i class="fa-solid fa-copy"></i></button>';
-  const COPY_TABLE_BTN = '<button type="button" class="copy-table-btn" data-copy-table title="Sao chép bảng" aria-label="Sao chép bảng"><i class="fa-solid fa-table"></i></button>';
   const previewBtnTitle = (key, fallback) => {
     try {
       return window.I18n?.t?.(key) || fallback;
@@ -10,18 +9,62 @@ window.Markdown = (() => {
       return fallback;
     }
   };
+  const copyBtnTitle = (key, fallback) => previewBtnTitle(key, fallback);
+
+  const copyTablePlainBtn = () => {
+    const title = escapeHTML(copyBtnTitle('copy', 'Sao chép'));
+    return '<button type="button" class="copy-code-btn copy-table-btn" data-copy-table-plain title="' + title + '" aria-label="' + title + '"><i class="fa-solid fa-copy"></i></button>';
+  };
+
+  const copyTableMarkdownBtn = () => {
+    const title = escapeHTML(copyBtnTitle('copyTableMarkdown', 'Sao chép bảng (Markdown)'));
+    return '<button type="button" class="copy-table-btn" data-copy-table title="' + title + '" aria-label="' + title + '"><i class="fa-solid fa-table"></i></button>';
+  };
 
   const previewMdBtn = () =>
     '<button type="button" class="preview-md-btn" data-preview-md title="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '" aria-label="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '"><i class="fa-solid fa-eye"></i></button>';
 
-  const previewHtmlBtn = () =>
-    '<button type="button" class="preview-md-btn" data-preview-html title="' + escapeHTML(previewBtnTitle('previewHtml', 'Preview HTML')) + '" aria-label="' + escapeHTML(previewBtnTitle('previewHtml', 'Preview HTML')) + '"><i class="fa-solid fa-eye"></i></button>';
+  const PREVIEW_ARTIFACT_META = {
+    html: { key: 'previewHtml', fallback: 'Preview HTML', icon: 'fa-solid fa-eye' },
+    react: { key: 'previewReact', fallback: 'Preview React', icon: 'fa-brands fa-react' },
+    svg: { key: 'previewSvg', fallback: 'Preview SVG', icon: 'fa-solid fa-bezier-curve' },
+    mermaid: { key: 'previewMermaid', fallback: 'Preview Mermaid', icon: 'fa-solid fa-diagram-project' },
+    css: { key: 'previewCss', fallback: 'Preview CSS', icon: 'fa-brands fa-css3-alt' },
+    json: { key: 'previewJson', fallback: 'Preview JSON', icon: 'fa-solid fa-code' },
+    yaml: { key: 'previewYaml', fallback: 'Preview YAML', icon: 'fa-solid fa-file-lines' },
+    vue: { key: 'previewVue', fallback: 'Preview Vue', icon: 'fa-brands fa-vuejs' },
+    svelte: { key: 'previewSvelte', fallback: 'Preview Svelte', icon: 'fa-solid fa-bolt' },
+    graphviz: { key: 'previewGraphviz', fallback: 'Preview Graphviz', icon: 'fa-solid fa-share-nodes' },
+    csv: { key: 'previewCsv', fallback: 'Preview CSV', icon: 'fa-solid fa-table' },
+    openapi: { key: 'previewOpenapi', fallback: 'Preview API doc', icon: 'fa-solid fa-book' },
+    chart: { key: 'previewChart', fallback: 'Preview Chart', icon: 'fa-solid fa-chart-column' },
+    python: { key: 'previewPython', fallback: 'Run Python', icon: 'fa-brands fa-python' },
+    sql: { key: 'previewSql', fallback: 'SQL Preview', icon: 'fa-solid fa-database' }
+  };
+
+  const previewArtifactBtn = (type) => {
+    const meta = PREVIEW_ARTIFACT_META[type] || PREVIEW_ARTIFACT_META.html;
+    const title = escapeHTML(previewBtnTitle(meta.key, meta.fallback));
+    return '<button type="button" class="preview-md-btn preview-artifact-btn" data-preview-artifact="' + type + '" title="' + title + '" aria-label="' + title + '"><i class="' + meta.icon + '"></i></button>';
+  };
 
   const MD_LANG_RE = /^(?:markdown|md|mdown|mkdn)$/i;
   const isMarkdownLang = (lang) => MD_LANG_RE.test((lang || '').trim());
 
-  const HTML_LANG_RE = /^(?:html|htm|xhtml)$/i;
-  const isHtmlLang = (lang) => HTML_LANG_RE.test((lang || '').trim());
+  const isHtmlLang = (lang) => window.ArtifactPreview?.isHtmlLang?.(lang) ?? /^(?:html|htm|xhtml)$/i.test((lang || '').trim());
+  const isReactLang = (lang) => window.ArtifactPreview?.isReactLang?.(lang) ?? /^(?:jsx|tsx|react)$/i.test((lang || '').trim());
+  const isSvgLang = (lang) => window.ArtifactPreview?.isSvgLang?.(lang) ?? /^svg$/i.test((lang || '').trim());
+  const isCssLang = (lang) => window.ArtifactPreview?.isCssLang?.(lang) ?? /^(?:css|scss|sass|less)$/i.test((lang || '').trim());
+  const isJsonLang = (lang) => window.ArtifactPreview?.isJsonLang?.(lang) ?? /^(?:json|jsonc)$/i.test((lang || '').trim());
+  const isYamlLang = (lang) => window.ArtifactPreview?.isYamlLang?.(lang) ?? /^(?:ya?ml)$/i.test((lang || '').trim());
+  const isVueLang = (lang) => window.ArtifactPreview?.isVueLang?.(lang) ?? /^vue$/i.test((lang || '').trim());
+  const isSvelteLang = (lang) => window.ArtifactPreview?.isSvelteLang?.(lang) ?? /^svelte$/i.test((lang || '').trim());
+  const isGraphvizLang = (lang) => window.ArtifactPreview?.isGraphvizLang?.(lang) ?? /^(?:graphviz|dot|gv)$/i.test((lang || '').trim());
+  const isCsvLang = (lang) => window.ArtifactPreview?.isCsvLang?.(lang) ?? /^(?:csv|tsv)$/i.test((lang || '').trim());
+  const isOpenApiLang = (lang) => window.ArtifactPreview?.isOpenApiLang?.(lang) ?? /^(?:openapi|swagger|oas)$/i.test((lang || '').trim());
+  const isChartLang = (lang) => window.ArtifactPreview?.isChartLang?.(lang) ?? /^(?:chart|chartjs|echarts)$/i.test((lang || '').trim());
+  const isPythonLang = (lang) => window.ArtifactPreview?.isPythonLang?.(lang) ?? /^(?:python|py)$/i.test((lang || '').trim());
+  const isSqlLang = (lang) => window.ArtifactPreview?.isSqlLang?.(lang) ?? /^sql$/i.test((lang || '').trim());
 
   const countCodeLines = (code) => {
     const normalized = String(code ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -147,6 +190,7 @@ window.Markdown = (() => {
       + '<div class="pre-header">'
       + '<span class="lang">mermaid</span>'
       + '<div class="mermaid-header-actions">'
+      + previewArtifactBtn('mermaid')
       + '<button type="button" class="toggle-mermaid-btn" data-toggle-mermaid title="Xem mã nguồn"><i class="fa-solid fa-code"></i></button>'
       + COPY_BTN
       + '</div>'
@@ -157,10 +201,25 @@ window.Markdown = (() => {
       + '</div>';
   };
 
-  const codeBlockActions = (lang) => {
+  const codeBlockActions = (lang, code = '') => {
+    const AP = window.ArtifactPreview;
     let preview = '';
     if (isMarkdownLang(lang)) preview = previewMdBtn();
-    else if (isHtmlLang(lang)) preview = previewHtmlBtn();
+    else if (isMermaidLang(lang)) preview = previewArtifactBtn('mermaid');
+    else if (isOpenApiLang(lang) || AP?.isOpenApiContent?.(code)) preview = previewArtifactBtn('openapi');
+    else if (isReactLang(lang)) preview = previewArtifactBtn('react');
+    else if (isSvgLang(lang)) preview = previewArtifactBtn('svg');
+    else if (isHtmlLang(lang)) preview = previewArtifactBtn('html');
+    else if (isCssLang(lang)) preview = previewArtifactBtn('css');
+    else if (isJsonLang(lang)) preview = previewArtifactBtn('json');
+    else if (isYamlLang(lang)) preview = previewArtifactBtn('yaml');
+    else if (isVueLang(lang)) preview = previewArtifactBtn('vue');
+    else if (isSvelteLang(lang)) preview = previewArtifactBtn('svelte');
+    else if (isGraphvizLang(lang)) preview = previewArtifactBtn('graphviz');
+    else if (isCsvLang(lang)) preview = previewArtifactBtn('csv');
+    else if (isChartLang(lang) || AP?.isChartContent?.(code)) preview = previewArtifactBtn('chart');
+    else if (isPythonLang(lang)) preview = previewArtifactBtn('python');
+    else if (isSqlLang(lang)) preview = previewArtifactBtn('sql');
     return '<div class="pre-header-actions">' + preview + COPY_BTN + '</div>';
   };
 
@@ -169,7 +228,7 @@ window.Markdown = (() => {
     const { html, validLang } = highlightCode(code, lang);
     const label = validLang || lang || '';
     const langClass = validLang ? ' language-' + validLang : (lang ? ' language-' + lang : '');
-    return '<div class="code-block"><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang) + '</div>'
+    return '<div class="code-block"><div class="pre-header"><span class="lang">' + escapeHTML(label) + '</span>' + codeBlockActions(lang, code) + '</div>'
       + codeBlockBodyHTML(code, html, langClass) + '</div>';
   };
 
@@ -376,6 +435,21 @@ window.Markdown = (() => {
     return { ok: false, error: lastError };
   };
 
+  const renderMermaidPreview = async (source, container) => {
+    if (!container) return { ok: false, error: new Error('No container') };
+    initMermaid();
+    const view = document.createElement('div');
+    view.className = 'mermaid-preview-view';
+    container.innerHTML = '';
+    container.appendChild(view);
+    const result = await renderOneMermaid(source, view);
+    if (!result.ok) {
+      const msg = result.error?.message || result.error?.str || 'Mermaid render failed';
+      container.innerHTML = '<pre class="artifact-error">' + escapeHTML(msg) + '</pre>';
+    }
+    return result;
+  };
+
   let mermaidRenderQueue = Promise.resolve();
 
   const renderMermaid = (root, { skipIfStreaming = true } = {}) => {
@@ -482,7 +556,7 @@ window.Markdown = (() => {
           const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
           const headerEl = document.createElement('div');
           headerEl.className = 'pre-header';
-          headerEl.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
+          headerEl.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang, code.textContent || '');
           block.appendChild(headerEl);
           if (!code.classList.contains('hljs')) code.classList.add('hljs');
           if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
@@ -504,7 +578,7 @@ window.Markdown = (() => {
         const lang = [...code.classList].find((c) => c.startsWith('language-'))?.slice(9) || '';
         const header = document.createElement('div');
         header.className = 'pre-header';
-        header.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang);
+        header.innerHTML = '<span class="lang">' + escapeHTML(lang) + '</span>' + codeBlockActions(lang, code.textContent || '');
         block.insertBefore(header, block.firstChild);
         if (!code.classList.contains('hljs')) code.classList.add('hljs');
         if (lang && !code.classList.contains('language-' + lang)) code.classList.add('language-' + lang);
@@ -520,6 +594,14 @@ window.Markdown = (() => {
     (cell.innerText || '').replace(/\t/g, ' ').replace(/\n+/g, ' ').trim();
 
   const escapeMdCell = (text) => text.replace(/\|/g, '\\|');
+
+  const tableToPlainText = (table) => {
+    const rows = [...table.querySelectorAll('tr')];
+    if (!rows.length) return '';
+    return rows.map((row) =>
+      [...row.querySelectorAll('th, td')].map((cell) => cell.innerText.replace(/\s+/g, ' ').trim()).join('\t')
+    ).join('\n');
+  };
 
   const tableToMarkdown = (table) => {
     const rows = [...table.querySelectorAll('tr')];
@@ -545,7 +627,8 @@ window.Markdown = (() => {
       wrapper.className = 'table-block';
       const header = document.createElement('div');
       header.className = 'table-header';
-      header.innerHTML = '<span class="table-label">Bảng</span>' + COPY_TABLE_BTN;
+      header.innerHTML = '<span class="table-label">' + escapeHTML(copyBtnTitle('tableLabel', 'Bảng')) + '</span>'
+        + '<div class="table-header-actions">' + copyTableMarkdownBtn() + copyTablePlainBtn() + '</div>';
       const scroll = document.createElement('div');
       scroll.className = 'table-scroll';
 
@@ -586,10 +669,17 @@ window.Markdown = (() => {
     }
   };
 
+  const wrapMath = (tex, display = false) => {
+    const rendered = renderKatex(String(tex || '').trim(), !!display);
+    return display
+      ? '<div class="math-block">' + rendered + '</div>'
+      : '<span class="math-inline">' + rendered + '</span>';
+  };
+
   const init = () => {
     ensure();
     initMermaid();
   };
 
-  return { init, render, enhanceCodeBlocks, enhanceTables, enhanceLinks, tableToMarkdown, typesetMath, renderMermaid, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
+  return { init, render, wrapMath, enhanceCodeBlocks, enhanceTables, enhanceLinks, tableToMarkdown, tableToPlainText, typesetMath, renderMermaid, renderMermaidPreview, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
 })();

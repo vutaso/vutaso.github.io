@@ -43,6 +43,11 @@ window.ModelCompare = (() => {
   const getActiveModels = (state) => normalizeModelList(state?.compareModels);
 
   const streamOne = (convo, modelId, settings, columnEl, columnData) => new Promise((resolve) => {
+    if (!columnEl) {
+      resolve({ modelId, text: '', reasoning: '', aborted: false, error: 'Missing compare column' });
+      return;
+    }
+
     const contentEl = columnEl.querySelector('.model-compare-col-body');
     const statusEl = columnEl.querySelector('.model-compare-col-status');
     let buffer = '';
@@ -50,6 +55,8 @@ window.ModelCompare = (() => {
     let groundingMetadata = null;
     let generatedImages = [];
     let finished = false;
+
+    const isPickable = () => !!(buffer.trim() || generatedImages.length);
 
     const setStatus = (key, { state = 'done' } = {}) => {
       const statusText = statusEl?.querySelector('.model-compare-status-text');
@@ -71,6 +78,7 @@ window.ModelCompare = (() => {
           error: null,
         };
       }
+      window.UI.setCompareColumnPickable(columnEl, isPickable());
       window.UI.updateCompareColumnContent(contentEl, buffer, generatedImages, reasoningBuffer, {
         reasoningOpen: !!reasoningBuffer && !buffer,
         groundingMetadata,
@@ -79,15 +87,18 @@ window.ModelCompare = (() => {
 
     setStatus('compareStatusStreaming', { state: 'streaming' });
     columnEl.classList.add('is-streaming');
+    window.UI.setCompareColumnPickable(columnEl, false);
 
     const finish = (payload) => {
       if (finished) return;
       finished = true;
       columnEl.classList.remove('is-streaming');
+      window.UI.setCompareColumnPickable(columnEl, isPickable());
       if (columnData && columnData[modelId]) {
         columnData[modelId].done = true;
         columnData[modelId].error = payload.error || null;
       }
+      window.UI.syncComparePickButtons();
       resolve(payload);
     };
 
@@ -119,7 +130,12 @@ window.ModelCompare = (() => {
       },
       onDone: (info) => {
         if (info?.aborted) {
-          setStatus(buffer ? 'compareStatusStopped' : 'compareStatusAborted', { state: buffer ? 'warning' : 'warning' });
+          setStatus(buffer ? 'compareStatusStopped' : 'compareStatusAborted', { state: 'warning' });
+          window.UI.finalizeCompareColumn(columnEl, buffer, {
+            generatedImages,
+            reasoningContent: reasoningBuffer,
+            groundingMetadata,
+          });
           finish({
             modelId,
             text: buffer,
@@ -163,6 +179,7 @@ window.ModelCompare = (() => {
             done: true,
           };
         }
+        window.UI.setCompareColumnPickable(columnEl, isPickable());
         finish({
           modelId,
           text: buffer,

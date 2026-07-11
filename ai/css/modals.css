@@ -712,7 +712,7 @@ a.btn {
   font-size: 14px;
   font-weight: 500;
   box-shadow: var(--shadow);
-  z-index: 200;
+  z-index: 1300;
   animation: toast-in 220ms ease;
 }
 @keyframes toast-in {

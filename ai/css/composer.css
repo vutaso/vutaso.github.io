@@ -28,7 +28,11 @@
 }
 
 .composer-translate-bar,
-.composer-imagegen-bar {
+.composer-imagegen-bar,
+.composer-slides-bar,
+.composer-excel-bar,
+.composer-document-bar,
+.composer-pdf-bar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -37,11 +41,19 @@
 }
 
 .composer-translate-bar.hidden,
-.composer-imagegen-bar.hidden {
+.composer-imagegen-bar.hidden,
+.composer-slides-bar.hidden,
+.composer-excel-bar.hidden,
+.composer-document-bar.hidden,
+.composer-pdf-bar.hidden {
   display: none;
 }
 
 .translate-chip,
+.slides-chip,
+.excel-chip,
+.document-chip,
+.pdf-chip,
 .mode-chip {
   display: inline-flex;
   align-items: center;
@@ -57,11 +69,19 @@
 }
 
 .translate-chip > i,
+.slides-chip > i,
+.excel-chip > i,
+.document-chip > i,
+.pdf-chip > i,
 .mode-chip > i {
   font-size: 13px;
 }
 
 .translate-chip-close,
+.slides-chip-close,
+.excel-chip-close,
+.document-chip-close,
+.pdf-chip-close,
 .mode-chip-close {
   display: inline-flex;
   align-items: center;
@@ -135,12 +155,15 @@
   min-width: 280px;
   max-height: 320px;
   overflow-y: auto;
-  background: var(--bg-elev);
+  background: var(--popup-bg);
   border: 1px solid var(--border);
   border-radius: 14px;
   box-shadow: var(--composer-shadow), 0 8px 24px rgba(0, 0, 0, 0.18);
   z-index: 30;
   padding: 6px 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
 }
 
 .composer-dropdown-menu.hidden,
@@ -381,6 +404,38 @@
 .composer-tool-btn.hidden {
   display: none;
 }
+
+.composer-tool-dropdown {
+  position: relative;
+}
+
+.composer-tool-dropdown .composer-dropdown-menu {
+  top: auto;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+}
+
+.composer-tool-dropdown .composer-tool-btn .create-file-chevron {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: -2px;
+}
+
+.create-file-option {
+  align-items: flex-start;
+}
+
+.create-file-option-icon {
+  width: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.create-file-option-icon-pptx { color: #d24726; }
+.create-file-option-icon-xlsx { color: #217346; }
+.create-file-option-icon-docx { color: #2b579a; }
+.create-file-option-icon-pdf { color: #e74c3c; }
 
 .composer-attachment {
   position: relative;

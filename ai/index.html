@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="css/modals.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/pdf-export.css" />
-  <link rel="stylesheet" href="css/docx-export.css" />
+  <link rel="stylesheet" href="css/artifact-preview.css" />
   <link rel="stylesheet" href="css/apple-theme.css" />
   <link rel="stylesheet" href="css/hello-kitty-theme.css" />
   <link rel="stylesheet" href="css/cyberpunk-theme.css" />
@@ -240,6 +240,40 @@
             <i class="fa-solid fa-language" aria-hidden="true"></i>
             <span>Dịch</span>
           </button>
+          <div id="createFileWrap" class="composer-tool-dropdown composer-dropdown-wrap">
+            <button type="button" id="createFileBtn" class="composer-tool-btn" title="Tạo file Office" aria-label="Tạo file" aria-haspopup="menu" aria-expanded="false" aria-pressed="false">
+              <i id="createFileBtnIcon" class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
+              <span id="createFileBtnLabel">Tạo file</span>
+              <i class="fa-solid fa-chevron-down create-file-chevron" aria-hidden="true"></i>
+            </button>
+            <div id="createFileMenu" class="composer-dropdown-menu create-file-menu hidden" role="menu" aria-label="Chọn loại file">
+              <div id="createFileMenuTitle" class="composer-dropdown-header">Tạo file</div>
+              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="document" role="menuitem">
+                <i class="fa-solid fa-file-word create-file-option-icon create-file-option-icon-docx" aria-hidden="true"></i>
+                <span class="composer-dropdown-option-text">
+                  <span class="composer-dropdown-option-title" id="createFileOptionDocumentLabel">Tạo Word</span>
+                </span>
+              </button>
+              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="excel" role="menuitem">
+                <i class="fa-solid fa-file-excel create-file-option-icon create-file-option-icon-xlsx" aria-hidden="true"></i>
+                <span class="composer-dropdown-option-text">
+                  <span class="composer-dropdown-option-title" id="createFileOptionExcelLabel">Tạo Excel</span>
+                </span>
+              </button>
+              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="slides" role="menuitem">
+                <i class="fa-solid fa-file-powerpoint create-file-option-icon create-file-option-icon-pptx" aria-hidden="true"></i>
+                <span class="composer-dropdown-option-text">
+                  <span class="composer-dropdown-option-title" id="createFileOptionSlidesLabel">Tạo Slides</span>
+                </span>
+              </button>
+              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="pdf" role="menuitem">
+                <i class="fa-solid fa-file-pdf create-file-option-icon create-file-option-icon-pdf" aria-hidden="true"></i>
+                <span class="composer-dropdown-option-text">
+                  <span class="composer-dropdown-option-title" id="createFileOptionPdfLabel">Tạo PDF</span>
+                </span>
+              </button>
+            </div>
+          </div>
           <button type="button" id="compareBtn" class="composer-tool-btn" title="So sánh 2–3 model song song" aria-label="So sánh model" aria-pressed="false">
             <i class="fa-solid fa-columns" aria-hidden="true"></i>
             <span id="compareBtnLabel">So sánh</span>
@@ -353,6 +387,42 @@
                 </div>
               </div>
             </div>
+            <div id="composerSlidesBar" class="composer-slides-bar hidden" aria-hidden="true">
+              <div class="slides-chip">
+                <i class="fa-solid fa-file-powerpoint" aria-hidden="true"></i>
+                <span>Tạo Slides</span>
+                <button type="button" id="slidesChipClose" class="slides-chip-close" title="Tắt tạo slides" aria-label="Tắt tạo slides">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div id="composerExcelBar" class="composer-excel-bar hidden" aria-hidden="true">
+              <div class="excel-chip">
+                <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                <span>Tạo Excel</span>
+                <button type="button" id="excelChipClose" class="excel-chip-close" title="Tắt tạo Excel" aria-label="Tắt tạo Excel">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div id="composerDocumentBar" class="composer-document-bar hidden" aria-hidden="true">
+              <div class="document-chip">
+                <i class="fa-solid fa-file-word" aria-hidden="true"></i>
+                <span>Tạo Word</span>
+                <button type="button" id="documentChipClose" class="document-chip-close" title="Tắt tạo Word" aria-label="Tắt tạo Word">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div id="composerPdfBar" class="composer-pdf-bar hidden" aria-hidden="true">
+              <div class="pdf-chip">
+                <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                <span>Tạo PDF</span>
+                <button type="button" id="pdfChipClose" class="pdf-chip-close" title="Tắt tạo PDF" aria-label="Tắt tạo PDF">
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
             <div id="composerTranslateBar" class="composer-translate-bar hidden" aria-hidden="true">
               <div class="translate-chip">
                 <i class="fa-solid fa-language" aria-hidden="true"></i>
@@ -397,9 +467,19 @@
         </button>
         <header class="md-preview-header">
           <span class="md-preview-title"><i id="previewPanelIcon" class="fa-brands fa-markdown" aria-hidden="true"></i> <span id="previewPanelTitle">Preview Markdown</span></span>
-          <button type="button" id="closeMdPreviewBtn" class="btn btn-icon" title="Đóng preview" aria-label="Đóng preview">
-            <span class="icon"><i class="fa-solid fa-xmark"></i></span>
-          </button>
+          <div class="md-preview-header-end">
+            <div id="artifactPreviewToolbar" class="md-preview-toolbar hidden" aria-label="Artifact preview">
+              <button type="button" id="artifactRefreshBtn" class="btn btn-icon" title="Làm mới preview" aria-label="Làm mới preview">
+                <span class="icon"><i class="fa-solid fa-rotate-right"></i></span>
+              </button>
+              <button type="button" id="artifactOpenTabBtn" class="btn btn-icon" title="Mở tab mới" aria-label="Mở tab mới">
+                <span class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </button>
+            </div>
+            <button type="button" id="closeMdPreviewBtn" class="btn btn-icon" title="Đóng preview" aria-label="Đóng preview">
+              <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+            </button>
+          </div>
         </header>
         <div id="markdownPreviewContent" class="md-preview-content"></div>
       </aside>
@@ -779,7 +859,7 @@
           <div class="guide-step-num" aria-hidden="true">8</div>
           <div class="guide-step-body">
             <h3>Xuất &amp; phím tắt khác</h3>
-            <p>Trên header: tải Markdown, sao chép Markdown, xuất Word (.docx), xuất PDF (A4). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid.</p>
+            <p>Trên header: tải Markdown, sao chép Markdown, xuất Word (.docx), xuất PDF (A4). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid. Khối code có nút preview — HTML, React, Vue, Python, Chart, OpenAPI, CSV, Graphviz, <strong>SQL</strong> (format + explain + mock result), Mermaid…</p>
             <ul>
               <li><kbd>Escape</kbd> — đóng modal, menu, preview; thoát sửa tin</li>
             </ul>
@@ -850,15 +930,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.2.0/dist/html2canvas-pro.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <script src="js/config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/files.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/sql-preview.js"></script>
+  <script src="js/artifact-preview.js"></script>
   <script src="js/markdown.js"></script>
   <script src="js/docx-export.js"></script>
+  <script src="js/pptx-export.js"></script>
+  <script src="js/xlsx-export.js"></script>
+  <script src="js/docx-create.js"></script>
   <script src="js/conversations.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
@@ -867,6 +954,7 @@
   <script src="js/model-compare.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/pdf-export.js"></script>
+  <script src="js/pdf-create.js"></script>
   <script src="js/html-export.js"></script>
   <script src="js/share.js"></script>
   <script src="js/events.js"></script>

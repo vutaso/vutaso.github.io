@@ -32,6 +32,10 @@ window.Events = (() => {
       imageGenEnabled: s.imageGenEnabled,
       thinkingEnabled: s.thinkingEnabled,
       translateEnabled: s.translateEnabled,
+      slidesEnabled: s.slidesEnabled,
+      excelEnabled: s.excelEnabled,
+      documentEnabled: s.documentEnabled,
+      pdfEnabled: s.pdfEnabled,
       translateTargetLang: s.translateTargetLang,
       imageGenRatio: s.imageGenRatio,
       imageGenStyle: s.imageGenStyle,
@@ -439,7 +443,7 @@ window.Events = (() => {
     }
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
-    if (compareMode || s.imageGenEnabled) {
+    if (compareMode || s.imageGenEnabled || s.slidesEnabled || s.excelEnabled || s.documentEnabled || s.pdfEnabled) {
       ui.els.sendBtn.disabled = !hasKey || !hasText;
     } else {
       ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
@@ -447,9 +451,13 @@ window.Events = (() => {
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
+      const slidesOn = s.slidesEnabled;
+      const excelOn = s.excelEnabled;
+      const documentOn = s.documentEnabled;
+      const pdfOn = s.pdfEnabled;
       const compareOn = !!s.compareEnabled;
-      ui.els.attachBtn.disabled = imageGenOn || compareOn;
-      if (ui.els.micBtn) ui.els.micBtn.disabled = imageGenOn;
+      ui.els.attachBtn.disabled = imageGenOn || compareOn || slidesOn || excelOn || documentOn || pdfOn;
+      if (ui.els.micBtn) ui.els.micBtn.disabled = imageGenOn || slidesOn || excelOn || documentOn || pdfOn;
     }
   };
 
@@ -614,6 +622,7 @@ window.Events = (() => {
       role: 'assistant',
       content: text,
       variants: [text],
+      variantModels: [modelId],
       variantIndex: 0,
       ts: Date.now(),
       responseModel: modelId,
@@ -667,8 +676,164 @@ window.Events = (() => {
     }
   };
 
+  const processPdfResponse = async (convo, messageIndex, buffer) => {
+    if (!window.PdfCreate) return;
+    const data = window.PdfCreate.extractPdfData(buffer);
+    if (!data) {
+      ui.showToast(t('toastPdfParseFail'));
+      return;
+    }
+    convoMod.updateMessage(convo, messageIndex, { pdfData: data });
+    const msg = convo.messages[messageIndex];
+    if (convoMod.getCurrent()?.id === convo.id && msg) {
+      ui.updateAssistantMessage(messageIndex, msg);
+    }
+    state.set({ pdfEnabled: false });
+    syncComposerTools();
+    ui.showToast(t('toastPdfReady', { n: data.blockCount }));
+  };
+
+  const downloadPdfFromMessage = async (article) => {
+    const idx = parseInt(article?.dataset?.idx, 10);
+    if (isNaN(idx)) return;
+    const convo = convoMod.getCurrent();
+    const msg = convo?.messages?.[idx];
+    if (!msg?.pdfData) return;
+    ui.setPdfExportLoading(true, {
+      title: t('exportPdfTitle'),
+      hint: t('exportPdfHint'),
+    });
+    try {
+      const result = await window.PdfCreate.generatePdf(msg.pdfData, {
+        onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
+      });
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('pdfDownloadBtn'),
+        kind: 'pdf',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastPdfDownloadOk'));
+    } catch (err) {
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastPdfDownloadFail', { err: err.message || err }));
+    }
+  };
+
+  const processDocumentResponse = async (convo, messageIndex, buffer) => {
+    if (!window.DocxCreate) return;
+    const data = window.DocxCreate.extractDocumentData(buffer);
+    if (!data) {
+      ui.showToast(t('toastDocumentParseFail'));
+      return;
+    }
+    convoMod.updateMessage(convo, messageIndex, { documentData: data });
+    const msg = convo.messages[messageIndex];
+    if (convoMod.getCurrent()?.id === convo.id && msg) {
+      ui.updateAssistantMessage(messageIndex, msg);
+    }
+    state.set({ documentEnabled: false });
+    syncComposerTools();
+    ui.showToast(t('toastDocumentReady', { n: data.blockCount }));
+  };
+
+  const downloadDocumentFromMessage = async (article) => {
+    const idx = parseInt(article?.dataset?.idx, 10);
+    if (isNaN(idx)) return;
+    const convo = convoMod.getCurrent();
+    const msg = convo?.messages?.[idx];
+    if (!msg?.documentData) return;
+    try {
+      const result = await window.DocxCreate.generateDocx(msg.documentData);
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('documentDownloadBtn'),
+        kind: 'document',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastDocumentDownloadOk'));
+    } catch (err) {
+      ui.showToast(t('toastDocumentDownloadFail', { err: err.message || err }));
+    }
+  };
+
+  const processExcelResponse = async (convo, messageIndex, buffer) => {
+    if (!window.XlsxExport) return;
+    const data = window.XlsxExport.extractExcelData(buffer);
+    if (!data) {
+      ui.showToast(t('toastExcelParseFail'));
+      return;
+    }
+    convoMod.updateMessage(convo, messageIndex, { excelData: data });
+    const msg = convo.messages[messageIndex];
+    if (convoMod.getCurrent()?.id === convo.id && msg) {
+      ui.updateAssistantMessage(messageIndex, msg);
+    }
+    state.set({ excelEnabled: false });
+    syncComposerTools();
+    ui.showToast(t('toastExcelReady', { sheets: data.sheetCount, rows: data.totalRows }));
+  };
+
+  const downloadExcelFromMessage = async (article) => {
+    const idx = parseInt(article?.dataset?.idx, 10);
+    if (isNaN(idx)) return;
+    const convo = convoMod.getCurrent();
+    const msg = convo?.messages?.[idx];
+    if (!msg?.excelData) return;
+    try {
+      const result = await window.XlsxExport.generateXlsx(msg.excelData);
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('excelDownloadBtn'),
+        kind: 'xlsx',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastExcelDownloadOk'));
+    } catch (err) {
+      ui.showToast(t('toastExcelDownloadFail', { err: err.message || err }));
+    }
+  };
+
+  const processSlidesResponse = async (convo, messageIndex, buffer) => {
+    if (!window.PptxExport) return;
+    const data = window.PptxExport.extractSlidesData(buffer);
+    if (!data) {
+      ui.showToast(t('toastSlidesParseFail'));
+      return;
+    }
+    convoMod.updateMessage(convo, messageIndex, { slidesData: data });
+    const msg = convo.messages[messageIndex];
+    if (convoMod.getCurrent()?.id === convo.id && msg) {
+      ui.updateAssistantMessage(messageIndex, msg);
+    }
+    state.set({ slidesEnabled: false });
+    syncComposerTools();
+    ui.showToast(t('toastSlidesReady', { n: data.slides.length }));
+  };
+
+  const downloadSlidesFromMessage = async (article) => {
+    const idx = parseInt(article?.dataset?.idx, 10);
+    if (isNaN(idx)) return;
+    const convo = convoMod.getCurrent();
+    const msg = convo?.messages?.[idx];
+    if (!msg?.slidesData) return;
+    try {
+      const result = await window.PptxExport.generatePptx(msg.slidesData);
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('slidesDownloadBtn'),
+        kind: 'pptx',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastSlidesDownloadOk'));
+    } catch (err) {
+      ui.showToast(t('toastSlidesDownloadFail', { err: err.message || err }));
+    }
+  };
+
   const streamResponse = async (convo, { retryIdx } = {}) => {
     const s = state.get();
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     let article;
     let content;
     let messageIndex;
@@ -686,9 +851,10 @@ window.Events = (() => {
         article = streaming.article;
         content = streaming.content;
       }
+      ui.syncMessageModelLabel(article, { role: 'assistant', responseModel: modelId, variantModels: [modelId] });
     } else {
       messageIndex = convo.messages.length;
-      const streaming = ui.appendStreamingMessage(messageIndex);
+      const streaming = ui.appendStreamingMessage(messageIndex, modelId);
       article = streaming.article;
       content = streaming.content;
     }
@@ -706,7 +872,6 @@ window.Events = (() => {
 
     streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, groundingMetadata, retryIdx, discardSave: false, messageIndex };
 
-    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const users = convo.messages.filter((m) => m.role === 'user');
     let triggerUser = users[users.length - 1] || null;
     if (retryIdx !== undefined) {
@@ -726,6 +891,11 @@ window.Events = (() => {
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
       : (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
         && window.APP_CONFIG.modelSupportsThinking(modelId);
+
+    const useSlides = !!(triggerUser?.slides);
+    const useExcel = !!(triggerUser?.excel);
+    const useDocument = !!(triggerUser?.document);
+    const usePdf = !!(triggerUser?.pdf);
 
     const refreshStreamingContent = () => {
       const reasoningOpen = !!reasoningBuffer && !buffer;
@@ -752,7 +922,7 @@ window.Events = (() => {
     const saveAssistantResult = (text) => {
       if (streamingContext?.discardSave) return;
       if (!convoMod.getById(convo.id)) return;
-      const extra = {};
+      const extra = { responseModel: modelId };
       if (generatedImages.length) extra.generatedImages = generatedImages.slice();
       if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
       if (groundingMetadata) extra.groundingMetadata = groundingMetadata;
@@ -763,7 +933,9 @@ window.Events = (() => {
           role: 'assistant',
           content: text,
           variants: [text],
+          variantModels: [modelId],
           variantIndex: 0,
+          responseModel: modelId,
           ts: Date.now(),
           ...extra
         });
@@ -798,6 +970,22 @@ window.Events = (() => {
         state.set({ imageGenEnabled: false });
         resetImageGenPicked();
         syncComposerTools(modelId, { imageGenEnabled: false });
+      }
+
+      if (useSlides && buffer && !aborted) {
+        processSlidesResponse(convo, messageIndex, buffer);
+      }
+
+      if (useExcel && buffer && !aborted) {
+        processExcelResponse(convo, messageIndex, buffer);
+      }
+
+      if (useDocument && buffer && !aborted) {
+        processDocumentResponse(convo, messageIndex, buffer);
+      }
+
+      if (usePdf && buffer && !aborted) {
+        processPdfResponse(convo, messageIndex, buffer);
       }
 
       updateSendEnabled();
@@ -877,6 +1065,28 @@ window.Events = (() => {
         finishStreamingResponse(buffer || '');
       }
     });
+  };
+
+  const branchFromMessageAt = async (idx) => {
+    if (window.API.isStreaming() || ui.isShareViewMode?.()) return;
+    const convo = convoMod.getCurrent();
+    if (!convo) return;
+    const msg = convo.messages[idx];
+    if (!msg) return;
+    if (msg.role === 'assistant' && !convoMod.getAssistantContent(msg)) return;
+
+    await settleActiveStream({ discard: false });
+    ui.setExportSelectMode(false);
+
+    const branched = convoMod.branchFromMessage(convo, idx);
+    if (!branched) return;
+
+    ui.refreshConversationList(branched.id);
+    ui.renderMessages(branched);
+    ui.syncCompressContextBar(branched);
+    ui.updateSettingsTokenUsage(state.get());
+    ui.showToast(t('branchCreated'));
+    if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput.focus();
   };
 
   const retryAssistantMessage = async (idx) => {
@@ -974,6 +1184,18 @@ window.Events = (() => {
       }
       if (s.translateEnabled && text) {
         userMsg.translateTo = s.translateTargetLang || window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
+      }
+      if (s.slidesEnabled && text) {
+        userMsg.slides = true;
+      }
+      if (s.excelEnabled && text) {
+        userMsg.excel = true;
+      }
+      if (s.documentEnabled && text) {
+        userMsg.document = true;
+      }
+      if (s.pdfEnabled && text) {
+        userMsg.pdf = true;
       }
     }
     convoMod.addMessage(convo, userMsg);
@@ -1540,7 +1762,13 @@ window.Events = (() => {
         ? 'toastExportWordOk'
         : pending.kind === 'html'
           ? 'toastExportHtmlOk'
-          : 'toastExportPdfOk';
+          : pending.kind === 'pptx'
+            ? 'toastSlidesDownloadOk'
+            : pending.kind === 'xlsx'
+              ? 'toastExcelDownloadOk'
+              : pending.kind === 'document'
+                ? 'toastDocumentDownloadOk'
+                : 'toastExportPdfOk';
       ui.showToast(t(toastKey));
     });
 
@@ -1678,6 +1906,10 @@ window.Events = (() => {
         patch.webSearchEnabled = false;
         patch.imageGenEnabled = false;
         patch.translateEnabled = false;
+        patch.slidesEnabled = false;
+        patch.excelEnabled = false;
+        patch.documentEnabled = false;
+        patch.pdfEnabled = false;
         clearPendingAttachments();
         pendingReferenceImage = null;
         resetImageGenPicked();
@@ -1712,7 +1944,16 @@ window.Events = (() => {
       const idx = parseInt(select.dataset.idx, 10);
       if (isNaN(idx)) return;
       const models = getCompareModels();
-      models[idx] = select.value;
+      const prev = models[idx];
+      const next = select.value;
+      if (!next || next === prev) return;
+      const otherIdx = models.indexOf(next);
+      if (otherIdx !== -1 && otherIdx !== idx) {
+        models[otherIdx] = prev;
+        models[idx] = next;
+      } else {
+        models[idx] = next;
+      }
       state.set({ compareModels: window.ModelCompare.normalizeModelList(models) });
       ui.syncCompareBar(state.get());
     });
@@ -1747,6 +1988,10 @@ window.Events = (() => {
       const patch = { imageGenEnabled: enabled };
       if (enabled) {
         patch.translateEnabled = false;
+        patch.slidesEnabled = false;
+        patch.excelEnabled = false;
+        patch.documentEnabled = false;
+        patch.pdfEnabled = false;
         clearPendingAttachments();
         resetImageGenPicked();
       } else {
@@ -1861,12 +2106,96 @@ window.Events = (() => {
       const patch = { translateEnabled: enabled };
       if (enabled) {
         patch.imageGenEnabled = false;
+        patch.slidesEnabled = false;
+        patch.excelEnabled = false;
+        patch.documentEnabled = false;
+        patch.pdfEnabled = false;
         pendingReferenceImage = null;
       }
       state.set(patch);
       syncComposerTools(modelId, patch);
       updateSendEnabled();
       ui.showToast(enabled ? t('toastTranslateOn') : t('toastTranslateOff'));
+    };
+
+    const setSlidesEnabled = (enabled) => {
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { slidesEnabled: enabled };
+      if (enabled) {
+        patch.imageGenEnabled = false;
+        patch.translateEnabled = false;
+        patch.excelEnabled = false;
+        patch.documentEnabled = false;
+        patch.pdfEnabled = false;
+        patch.compareEnabled = false;
+        pendingReferenceImage = null;
+        clearPendingAttachments();
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? t('toastSlidesOn') : t('toastSlidesOff'));
+    };
+
+    const setExcelEnabled = (enabled) => {
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { excelEnabled: enabled };
+      if (enabled) {
+        patch.imageGenEnabled = false;
+        patch.translateEnabled = false;
+        patch.slidesEnabled = false;
+        patch.documentEnabled = false;
+        patch.pdfEnabled = false;
+        patch.compareEnabled = false;
+        pendingReferenceImage = null;
+        clearPendingAttachments();
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? t('toastExcelOn') : t('toastExcelOff'));
+    };
+
+    const setDocumentEnabled = (enabled) => {
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { documentEnabled: enabled };
+      if (enabled) {
+        patch.imageGenEnabled = false;
+        patch.translateEnabled = false;
+        patch.slidesEnabled = false;
+        patch.excelEnabled = false;
+        patch.pdfEnabled = false;
+        patch.compareEnabled = false;
+        pendingReferenceImage = null;
+        clearPendingAttachments();
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? t('toastDocumentOn') : t('toastDocumentOff'));
+    };
+
+    const setPdfEnabled = (enabled) => {
+      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      const patch = { pdfEnabled: enabled };
+      if (enabled) {
+        patch.imageGenEnabled = false;
+        patch.translateEnabled = false;
+        patch.slidesEnabled = false;
+        patch.excelEnabled = false;
+        patch.documentEnabled = false;
+        patch.compareEnabled = false;
+        pendingReferenceImage = null;
+        clearPendingAttachments();
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(enabled ? t('toastPdfOn') : t('toastPdfOff'));
     };
 
     ui.els.translateBtn.addEventListener('click', () => {
@@ -1900,12 +2229,46 @@ window.Events = (() => {
       syncComposerTools(null, { translateTargetLang: langCode });
     });
 
+    ui.els.createFileBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleCreateFileMenu();
+    });
+
+    ui.els.createFileMenu?.addEventListener('click', (e) => {
+      const option = e.target.closest('[data-create-file]');
+      if (!option) return;
+      const mode = option.dataset.createFile;
+      ui.closeCreateFileMenu();
+      const s = state.get();
+      if (mode === 'slides') setSlidesEnabled(!s.slidesEnabled);
+      else if (mode === 'excel') setExcelEnabled(!s.excelEnabled);
+      else if (mode === 'document') setDocumentEnabled(!s.documentEnabled);
+      else if (mode === 'pdf') setPdfEnabled(!s.pdfEnabled);
+    });
+
+    ui.els.slidesChipClose?.addEventListener('click', () => {
+      setSlidesEnabled(false);
+    });
+
+    ui.els.excelChipClose?.addEventListener('click', () => {
+      setExcelEnabled(false);
+    });
+
+    ui.els.documentChipClose?.addEventListener('click', () => {
+      setDocumentEnabled(false);
+    });
+
+    ui.els.pdfChipClose?.addEventListener('click', () => {
+      setPdfEnabled(false);
+    });
+
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.translate-lang-wrap')) {
         ui.closeTranslateLangMenu();
       }
       if (!e.target.closest('.composer-dropdown-wrap')) {
         ui.closeImageGenMenus();
+        ui.closeCreateFileMenu();
       }
       if (!e.target.closest('.composer-snippets-wrap')) {
         ui.closeSnippetsMenu();
@@ -2290,6 +2653,16 @@ window.Events = (() => {
       e.stopPropagation();
       ui.closeMarkdownPreview();
     });
+    ui.els.artifactRefreshBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      ui.refreshArtifactPreview();
+    });
+    ui.els.artifactOpenTabBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!ui.openArtifactPreviewInNewTab()) ui.showToast(t('toastOpenTabBlocked'));
+    });
     ui.els.mdPreviewOverlay?.addEventListener('click', () => ui.closeMarkdownPreview());
     ui.bindPreviewResize();
 
@@ -2308,13 +2681,27 @@ window.Events = (() => {
         if (code.trim()) ui.openMarkdownPreview(code);
         return;
       }
+      const previewArtifactBtn = e.target.closest('[data-preview-artifact]');
+      if (previewArtifactBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const mermaidBlock = previewArtifactBtn.closest('.mermaid-block');
+        const block = mermaidBlock || previewArtifactBtn.closest('.code-block') || previewArtifactBtn.closest('pre');
+        const code = mermaidBlock
+          ? window.Markdown.getMermaidSource(mermaidBlock)
+          : window.Utils.getCodeBlockSource(block);
+        const type = previewArtifactBtn.getAttribute('data-preview-artifact') || 'html';
+        const lang = block?.querySelector('.lang')?.textContent?.trim() || '';
+        if (code.trim()) ui.openArtifactPreview(code, type, lang);
+        return;
+      }
       const previewHtmlBtn = e.target.closest('[data-preview-html]');
       if (previewHtmlBtn) {
         e.preventDefault();
         e.stopPropagation();
         const block = previewHtmlBtn.closest('.code-block') || previewHtmlBtn.closest('pre');
         const code = window.Utils.getCodeBlockSource(block);
-        if (code.trim()) ui.openHtmlPreview(code);
+        if (code.trim()) ui.openArtifactPreview(code, 'html');
         return;
       }
       const toggleMermaid = e.target.closest('[data-toggle-mermaid]');
@@ -2359,6 +2746,30 @@ window.Events = (() => {
         }
         return;
       }
+      const downloadSlidesBtn = e.target.closest('[data-download-slides]');
+      if (downloadSlidesBtn) {
+        const article = downloadSlidesBtn.closest('.message');
+        await downloadSlidesFromMessage(article);
+        return;
+      }
+      const downloadExcelBtn = e.target.closest('[data-download-excel]');
+      if (downloadExcelBtn) {
+        const article = downloadExcelBtn.closest('.message');
+        await downloadExcelFromMessage(article);
+        return;
+      }
+      const downloadDocumentBtn = e.target.closest('[data-download-document]');
+      if (downloadDocumentBtn) {
+        const article = downloadDocumentBtn.closest('.message');
+        await downloadDocumentFromMessage(article);
+        return;
+      }
+      const downloadPdfBtn = e.target.closest('[data-download-pdf]');
+      if (downloadPdfBtn) {
+        const article = downloadPdfBtn.closest('.message');
+        await downloadPdfFromMessage(article);
+        return;
+      }
       const copyBtn = e.target.closest('[data-copy-code]');
       if (copyBtn) {
         const mermaidBlock = copyBtn.closest('.mermaid-block');
@@ -2366,6 +2777,14 @@ window.Events = (() => {
           ? window.Markdown.getMermaidSource(mermaidBlock)
           : ((copyBtn.closest('.code-block') || copyBtn.closest('pre'))?.querySelector('code')?.innerText || '');
         if (await copyToClipboard(code)) ui.showToast(t('toastCopyCode'));
+        return;
+      }
+      const copyTablePlainBtn = e.target.closest('[data-copy-table-plain]');
+      if (copyTablePlainBtn) {
+        const table = copyTablePlainBtn.closest('.table-block')?.querySelector('table');
+        if (table && await copyToClipboard(window.Markdown.tableToPlainText(table))) {
+          ui.showToast(t('toastCopyCode'));
+        }
         return;
       }
       const copyTableBtn = e.target.closest('[data-copy-table]');
@@ -2490,6 +2909,15 @@ window.Events = (() => {
       if (cancelBtn) {
         const msg = cancelBtn.closest('.message');
         if (msg) ui.exitEditMode(msg);
+        return;
+      }
+      const branchBtn = e.target.closest('[data-action="branch"]');
+      if (branchBtn) {
+        if (ui.isShareViewMode?.()) return;
+        const msgEl = branchBtn.closest('.message');
+        if (!msgEl || window.API.isStreaming()) return;
+        const idx = parseInt(msgEl.dataset.idx, 10);
+        if (!isNaN(idx)) branchFromMessageAt(idx);
         return;
       }
       const delBtn = e.target.closest('[data-action="delete-msg"]');

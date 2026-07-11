@@ -211,11 +211,27 @@ window.Conversations = (() => {
     return message.content || '';
   };
 
+  const getResponseModel = (message) => {
+    if (!message || message.role !== 'assistant') return '';
+    if (message.variantModels?.length) {
+      const i = message.variantIndex ?? 0;
+      return message.variantModels[i] || message.variantModels[0] || message.responseModel || '';
+    }
+    return message.responseModel || '';
+  };
+
   const initAssistantVariants = (message) => {
     if (!message || message.role !== 'assistant') return;
     if (!message.variants) {
       message.variants = [message.content || ''];
       message.variantIndex = 0;
+    }
+    if (!message.variantModels) {
+      const fallback = message.responseModel || '';
+      message.variantModels = message.variants.map(() => fallback);
+    }
+    while (message.variantModels.length < message.variants.length) {
+      message.variantModels.push(message.responseModel || '');
     }
   };
 
@@ -232,6 +248,7 @@ window.Conversations = (() => {
     convo.messages = convo.messages.slice(0, messageIndex + 1);
     initAssistantVariants(msg);
     msg.variants.push('');
+    msg.variantModels.push('');
     msg.variantIndex = msg.variants.length - 1;
     msg.content = '';
     msg.generatedImages = [];
@@ -246,6 +263,9 @@ window.Conversations = (() => {
     const next = Math.max(0, Math.min(variantIndex, msg.variants.length - 1));
     msg.variantIndex = next;
     msg.content = msg.variants[next] || '';
+    if (msg.variantModels?.length) {
+      msg.responseModel = msg.variantModels[next] || msg.responseModel || '';
+    }
     saveConvo(convo);
   };
 
@@ -254,8 +274,12 @@ window.Conversations = (() => {
     if (!msg || !msg.variants || msg.variants.length <= 1) return;
     if (msg.variants[msg.variantIndex] === '') {
       msg.variants.pop();
+      if (msg.variantModels?.length) msg.variantModels.pop();
       msg.variantIndex = msg.variants.length - 1;
       msg.content = msg.variants[msg.variantIndex] || '';
+      if (msg.variantModels?.length) {
+        msg.responseModel = msg.variantModels[msg.variantIndex] || msg.responseModel || '';
+      }
       saveConvo(convo);
     }
   };
@@ -280,6 +304,11 @@ window.Conversations = (() => {
     } else {
       delete msg.groundingMetadata;
     }
+    if (extra.responseModel) {
+      initAssistantVariants(msg);
+      msg.variantModels[msg.variantIndex] = extra.responseModel;
+      msg.responseModel = extra.responseModel;
+    }
     saveConvo(convo);
   };
 
@@ -298,6 +327,68 @@ window.Conversations = (() => {
     const all = getAll().map(c => c.id === convo.id ? convo : c);
     set({ conversations: all });
   };
+
+  const cloneMessageForBranch = (message) => {
+    const clone = JSON.parse(JSON.stringify(message));
+    if (clone.role === 'assistant') {
+      const content = getAssistantContent(message);
+      clone.content = content;
+      if (clone.variants?.length) {
+        clone.variants = [content];
+        clone.variantIndex = 0;
+      }
+    }
+    return clone;
+  };
+
+  const deriveBranchTitle = (parent, messages, messageIndex) => {
+    const { truncate } = window.Utils;
+    const parentTitle = (parent.title || window.I18n.t('newConversation')).trim();
+    const msg = messages[messageIndex];
+    let hint = '';
+    if (msg?.role === 'user') {
+      hint = messagePreviewText(msg).trim();
+    } else {
+      for (let i = messageIndex; i >= 0; i--) {
+        if (messages[i].role === 'user') {
+          hint = messagePreviewText(messages[i]).trim();
+          break;
+        }
+      }
+    }
+    const base = hint || parentTitle;
+    return window.I18n.t('branchTitle', { title: truncate(base, 42) });
+  };
+
+  const branchFromMessage = (convo, messageIndex) => {
+    if (!convo || !isPersisted(convo.id)) return null;
+    if (messageIndex < 0 || messageIndex >= convo.messages.length) return null;
+
+    const msg = convo.messages[messageIndex];
+    if (msg.role === 'assistant' && !getAssistantContent(msg)) return null;
+
+    const messages = convo.messages
+      .slice(0, messageIndex + 1)
+      .map(cloneMessageForBranch);
+
+    const branched = {
+      id: uuid(),
+      title: deriveBranchTitle(convo, convo.messages, messageIndex),
+      model: getModel(convo),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      messages,
+      parentId: convo.id,
+      branchFromMessageIndex: messageIndex,
+      branchedAt: Date.now(),
+    };
+
+    const all = [branched, ...getAll()];
+    set({ conversations: all, currentConversationId: branched.id });
+    return branched;
+  };
+
+  const isBranch = (convo) => !!(convo && convo.parentId);
 
   const compressWithSummary = (convo, summary, keepRecent = window.APP_CONFIG.COMPRESS_KEEP_RECENT_MESSAGES) => {
     if (!convo || !summary?.trim()) return false;
@@ -364,7 +455,7 @@ window.Conversations = (() => {
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
     getModel, setModel, getTokenUsage, addTokenUsage, isCostWarningShown, markCostWarningShown, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
-    addMessage, updateMessage, editMessage, deleteMessageFrom, compressWithSummary, clearAll,
-    getAssistantContent, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
+    addMessage, updateMessage, editMessage, deleteMessageFrom, branchFromMessage, isBranch, compressWithSummary, clearAll,
+    getAssistantContent, getResponseModel, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };
 })();

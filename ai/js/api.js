@@ -17,6 +17,35 @@ window.API = (() => {
     return userText ? instruction + '\n\n' + userText : instruction;
   };
 
+  const appendSlidesInstruction = (text, m) => {
+    if (!m.slides || !window.PptxExport) return text || '';
+    return window.PptxExport.appendSlidesInstruction(text, m);
+  };
+
+  const appendExcelInstruction = (text, m) => {
+    if (!m.excel || !window.XlsxExport) return text || '';
+    return window.XlsxExport.appendExcelInstruction(text, m);
+  };
+
+  const appendDocumentInstruction = (text, m) => {
+    if (!m.document || !window.DocxCreate) return text || '';
+    return window.DocxCreate.appendDocumentInstruction(text, m);
+  };
+
+  const appendPdfInstruction = (text, m) => {
+    if (!m.pdf || !window.PdfCreate) return text || '';
+    return window.PdfCreate.appendPdfInstruction(text, m);
+  };
+
+  const appendUserInstructions = (text, m) => {
+    let result = appendTranslateInstruction(text, m);
+    result = appendSlidesInstruction(result, m);
+    result = appendExcelInstruction(result, m);
+    result = appendDocumentInstruction(result, m);
+    result = appendPdfInstruction(result, m);
+    return result;
+  };
+
   const parseDataUrl = (dataUrl) => {
     if (!dataUrl) return null;
     const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
@@ -28,7 +57,7 @@ window.API = (() => {
     const images = m.images || [];
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
-      text = appendTranslateInstruction(text, m);
+      text = appendUserInstructions(text, m);
     }
 
     if (m.role === 'user' && images.length > 0) {
@@ -64,7 +93,7 @@ window.API = (() => {
     const images = m.images || [];
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
-      text = appendTranslateInstruction(text, m);
+      text = appendUserInstructions(text, m);
       if (m.imageGen) {
         text = window.APP_CONFIG.buildImageGenPrompt(text, {
           ratioId: m.imageGen.ratio,
@@ -109,7 +138,7 @@ window.API = (() => {
     const images = m.images || [];
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
-      text = appendTranslateInstruction(text, m);
+      text = appendUserInstructions(text, m);
       if (m.imageGen) {
         text = window.APP_CONFIG.buildImageGenPrompt(text, {
           ratioId: m.imageGen.ratio,
@@ -511,7 +540,7 @@ window.API = (() => {
   const buildDeepseekMessageContent = (m) => {
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
-      text = appendTranslateInstruction(text, m);
+      text = appendUserInstructions(text, m);
     }
     return appendImagesAsTextNote(text, m.images);
   };
