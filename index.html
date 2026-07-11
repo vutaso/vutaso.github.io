@@ -16,7 +16,7 @@
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/vutaso-home.css">
 
   <!-- Alternate domains (giúp Google liên kết tất cả domain về cùng 1 site) -->
@@ -204,9 +204,9 @@
        ============================================================ -->
   <section id="hero">
     <div class="hero-bg" aria-hidden="true">
-      <div class="dot-grid"></div>
-      <div class="glow-orb a"></div>
-      <div class="glow-orb b"></div>
+      <video class="hero-video" autoplay muted loop playsinline preload="auto">
+        <source src="assets/background_video.mp4" type="video/mp4">
+      </video>
     </div>
 
     <div class="hero-content">
@@ -653,15 +653,8 @@
       </div>
     </div>
     <div class="ft-divider" aria-hidden="true"></div>
-    <div class="ft-giant">
-      <div class="ft-giant-text" aria-hidden="true">
-        <span class="ft-char"><span class="ft-char-inner">V</span></span>
-        <span class="ft-char"><span class="ft-char-inner">U</span></span>
-        <span class="ft-char"><span class="ft-char-inner">T</span></span>
-        <span class="ft-char"><span class="ft-char-inner">A</span></span>
-        <span class="ft-char"><span class="ft-char-inner">S</span></span>
-        <span class="ft-char"><span class="ft-char-inner">O</span></span>
-      </div>
+    <div class="ft-giant ft-giant-pixel">
+      <p class="ft-pixel-logo" aria-hidden="true">VUTASO<span class="ft-pixel-tld">.com</span></p>
     </div>
     <div class="ft-bottom" data-i18n="ft_bottom">&copy; 2025 VUTASO. Make in Vietnam</div>
   </footer>
