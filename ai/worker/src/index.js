@@ -2,6 +2,8 @@ const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions';
 const NVIDIA_API = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const BYTEPLUS_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/completions';
 const BYTEPLUS_RESPONSES_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/responses';
+const OPENCODE_GO_CHAT_API = 'https://opencode.ai/zen/go/v1/chat/completions';
+const OPENCODE_GO_MESSAGES_API = 'https://opencode.ai/zen/go/v1/messages';
 const ALLOWED_DEEPSEEK_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
 const ALLOWED_NVIDIA_MODELS = new Set([
   'nvidia/nemotron-3-ultra-550b-a55b',
@@ -21,6 +23,30 @@ const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
   'seed-2-0-mini-260428',
   'seed-2-0-pro-260328',
   'seed-2-0-code-preview-260328'
+]);
+const ALLOWED_OPENCODE_GO_CHAT_MODELS = new Set([
+  'glm-5.2',
+  'glm-5.1',
+  'kimi-k2.7-code',
+  'kimi-k2.6',
+  'deepseek-v4-pro',
+  'deepseek-v4-flash',
+  'mimo-v2.5',
+  'mimo-v2.5-pro',
+  'minimax-m3',
+  'minimax-m2.7',
+  'minimax-m2.5',
+  'qwen3.7-max',
+  'qwen3.7-plus',
+  'qwen3.6-plus'
+]);
+const ALLOWED_OPENCODE_GO_MESSAGES_MODELS = new Set([
+  'minimax-m3',
+  'minimax-m2.7',
+  'minimax-m2.5',
+  'qwen3.7-max',
+  'qwen3.7-plus',
+  'qwen3.6-plus'
 ]);
 
 const DEFAULT_ORIGINS = [
@@ -121,6 +147,33 @@ const validateByteplusResponsesBody = (body) => {
   if (!Array.isArray(body.input) || !body.input.length) return 'input is required';
   if (body.stream !== true) return 'stream must be true';
   return null;
+};
+
+const validateOpencodeGoChatBody = (body) => {
+  if (!body || typeof body !== 'object') return 'Invalid request body';
+  if (!ALLOWED_OPENCODE_GO_CHAT_MODELS.has(body.model)) return 'Model not allowed';
+  if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
+  if (body.stream !== true) return 'stream must be true';
+  return null;
+};
+
+const validateOpencodeGoMessagesBody = (body) => {
+  if (!body || typeof body !== 'object') return 'Invalid request body';
+  if (!ALLOWED_OPENCODE_GO_MESSAGES_MODELS.has(body.model)) return 'Model not allowed';
+  if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
+  if (body.stream !== true) return 'stream must be true';
+  return null;
+};
+
+// OpenCode Go /v1/messages validates x-api-key (not Bearer). Browser sends Bearer to proxy for CORS.
+const extractOpencodeGoApiKey = (request) => {
+  const auth = request.headers.get('Authorization');
+  if (auth?.startsWith('Bearer ')) {
+    const key = auth.slice(7).trim();
+    if (key) return key;
+  }
+  const headerKey = request.headers.get('x-api-key') || request.headers.get('X-Api-Key');
+  return headerKey?.trim() || null;
 };
 
 const proxyStreamResponse = (upstream, requestOrigin, env) => new Response(upstream.body, {
@@ -447,6 +500,67 @@ const handleByteplusResponses = async (request, env, origin) => {
   return nvidiaStreamResponse(upstream, origin);
 };
 
+const handleOpencodeGoChat = async (request, env, origin) => {
+  const auth = request.headers.get('Authorization');
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return nvidiaJsonError('Missing Authorization header', 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return nvidiaJsonError('Invalid JSON', 400, origin);
+  }
+
+  const validationError = validateOpencodeGoChatBody(body);
+  if (validationError) {
+    return nvidiaJsonError(validationError, 400, origin);
+  }
+
+  const upstream = await fetch(OPENCODE_GO_CHAT_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: auth
+    },
+    body: JSON.stringify(body)
+  });
+
+  return nvidiaStreamResponse(upstream, origin);
+};
+
+const handleOpencodeGoMessages = async (request, env, origin) => {
+  const apiKey = extractOpencodeGoApiKey(request);
+  if (!apiKey) {
+    return nvidiaJsonError('Missing Authorization header', 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return nvidiaJsonError('Invalid JSON', 400, origin);
+  }
+
+  const validationError = validateOpencodeGoMessagesBody(body);
+  if (validationError) {
+    return nvidiaJsonError(validationError, 400, origin);
+  }
+
+  const upstream = await fetch(OPENCODE_GO_MESSAGES_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify(body)
+  });
+
+  return nvidiaStreamResponse(upstream, origin);
+};
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -501,6 +615,26 @@ export default {
       return handleByteplusResponses(request, env, origin);
     }
 
+    if (pathname.endsWith('/opencode-go-chat')) {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
+      }
+      if (request.method !== 'POST') {
+        return nvidiaJsonError('Method not allowed', 405, origin);
+      }
+      return handleOpencodeGoChat(request, env, origin);
+    }
+
+    if (pathname.endsWith('/opencode-go-messages')) {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
+      }
+      if (request.method !== 'POST') {
+        return nvidiaJsonError('Method not allowed', 405, origin);
+      }
+      return handleOpencodeGoMessages(request, env, origin);
+    }
+
     if (request.method === 'OPTIONS') {
       if (!resolveOrigin(origin, env)) {
         return new Response(null, { status: 403 });
@@ -522,6 +656,14 @@ export default {
 
     if (pathname.endsWith('/byteplus-responses')) {
       return handleByteplusResponses(request, env, origin);
+    }
+
+    if (pathname.endsWith('/opencode-go-chat')) {
+      return handleOpencodeGoChat(request, env, origin);
+    }
+
+    if (pathname.endsWith('/opencode-go-messages')) {
+      return handleOpencodeGoMessages(request, env, origin);
     }
 
     return handleDeepseek(request, env, origin);

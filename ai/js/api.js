@@ -285,6 +285,8 @@ window.API = (() => {
       } else if (provider === 'openrouter') {
         const meta = errJson.error?.metadata;
         errMsg = meta?.raw || meta?.message || errJson.error?.message || errMsg;
+      } else if (provider === 'opencode-go') {
+        errMsg = errJson.error?.message || errJson.error?.type || errMsg;
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -750,6 +752,23 @@ window.API = (() => {
     return body;
   };
 
+  const buildOpencodeGoBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      messages: buildMessages(convo, systemPrompt),
+      stream: true
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    const reasoning = window.APP_CONFIG.getOpencodeGoThinkingConfig(model, thinking, reasoningEffort);
+    if (reasoning) {
+      body.reasoning = reasoning;
+    }
+    return body;
+  };
+
   const sendOpenRouterImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
     const { prompt, images } = getOpenRouterImagePromptFromConvo(convo);
     if (!prompt) {
@@ -810,6 +829,8 @@ window.API = (() => {
           ? buildNvidiaBody(model, systemPrompt, convo, thinking, reasoningEffort)
           : provider === 'openrouter'
             ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
+          : provider === 'opencode-go'
+            ? buildOpencodeGoBody(model, systemPrompt, convo, thinking, reasoningEffort)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
             : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
@@ -836,7 +857,8 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendAnthropic = async ({ apiKey, model, systemPrompt, convo, webSearch, thinking, reasoningEffort, controller, handlers }) => {
+  const sendAnthropic = async ({ apiKey, model, appModelId, systemPrompt, convo, webSearch, thinking, reasoningEffort, controller, handlers, endpoint }) => {
+    const configModelId = appModelId || model;
     const messages = buildAnthropicMessages(convo);
     if (!messages.length) {
       throw new Error('Không có tin nhắn để gửi');
@@ -847,7 +869,7 @@ window.API = (() => {
       messages,
       stream: true
     };
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(configModelId);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
     }
@@ -857,26 +879,29 @@ window.API = (() => {
       body.system = systemPrompt.trim();
     }
     if (thinking) {
-      if (window.APP_CONFIG.modelUsesAnthropicAdaptiveThinking(model)) {
-        const effort = window.APP_CONFIG.normalizeAnthropicApiEffort(model, reasoningEffort);
+      if (window.APP_CONFIG.modelUsesAnthropicAdaptiveThinking(configModelId)) {
+        const effort = window.APP_CONFIG.normalizeAnthropicApiEffort(configModelId, reasoningEffort);
         body.thinking = { type: 'adaptive' };
         body.output_config = { effort };
-      } else if (window.APP_CONFIG.modelUsesAnthropicManualThinking(model)) {
+      } else if (window.APP_CONFIG.modelUsesAnthropicManualThinking(configModelId)) {
         body.thinking = {
           type: 'enabled',
-          budget_tokens: window.APP_CONFIG.getAnthropicHaikuThinkingBudget(model)
+          budget_tokens: window.APP_CONFIG.getAnthropicHaikuThinkingBudget(configModelId)
         };
       }
     }
 
-    const res = await fetch(ANTHROPIC_ENDPOINT, {
+    const apiEndpoint = endpoint || ANTHROPIC_ENDPOINT;
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': ANTHROPIC_VERSION,
+      'anthropic-dangerous-direct-browser-access': 'true'
+    };
+
+    const res = await fetch(apiEndpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': ANTHROPIC_VERSION,
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal
     });
@@ -1145,6 +1170,14 @@ window.API = (() => {
             endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
           });
         }
+      } else if (provider === 'opencode-go') {
+        if (window.APP_CONFIG.opencodeGoRequiresProxy() && !window.APP_CONFIG.getOpencodeGoProxyEndpoint()) {
+          throw new Error(window.APP_CONFIG.getOpencodeGoProxyRequiredError());
+        }
+        await sendChatCompletions({
+          apiKey, model, systemPrompt, convo, controller, handlers,
+          endpoint: window.APP_CONFIG.getOpencodeGoEndpoint(), provider: 'opencode-go', thinking, reasoningEffort: effort
+        });
       } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });
       } else {

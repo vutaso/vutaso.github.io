@@ -38,6 +38,8 @@ window.UI = (() => {
     els.kimiApiKeyIcon = $('#kimiApiKeyIcon');
     els.openrouterApiKeyInput = $('#openrouterApiKeyInput');
     els.openrouterApiKeyIcon = $('#openrouterApiKeyIcon');
+    els.opencodeGoApiKeyInput = $('#opencodeGoApiKeyInput');
+    els.opencodeGoApiKeyIcon = $('#opencodeGoApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsLocaleSelect = $('#settingsLocaleSelect');
     els.settingsThemeSelect = $('#settingsThemeSelect');
@@ -102,6 +104,7 @@ window.UI = (() => {
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
     els.toggleOpenrouterApiKeyBtn = $('#toggleOpenrouterApiKeyBtn');
+    els.toggleOpencodeGoApiKeyBtn = $('#toggleOpencodeGoApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
@@ -2549,6 +2552,7 @@ window.UI = (() => {
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.openrouterApiKeyInput.value = state.openrouterApiKey || '';
+    els.opencodeGoApiKeyInput.value = state.opencodeGoApiKey || '';
     const promptForInput = state.systemPromptMode === 'custom'
       ? (state.customSystemPrompt || state.systemPrompt || '')
       : (state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale));
@@ -2572,6 +2576,8 @@ window.UI = (() => {
     els.kimiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.openrouterApiKeyInput.type = 'password';
     els.openrouterApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.opencodeGoApiKeyInput.type = 'password';
+    els.opencodeGoApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     updateSettingsTokenUsage(state);
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);
