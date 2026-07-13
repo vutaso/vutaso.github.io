@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Translate</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
+              <stop offset="0%" stop-color="#007AFF"/>
+              <stop offset="100%" stop-color="#5856D6"/>
+            </linearGradient>
+          </defs>
+          <rect width="32" height="32" rx="8.5" fill="url(#logoGrad)"/>
+          <ellipse cx="16" cy="16" rx="8" ry="11" fill="none" stroke="white" stroke-width="1.6" opacity="0.7"/>
+          <path d="M8 16H24" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+          <path d="M16 5C12 10 12 22 16 27" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+          <path d="M16 5C20 10 20 22 16 27" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+        <h1>AI Translate</h1>
+      </div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle theme">
+        <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="api-key-section">
+        <input type="password" id="apiKey" class="api-key-input" placeholder="DeepSeek API Key" autocomplete="off">
+        <button id="saveApiKey" class="btn btn-sm btn-primary">Save</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="text">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+        Text
+      </button>
+      <button class="tab" data-tab="file">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        File
+      </button>
+      <button class="tab" data-tab="batch">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Batch
+      </button>
+      <button class="tab" data-tab="history">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+      </button>
+    </nav>
+
+    <main class="main-content">
+      <!-- Text Translation Tab -->
+      <section id="tab-text" class="tab-panel active">
+        <div class="translation-panel">
+          <div class="lang-selectors">
+            <div class="lang-group">
+              <label>From</label>
+              <select id="textSourceLang" class="lang-select">
+                <option value="auto">Auto Detect</option>
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Russian">Russian</option>
+                <option value="Thai">Thai</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Italian">Italian</option>
+              </select>
+            </div>
+            <button id="swapLangText" class="btn btn-icon" title="Swap languages">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+            <div class="lang-group">
+              <label>To</label>
+              <select id="textTargetLang" class="lang-select">
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English" selected>English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Russian">Russian</option>
+                <option value="Thai">Thai</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Italian">Italian</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-group">
+              <label>Domain</label>
+              <select id="textDomain" class="lang-select">
+                <option value="general">General</option>
+                <option value="medical">Medical</option>
+                <option value="legal">Legal</option>
+                <option value="technology">Technology</option>
+                <option value="finance">Finance</option>
+                <option value="academic">Academic</option>
+              </select>
+            </div>
+            <div class="settings-group">
+              <label>Tone</label>
+              <select id="textTone" class="lang-select">
+                <option value="professional">Professional</option>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="technical">Technical</option>
+              </select>
+            </div>
+            <button id="toggleTextAdvanced" class="btn btn-text" title="Show advanced options">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span class="advanced-toggle-label">Advanced</span>
+            </button>
+          </div>
+
+          <div id="textAdvancedOptions" class="advanced-options hidden">
+            <div class="advanced-section">
+              <label>Custom Glossary (one per line: English = Tiếng Việt)</label>
+              <textarea id="textGlossary" class="glossary-input" placeholder="Example:&#10;COVID-19 = Bệnh dịch COVID-19&#10;blockchain = chuỗi khối"></textarea>
+            </div>
+            <div class="advanced-section">
+              <label>Context/Notes (help AI understand the content)</label>
+              <textarea id="textContext" class="context-input" placeholder="Example: This is a medical report about heart disease for a patient in Vietnam. Use medical terminology."></textarea>
+            </div>
+          </div>
+
+          <div class="io-area">
+            <div class="io-box">
+              <textarea id="textInput" class="translate-input" placeholder="Enter text to translate..." rows="8"></textarea>
+              <div class="io-footer">
+                <span id="textCharCount" class="char-count">0 characters</span>
+                <button id="clearTextInput" class="btn btn-text">Clear</button>
+              </div>
+            </div>
+
+            <button id="translateText" class="btn btn-primary btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              Translate
+            </button>
+
+            <div class="io-box">
+              <div id="textResult" class="translate-result" placeholder="Translation will appear here..."></div>
+              <div class="io-footer io-footer-end">
+                <button id="copyTextResult" class="btn btn-text">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- File Translation Tab -->
+      <section id="tab-file" class="tab-panel">
+        <div class="translation-panel">
+          <div class="lang-selectors">
+            <div class="lang-group">
+              <label>From</label>
+              <select id="fileSourceLang" class="lang-select">
+                <option value="auto">Auto Detect</option>
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Russian">Russian</option>
+                <option value="Thai">Thai</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Italian">Italian</option>
+              </select>
+            </div>
+            <button id="swapLangFile" class="btn btn-icon" title="Swap languages">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+            <div class="lang-group">
+              <label>To</label>
+              <select id="fileTargetLang" class="lang-select">
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English" selected>English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Russian">Russian</option>
+                <option value="Thai">Thai</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Italian">Italian</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-group">
+              <label>Domain</label>
+              <select id="fileDomain" class="lang-select">
+                <option value="general">General</option>
+                <option value="medical">Medical</option>
+                <option value="legal">Legal</option>
+                <option value="technology">Technology</option>
+                <option value="finance">Finance</option>
+                <option value="academic">Academic</option>
+              </select>
+            </div>
+            <div class="settings-group">
+              <label>Tone</label>
+              <select id="fileTone" class="lang-select">
+                <option value="professional">Professional</option>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="technical">Technical</option>
+              </select>
+            </div>
+            <button id="toggleFileAdvanced" class="btn btn-text" title="Show advanced options">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span class="advanced-toggle-label">Advanced</span>
+            </button>
+          </div>
+
+          <div id="fileAdvancedOptions" class="advanced-options hidden">
+            <div class="advanced-section">
+              <label>Custom Glossary (one per line: English = Tiếng Việt)</label>
+              <textarea id="fileGlossary" class="glossary-input" placeholder="Example:&#10;COVID-19 = Bệnh dịch COVID-19&#10;blockchain = chuỗi khối"></textarea>
+            </div>
+            <div class="advanced-section">
+              <label>Context/Notes (help AI understand the content)</label>
+              <textarea id="fileContext" class="context-input" placeholder="Example: This is a medical report about heart disease for a patient in Vietnam. Use medical terminology."></textarea>
+            </div>
+          </div>
+
+          <div class="io-area">
+            <div class="io-box">
+              <div id="fileDropZone" class="drop-zone">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+                <p>Drop file here or click to upload</p>
+                <span class="file-types">PDF, DOCX, TXT (max 10MB)</span>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+              </div>
+              <div id="filePreview" class="file-preview hidden">
+                <div class="file-info">
+                  <span id="fileName"></span>
+                  <div class="file-info-actions">
+                    <button id="replaceFile" class="btn btn-text">Replace</button>
+                    <button id="removeFile" class="btn btn-text">Remove</button>
+                  </div>
+                </div>
+                <pre id="extractedText" class="extracted-text"></pre>
+                <div class="io-footer">
+                  <span id="fileCharCount" class="char-count">0 characters</span>
+                </div>
+              </div>
+            </div>
+
+            <button id="translateFile" class="btn btn-primary btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              Translate
+            </button>
+
+            <div class="io-box">
+              <div id="fileResult" class="translate-result" placeholder="Translation will appear here..."></div>
+              <div class="io-footer io-footer-end">
+                <button id="copyFileResult" class="btn btn-text">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Batch Translation Tab -->
+      <section id="tab-batch" class="tab-panel">
+        <div class="batch-panel">
+          <div class="batch-actions">
+            <select id="batchTargetLang" class="lang-select">
+              <option value="Vietnamese">Vietnamese</option>
+              <option value="English" selected>English</option>
+              <option value="Japanese">Japanese</option>
+              <option value="Korean">Korean</option>
+              <option value="Chinese">Chinese</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Russian">Russian</option>
+              <option value="Thai">Thai</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Italian">Italian</option>
+            </select>
+            <select id="batchDomain" class="lang-select">
+              <option value="general">General</option>
+              <option value="medical">Medical</option>
+              <option value="legal">Legal</option>
+              <option value="technology">Technology</option>
+              <option value="finance">Finance</option>
+              <option value="academic">Academic</option>
+            </select>
+            <button id="addBatchRow" class="btn btn-outline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Row
+            </button>
+            <button id="translateBatch" class="btn btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              Translate All
+            </button>
+          </div>
+          <div id="batchRows" class="batch-rows">
+            <!-- Dynamic batch rows added here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- History Tab -->
+      <section id="tab-history" class="tab-panel">
+        <div class="history-panel">
+          <div class="history-header">
+            <h3>Translation History</h3>
+            <button id="clearHistory" class="btn btn-text btn-danger">Clear All</button>
+          </div>
+          <div id="historyList" class="history-list">
+            <p class="empty-state">No translation history yet.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="spinner"></div>
+      <p id="loadingText">Translating...</p>
+    </div>
+  </div>
+
+  <script src="js/translator.js"></script>
+  <script src="js/fileParser.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
