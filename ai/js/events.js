@@ -67,7 +67,11 @@ window.Events = (() => {
     if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
     if (window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) imageGenEnabled = true;
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
-    if (window.APP_CONFIG.modelThinkingRequired(modelId)) thinkingEnabled = true;
+    if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
+      thinkingEnabled = true;
+    } else if (window.APP_CONFIG.modelUsesOpencodeGoReasoning(modelId)) {
+      thinkingEnabled = false;
+    }
     if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
       thinkingEnabled = reasoningEffort !== 'default';
     }

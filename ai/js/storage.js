@@ -222,6 +222,8 @@ window.Storage = (() => {
     }
     if (window.APP_CONFIG.modelThinkingRequired(state.currentModel)) {
       state.thinkingEnabled = true;
+    } else if (window.APP_CONFIG.modelUsesOpencodeGoReasoning(state.currentModel)) {
+      state.thinkingEnabled = false;
     }
     if (!window.APP_CONFIG.LOCALES.includes(state.locale)) {
       state.locale = window.APP_CONFIG.DEFAULT_LOCALE;

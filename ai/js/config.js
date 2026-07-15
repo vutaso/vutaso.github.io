@@ -62,18 +62,18 @@ window.APP_CONFIG = {
     { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'opencode-go-glm-5-2', apiModel: 'glm-5.2', label: 'GLM-5.2 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-glm-5-1', apiModel: 'glm-5.1', label: 'GLM-5.1 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-kimi-k2.7-code', apiModel: 'kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: false },
-    { id: 'opencode-go-kimi-k2.6', apiModel: 'kimi-k2.6', label: 'Kimi K2.6 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'opencode-go-kimi-k2.7-code', apiModel: 'kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'opencode-go-kimi-k2.6', apiModel: 'kimi-k2.6', label: 'Kimi K2.6 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'opencode-go-deepseek-v4-pro', apiModel: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-deepseek-v4-flash', apiModel: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-mimo-v2-5', apiModel: 'mimo-v2.5', label: 'MiMo-V2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-mimo-v2.5-pro', apiModel: 'mimo-v2.5-pro', label: 'MiMo-V2.5-Pro (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-minimax-m3', apiModel: 'minimax-m3', label: 'MiniMax M3 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'opencode-go-mimo-v2-5', apiModel: 'mimo-v2.5', label: 'MiMo-V2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'opencode-go-mimo-v2.5-pro', apiModel: 'mimo-v2.5-pro', label: 'MiMo-V2.5-Pro (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'opencode-go-minimax-m3', apiModel: 'minimax-m3', label: 'MiniMax M3 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'opencode-go-minimax-m2.7', apiModel: 'minimax-m2.7', label: 'MiniMax M2.7 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-minimax-m2.5', apiModel: 'minimax-m2.5', label: 'MiniMax M2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-qwen3.7-max', apiModel: 'qwen3.7-max', label: 'Qwen3.7 Max (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-qwen3.7-plus', apiModel: 'qwen3.7-plus', label: 'Qwen3.7 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-qwen3.6-plus', apiModel: 'qwen3.6-plus', label: 'Qwen3.6 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false }
+    { id: 'opencode-go-qwen3.7-plus', apiModel: 'qwen3.7-plus', label: 'Qwen3.7 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'opencode-go-qwen3.6-plus', apiModel: 'qwen3.6-plus', label: 'Qwen3.6 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true }
   ],
 
   // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-06-29
@@ -640,7 +640,7 @@ window.APP_CONFIG = {
       return 'Could not reach Byte Plus proxy. Check API key, use a local server (not file://), and redeploy worker/.';
     }
     if (isNetwork && provider === 'opencode-go') {
-      if (!this.getOpencodeGoProxyEndpoint()) {
+      if (!this.getOpencodeGoProxyEndpoint(modelId)) {
         return this.getOpencodeGoProxyRequiredError();
       }
       if (window.I18n) return window.I18n.t('opencodeGoProxyNetworkError');
@@ -839,6 +839,15 @@ window.APP_CONFIG = {
   // Deploy: cd worker && npx wrangler deploy → dán URL + '/opencode-go-chat' hoặc '/opencode-go-messages'.
   OPENCODE_GO_CHAT_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/opencode-go-chat',
   OPENCODE_GO_MESSAGES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/opencode-go-messages',
+  // OpenCode Go: MiniMax + Qwen dùng /v1/messages (Anthropic); còn lại dùng /v1/chat/completions.
+  OPENCODE_GO_MESSAGES_MODELS: new Set([
+    'opencode-go-minimax-m3',
+    'opencode-go-minimax-m2.7',
+    'opencode-go-minimax-m2.5',
+    'opencode-go-qwen3.7-max',
+    'opencode-go-qwen3.7-plus',
+    'opencode-go-qwen3.6-plus'
+  ]),
   // Để null: không gửi max_tokens (OpenRouter tự giới hạn theo credit). Đặt số (vd. 8192) nếu tài khoản có đủ credit.
   OPENROUTER_MAX_OUTPUT_TOKENS: 32768,
   NVIDIA_MAX_OUTPUT_TOKENS: 65536,
@@ -901,11 +910,21 @@ window.APP_CONFIG = {
     return { enabled: true, effort };
   },
 
-  getOpencodeGoEndpoint() {
+  modelUsesOpencodeGoMessages(modelId) {
+    return this.OPENCODE_GO_MESSAGES_MODELS.has(modelId);
+  },
+
+  getOpencodeGoEndpoint(modelId) {
+    if (this.modelUsesOpencodeGoMessages(modelId)) {
+      return this.OPENCODE_GO_MESSAGES_PROXY_ENDPOINT || this.OPENCODE_GO_MESSAGES_ENDPOINT;
+    }
     return this.OPENCODE_GO_CHAT_PROXY_ENDPOINT || this.OPENCODE_GO_CHAT_ENDPOINT;
   },
 
-  getOpencodeGoProxyEndpoint() {
+  getOpencodeGoProxyEndpoint(modelId) {
+    if (this.modelUsesOpencodeGoMessages(modelId)) {
+      return this.OPENCODE_GO_MESSAGES_PROXY_ENDPOINT;
+    }
     return this.OPENCODE_GO_CHAT_PROXY_ENDPOINT;
   },
 

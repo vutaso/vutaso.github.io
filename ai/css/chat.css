@@ -1222,8 +1222,26 @@
 
 .message.editing .toolbar { opacity: 1; }
 
-.message.editing .content .edit-textarea {
+.message.user.editing .body {
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-width: 0;
+  padding-right: 16px;
+}
+
+.message.user.editing .toolbar {
+  padding-right: 0;
+}
+
+.message.editing .content {
   width: 100%;
+}
+
+.message.editing .content .edit-textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 4.5em;
   background: var(--bg-elev);
   border: 1px solid var(--accent);
   border-radius: var(--radius-md);

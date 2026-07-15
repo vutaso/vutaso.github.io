@@ -857,6 +857,47 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
+  const sendOpencodeGoMessages = async ({ apiKey, model, systemPrompt, convo, thinking, reasoningEffort, controller, handlers, endpoint }) => {
+    const messages = buildAnthropicMessages(convo);
+    if (!messages.length) {
+      throw new Error('Không có tin nhắn để gửi');
+    }
+
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      messages,
+      stream: true
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    if (systemPrompt && systemPrompt.trim()) {
+      body.system = systemPrompt.trim();
+    }
+    const reasoning = window.APP_CONFIG.getOpencodeGoThinkingConfig(model, thinking, reasoningEffort);
+    if (reasoning) {
+      body.reasoning = reasoning;
+    }
+
+    const res = await fetch(endpoint || window.APP_CONFIG.OPENCODE_GO_MESSAGES_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'opencode-go');
+    if (!res.body || !res.body.getReader) {
+      throw new Error('Trình duyệt không hỗ trợ streaming response');
+    }
+
+    await readSseStream(res.body.getReader(), handlers);
+  };
+
   const sendAnthropic = async ({ apiKey, model, appModelId, systemPrompt, convo, webSearch, thinking, reasoningEffort, controller, handlers, endpoint }) => {
     const configModelId = appModelId || model;
     const messages = buildAnthropicMessages(convo);
@@ -1171,13 +1212,21 @@ window.API = (() => {
           });
         }
       } else if (provider === 'opencode-go') {
-        if (window.APP_CONFIG.opencodeGoRequiresProxy() && !window.APP_CONFIG.getOpencodeGoProxyEndpoint()) {
+        if (window.APP_CONFIG.opencodeGoRequiresProxy() && !window.APP_CONFIG.getOpencodeGoProxyEndpoint(model)) {
           throw new Error(window.APP_CONFIG.getOpencodeGoProxyRequiredError());
         }
-        await sendChatCompletions({
-          apiKey, model, systemPrompt, convo, controller, handlers,
-          endpoint: window.APP_CONFIG.getOpencodeGoEndpoint(), provider: 'opencode-go', thinking, reasoningEffort: effort
-        });
+        const opencodeEndpoint = window.APP_CONFIG.getOpencodeGoEndpoint(model);
+        if (window.APP_CONFIG.modelUsesOpencodeGoMessages(model)) {
+          await sendOpencodeGoMessages({
+            apiKey, model, systemPrompt, convo, controller, handlers,
+            endpoint: opencodeEndpoint, thinking, reasoningEffort: effort
+          });
+        } else {
+          await sendChatCompletions({
+            apiKey, model, systemPrompt, convo, controller, handlers,
+            endpoint: opencodeEndpoint, provider: 'opencode-go', thinking, reasoningEffort: effort
+          });
+        }
       } else if (tools.length || (thinking && provider === 'openai')) {
         await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });
       } else {

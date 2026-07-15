@@ -39,8 +39,8 @@
   .app:not([data-sidebar-init]) .sidebar-overlay { display: none !important; }
 
   .main-header {
-    gap: 8px;
-    padding: 0 12px;
+    gap: 6px;
+    padding: 0 10px;
   }
 
   .header-actions {
@@ -58,7 +58,7 @@
   }
 
   .header-selects {
-    gap: 6px;
+    gap: 4px;
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
@@ -90,9 +90,9 @@
 
   .header-title .model-select,
   .header-title .header-prompt-mode-select {
-    max-width: min(150px, 44vw);
-    font-size: 12px;
-    padding: 5px 24px 5px 10px;
+    max-width: min(130px, 40vw);
+    font-size: 11px;
+    padding: 3px 22px 3px 8px;
     flex-shrink: 0;
   }
 

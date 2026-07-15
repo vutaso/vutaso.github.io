@@ -677,8 +677,8 @@ body.md-preview-resizing * {
 .main-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 0 14px;
   height: var(--header-height);
   border-bottom: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg) 85%, transparent);
@@ -686,6 +686,13 @@ body.md-preview-resizing * {
   flex-shrink: 0;
   z-index: 10;
   position: relative;
+}
+
+.main-header .btn-icon,
+.main-header .header-menu {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
 }
 
 .header-menu { display: inline-flex; }
@@ -697,39 +704,41 @@ body.md-preview-resizing * {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: calc(100% - 140px);
+  max-width: calc(100% - 120px);
   pointer-events: none;
 }
 
 .header-selects {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   pointer-events: auto;
 }
 
 .header-title .header-select {
   pointer-events: auto;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text);
   background-color: var(--bg-hover);
-  padding: 6px 28px 6px 12px;
-  background-position: right 8px center;
+  padding: 4px 24px 4px 10px;
+  background-position: right 6px center;
   min-width: 0;
 }
 
 .header-title .provider-select {
-  max-width: min(140px, 26vw);
+  flex-shrink: 0;
+  min-width: max-content;
+  max-width: min(160px, 32vw);
 }
 
 .header-title .model-select {
-  max-width: min(200px, 34vw);
+  max-width: min(160px, 30vw);
 }
 
 .header-title .header-effort-select {
-  max-width: min(120px, 22vw);
+  max-width: min(96px, 18vw);
 }
 
 .header-title .header-effort-select:disabled,
@@ -739,7 +748,7 @@ body.md-preview-resizing * {
 }
 
 .header-title .header-prompt-mode-select {
-  max-width: min(200px, 34vw);
+  max-width: min(140px, 28vw);
 }
 
 .header-title .header-select:hover,
@@ -780,8 +789,8 @@ body.md-preview-resizing * {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 2px;
-  min-width: 80px;
+  gap: 0;
+  min-width: 72px;
   justify-content: flex-end;
   position: relative;
   z-index: 2;
