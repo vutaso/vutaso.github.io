@@ -1249,32 +1249,68 @@ window.Events = (() => {
     streamResponse(convo);
   };
 
+  const syncComposerInputState = () => {
+    autoResize(ui.els.composerInput);
+    updateSendEnabled();
+  };
+
+  const isComposerEnterSend = (e) => {
+    if (e.isComposing || e.keyCode === 229) return false;
+    if (e.key === 'Enter' || e.key === 'NumpadEnter') return !e.shiftKey;
+    return false;
+  };
+
   const bind = () => {
     ui.els.composer.addEventListener('submit', (e) => {
       e.preventDefault();
       sendCurrent();
     });
 
-    ui.els.composerInput.addEventListener('input', () => {
-      autoResize(ui.els.composerInput);
-      updateSendEnabled();
+    // Mobile Safari/IME often skip or delay `input`; also sync on keyup and composition.
+    ['input', 'keyup', 'change', 'compositionend', 'cut'].forEach((type) => {
+      ui.els.composerInput.addEventListener(type, syncComposerInputState);
+    });
+    // During IME composition, only refresh send state — avoid autoResize fighting the caret.
+    ui.els.composerInput.addEventListener('compositionupdate', updateSendEnabled);
+    ui.els.composerInput.addEventListener('focus', updateSendEnabled);
+    // selectionchange is a reliable Safari fallback when `input` is missed; avoid autoResize here.
+    document.addEventListener('selectionchange', () => {
+      if (document.activeElement === ui.els.composerInput) updateSendEnabled();
     });
 
+    // Keep focus on touch so keyboard reflow doesn't make the send tap miss.
+    ui.els.sendBtn.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      e.preventDefault();
+    });
+
+    let enterSendHandled = false;
     ui.els.composerInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.shiftKey && !e.isComposing) {
-        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+      if (e.key === 'Enter' && e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+        requestAnimationFrame(syncComposerInputState);
         return;
       }
-      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      if (isComposerEnterSend(e)) {
+        enterSendHandled = true;
         e.preventDefault();
         sendCurrent();
+        queueMicrotask(() => { enterSendHandled = false; });
       }
+    });
+
+    // Android GBoard / some mobile keyboards send via beforeinput instead of keydown Enter.
+    ui.els.composerInput.addEventListener('beforeinput', (e) => {
+      if (e.isComposing || e.shiftKey) return;
+      if (e.inputType !== 'insertLineBreak' && e.inputType !== 'insertParagraph') return;
+      e.preventDefault();
+      if (enterSendHandled) return;
+      sendCurrent();
     });
 
     ui.els.composerInput.addEventListener('paste', (e) => {
       const items = e.clipboardData && e.clipboardData.items;
       if (!items) {
-        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+        requestAnimationFrame(syncComposerInputState);
         return;
       }
       const imageFiles = [];
@@ -1285,7 +1321,7 @@ window.Events = (() => {
         }
       }
       if (!imageFiles.length) {
-        requestAnimationFrame(() => autoResize(ui.els.composerInput));
+        requestAnimationFrame(syncComposerInputState);
         return;
       }
       e.preventDefault();

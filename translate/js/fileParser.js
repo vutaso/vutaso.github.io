@@ -1,7 +1,14 @@
 const FileParser = {
   SUPPORTED_EXTENSIONS: ['txt', 'pdf', 'docx'],
+  // OCR is slow (seconds per page) — cap it so a huge scanned PDF can't
+  // run forever. Pages beyond the cap are skipped (the UI warns about it).
+  OCR_MAX_PAGES: 20,
 
-  async parseFile(file) {
+  // Returns { text, pages: string[] | null, numPages?: number }
+  // `pages` is the per-page text for PDFs (enables page-range selection);
+  // null for txt/docx. onProgress({stage, current, total}) is called as
+  // pages are processed.
+  async parseFile(file, { onProgress } = {}) {
     if (!file.name.includes('.')) {
       throw new Error('File has no extension. Supported types: .pdf, .docx, .txt');
     }
@@ -17,12 +24,34 @@ const FileParser = {
     }
 
     if (extension === 'txt') {
-      return this._parseTxt(file);
+      return { text: await this._parseTxt(file), pages: null };
     } else if (extension === 'pdf') {
-      return this._parsePdf(file);
+      return this._parsePdf(file, onProgress);
     } else {
-      return this._parseDocx(file);
+      return { text: await this._parseDocx(file), pages: null };
     }
+  },
+
+  // Join a 1-based inclusive page range of a pages array into one text,
+  // clamping the range to valid bounds.
+  joinPages(pages, from, to) {
+    const f = Math.max(1, Math.min(from, pages.length));
+    const t = Math.max(f, Math.min(to, pages.length));
+    return pages.slice(f - 1, t).join('\n\n').trim();
+  },
+
+  // Map an app language name to a Tesseract language code. For 'auto' /
+  // unknown we use eng+vie: this app's primary language pair, and
+  // Latin-script OCR of most other languages still works with 'eng'.
+  tesseractLangFor(appLang) {
+    const map = {
+      English: 'eng', Vietnamese: 'vie', Japanese: 'jpn', Korean: 'kor',
+      Chinese: 'chi_sim', French: 'fra', German: 'deu', Spanish: 'spa',
+      Russian: 'rus', Thai: 'tha', Arabic: 'ara', Portuguese: 'por',
+      Italian: 'ita'
+    };
+    if (!appLang || appLang === 'auto') return 'eng+vie';
+    return map[appLang] || 'eng';
   },
 
   _readAsArrayBuffer(file) {
@@ -62,7 +91,81 @@ const FileParser = {
     return !!controlChars && controlChars.length / sample.length > 0.05;
   },
 
-  async _parsePdf(file) {
+  async _parsePdf(file, onProgress) {
+    const pdf = await this._openPdf(file);
+
+    const pages = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      pages.push(this._reconstructPageText(content.items));
+      if (onProgress) {
+        onProgress({ stage: 'extract', current: i, total: pdf.numPages });
+      }
+    }
+
+    return { text: pages.join('\n\n').trim(), pages, numPages: pdf.numPages };
+  },
+
+  // OCR a scanned PDF: render each page to a canvas via pdf.js and run
+  // Tesseract over it. Heavy (loads several MB of OCR data on first use,
+  // then seconds per page) — always user-initiated.
+  async ocrPdf(file, { onProgress, langCode } = {}) {
+    await this._loadTesseract();
+
+    const pdf = await this._openPdf(file);
+    const total = Math.min(pdf.numPages, this.OCR_MAX_PAGES);
+
+    const worker = await Tesseract.createWorker(langCode || this.tesseractLangFor('auto'));
+    try {
+      const pages = [];
+      for (let i = 1; i <= total; i++) {
+        const page = await pdf.getPage(i);
+        // 2x scale noticeably improves OCR accuracy on small fonts
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+        const result = await worker.recognize(canvas);
+        pages.push((result.data.text || '').trim());
+        if (onProgress) {
+          onProgress({ stage: 'ocr', current: i, total });
+        }
+      }
+
+      return {
+        text: pages.join('\n\n').trim(),
+        pages,
+        numPages: pdf.numPages,
+        truncated: pdf.numPages > total
+      };
+    } finally {
+      await worker.terminate();
+    }
+  },
+
+  // Tesseract.js (~2MB core + language data) is only fetched when the
+  // user actually runs OCR on a scanned PDF.
+  _loadTesseract() {
+    if (window.Tesseract) return Promise.resolve();
+    if (!this._tesseractPromise) {
+      this._tesseractPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        script.onload = () => resolve();
+        script.onerror = () => {
+          this._tesseractPromise = null; // allow retry
+          reject(new Error('Failed to load the OCR library. Check your internet connection and try again.'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+    return this._tesseractPromise;
+  },
+
+  async _openPdf(file) {
     const data = await this._readAsArrayBuffer(file);
 
     if (typeof pdfjsLib === 'undefined') {
@@ -74,25 +177,14 @@ const FileParser = {
       this._workerConfigured = true;
     }
 
-    let pdf;
     try {
-      pdf = await pdfjsLib.getDocument({ data }).promise;
+      return await pdfjsLib.getDocument({ data }).promise;
     } catch (err) {
       if (err.name === 'PasswordException') {
         throw new Error('This PDF is password-protected. Please remove the password and try again.');
       }
       throw new Error('Failed to open PDF. The file may be corrupted or not a valid PDF.');
     }
-
-    const texts = [];
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      texts.push(this._reconstructPageText(content.items));
-    }
-
-    return texts.join('\n\n').trim();
   },
 
   // Reconstruct readable text from PDF.js text items, restoring line

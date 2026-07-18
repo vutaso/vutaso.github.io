@@ -512,6 +512,12 @@
   opacity: 1;
 }
 
+@media (hover: none) {
+  .composer-attachment-remove {
+    opacity: 1;
+  }
+}
+
 .composer-inner:focus-within {
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
   box-shadow: var(--composer-shadow), 0 0 0 3px var(--accent-glow);

@@ -34,7 +34,9 @@ window.APP_CONFIG = {
     { id: 'openrouter-mistral-small-4', apiModel: 'mistralai/mistral-small-2603', label: 'Mistral Small 4 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
     { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-kimi-k3', apiModel: 'moonshotai/kimi-k3', label: 'Kimi K3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-grok-4.5', apiModel: 'x-ai/grok-4.5', label: 'Grok 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-muse-spark-1.1', apiModel: 'meta/muse-spark-1.1', label: 'Muse Spark 1.1 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gpt-5.6-sol', apiModel: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gpt-5.6-terra', apiModel: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gpt-5.6-luna', apiModel: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
@@ -112,7 +114,9 @@ window.APP_CONFIG = {
     'openrouter-mistral-small-4': { input: 0.15, output: 0.60 },
     'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
     'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
+    'openrouter-kimi-k3': { input: 3.00, output: 15.00 },
     'openrouter-grok-4.5': { input: 2.00, output: 6.00 },
+    'openrouter-muse-spark-1.1': { input: 1.25, output: 4.25 },
     'openrouter-gpt-5.6-sol': { input: 5.00, output: 30.00 },
     'openrouter-gpt-5.6-terra': { input: 2.50, output: 15.00 },
     'openrouter-gpt-5.6-luna': { input: 1.00, output: 6.00 },
@@ -238,7 +242,9 @@ window.APP_CONFIG = {
     'openrouter-mistral-small-4': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
     'openrouter-kimi-k2.6': ['low', 'medium', 'high'],
+    'openrouter-kimi-k3': ['max'],
     'openrouter-grok-4.5': ['low', 'medium', 'high'],
+    'openrouter-muse-spark-1.1': ['low', 'medium', 'high'],
     'openrouter-gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max'],
@@ -431,6 +437,8 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
     if (modelId === 'openrouter-gpt-5.6-luna') return 'low';
     if (modelId === 'openrouter-gpt-5.6-terra') return 'medium';
+    if (modelId === 'openrouter-kimi-k3') return 'max';
+    if (modelId === 'openrouter-muse-spark-1.1') return 'medium';
     if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
     if (modelId === 'opencode-go-glm-5-2' || modelId === 'opencode-go-glm-5-1' || modelId === 'opencode-go-deepseek-v4-pro' || modelId === 'opencode-go-deepseek-v4-flash') return 'high';
     if (modelId === 'opencode-go-mimo-v2-5' || modelId === 'opencode-go-mimo-v2.5-pro' || modelId === 'opencode-go-minimax-m3' || modelId === 'opencode-go-minimax-m2.7' || modelId === 'opencode-go-minimax-m2.5' || modelId === 'opencode-go-qwen3.7-plus' || modelId === 'opencode-go-qwen3.6-plus') return 'medium';
