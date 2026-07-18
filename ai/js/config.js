@@ -52,7 +52,7 @@ window.APP_CONFIG = {
     { id: 'nvidia-minimax-m3', apiModel: 'minimaxai/minimax-m3', label: 'MiniMax M3 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'nvidia-minimax-m2-7', apiModel: 'minimaxai/minimax-m2.7', label: 'MiniMax M2.7 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'nvidia-step-3-7-flash', apiModel: 'stepfun-ai/step-3.7-flash', label: 'Step 3.7 Flash (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-mistral-small-4', apiModel: 'mistralai/mistral-small-4-119b-2603', label: 'Mistral Small 4 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'nvidia-mistral-small-4', apiModel: 'mistralai/mistral-small-4-119b-2603', label: 'Mistral Small 4 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'nvidia-mistral-medium-3-5-128b', apiModel: 'mistralai/mistral-medium-3.5-128b', label: 'Mistral Medium 3.5 128B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
