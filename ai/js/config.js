@@ -76,7 +76,11 @@ window.APP_CONFIG = {
     { id: 'opencode-go-minimax-m2.5', apiModel: 'minimax-m2.5', label: 'MiniMax M2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-qwen3.7-max', apiModel: 'qwen3.7-max', label: 'Qwen3.7 Max (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'opencode-go-qwen3.7-plus', apiModel: 'qwen3.7-plus', label: 'Qwen3.7 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-qwen3.6-plus', apiModel: 'qwen3.6-plus', label: 'Qwen3.6 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true }
+    { id: 'opencode-go-qwen3.6-plus', apiModel: 'qwen3.6-plus', label: 'Qwen3.6 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'sonar', label: 'Sonar', provider: 'perplexity', webSearch: true, imageGen: false, thinking: false, vision: false },
+    { id: 'sonar-pro', label: 'Sonar Pro', provider: 'perplexity', webSearch: true, imageGen: false, thinking: false, vision: false },
+    { id: 'sonar-reasoning-pro', label: 'Sonar Reasoning Pro', provider: 'perplexity', webSearch: true, imageGen: false, thinking: true, vision: false },
+    { id: 'perplexity-search', label: 'Perplexity Search', provider: 'perplexity', apiMode: 'search', webSearch: true, imageGen: false, thinking: false, vision: false }
   ],
 
   // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-06-29
@@ -157,7 +161,11 @@ window.APP_CONFIG = {
     'opencode-go-minimax-m2.5': { input: 0.30, output: 1.20 },
     'opencode-go-qwen3.7-max': { input: 2.50, output: 7.50 },
     'opencode-go-qwen3.7-plus': { input: 0.40, output: 1.60 },
-    'opencode-go-qwen3.6-plus': { input: 0.50, output: 3.00 }
+    'opencode-go-qwen3.6-plus': { input: 0.50, output: 3.00 },
+    'sonar': { input: 1.00, output: 1.00 },
+    'sonar-pro': { input: 3.00, output: 15.00 },
+    'sonar-reasoning-pro': { input: 2.00, output: 8.00 },
+    'perplexity-search': { input: 0, output: 0 }
   },
 
   TOKEN_COST_WARNING_USD: 1,
@@ -182,7 +190,8 @@ window.APP_CONFIG = {
     { id: 'openai', label: 'OpenAI' },
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'google', label: 'Gemini' },
-    { id: 'kimi', label: 'Kimi' }
+    { id: 'kimi', label: 'Kimi' },
+    { id: 'perplexity', label: 'Perplexity' }
   ],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
@@ -201,7 +210,8 @@ window.APP_CONFIG = {
     byteplus:  ['default', 'high', 'max'],
     openrouter: ['low', 'medium', 'high'],
     'opencode-go': ['low', 'medium', 'high'],
-    kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
+    kimi:      [], // binary thinking only: enabled/disabled via Thinking toggle
+    perplexity: ['low', 'medium', 'high']
   },
 
   MODEL_EFFORT_LEVELS: {
@@ -586,6 +596,7 @@ window.APP_CONFIG = {
     if (provider === 'opencode-go') return state.opencodeGoApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
     if (provider === 'kimi') return state.kimiApiKey || '';
+    if (provider === 'perplexity') return state.perplexityApiKey || '';
     return state.apiKey || '';
   },
 
@@ -600,6 +611,7 @@ window.APP_CONFIG = {
     if (provider === 'opencode-go') return 'Enter your OpenCode Go API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
     if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
+    if (provider === 'perplexity') return 'Enter your Perplexity API key in Settings first';
     return 'Enter your API key in Settings first';
   },
 
@@ -614,6 +626,7 @@ window.APP_CONFIG = {
     if (provider === 'opencode-go') return 'No OpenCode Go API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
     if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
+    if (provider === 'perplexity') return 'No Perplexity API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 
@@ -630,6 +643,11 @@ window.APP_CONFIG = {
   getOpencodeGoProxyRequiredError() {
     if (window.I18n) return window.I18n.t('opencodeGoProxyRequired');
     return 'OpenCode Go API requires a CORS proxy. Deploy worker/ and set OPENCODE_GO proxy endpoints in config.js.';
+  },
+
+  getPerplexityProxyRequiredError() {
+    if (window.I18n) return window.I18n.t('perplexityProxyRequired');
+    return 'Perplexity API requires a CORS proxy. Deploy worker/ and set PERPLEXITY_PROXY_ENDPOINT in config.js.';
   },
 
   formatApiError(err, modelId) {
@@ -656,6 +674,13 @@ window.APP_CONFIG = {
       }
       if (window.I18n) return window.I18n.t('opencodeGoProxyNetworkError');
       return 'Could not reach OpenCode Go proxy. Check API key, use a local server (not file://), and redeploy worker/.';
+    }
+    if (isNetwork && provider === 'perplexity') {
+      if (!this.getPerplexityProxyEndpoint(modelId)) {
+        return this.getPerplexityProxyRequiredError();
+      }
+      if (window.I18n) return window.I18n.t('perplexityProxyNetworkError');
+      return 'Could not reach Perplexity proxy. Check API key, use a local server (not file://), and redeploy worker/.';
     }
     if (/DEGRADED function cannot be invoked/i.test(msg) && provider === 'nvidia') {
       if (window.I18n) return window.I18n.t('nvidiaDegradedError');
@@ -871,6 +896,11 @@ window.APP_CONFIG = {
   OPENROUTER_MAX_OUTPUT_TOKENS: 32768,
   NVIDIA_MAX_OUTPUT_TOKENS: 65536,
   KIMI_ENDPOINT: 'https://api.moonshot.ai/v1/chat/completions',
+  PERPLEXITY_ENDPOINT: 'https://api.perplexity.ai/v1/sonar',
+  PERPLEXITY_SEARCH_ENDPOINT: 'https://api.perplexity.ai/search',
+  // Deploy: cd worker && npx wrangler deploy → dán URL + '/perplexity' hoặc '/perplexity-search'.
+  PERPLEXITY_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/perplexity',
+  PERPLEXITY_SEARCH_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/perplexity-search',
   GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
 
   geminiStreamUrl(modelId) {
@@ -949,6 +979,32 @@ window.APP_CONFIG = {
 
   opencodeGoRequiresProxy() {
     return true;
+  },
+
+  modelUsesPerplexitySearch(modelId) {
+    return this.getModel(modelId).apiMode === 'search';
+  },
+
+  getPerplexityEndpoint(modelId) {
+    if (this.modelUsesPerplexitySearch(modelId)) {
+      return this.PERPLEXITY_SEARCH_PROXY_ENDPOINT || this.PERPLEXITY_SEARCH_ENDPOINT;
+    }
+    return this.PERPLEXITY_PROXY_ENDPOINT || this.PERPLEXITY_ENDPOINT;
+  },
+
+  getPerplexityProxyEndpoint(modelId) {
+    if (this.modelUsesPerplexitySearch(modelId)) {
+      return this.PERPLEXITY_SEARCH_PROXY_ENDPOINT;
+    }
+    return this.PERPLEXITY_PROXY_ENDPOINT;
+  },
+
+  perplexityRequiresProxy() {
+    return true;
+  },
+
+  getPerplexitySearchContextSize() {
+    return this.SEARCH_CONTEXT_SIZE || 'high';
   },
 
   getOpenRouterThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {

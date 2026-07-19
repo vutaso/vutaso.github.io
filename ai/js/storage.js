@@ -17,6 +17,7 @@ window.Storage = (() => {
     opencodeGoApiKey: '',
     geminiApiKey: '',
     kimiApiKey: '',
+    perplexityApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
     imageGenEnabled: false,
@@ -384,6 +385,7 @@ window.Storage = (() => {
       opencodeGoApiKey: state.opencodeGoApiKey,
       geminiApiKey: state.geminiApiKey,
       kimiApiKey: state.kimiApiKey,
+      perplexityApiKey: state.perplexityApiKey,
       currentModel: state.currentModel,
       systemPrompt: state.systemPrompt,
       theme: state.theme

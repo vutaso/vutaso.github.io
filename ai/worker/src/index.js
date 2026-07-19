@@ -4,6 +4,8 @@ const BYTEPLUS_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/comple
 const BYTEPLUS_RESPONSES_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/responses';
 const OPENCODE_GO_CHAT_API = 'https://opencode.ai/zen/go/v1/chat/completions';
 const OPENCODE_GO_MESSAGES_API = 'https://opencode.ai/zen/go/v1/messages';
+const PERPLEXITY_API = 'https://api.perplexity.ai/v1/sonar';
+const PERPLEXITY_SEARCH_API = 'https://api.perplexity.ai/search';
 const ALLOWED_DEEPSEEK_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
 const ALLOWED_NVIDIA_MODELS = new Set([
   'nvidia/nemotron-3-ultra-550b-a55b',
@@ -49,6 +51,7 @@ const ALLOWED_OPENCODE_GO_MESSAGES_MODELS = new Set([
   'qwen3.7-plus',
   'qwen3.6-plus'
 ]);
+const ALLOWED_PERPLEXITY_MODELS = new Set(['sonar', 'sonar-pro', 'sonar-reasoning-pro']);
 
 const DEFAULT_ORIGINS = [
   'https://vutaso.com',
@@ -163,6 +166,21 @@ const validateOpencodeGoMessagesBody = (body) => {
   if (!ALLOWED_OPENCODE_GO_MESSAGES_MODELS.has(body.model)) return 'Model not allowed';
   if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
   if (body.stream !== true) return 'stream must be true';
+  return null;
+};
+
+const validatePerplexityBody = (body) => {
+  if (!body || typeof body !== 'object') return 'Invalid request body';
+  if (!ALLOWED_PERPLEXITY_MODELS.has(body.model)) return 'Model not allowed';
+  if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
+  if (body.stream !== true) return 'stream must be true';
+  return null;
+};
+
+const validatePerplexitySearchBody = (body) => {
+  if (!body || typeof body !== 'object') return 'Invalid request body';
+  const query = body.query;
+  if (typeof query !== 'string' && (!Array.isArray(query) || !query.length)) return 'query is required';
   return null;
 };
 
@@ -562,6 +580,73 @@ const handleOpencodeGoMessages = async (request, env, origin) => {
   return nvidiaStreamResponse(upstream, origin);
 };
 
+const handlePerplexity = async (request, env, origin) => {
+  const auth = request.headers.get('Authorization');
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return nvidiaJsonError('Missing Authorization header', 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return nvidiaJsonError('Invalid JSON', 400, origin);
+  }
+
+  const validationError = validatePerplexityBody(body);
+  if (validationError) {
+    return nvidiaJsonError(validationError, 400, origin);
+  }
+
+  const upstream = await fetch(PERPLEXITY_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: auth
+    },
+    body: JSON.stringify(body)
+  });
+
+  return nvidiaStreamResponse(upstream, origin);
+};
+
+const handlePerplexitySearch = async (request, env, origin) => {
+  const auth = request.headers.get('Authorization');
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return nvidiaJsonError('Missing Authorization header', 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return nvidiaJsonError('Invalid JSON', 400, origin);
+  }
+
+  const validationError = validatePerplexitySearchBody(body);
+  if (validationError) {
+    return nvidiaJsonError(validationError, 400, origin);
+  }
+
+  const upstream = await fetch(PERPLEXITY_SEARCH_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: auth
+    },
+    body: JSON.stringify(body)
+  });
+
+  return new Response(upstream.body, {
+    status: upstream.status,
+    headers: new Headers({
+      'Content-Type': upstream.headers.get('Content-Type') || 'application/json',
+      'Cache-Control': 'no-store',
+      ...nvidiaCorsHeaders(origin)
+    })
+  });
+};
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -636,6 +721,26 @@ export default {
       return handleOpencodeGoMessages(request, env, origin);
     }
 
+    if (pathname.endsWith('/perplexity-search')) {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
+      }
+      if (request.method !== 'POST') {
+        return nvidiaJsonError('Method not allowed', 405, origin);
+      }
+      return handlePerplexitySearch(request, env, origin);
+    }
+
+    if (pathname.endsWith('/perplexity')) {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
+      }
+      if (request.method !== 'POST') {
+        return nvidiaJsonError('Method not allowed', 405, origin);
+      }
+      return handlePerplexity(request, env, origin);
+    }
+
     if (request.method === 'OPTIONS') {
       if (!resolveOrigin(origin, env)) {
         return new Response(null, { status: 403 });
@@ -665,6 +770,14 @@ export default {
 
     if (pathname.endsWith('/opencode-go-messages')) {
       return handleOpencodeGoMessages(request, env, origin);
+    }
+
+    if (pathname.endsWith('/perplexity-search')) {
+      return handlePerplexitySearch(request, env, origin);
+    }
+
+    if (pathname.endsWith('/perplexity')) {
+      return handlePerplexity(request, env, origin);
     }
 
     return handleDeepseek(request, env, origin);

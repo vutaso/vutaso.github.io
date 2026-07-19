@@ -2372,6 +2372,12 @@ window.Events = (() => {
       ui.els.opencodeGoApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
+    ui.els.togglePerplexityApiKeyBtn.addEventListener('click', () => {
+      const isPwd = ui.els.perplexityApiKeyInput.type === 'password';
+      ui.els.perplexityApiKeyInput.type = isPwd ? 'text' : 'password';
+      ui.els.perplexityApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    });
+
     const handleClearAll = async () => {
       if (!confirm(t('confirmClearAll'))) return;
       await settleActiveStream({ discard: true });
@@ -2434,9 +2440,10 @@ window.Events = (() => {
         const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
         const openrouterApiKey = ui.els.openrouterApiKeyInput.value.trim();
         const opencodeGoApiKey = ui.els.opencodeGoApiKeyInput.value.trim();
+        const perplexityApiKey = ui.els.perplexityApiKeyInput.value.trim();
         const theme = ui.els.settingsThemeSelect?.value || 'dark';
         nextState = {
-          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey, openrouterApiKey, opencodeGoApiKey,
+          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey, openrouterApiKey, opencodeGoApiKey, perplexityApiKey,
           ...promptPatch, theme, locale
         };
       }
@@ -2528,6 +2535,7 @@ window.Events = (() => {
       ui.els.kimiApiKeyInput,
       ui.els.openrouterApiKeyInput,
       ui.els.opencodeGoApiKeyInput,
+      ui.els.perplexityApiKeyInput,
       ui.els.systemPromptInput,
     ].forEach((input) => {
       input?.addEventListener('blur', applySettingsFromForm);

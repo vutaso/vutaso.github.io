@@ -287,6 +287,8 @@ window.API = (() => {
         errMsg = meta?.raw || meta?.message || errJson.error?.message || errMsg;
       } else if (provider === 'opencode-go') {
         errMsg = errJson.error?.message || errJson.error?.type || errMsg;
+      } else if (provider === 'perplexity') {
+        errMsg = errJson.error?.message || errJson.detail || errMsg;
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -482,6 +484,19 @@ window.API = (() => {
         if (delta.content) {
           if (handlers.onToken) handlers.onToken(delta.content);
         }
+      }
+      if (json.search_results?.length && handlers.onGroundingMetadata) {
+        handlers.onGroundingMetadata({
+          groundingChunks: json.search_results.map((r) => ({
+            web: { uri: r.url, title: r.title || r.url }
+          }))
+        });
+      } else if (json.citations?.length && handlers.onGroundingMetadata) {
+        handlers.onGroundingMetadata({
+          groundingChunks: json.citations.map((url) => ({
+            web: { uri: url, title: url }
+          }))
+        });
       }
     } catch (e) {
       if (e instanceof SyntaxError) {
@@ -769,6 +784,116 @@ window.API = (() => {
     return body;
   };
 
+  const buildPerplexityBody = (model, systemPrompt, convo) => {
+    const body = withStreamUsage({
+      model: window.APP_CONFIG.getApiModel(model),
+      messages: buildMessages(convo, systemPrompt),
+      stream: true,
+      search_context_size: window.APP_CONFIG.getPerplexitySearchContextSize()
+    });
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    return body;
+  };
+
+  const getPerplexitySearchQueryFromConvo = (convo) => {
+    const users = (convo.messages || []).filter((m) => m.role === 'user');
+    const last = users[users.length - 1];
+    if (!last) return '';
+    let text = appendFilesToText(last.content || '', last.files);
+    text = appendUserInstructions(text, last);
+    return text.trim();
+  };
+
+  const formatPerplexitySearchResult = (item, index) => {
+    const title = item.title || item.url || ('Kết quả ' + (index + 1));
+    const snippet = (item.snippet || '').trim();
+    const url = item.url || '';
+    const meta = [item.date, item.last_updated].filter(Boolean).join(' · ');
+    let block = '### ' + (index + 1) + '. ' + title;
+    if (meta) block += '\n_' + meta + '_';
+    if (snippet) block += '\n\n' + snippet;
+    if (url) block += '\n\n' + url;
+    return block;
+  };
+
+  const sleep = (ms, signal) => new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'));
+      return;
+    }
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new DOMException('Aborted', 'AbortError'));
+    }, { once: true });
+  });
+
+  const emitSimulatedStream = async (text, handlers, signal, { chunkSize = 28, delayMs = 14 } = {}) => {
+    if (!handlers.onToken || !text) return;
+    for (let i = 0; i < text.length; i += chunkSize) {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+      handlers.onToken(text.slice(i, i + chunkSize));
+      if (i + chunkSize < text.length) await sleep(delayMs, signal);
+    }
+  };
+
+  const emitPerplexitySearchStream = async (results, handlers, signal) => {
+    if (!results.length) {
+      await emitSimulatedStream('Không tìm thấy kết quả.', handlers, signal);
+      return;
+    }
+    for (let i = 0; i < results.length; i++) {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+      const block = formatPerplexitySearchResult(results[i], i);
+      const chunk = (i === 0 ? '' : '\n\n') + block;
+      await emitSimulatedStream(chunk, handlers, signal, { chunkSize: 32, delayMs: 12 });
+      if (i < results.length - 1) await sleep(80, signal);
+    }
+  };
+
+  const toPerplexitySearchGrounding = (results) => ({
+    groundingChunks: (results || []).map((r) => ({
+      web: { uri: r.url, title: r.title || r.url }
+    }))
+  });
+
+  const sendPerplexitySearch = async ({ apiKey, convo, controller, handlers, endpoint }) => {
+    const query = getPerplexitySearchQueryFromConvo(convo);
+    if (!query) {
+      throw new Error('Không có truy vấn tìm kiếm');
+    }
+
+    if (handlers.onSearchStatus) handlers.onSearchStatus('searching');
+
+    const body = {
+      query: [query],
+      max_results: 10,
+      search_context_size: window.APP_CONFIG.getPerplexitySearchContextSize()
+    };
+
+    const res = await fetch(endpoint || window.APP_CONFIG.PERPLEXITY_SEARCH_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'perplexity');
+
+    const json = await res.json();
+    const results = json.results || [];
+    if (handlers.onGroundingMetadata) {
+      handlers.onGroundingMetadata(toPerplexitySearchGrounding(results));
+    }
+    await emitPerplexitySearchStream(results, handlers, controller.signal);
+  };
+
   const sendOpenRouterImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
     const { prompt, images } = getOpenRouterImagePromptFromConvo(convo);
     if (!prompt) {
@@ -831,6 +956,8 @@ window.API = (() => {
             ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
           : provider === 'opencode-go'
             ? buildOpencodeGoBody(model, systemPrompt, convo, thinking, reasoningEffort)
+          : provider === 'perplexity'
+            ? buildPerplexityBody(model, systemPrompt, convo)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
             : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
@@ -1225,6 +1352,21 @@ window.API = (() => {
           await sendChatCompletions({
             apiKey, model, systemPrompt, convo, controller, handlers,
             endpoint: opencodeEndpoint, provider: 'opencode-go', thinking, reasoningEffort: effort
+          });
+        }
+      } else if (provider === 'perplexity') {
+        if (window.APP_CONFIG.perplexityRequiresProxy() && !window.APP_CONFIG.getPerplexityProxyEndpoint(model)) {
+          throw new Error(window.APP_CONFIG.getPerplexityProxyRequiredError());
+        }
+        const perplexityEndpoint = window.APP_CONFIG.getPerplexityEndpoint(model);
+        if (window.APP_CONFIG.modelUsesPerplexitySearch(model)) {
+          await sendPerplexitySearch({
+            apiKey, convo, controller, handlers, endpoint: perplexityEndpoint
+          });
+        } else {
+          await sendChatCompletions({
+            apiKey, model, systemPrompt, convo, controller, handlers,
+            endpoint: perplexityEndpoint, provider: 'perplexity', thinking: false, reasoningEffort: effort
           });
         }
       } else if (tools.length || (thinking && provider === 'openai')) {
