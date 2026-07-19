@@ -1,7 +1,7 @@
 (() => {
   const STRINGS = {
     en: {
-      back: 'Back to VUTASO AI',
+      back: 'Back to Vutaso AI',
       title: 'Model Pricing',
       subtitle: 'USD per 1M tokens — standard API rates (cache-miss input). Sorted by input price, lowest first.',
       updated: 'Last updated: June 29, 2026',
@@ -17,7 +17,7 @@
       terms: 'Terms of Service'
     },
     vi: {
-      back: 'Về VUTASO AI',
+      back: 'Về Vutaso AI',
       title: 'Bảng giá model',
       subtitle: 'USD / 1M token — giá API chuẩn (input cache miss). Sắp xếp theo giá input từ thấp đến cao.',
       updated: 'Cập nhật: 29/06/2026',
@@ -33,7 +33,7 @@
       terms: 'Điều khoản dịch vụ'
     },
     jp: {
-      back: 'VUTASO AI に戻る',
+      back: 'Vutaso AI に戻る',
       title: 'モデル料金',
       subtitle: '100万トークンあたりの USD — 標準 API 単価（キャッシュミス入力）。入力単価の安い順。',
       updated: '最終更新: 2026年6月29日',
@@ -49,7 +49,7 @@
       terms: '利用規約'
     },
     zh: {
-      back: '返回 VUTASO AI',
+      back: '返回 Vutaso AI',
       title: '模型价格',
       subtitle: '每 100 万 Token 的 USD 价格 — 标准 API 单价（未命中缓存输入）。按输入价格从低到高排序。',
       updated: '最后更新：2026 年 6 月 29 日',
@@ -148,7 +148,7 @@
   const applyLabels = () => {
     const loc = getLocale();
     document.documentElement.lang = HTML_LANG[loc] || 'en';
-    document.title = `${t('title')} — VUTASO AI`;
+    document.title = `${t('title')} — Vutaso AI`;
 
     const setText = (id, key) => {
       const el = document.getElementById(id);

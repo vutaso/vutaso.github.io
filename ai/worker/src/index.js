@@ -22,7 +22,8 @@ const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
   'seed-2-0-lite-260428',
   'seed-2-0-mini-260428',
   'seed-2-0-pro-260328',
-  'seed-2-0-code-preview-260328'
+  'seed-2-0-code-preview-260328',
+  'dola-seed-2-1-turbo-260628'
 ]);
 const ALLOWED_OPENCODE_GO_CHAT_MODELS = new Set([
   'glm-5.2',

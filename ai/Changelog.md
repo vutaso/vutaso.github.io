@@ -1,6 +1,6 @@
 # Changelog
 
-Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lại trong file này.
+Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lại trong file này.
 
 Định dạng dựa trên [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/).
 
@@ -224,7 +224,7 @@ Tất cả các thay đổi đáng chú ý của **VUTASO AI** được ghi lạ
 ## [1.0.0] — 2026-06-26
 
 ### Added
-- Phiên bản đầu tiên **VUTASO AI** — chat AI chạy trên trình duyệt.
+- Phiên bản đầu tiên **Vutaso AI** — chat AI chạy trên trình duyệt.
 - Chat với **OpenAI** (`gpt-4o-mini`), phản hồi **streaming**.
 - Quản lý hội thoại — tạo mới, lịch sử, đổi tên, xóa; lưu `localStorage`.
 - **Dark / Light** theme.

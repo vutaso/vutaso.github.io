@@ -1,6 +1,6 @@
 .pdf-export-root {
-  position: absolute;
-  left: 0;
+  position: fixed;
+  left: -10000px;
   top: 0;
   width: 186mm;
   z-index: -1;
@@ -12,8 +12,6 @@
   -webkit-font-smoothing: auto;
   text-rendering: geometricPrecision;
   font-synthesis: none;
-  clip-path: inset(100%);
-  clip: rect(0 0 0 0);
   overflow: hidden;
 }
 
@@ -42,10 +40,10 @@
 }
 
 .pdf-export-root.is-capturing {
-  z-index: 2147483647;
-  clip-path: none;
-  clip: auto;
-  overflow: visible;
+  z-index: -1;
+  opacity: 1;
+  left: -10000px;
+  overflow: hidden;
 }
 
 .pdf-export-sheet {
@@ -109,6 +107,14 @@
 
 .pdf-export-root .message.user .body {
   max-width: 85%;
+}
+
+.pdf-export-root .pdf-export-chunk.continuation.message.user .body {
+  background: transparent !important;
+  border: 0 !important;
+  max-width: 85%;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .pdf-export-root .toolbar,
@@ -268,6 +274,24 @@
 .pdf-export-root .mermaid-block {
   background: #ffffff !important;
   border-color: #e2e4ec !important;
+  max-width: 100%;
+}
+
+.pdf-export-root .table-scroll {
+  overflow: hidden !important;
+  max-width: 100%;
+}
+
+.pdf-export-root .table-block table {
+  table-layout: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.pdf-export-root .table-block th,
+.pdf-export-root .table-block td {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .pdf-export-root .table-header,

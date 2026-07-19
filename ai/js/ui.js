@@ -1519,7 +1519,7 @@ window.UI = (() => {
       + '<button type="button" class="msg-export-option" data-export-format="txt" role="menuitem">'
       + '<i class="fa-solid fa-file-lines" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatTxt')) + '</span></button>'
       + '<button type="button" class="msg-export-option" data-export-format="pdf" role="menuitem">'
-      + '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatPdf')) + '</span></button>'
+      + '<i class="fa-solid fa-print" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatPdf')) + '</span></button>'
       + '<button type="button" class="msg-export-option" data-export-format="docx" role="menuitem">'
       + '<i class="fa-solid fa-file-word" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatDocs')) + '</span></button>'
       + imageExportOption

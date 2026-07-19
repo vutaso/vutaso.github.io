@@ -1,4 +1,4 @@
-# VUTASO AI
+# Vutaso AI
 
 Ứng dụng chat AI chạy trên trình duyệt — hỗ trợ nhiều nhà cung cấp, lưu trữ cục bộ, không cần cài đặt hay build.
 
@@ -8,7 +8,7 @@
 
 ## Tổng quan
 
-VUTASO AI là giao diện web để trò chuyện với các model AI từ OpenAI, Anthropic, DeepSeek, Google Gemini và Kimi. Bạn tự cấu hình API key; dữ liệu hội thoại được lưu trên thiết bị của bạn (IndexedDB + localStorage). Yêu cầu chat được gửi trực tiếp từ trình duyệt tới nhà cung cấp bạn chọn.
+Vutaso AI là giao diện web để trò chuyện với các model AI từ OpenAI, Anthropic, DeepSeek, Google Gemini và Kimi. Bạn tự cấu hình API key; dữ liệu hội thoại được lưu trên thiết bị của bạn (IndexedDB + localStorage). Yêu cầu chat được gửi trực tiếp từ trình duyệt tới nhà cung cấp bạn chọn.
 
 - **Frontend thuần:** HTML, CSS, JavaScript — không framework, không build step
 - **Đa ngôn ngữ:** English, Tiếng Việt, 日本語, 中文

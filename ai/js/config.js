@@ -44,6 +44,7 @@ window.APP_CONFIG = {
     { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-code', apiModel: 'seed-2-0-code-preview-260328', label: 'Dola Seed 2.0 Code', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'byteplus-dola-seed-2-1-turbo', apiModel: 'dola-seed-2-1-turbo-260628', label: 'Dola Seed 2.1 Turbo', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'nvidia-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b', label: 'Nemotron 3 Ultra (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'nvidia-nemotron-3-super', apiModel: 'nvidia/nemotron-3-super-120b-a12b', label: 'Nemotron 3 Super (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false, nemotronReasoningBudget: 16384 },
     { id: 'nvidia-nemotron-3-nano-omni', apiModel: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning', label: 'Nemotron 3 Nano Omni (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false, nemotronReasoningBudget: 16384 },
@@ -124,6 +125,7 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
     'byteplus-dola-seed-2-0-code': { input: 0.50, output: 3.00 },
+    'byteplus-dola-seed-2-1-turbo': { input: 0.15, output: 0.80 },
     'nvidia-nemotron-3-ultra-550b-a55b': { input: 0, output: 0 },
     'nvidia-nemotron-3-super': { input: 0, output: 0 },
     'nvidia-nemotron-3-nano-omni': { input: 0, output: 0 },
@@ -223,6 +225,7 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-pro': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-code': ['minimal', 'low', 'medium', 'high'],
+    'byteplus-dola-seed-2-1-turbo': ['minimal', 'low', 'medium', 'high'],
     'byteplus-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-deepseek-v4-flash': ['high', 'xhigh'],
@@ -421,7 +424,7 @@ window.APP_CONFIG = {
 
   getDefaultEffortForModel(modelId) {
     if (modelId === 'gemini-3.5-flash' || modelId === 'openrouter-gemini-3.5-flash') return 'medium';
-    if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code') return 'medium';
+    if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code' || modelId === 'byteplus-dola-seed-2-1-turbo') return 'medium';
     if (modelId === 'byteplus-gpt-oss-120b' || modelId === 'nvidia-gpt-oss-120b') return 'medium';
     if (modelId === 'nvidia-glm-5-2') return 'high';
     if (modelId === 'nvidia-minimax-m3') return 'medium';
@@ -832,6 +835,14 @@ window.APP_CONFIG = {
       }
     ],
     'byteplus-dola-seed-2-0-code': [
+      {
+        type: 'mcp',
+        server_label: 'deepwiki',
+        server_url: 'https://mcp.deepwiki.com/mcp',
+        require_approval: 'never'
+      }
+    ],
+    'byteplus-dola-seed-2-1-turbo': [
       {
         type: 'mcp',
         server_label: 'deepwiki',

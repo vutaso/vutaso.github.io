@@ -839,7 +839,7 @@ window.API = (() => {
     if (apiKey) headers.Authorization = 'Bearer ' + apiKey;
     if (provider === 'openrouter') {
       headers['HTTP-Referer'] = window.location.origin || 'https://vutaso.github.io';
-      headers['X-Title'] = 'VUTASO AI';
+      headers['X-Title'] = 'Vutaso AI';
     }
 
     const res = await fetch(endpoint || OPENAI_ENDPOINT, {

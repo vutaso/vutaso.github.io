@@ -196,7 +196,7 @@ window.PptxExport = (() => {
     const pptx = new PptxGen();
     pptx.layout = 'LAYOUT_16x9';
     pptx.title = normalized.title;
-    pptx.author = 'VUTASO AI';
+    pptx.author = 'Vutaso AI';
     defineSlideMasters(pptx);
 
     normalized.slides.forEach((slide) => addSlideByLayout(pptx, slide));

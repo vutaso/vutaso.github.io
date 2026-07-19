@@ -277,7 +277,7 @@ window.PdfCreate = (() => {
   };
 
   const generatePdf = async (data, { onProgress } = {}) => {
-    if (!window.PdfExport?.exportRootToPdf) throw new Error('Thư viện xuất PDF chưa tải');
+    if (!window.PdfExport?.exportRootToPdf) throw new Error('Thư viện in PDF chưa tải');
 
     const normalized = normalizePdfData(data);
     if (!normalized) throw new Error('Dữ liệu PDF không hợp lệ');
@@ -289,7 +289,7 @@ window.PdfCreate = (() => {
         onProgress,
       });
       return {
-        ...result,
+        printed: !!result?.printed,
         blockCount: normalized.blockCount,
         title: normalized.title,
       };

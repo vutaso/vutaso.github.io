@@ -417,16 +417,11 @@ window.Events = (() => {
     });
 
     try {
-      const result = await window.PdfExport.exportToPdf(exportConvo, {
+      await window.PdfExport.exportToPdf(exportConvo, {
         onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
       });
-      const status = ui.finishExportDownload(result, {
-        readyTitle: t('exportDownloadReadyTitle'),
-        readyHint: t('exportDownloadReadyHint'),
-        readyDownloadLabel: t('exportDownloadPdfBtn'),
-        kind: 'pdf',
-      });
-      if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastExportPdfOk'));
     } catch (err) {
       ui.setPdfExportLoading(false);
       ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
@@ -708,16 +703,11 @@ window.Events = (() => {
       hint: t('exportPdfHint'),
     });
     try {
-      const result = await window.PdfCreate.generatePdf(msg.pdfData, {
+      await window.PdfCreate.generatePdf(msg.pdfData, {
         onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
       });
-      const status = ui.finishExportDownload(result, {
-        readyTitle: t('exportDownloadReadyTitle'),
-        readyHint: t('exportDownloadReadyHint'),
-        readyDownloadLabel: t('pdfDownloadBtn'),
-        kind: 'pdf',
-      });
-      if (status === 'downloaded') ui.showToast(t('toastPdfDownloadOk'));
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastPdfDownloadOk'));
     } catch (err) {
       ui.setPdfExportLoading(false);
       ui.showToast(t('toastPdfDownloadFail', { err: err.message || err }));
@@ -1737,16 +1727,11 @@ window.Events = (() => {
         });
 
         try {
-          const result = await window.PdfExport.exportToPdf(exportConvo, {
+          await window.PdfExport.exportToPdf(exportConvo, {
             onProgress: ({ title, hint }) => ui.setPdfExportLoading(true, { title, hint }),
           });
-          const status = ui.finishExportDownload(result, {
-            readyTitle: t('exportDownloadReadyTitle'),
-            readyHint: t('exportDownloadReadyHint'),
-            readyDownloadLabel: t('exportDownloadPdfBtn'),
-            kind: 'pdf',
-          });
-          if (status === 'downloaded') ui.showToast(t('toastExportPdfOk'));
+          ui.setPdfExportLoading(false);
+          ui.showToast(t('toastExportPdfOk'));
         } catch (err) {
           ui.setPdfExportLoading(false);
           ui.showToast(t('toastExportPdfFail', { err: err.message || err }));
