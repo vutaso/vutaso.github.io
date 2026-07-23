@@ -7,8 +7,9 @@ const FileParser = {
   // Returns { text, pages: string[] | null, numPages?: number }
   // `pages` is the per-page text for PDFs (enables page-range selection);
   // null for txt/docx. onProgress({stage, current, total}) is called as
-  // pages are processed.
-  async parseFile(file, { onProgress } = {}) {
+  // pages are processed. `signal` (AbortSignal) cancels PDF extraction
+  // between pages.
+  async parseFile(file, { onProgress, signal } = {}) {
     if (!file.name.includes('.')) {
       throw new Error('File has no extension. Supported types: .pdf, .docx, .txt');
     }
@@ -26,9 +27,17 @@ const FileParser = {
     if (extension === 'txt') {
       return { text: await this._parseTxt(file), pages: null };
     } else if (extension === 'pdf') {
-      return this._parsePdf(file, onProgress);
+      return this._parsePdf(file, onProgress, signal);
     } else {
       return { text: await this._parseDocx(file), pages: null };
+    }
+  },
+
+  _throwIfAborted(signal) {
+    if (signal?.aborted) {
+      const err = new Error('Cancelled.');
+      err.cancelled = true;
+      throw err;
     }
   },
 
@@ -67,7 +76,7 @@ const FileParser = {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        const text = reader.result;
+        const text = this._decodeText(reader.result);
         // Binary files misnamed as .txt decode to a wall of replacement/
         // control characters — surface that instead of feeding garbage
         // into the translator.
@@ -78,8 +87,25 @@ const FileParser = {
         resolve(text);
       };
       reader.onerror = () => reject(new Error('Failed to read text file.'));
-      reader.readAsText(file, 'UTF-8');
+      reader.readAsArrayBuffer(file);
     });
+  },
+
+  // Decode a text file honoring a BOM when present. UTF-16 LE/BE files
+  // (common from Windows Notepad's "Unicode" save) would otherwise decode
+  // as garbage under UTF-8 and trip the binary check. Without a BOM,
+  // assume UTF-8 (TextDecoder strips a UTF-8 BOM itself).
+  _decodeText(buffer) {
+    const bytes = new Uint8Array(buffer);
+    if (bytes.length >= 2) {
+      if (bytes[0] === 0xFF && bytes[1] === 0xFE) {
+        return new TextDecoder('utf-16le').decode(bytes.subarray(2));
+      }
+      if (bytes[0] === 0xFE && bytes[1] === 0xFF) {
+        return new TextDecoder('utf-16be').decode(bytes.subarray(2));
+      }
+    }
+    return new TextDecoder('utf-8').decode(bytes);
   },
 
   _looksBinary(text) {
@@ -91,35 +117,56 @@ const FileParser = {
     return !!controlChars && controlChars.length / sample.length > 0.05;
   },
 
-  async _parsePdf(file, onProgress) {
+  async _parsePdf(file, onProgress, signal) {
     const pdf = await this._openPdf(file);
 
-    const pages = [];
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      pages.push(this._reconstructPageText(content.items));
-      if (onProgress) {
-        onProgress({ stage: 'extract', current: i, total: pdf.numPages });
+    try {
+      const pages = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        this._throwIfAborted(signal);
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        pages.push(this._reconstructPageText(content.items));
+        if (onProgress) {
+          onProgress({ stage: 'extract', current: i, total: pdf.numPages });
+        }
       }
-    }
 
-    return { text: pages.join('\n\n').trim(), pages, numPages: pdf.numPages };
+      return { text: pages.join('\n\n').trim(), pages, numPages: pdf.numPages };
+    } finally {
+      // Release the pdf.js worker + buffers — without this every opened
+      // PDF stays in memory for the lifetime of the page.
+      pdf.destroy();
+    }
   },
 
   // OCR a scanned PDF: render each page to a canvas via pdf.js and run
   // Tesseract over it. Heavy (loads several MB of OCR data on first use,
   // then seconds per page) — always user-initiated.
-  async ocrPdf(file, { onProgress, langCode } = {}) {
+  // Options: from/to — 1-based inclusive page range, capped at
+  // OCR_MAX_PAGES per run; signal — AbortSignal (between pages, and
+  // mid-page by terminating the Tesseract worker).
+  // Returns { text, pages, numPages, from, to, truncated } where
+  // `truncated` means the PDF has pages beyond the processed range.
+  async ocrPdf(file, { onProgress, langCode, from, to, signal } = {}) {
     await this._loadTesseract();
+    this._throwIfAborted(signal);
 
     const pdf = await this._openPdf(file);
-    const total = Math.min(pdf.numPages, this.OCR_MAX_PAGES);
+    // Clamp the requested range, then cap it at OCR_MAX_PAGES per run.
+    const first = Math.max(1, Math.min(from || 1, pdf.numPages));
+    const last = Math.max(first,
+      Math.min(to || pdf.numPages, pdf.numPages, first + this.OCR_MAX_PAGES - 1));
 
     const worker = await Tesseract.createWorker(langCode || this.tesseractLangFor('auto'));
+    // Mid-page cancellation: aborting terminates the worker, which rejects
+    // the in-flight recognize() promise.
+    const onAbort = () => worker.terminate();
+    if (signal) signal.addEventListener('abort', onAbort, { once: true });
     try {
       const pages = [];
-      for (let i = 1; i <= total; i++) {
+      for (let i = first; i <= last; i++) {
+        this._throwIfAborted(signal);
         const page = await pdf.getPage(i);
         // 2x scale noticeably improves OCR accuracy on small fonts
         const viewport = page.getViewport({ scale: 2 });
@@ -131,7 +178,7 @@ const FileParser = {
         const result = await worker.recognize(canvas);
         pages.push((result.data.text || '').trim());
         if (onProgress) {
-          onProgress({ stage: 'ocr', current: i, total });
+          onProgress({ stage: 'ocr', current: i - first + 1, total: last - first + 1 });
         }
       }
 
@@ -139,10 +186,19 @@ const FileParser = {
         text: pages.join('\n\n').trim(),
         pages,
         numPages: pdf.numPages,
-        truncated: pdf.numPages > total
+        from: first,
+        to: last,
+        truncated: last < pdf.numPages
       };
+    } catch (err) {
+      // A worker killed by the abort listener rejects with a generic
+      // error — surface it as a clean cancellation instead.
+      this._throwIfAborted(signal);
+      throw err;
     } finally {
-      await worker.terminate();
+      if (signal) signal.removeEventListener('abort', onAbort);
+      await worker.terminate().catch(() => {});
+      pdf.destroy();
     }
   },
 

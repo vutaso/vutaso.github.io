@@ -7,6 +7,45 @@
   padding: 0;
 }
 
+/* Visually hidden but available to screen readers (for off-screen labels) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Keyboard focus ring. Buttons/inputs set `outline: none`, which erased
+   the focus indicator for keyboard users; restore it via :focus-visible so
+   it shows on Tab but not on mouse click. Selectors are element-qualified
+   so they out-specify the component rules that set `outline: none`. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+/* Older engines with no :focus-visible support still get a ring on :focus */
+@supports not selector(:focus-visible) {
+  a:focus,
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus,
+  [tabindex]:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
 :root {
   /* ===== Light Mode (default) ===== */
   --bg: #F2F2F7;
@@ -782,6 +821,123 @@ body::before {
   gap: 8px;
 }
 
+.ocr-page-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ocr-page-input {
+  width: 56px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text);
+  text-align: center;
+}
+
+.ocr-page-info {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ===== Multi-file queue ===== */
+.file-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.file-queue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.file-queue-summary {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.file-queue-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.file-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-queue-item {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  padding: 12px 14px;
+}
+
+.file-queue-item[data-status="done"] { border-left-color: var(--success); }
+.file-queue-item[data-status="translating"],
+.file-queue-item[data-status="extracting"] { border-left-color: var(--primary); }
+.file-queue-item[data-status="error"] { border-left-color: var(--danger); }
+.file-queue-item[data-status="needs-ocr"],
+.file-queue-item[data-status="skipped"],
+.file-queue-item[data-status="cancelled"] { border-left-color: var(--warning); }
+
+.fq-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fq-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.fq-status {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fq-detected {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.fq-detected:empty { display: none; }
+
+.fq-result {
+  font-size: 0.85rem;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-top: 6px;
+}
+.fq-result:empty { display: none; }
+
+.fq-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.fq-actions.hidden { display: none; }
+
 /* Glossary preset row */
 .glossary-preset-row {
   display: flex;
@@ -1464,15 +1620,33 @@ body::before {
     padding: 10px 10px 20px;
   }
 
+  /* Keep the header on ONE tidy row: logo · theme · API key · Save */
   .header {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px 14px;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 8px 10px;
+    margin-bottom: 12px;
     gap: 8px;
   }
 
+  .logo {
+    gap: 6px;
+  }
+
+  .logo h1 {
+    font-size: 1rem;
+  }
+
   .api-key-section {
-    max-width: 100%;
+    flex: 1;
+    min-width: 0;      /* allow the key field to shrink instead of overflowing */
+    max-width: none;
+  }
+
+  .api-key-input {
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 0.8rem;
   }
 
   .tabs {
@@ -1489,18 +1663,54 @@ body::before {
   }
 
   .control-strip {
-    padding: 8px 10px;
-    gap: 6px;
+    padding: 10px 12px;
+    gap: 8px;
   }
 
+  /* From / To stacked full-width with a tight swap button between them */
   .lang-selectors {
     flex-direction: column;
     align-items: stretch;
+    gap: 4px;
+  }
+
+  .lang-group {
+    flex: none;
   }
 
   .lang-selectors .btn-icon {
     align-self: center;
     transform: rotate(90deg);
+    padding: 4px;
+    margin: -2px 0;
+  }
+
+  /* Domain + Tone share one row (two columns); Advanced gets its own
+     full-width line for an easy tap target. */
+  .settings-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+    border-top: 1px solid var(--separator);
+    padding-top: 8px;
+  }
+
+  .settings-group {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .settings-row > .btn {
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  /* Slightly taller selects = comfortable touch targets */
+  .lang-select {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: 0.9rem;
   }
 
   .translate-input,
@@ -1520,44 +1730,65 @@ body::before {
   .batch-actions .lang-select {
     min-width: 100%;
   }
+}
 
-  .settings-row {
-    flex-direction: column;
+/* Very small phones: drop the wordmark so the single-row header keeps the
+   API key field comfortably wide (the logo icon still identifies the app). */
+@media (max-width: 400px) {
+  .logo h1 {
+    display: none;
   }
 }
 
 @media (min-width: 769px) {
+  /* One aligned row: From · swap · To · Domain · Tone · Advanced.
+     display:contents flattens the two wrappers so every field becomes a
+     direct flex child of the strip and their labels + selects line up on
+     shared baselines (fixes the row misalignment). */
   .control-strip {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    gap: 6px 12px;
-    align-items: start;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 4px 10px;
   }
 
-  .lang-selectors {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
+  .lang-selectors,
   .settings-row {
-    grid-column: 2;
-    grid-row: 1;
-    flex-wrap: nowrap;
-    border-top: none;
-    padding-top: 0;
-    align-self: start;
+    display: contents;
   }
 
+  .lang-group {
+    flex: 1.25 1 0;
+    min-width: 128px;
+  }
+
+  .settings-group {
+    flex: 1 1 0;
+    min-width: 92px;
+  }
+
+  /* Label-less controls sit on the SELECT row, not the label row — nudge
+     them down by roughly one label's height. */
+  .swap-lang-btn,
+  .settings-row > .btn {
+    align-self: flex-start;
+    margin-top: 15px;
+  }
+
+  /* Advanced options span the full width and wrap onto their own line. */
   .advanced-options {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    flex-basis: 100%;
   }
 
   .io-area {
     flex-direction: row;
     align-items: stretch;
     gap: 14px;
+    /* Cap the input/result row to the viewport (offset ≈ header + tabs +
+       control strip + paddings) so each box scrolls INTERNALLY instead of
+       the whole page growing with a long translation. */
+    max-height: calc(100dvh - 244px);
   }
 
   .io-area .io-box {

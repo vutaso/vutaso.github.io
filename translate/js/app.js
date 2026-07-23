@@ -9,6 +9,7 @@
     saveApiKey: document.getElementById('saveApiKey'),
     loadingOverlay: document.getElementById('loadingOverlay'),
     loadingText: document.getElementById('loadingText'),
+    loadingCancel: document.getElementById('loadingCancel'),
 
     // Text tab
     textSourceLang: document.getElementById('textSourceLang'),
@@ -22,6 +23,7 @@
     copyTextResult: document.getElementById('copyTextResult'),
     textTranslateProgress: document.getElementById('textTranslateProgress'),
     cancelTextTranslate: document.getElementById('cancelTextTranslate'),
+    reuseTextResult: document.getElementById('reuseTextResult'),
     textDomain: document.getElementById('textDomain'),
     textTone: document.getElementById('textTone'),
     textGlossary: document.getElementById('textGlossary'),
@@ -50,6 +52,7 @@
     cancelFileTranslate: document.getElementById('cancelFileTranslate'),
     downloadFileTxt: document.getElementById('downloadFileTxt'),
     downloadFileDocx: document.getElementById('downloadFileDocx'),
+    downloadFileDocxFormatted: document.getElementById('downloadFileDocxFormatted'),
     fileDomain: document.getElementById('fileDomain'),
     fileTone: document.getElementById('fileTone'),
     fileGlossary: document.getElementById('fileGlossary'),
@@ -65,6 +68,16 @@
     ocrPrompt: document.getElementById('ocrPrompt'),
     runOcr: document.getElementById('runOcr'),
     dismissOcr: document.getElementById('dismissOcr'),
+    ocrPageRange: document.getElementById('ocrPageRange'),
+    ocrPageFrom: document.getElementById('ocrPageFrom'),
+    ocrPageTo: document.getElementById('ocrPageTo'),
+    ocrPageInfo: document.getElementById('ocrPageInfo'),
+    fileSingleArea: document.getElementById('fileSingleArea'),
+    fileQueue: document.getElementById('fileQueue'),
+    fileQueueList: document.getElementById('fileQueueList'),
+    fileQueueSummary: document.getElementById('fileQueueSummary'),
+    fileQueueCancel: document.getElementById('fileQueueCancel'),
+    fileQueueClear: document.getElementById('fileQueueClear'),
 
     // Batch tab
     batchTargetLang: document.getElementById('batchTargetLang'),
@@ -81,6 +94,8 @@
     importBatchCsv: document.getElementById('importBatchCsv'),
     exportBatchCsv: document.getElementById('exportBatchCsv'),
     batchCsvInput: document.getElementById('batchCsvInput'),
+    retryBatchFailed: document.getElementById('retryBatchFailed'),
+    batchProgress: document.getElementById('batchProgress'),
 
     // History tab
     historyList: document.getElementById('historyList'),
@@ -94,13 +109,22 @@
 
   const themeToggle = document.getElementById('themeToggle');
 
-  let currentTab = 'text';
   let currentFileText = '';
   let currentFileName = '';
+  let currentFileObject = null; // the loaded File itself (for keep-format .docx export)
   let currentFilePages = null; // per-page text for PDFs (page-range feature)
   let pendingOcrFile = null;   // scanned PDF waiting for a user-triggered OCR
+  let pendingOcrNumPages = 0;  // total pages of pendingOcrFile (for the OCR range UI)
+  let extractAbort = null;     // AbortController for file extraction / OCR
+  let lastTextDetected = null; // auto-detected source lang of the last text translation
   let batchRowCounter = 0;
   let isLoading = false;
+
+  // Multi-file queue (File tab): dropping/selecting >1 file switches the
+  // File tab into a queue that extracts + translates each file in turn.
+  let fileQueue = [];          // [{ id, file, status, text, error, detectedLang }]
+  let fileQueueCounter = 0;
+  let fileQueueRunning = false;
 
   // History tab filter state
   let historyQuery = '';
@@ -144,6 +168,9 @@
 
   // ===== Preferences (remember last language choices) =====
   const PREFS_KEY = 'translation_preferences';
+  // Unsent text input survives reloads too — losing a long pasted text
+  // on an accidental refresh is as annoying as losing settings.
+  const TEXT_DRAFT_KEY = 'translation_text_draft';
 
   function loadPreferences() {
     try {
@@ -176,6 +203,14 @@
     } catch (e) {
       // Corrupted data — silently discard
       localStorage.removeItem(PREFS_KEY);
+    }
+
+    // Restore an unsent draft from the previous session
+    try {
+      const draft = localStorage.getItem(TEXT_DRAFT_KEY);
+      if (draft) dom.textInput.value = draft;
+    } catch (e) {
+      // Storage unavailable — skip
     }
   }
 
@@ -215,6 +250,84 @@
     [dom.textGlossary, dom.textContext, dom.fileGlossary, dom.fileContext,
       dom.batchGlossary, dom.batchContext]
       .forEach(el => el.addEventListener('change', savePreferences));
+  }
+
+  // ===== Glossary presets =====
+  // Wires the Load/Save/Delete preset controls above every glossary
+  // textarea (Text/File/Batch tabs). The preset list itself lives in
+  // GlossaryPresets (localStorage) and is shared across all three tabs.
+  function wireGlossaryPresets() {
+    const controls = [...document.querySelectorAll('.glossary-preset-row')].map(row => {
+      const select = row.querySelector('.glossary-preset-select');
+      return {
+        select,
+        saveBtn: row.querySelector('.glossary-save-preset'),
+        deleteBtn: row.querySelector('.glossary-delete-preset'),
+        textarea: document.getElementById(select.dataset.target)
+      };
+    }).filter(c => c.select && c.saveBtn && c.deleteBtn && c.textarea);
+
+    if (!controls.length || typeof GlossaryPresets === 'undefined') return;
+
+    // Rebuild every select's options from storage, keeping each select's
+    // current choice when that preset still exists.
+    function refreshPresetSelects(keepSelection = true) {
+      const names = Object.keys(GlossaryPresets.getAll()).sort((a, b) => a.localeCompare(b));
+      controls.forEach(c => {
+        const current = keepSelection ? c.select.value : '';
+        c.select.innerHTML = '<option value="">Load preset…</option>' +
+          names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+        if (current && names.includes(current)) {
+          c.select.value = current;
+        }
+        c.deleteBtn.disabled = !c.select.value;
+      });
+    }
+
+    controls.forEach(c => {
+      c.select.addEventListener('change', () => {
+        const name = c.select.value;
+        c.deleteBtn.disabled = !name;
+        if (!name) return;
+        const text = GlossaryPresets.getAll()[name];
+        if (typeof text === 'string') {
+          c.textarea.value = text;
+          savePreferences();
+          showToast(`Loaded preset "${name}"`, 'success');
+        }
+      });
+
+      c.saveBtn.addEventListener('click', () => {
+        const text = c.textarea.value.trim();
+        if (!text) {
+          showToast('Glossary is empty — nothing to save', 'error');
+          return;
+        }
+        const name = (prompt('Preset name:', c.select.value || '') || '').trim();
+        if (!name) return;
+        const exists = GlossaryPresets.getAll()[name] !== undefined;
+        if (exists && name !== c.select.value &&
+            !confirm(`Preset "${name}" already exists. Overwrite it?`)) {
+          return;
+        }
+        GlossaryPresets.save(name, text);
+        refreshPresetSelects();
+        c.select.value = name;
+        c.deleteBtn.disabled = false;
+        showToast(`Saved preset "${name}"`, 'success');
+      });
+
+      c.deleteBtn.addEventListener('click', () => {
+        const name = c.select.value;
+        if (!name) return;
+        if (!confirm(`Delete preset "${name}"? The glossary text stays in the box.`)) return;
+        GlossaryPresets.remove(name);
+        refreshPresetSelects(false);
+        showToast(`Deleted preset "${name}"`, 'success');
+      });
+    });
+
+    refreshPresetSelects();
   }
 
   // ===== Theme Toggle =====
@@ -305,8 +418,11 @@
   }
 
   function switchTab(target) {
-    currentTab = target;
-    dom.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+    dom.tabs.forEach(t => {
+      const selected = t.dataset.tab === target;
+      t.classList.toggle('active', selected);
+      t.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
     dom.panels.forEach(p => p.classList.toggle('active', p.id === `tab-${target}`));
     if (target === 'history') refreshHistory();
   }
@@ -324,6 +440,9 @@
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    // Errors interrupt (assertive); success/info wait their turn (polite).
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
     toast.textContent = message;
     document.body.appendChild(toast);
 
@@ -345,15 +464,21 @@
     }
   }
 
-  // Keep overlay only for file extraction (no button to spin)
-  function showExtracting(show) {
+  // Keep overlay only for file extraction/OCR (no button to spin).
+  // `cancellable` shows a Cancel button that aborts the in-flight work
+  // through `extractAbort`.
+  function showExtracting(show, cancellable = false) {
     if (show) {
       isLoading = true;
       dom.loadingText.textContent = 'Extracting text from file...';
       dom.loadingOverlay.classList.remove('hidden');
+      dom.loadingCancel.classList.toggle('hidden', !cancellable);
+      dom.loadingCancel.disabled = false;
     } else {
       isLoading = false;
       dom.loadingOverlay.classList.add('hidden');
+      dom.loadingCancel.classList.add('hidden');
+      extractAbort = null;
     }
   }
 
@@ -395,6 +520,35 @@
     return `${usage.totalTokens.toLocaleString()} tokens · ~$${estimateCost(usage).toFixed(4)}`;
   }
 
+  // Streams arrive token-by-token, each carrying the FULL text so far —
+  // writing all of it to the DOM per token is O(n²) on long translations.
+  // Coalesce writes to at most one per animation frame instead; flush()
+  // applies any queued write synchronously (before reading final state).
+  function makeStreamRenderer(el) {
+    let pending = null;
+    let rafId = 0;
+    const render = () => {
+      rafId = 0;
+      if (pending !== null) {
+        el.textContent = pending;
+        pending = null;
+      }
+    };
+    return {
+      push(text) {
+        pending = text;
+        if (!rafId) rafId = requestAnimationFrame(render);
+      },
+      flush() {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+        render();
+      }
+    };
+  }
+
   // ===== Clipboard =====
   async function copyToClipboard(text) {
     try {
@@ -426,6 +580,7 @@
     dom.textTone.addEventListener('change', savePreferences);
 
     // Character count & update copy button state
+    let draftSaveTimer = null;
     dom.textInput.addEventListener('input', () => {
       const charCount = dom.textInput.value.length;
       const maxChars = Translator.MAX_CHARS;
@@ -437,12 +592,28 @@
         warning = ` ℹ️ Long text — will be translated in ~${parts} parts`;
       }
       dom.textCharCount.textContent = `${charCount.toLocaleString()} / ${maxChars.toLocaleString()} characters${warning}`;
+
+      // Debounced draft auto-save (see TEXT_DRAFT_KEY)
+      clearTimeout(draftSaveTimer);
+      draftSaveTimer = setTimeout(() => {
+        try {
+          if (dom.textInput.value) {
+            localStorage.setItem(TEXT_DRAFT_KEY, dom.textInput.value);
+          } else {
+            localStorage.removeItem(TEXT_DRAFT_KEY);
+          }
+        } catch (e) {
+          // Storage full — drafts are a convenience, not critical
+        }
+      }, 400);
     });
 
-    // Result change - update copy button state (locked while a
+    // Result change - update copy/reuse button state (locked while a
     // translation is streaming in, so partial text can't be copied)
     const updateTextResultCopyBtn = () => {
-      dom.copyTextResult.disabled = !dom.textResult.textContent || isLoading;
+      const ready = !!dom.textResult.textContent && !isLoading;
+      dom.copyTextResult.disabled = !ready;
+      dom.reuseTextResult.disabled = !ready;
     };
 
     // Observe result changes
@@ -455,7 +626,36 @@
       dom.textResult.textContent = '';
       dom.textDetectedLang.textContent = '';
       dom.textCharCount.textContent = '0 characters';
+      try { localStorage.removeItem(TEXT_DRAFT_KEY); } catch (e) { /* ignore */ }
       updateTextResultCopyBtn();
+    });
+
+    // Reuse the translation as new input, reversing the language
+    // direction — handy for back-and-forth conversations and for
+    // checking a translation by translating it back.
+    dom.reuseTextResult.addEventListener('click', () => {
+      const resultText = dom.textResult.textContent;
+      if (!resultText) return;
+
+      const newSource = dom.textTargetLang.value;
+      const oldSource = dom.textSourceLang.value === 'auto' ? lastTextDetected : dom.textSourceLang.value;
+      // Fall back to the app's primary pair when the old source is
+      // unknown (auto-detect never reported) or would collide.
+      const newTarget = (oldSource && oldSource !== newSource)
+        ? oldSource
+        : (newSource === 'English' ? 'Vietnamese' : 'English');
+
+      dom.textSourceLang.value = newSource;
+      dom.textTargetLang.value = newTarget;
+      savePreferences();
+
+      dom.textInput.value = resultText;
+      dom.textInput.dispatchEvent(new Event('input'));
+      dom.textResult.textContent = '';
+      dom.textDetectedLang.textContent = '';
+      dom.textUsage.textContent = '';
+      updateTextResultCopyBtn();
+      dom.textInput.focus();
     });
 
     // Swap languages
@@ -483,8 +683,9 @@
       }
     });
 
-    // Initial state
+    // Initial state (also refreshes the char count for a restored draft)
     updateTextResultCopyBtn();
+    dom.textInput.dispatchEvent(new Event('input'));
 
     // Enter to translate (Ctrl+Enter)
     dom.textInput.addEventListener('keydown', (e) => {
@@ -510,6 +711,8 @@
       return;
     }
 
+    const renderer = makeStreamRenderer(dom.textResult);
+
     try {
       setButtonLoading(dom.translateText, true);
       showCancelButton(dom.cancelTextTranslate, true);
@@ -517,6 +720,7 @@
       dom.textDetectedLang.textContent = '';
       dom.textUsage.textContent = '';
       dom.textUsage.title = '';
+      lastTextDetected = null;
 
       // Prepare translation options
       const options = {
@@ -530,14 +734,17 @@
             : '';
         },
         onStream: (s) => {
-          dom.textResult.textContent = s.text;
+          renderer.push(s.text);
         },
         onDetectedLang: (lang) => {
+          lastTextDetected = lang;
           dom.textDetectedLang.textContent = `Detected: ${lang}`;
         }
       };
 
       const result = await Translator.translate(text, sourceLang, targetLang, options);
+      renderer.flush();
+      if (result.detectedLang) lastTextDetected = result.detectedLang;
       dom.textResult.textContent = result.text;
       dom.textUsage.textContent = formatUsage(result.usage);
       dom.textUsage.title = usageTitle(result.usage);
@@ -555,6 +762,8 @@
         showToast('Part of the output was truncated by the API length limit', 'error');
       }
     } catch (err) {
+      // Show the newest partial text that may still be queued in the renderer
+      renderer.flush();
       if (err.cancelled) {
         // Keep whatever partial translation already streamed into the
         // result area — the user may still want to copy it.
@@ -571,6 +780,7 @@
       dom.textTranslateProgress.textContent = '';
       setButtonLoading(dom.translateText, false);
       dom.copyTextResult.disabled = !dom.textResult.textContent;
+      dom.reuseTextResult.disabled = !dom.textResult.textContent;
     }
   }
 
@@ -596,7 +806,14 @@
 
     // Click to upload
     dom.dropZone.addEventListener('click', () => dom.fileInput.click());
-    dom.fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+    // Keyboard activation for the role="button" drop zone (Enter/Space)
+    dom.dropZone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        dom.fileInput.click();
+      }
+    });
+    dom.fileInput.addEventListener('change', (e) => handleFileSelection(e.target.files));
 
     // Swap languages
     dom.swapLangFile.addEventListener('click', () => {
@@ -644,9 +861,15 @@
         dragCounter = 0;
         dom.dropZone.classList.remove('drag-over');
         dom.filePreview.classList.remove('drag-over-preview');
-        const file = e.dataTransfer.files[0];
-        if (file) handleFileSelect(file);
+        handleFileSelection(e.dataTransfer.files);
       });
+    });
+
+    // Dropping onto the queue panel appends more files to it
+    dom.fileQueue.addEventListener('dragover', (e) => e.preventDefault());
+    dom.fileQueue.addEventListener('drop', (e) => {
+      e.preventDefault();
+      handleFileSelection(e.dataTransfer.files);
     });
 
     // Page range selection (PDF only)
@@ -657,7 +880,29 @@
     dom.runOcr.addEventListener('click', () => runOcrExtraction());
     dom.dismissOcr.addEventListener('click', () => {
       pendingOcrFile = null;
+      pendingOcrNumPages = 0;
       dom.ocrPrompt.classList.add('hidden');
+      dom.ocrPageRange.classList.add('hidden');
+    });
+    dom.ocrPageFrom.addEventListener('change', onOcrPageRangeChange);
+    dom.ocrPageTo.addEventListener('change', onOcrPageRangeChange);
+
+    // Cancel an in-flight extraction/OCR or keep-format translation
+    dom.loadingCancel.addEventListener('click', () => {
+      dom.loadingCancel.disabled = true;
+      if (extractAbort) extractAbort.abort();
+      Translator.cancel(); // keep-format export translates through jobs
+    });
+
+    // Multi-file queue controls
+    dom.fileQueueCancel.addEventListener('click', () => {
+      dom.fileQueueCancel.disabled = true;
+      if (extractAbort) extractAbort.abort(); // stop an in-flight extraction
+      Translator.cancel();                    // stop an in-flight translation
+    });
+    dom.fileQueueClear.addEventListener('click', () => {
+      if (fileQueueRunning) return; // Cancel first
+      exitFileQueueMode();
     });
 
     // Replace file
@@ -670,12 +915,16 @@
     dom.removeFile.addEventListener('click', () => {
       currentFileText = '';
       currentFileName = '';
+      currentFileObject = null;
       currentFilePages = null;
       pendingOcrFile = null;
+      pendingOcrNumPages = 0;
       dom.fileInput.value = '';
       dom.filePreview.classList.add('hidden');
       dom.ocrPrompt.classList.add('hidden');
+      dom.ocrPageRange.classList.add('hidden');
       dom.pageRangeRow.classList.add('hidden');
+      dom.downloadFileDocxFormatted.classList.add('hidden');
       dom.dropZone.style.display = '';
       dom.fileResult.textContent = '';
       dom.fileDetectedLang.textContent = '';
@@ -731,6 +980,10 @@
       }
     });
 
+    // Download .docx keeping the original formatting (translates the
+    // original document in place; runs its own translation pass)
+    dom.downloadFileDocxFormatted.addEventListener('click', () => downloadDocxKeepingFormat());
+
     // Copy result
     dom.copyFileResult.addEventListener('click', () => {
       if (dom.fileResult.textContent) {
@@ -758,9 +1011,11 @@
     // until parsing succeeds. If this is a "Replace" of an already-loaded
     // file and parsing fails, the previous valid file (and its translation
     // result) must stay intact instead of being wiped out by a failed attempt.
+    extractAbort = new AbortController();
     try {
-      showExtracting(true);
+      showExtracting(true, true);
       const result = await FileParser.parseFile(file, {
+        signal: extractAbort.signal,
         onProgress: (p) => {
           if (p.stage === 'extract') {
             dom.loadingText.textContent = `Extracting text… page ${p.current}/${p.total}`;
@@ -773,7 +1028,18 @@
         // dead-end error toast.
         if (result.pages) {
           pendingOcrFile = file;
+          pendingOcrNumPages = result.numPages || result.pages.length;
           dom.ocrPrompt.classList.remove('hidden');
+          if (pendingOcrNumPages > 1) {
+            dom.ocrPageRange.classList.remove('hidden');
+            dom.ocrPageFrom.max = pendingOcrNumPages;
+            dom.ocrPageTo.max = pendingOcrNumPages;
+            dom.ocrPageFrom.value = 1;
+            dom.ocrPageTo.value = Math.min(pendingOcrNumPages, FileParser.OCR_MAX_PAGES);
+            dom.ocrPageInfo.textContent = `PDF has ${pendingOcrNumPages} pages · up to ${FileParser.OCR_MAX_PAGES} per run`;
+          } else {
+            dom.ocrPageRange.classList.add('hidden');
+          }
         } else {
           showToast('No text could be extracted from this file.', 'error');
         }
@@ -783,13 +1049,336 @@
       // Parsing succeeded — now it's safe to commit the new file and
       // discard whatever was loaded before.
       dom.ocrPrompt.classList.add('hidden');
+      dom.ocrPageRange.classList.add('hidden');
       pendingOcrFile = null;
+      pendingOcrNumPages = 0;
       commitParsedFile(file, result);
     } catch (err) {
-      showToast(err.message, 'error');
+      if (err.cancelled) {
+        showToast('Extraction cancelled', 'success');
+      } else {
+        showToast(err.message, 'error');
+      }
     } finally {
       dom.fileInput.value = '';
       showExtracting(false);
+    }
+  }
+
+  // ===== Multi-file queue =====
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+  // Entry point for the input `change` / drop events. A single file (with
+  // no queue already active) keeps the original rich single-file UI;
+  // anything else routes into the sequential queue.
+  function handleFileSelection(fileList) {
+    const files = [...(fileList || [])];
+    if (!files.length) return;
+
+    if (files.length === 1 && !fileQueueRunning && fileQueue.length === 0) {
+      handleFileSelect(files[0]); // unchanged single-file path
+      return;
+    }
+    enqueueFiles(files);
+    dom.fileInput.value = '';
+  }
+
+  function enqueueFiles(files) {
+    const accepted = [];
+    let rejected = 0;
+    for (const file of files) {
+      const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+      if (!FileParser.SUPPORTED_EXTENSIONS.includes(ext) || file.size === 0 || file.size > MAX_FILE_SIZE) {
+        rejected++;
+        continue;
+      }
+      accepted.push(file);
+    }
+    if (!accepted.length) {
+      showToast('No supported files to add (PDF, DOCX, TXT up to 10MB).', 'error');
+      return;
+    }
+    if (rejected) showToast(`Skipped ${rejected} unsupported or too-large file(s)`, 'error');
+
+    enterFileQueueMode();
+    for (const file of accepted) {
+      fileQueue.push({ id: ++fileQueueCounter, file, status: 'pending', text: '', error: '', detectedLang: '', progress: '' });
+    }
+    renderFileQueue();
+    if (!fileQueueRunning) processFileQueue();
+  }
+
+  // Switch the File tab from single-file to queue layout, discarding any
+  // half-loaded single file.
+  function enterFileQueueMode() {
+    currentFileText = '';
+    currentFileName = '';
+    currentFilePages = null;
+    pendingOcrFile = null;
+    pendingOcrNumPages = 0;
+    dom.filePreview.classList.add('hidden');
+    dom.ocrPrompt.classList.add('hidden');
+    dom.ocrPageRange.classList.add('hidden');
+    dom.fileSingleArea.classList.add('hidden');
+    dom.fileQueue.classList.remove('hidden');
+  }
+
+  function exitFileQueueMode() {
+    fileQueue = [];
+    dom.fileQueueList.innerHTML = '';
+    dom.fileQueueSummary.textContent = '';
+    dom.fileQueue.classList.add('hidden');
+    dom.fileSingleArea.classList.remove('hidden');
+    dom.dropZone.style.display = '';
+    dom.filePreview.classList.add('hidden');
+    dom.fileInput.value = '';
+  }
+
+  const FQ_STATUS_LABELS = {
+    pending: '• Pending',
+    extracting: '⟳ Extracting…',
+    translating: '⟳ Translating…',
+    done: '✓ Done',
+    error: '⚠ Error',
+    'needs-ocr': '⚠ Skipped — scanned PDF, open it on its own to run OCR',
+    skipped: '⚠ Skipped — no text found',
+    cancelled: '✕ Cancelled'
+  };
+
+  // Add a row for any queue item that doesn't have one yet, then patch all
+  // rows. Rows are keyed by item id so streaming patches never rebuild the
+  // whole list.
+  function renderFileQueue() {
+    for (const item of fileQueue) {
+      if (!dom.fileQueueList.querySelector(`[data-qid="${item.id}"]`)) {
+        dom.fileQueueList.appendChild(buildQueueRow(item));
+      }
+      updateQueueItemRow(item);
+    }
+    updateQueueSummary();
+  }
+
+  function buildQueueRow(item) {
+    const row = document.createElement('div');
+    row.className = 'file-queue-item';
+    row.dataset.qid = item.id;
+    row.setAttribute('role', 'listitem');
+    row.innerHTML = `
+      <div class="fq-head">
+        <span class="fq-name"></span>
+        <span class="fq-status" role="status" aria-live="polite"></span>
+      </div>
+      <div class="fq-detected"></div>
+      <div class="fq-result"></div>
+      <div class="fq-actions hidden">
+        <button class="btn btn-text btn-sm fq-copy">Copy</button>
+        <button class="btn btn-text btn-sm fq-txt">Download .txt</button>
+        <button class="btn btn-text btn-sm fq-docx">Download .docx</button>
+      </div>
+    `;
+    // textContent (not innerHTML) — filenames are user-controlled
+    row.querySelector('.fq-name').textContent = `${item.file.name} (${formatFileSize(item.file.size)})`;
+    row.querySelector('.fq-copy').addEventListener('click', () => {
+      if (item.text) copyToClipboard(item.text);
+    });
+    row.querySelector('.fq-txt').addEventListener('click', () => downloadQueueItem(item, 'txt'));
+    row.querySelector('.fq-docx').addEventListener('click', () => downloadQueueItem(item, 'docx'));
+    return row;
+  }
+
+  function updateQueueItemRow(item) {
+    const row = dom.fileQueueList.querySelector(`[data-qid="${item.id}"]`);
+    if (!row) return;
+    row.dataset.status = item.status;
+    row.querySelector('.fq-status').textContent = item.progress || FQ_STATUS_LABELS[item.status] || item.status;
+    row.querySelector('.fq-detected').textContent = item.detectedLang ? `Detected: ${item.detectedLang}` : '';
+
+    const resultEl = row.querySelector('.fq-result');
+    // While translating, the stream renderer owns .fq-result — don't clobber it.
+    if (item.status === 'done') {
+      resultEl.textContent = item.text || '';
+    } else if (item.status === 'error' || item.status === 'needs-ocr' || item.status === 'skipped' || item.status === 'cancelled') {
+      resultEl.textContent = item.error || item.text || '';
+    } else if (item.status === 'pending' || item.status === 'extracting') {
+      resultEl.textContent = '';
+    }
+
+    row.querySelector('.fq-actions').classList.toggle('hidden', !(item.status === 'done' && item.text));
+  }
+
+  function updateQueueSummary() {
+    const total = fileQueue.length;
+    if (!total) { dom.fileQueueSummary.textContent = ''; return; }
+    if (fileQueueRunning) {
+      const processed = fileQueue.filter(i => !['pending', 'extracting', 'translating'].includes(i.status)).length;
+      dom.fileQueueSummary.textContent = `Processing… ${processed}/${total} done`;
+      return;
+    }
+    const done = fileQueue.filter(i => i.status === 'done').length;
+    const failed = fileQueue.filter(i => ['error', 'needs-ocr', 'skipped'].includes(i.status)).length;
+    dom.fileQueueSummary.textContent = failed
+      ? `${done} done · ${failed} skipped/failed · ${total} total`
+      : `${done} done · ${total} total`;
+  }
+
+  async function downloadQueueItem(item, ext) {
+    if (!item.text) {
+      showToast('Nothing to download', 'error');
+      return;
+    }
+    const base = (item.file.name.replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').trim()) || 'translation';
+    const name = `${base}_translated_${dom.fileTargetLang.value}.${ext}`;
+    if (ext === 'txt') {
+      triggerDownload(new Blob(['﻿' + item.text], { type: 'text/plain;charset=utf-8' }), name);
+      showToast('Downloaded .txt file', 'success');
+    } else {
+      try {
+        await downloadAsDocx(item.text, name);
+        showToast('Downloaded .docx file', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  }
+
+  // Extract + translate each pending item, one at a time. New items dropped
+  // while this runs are picked up by the live array iterator.
+  async function processFileQueue() {
+    if (fileQueueRunning) return;
+    fileQueueRunning = true;
+    isLoading = true;
+    dom.fileQueueCancel.classList.remove('hidden');
+    dom.fileQueueCancel.disabled = false;
+    dom.fileQueueClear.disabled = true;
+
+    const sourceLang = dom.fileSourceLang.value;
+    const targetLang = dom.fileTargetLang.value;
+    const job = Translator.createJob();
+    let cancelledAll = false;
+
+    try {
+      for (const item of fileQueue) {
+        if (cancelledAll) break;
+        if (item.status !== 'pending') continue;
+
+        // ---- Extract (no OCR — scanned PDFs are flagged and skipped) ----
+        item.status = 'extracting';
+        item.progress = '';
+        updateQueueItemRow(item);
+        updateQueueSummary();
+
+        extractAbort = new AbortController();
+        let parsed;
+        try {
+          parsed = await FileParser.parseFile(item.file, {
+            signal: extractAbort.signal,
+            onProgress: (p) => {
+              if (p.stage === 'extract') {
+                item.progress = `⟳ Extracting… page ${p.current}/${p.total}`;
+                updateQueueItemRow(item);
+              }
+            }
+          });
+        } catch (err) {
+          if (err.cancelled) { item.status = 'cancelled'; item.progress = ''; updateQueueItemRow(item); cancelledAll = true; break; }
+          item.status = 'error'; item.error = err.message; item.progress = '';
+          updateQueueItemRow(item); updateQueueSummary();
+          continue;
+        } finally {
+          extractAbort = null;
+        }
+
+        const text = (parsed.text || '').trim();
+        if (!text) {
+          item.status = parsed.pages ? 'needs-ocr' : 'skipped';
+          item.progress = '';
+          updateQueueItemRow(item); updateQueueSummary();
+          continue;
+        }
+        if (sourceLang !== 'auto' && sourceLang === targetLang) {
+          item.status = 'error'; item.error = 'Source and target languages are the same.'; item.progress = '';
+          updateQueueItemRow(item); updateQueueSummary();
+          continue;
+        }
+        if (text.length > Translator.MAX_CHARS) {
+          item.status = 'error'; item.error = `Too long (${text.length.toLocaleString()} characters).`; item.progress = '';
+          updateQueueItemRow(item); updateQueueSummary();
+          continue;
+        }
+
+        // ---- Translate ----
+        item.status = 'translating';
+        item.progress = '⟳ Translating…';
+        item.text = '';
+        updateQueueItemRow(item);
+        updateQueueSummary();
+
+        const resultEl = dom.fileQueueList.querySelector(`[data-qid="${item.id}"] .fq-result`);
+        const renderer = makeStreamRenderer(resultEl);
+        try {
+          const result = await Translator.translate(text, sourceLang, targetLang, {
+            domain: dom.fileDomain.value,
+            tone: dom.fileTone.value,
+            glossary: dom.fileGlossary.value,
+            context: dom.fileContext.value,
+            job,
+            onProgress: (p) => {
+              item.progress = p.total > 1 ? `⟳ Translating part ${p.current}/${p.total}…` : '⟳ Translating…';
+              const st = dom.fileQueueList.querySelector(`[data-qid="${item.id}"] .fq-status`);
+              if (st) st.textContent = item.progress;
+            },
+            onStream: (s) => renderer.push(s.text),
+            onDetectedLang: (lang) => {
+              item.detectedLang = lang;
+              const d = dom.fileQueueList.querySelector(`[data-qid="${item.id}"] .fq-detected`);
+              if (d) d.textContent = `Detected: ${lang}`;
+            }
+          });
+          renderer.flush();
+          item.status = 'done';
+          item.text = result.text;
+          item.progress = '';
+          if (!item.detectedLang && result.detectedLang) item.detectedLang = result.detectedLang;
+          updateQueueItemRow(item);
+          updateQueueSummary();
+
+          History.add({
+            sourceLang: sourceLang === 'auto' ? (result.detectedLang || 'Auto') : sourceLang,
+            targetLang,
+            sourceText: text,
+            translatedText: result.text,
+            type: 'file',
+            domain: dom.fileDomain.value
+          });
+        } catch (err) {
+          renderer.flush();
+          if (err.cancelled) { item.status = 'cancelled'; item.progress = ''; item.text = ''; updateQueueItemRow(item); cancelledAll = true; break; }
+          item.status = 'error'; item.error = err.message; item.progress = ''; item.text = '';
+          updateQueueItemRow(item); updateQueueSummary();
+          // A bad API key will fail every remaining file — stop and prompt.
+          if (err.message.includes('API key')) {
+            dom.apiKeyInput.focus();
+            dom.apiKeyInput.select();
+            cancelledAll = true;
+            break;
+          }
+        }
+      }
+    } finally {
+      Translator.endJob(job);
+      extractAbort = null;
+      fileQueueRunning = false;
+      isLoading = false;
+      dom.fileQueueCancel.classList.add('hidden');
+      dom.fileQueueClear.disabled = false;
+      updateQueueSummary();
+    }
+
+    const done = fileQueue.filter(i => i.status === 'done').length;
+    if (cancelledAll) {
+      showToast('File queue cancelled', 'success');
+    } else {
+      showToast(`Translated ${done} of ${fileQueue.length} file(s)`, done ? 'success' : 'error');
     }
   }
 
@@ -798,13 +1387,20 @@
     const file = pendingOcrFile;
     if (!file) return;
 
+    const from = pendingOcrNumPages ? parseInt(dom.ocrPageFrom.value, 10) || 1 : undefined;
+    const to = pendingOcrNumPages ? parseInt(dom.ocrPageTo.value, 10) || pendingOcrNumPages : undefined;
+
+    extractAbort = new AbortController();
     try {
       dom.ocrPrompt.classList.add('hidden');
-      showExtracting(true);
+      showExtracting(true, true);
       dom.loadingText.textContent = 'Loading OCR engine…';
 
       const result = await FileParser.ocrPdf(file, {
         langCode: FileParser.tesseractLangFor(dom.fileSourceLang.value),
+        from,
+        to,
+        signal: extractAbort.signal,
         onProgress: (p) => {
           if (p.stage === 'ocr') {
             dom.loadingText.textContent = `OCR in progress… page ${p.current}/${p.total}`;
@@ -818,15 +1414,22 @@
       }
 
       pendingOcrFile = null;
+      pendingOcrNumPages = 0;
+      dom.ocrPageRange.classList.add('hidden');
       commitParsedFile(file, result);
 
       if (result.truncated) {
-        showToast(`OCR processed the first ${FileParser.OCR_MAX_PAGES} pages only`, 'error');
+        showToast(`OCR processed pages ${result.from}-${result.to} only`, 'error');
       }
     } catch (err) {
       // OCR failed — restore the prompt so the user can retry
       dom.ocrPrompt.classList.remove('hidden');
-      showToast(err.message, 'error');
+      if (pendingOcrNumPages > 1) dom.ocrPageRange.classList.remove('hidden');
+      if (err.cancelled) {
+        showToast('OCR cancelled', 'success');
+      } else {
+        showToast(err.message, 'error');
+      }
     } finally {
       showExtracting(false);
     }
@@ -836,11 +1439,16 @@
   function commitParsedFile(file, result) {
     currentFileText = result.text;
     currentFileName = file.name;
+    currentFileObject = file;
     currentFilePages = result.pages || null;
     dom.fileResult.textContent = '';
     dom.fileUsage.textContent = '';
 
     dom.fileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+    // The keep-format export only applies to real .docx sources (it edits
+    // the original document's XML in place).
+    const isDocx = /\.docx$/i.test(file.name);
+    dom.downloadFileDocxFormatted.classList.toggle('hidden', !isDocx);
     setupPageRangeUI();
     refreshFilePreview();
     dom.dropZone.style.display = 'none';
@@ -868,6 +1476,17 @@
     dom.pageTo.value = to;
     currentFileText = FileParser.joinPages(currentFilePages, from, to);
     refreshFilePreview();
+  }
+
+  // Clamp the OCR page-range inputs to the PDF's bounds and OCR_MAX_PAGES
+  // per run, mirroring onPageRangeChange for the extracted-text range.
+  function onOcrPageRangeChange() {
+    if (!pendingOcrNumPages) return;
+    const from = Math.max(1, Math.min(parseInt(dom.ocrPageFrom.value, 10) || 1, pendingOcrNumPages));
+    const maxTo = Math.min(pendingOcrNumPages, from + FileParser.OCR_MAX_PAGES - 1);
+    const to = Math.max(from, Math.min(parseInt(dom.ocrPageTo.value, 10) || maxTo, maxTo));
+    dom.ocrPageFrom.value = from;
+    dom.ocrPageTo.value = to;
   }
 
   function refreshFilePreview() {
@@ -970,6 +1589,11 @@
   function setupBatchTab() {
     dom.addBatchRow.addEventListener('click', () => addBatchRow());
     dom.translateBatch.addEventListener('click', () => translateBatchAll());
+    dom.retryBatchFailed.addEventListener('click', () => {
+      const failedRows = [...dom.batchRows.querySelectorAll('.batch-row')]
+        .filter(row => row.dataset.failed === 'true');
+      if (failedRows.length) translateBatchAll(failedRows);
+    });
     wireCancelButton(dom.cancelBatch);
 
     // Toggle advanced options
@@ -1014,24 +1638,24 @@
     row.dataset.rowId = rowId;
     row.innerHTML = `
       <div class="batch-row-input">
-        <select class="lang-select batch-source-lang">${sourceLangOptions}</select>
-        <textarea placeholder="Enter text..." rows="3"></textarea>
+        <select class="lang-select batch-source-lang" aria-label="Source language for this row">${sourceLangOptions}</select>
+        <textarea placeholder="Enter text..." rows="3" aria-label="Text to translate"></textarea>
         <div class="batch-row-char-count">0 characters</div>
       </div>
       <div class="batch-row-actions">
-        <button class="btn btn-icon translate-row-btn" title="Translate this row">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <button class="btn btn-icon translate-row-btn" title="Translate this row" aria-label="Translate this row">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
-        <button class="btn btn-icon remove-row-btn" title="Remove row">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button class="btn btn-icon remove-row-btn" title="Remove row" aria-label="Remove this row">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="batch-row-output">
         <div class="batch-row-detected"></div>
-        <div class="batch-row-result" data-result-id="${rowId}"></div>
+        <div class="batch-row-result" data-result-id="${rowId}" role="region" aria-label="Row translation result"></div>
         <div class="batch-row-usage"></div>
-        <button class="btn btn-icon copy-row-btn" title="Copy translation" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <button class="btn btn-icon copy-row-btn" title="Copy translation" aria-label="Copy this translation" disabled>
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
       </div>
     `;
@@ -1055,6 +1679,9 @@
     row.querySelector('.remove-row-btn').addEventListener('click', () => {
       if (dom.batchRows.children.length > 1) {
         row.remove();
+        const anyFailed = [...dom.batchRows.querySelectorAll('.batch-row')]
+          .some(r => r.dataset.failed === 'true');
+        dom.retryBatchFailed.classList.toggle('hidden', !anyFailed);
       } else {
         showToast('Need at least one row', 'error');
       }
@@ -1104,12 +1731,18 @@
     // Importing/exporting mid-run would capture or clobber half-done rows.
     dom.importBatchCsv.disabled = locked;
     dom.exportBatchCsv.disabled = locked;
+    dom.retryBatchFailed.disabled = locked;
   }
 
   async function translateBatchRow(row) {
-    // Guard against concurrent Translate All
-    if (dom.translateBatch.disabled) {
-      showToast('Batch translation is already in progress', 'error');
+    // Guard against ANY other in-flight translation: Translate All, or
+    // another single row already streaming. All batch translations share
+    // the one Cancel button, and Translator.cancel() aborts every job at
+    // once — so two running together would clobber each other's cancel.
+    // isLoading also gates tab-switching, keeping this consistent with the
+    // Text/File/Translate-All flows.
+    if (isLoading) {
+      showToast('A translation is already in progress', 'error');
       return;
     }
 
@@ -1132,7 +1765,9 @@
     }
 
     try {
+      isLoading = true;
       row.dataset.translating = 'true';
+      delete row.dataset.failed;
       showCancelButton(dom.cancelBatch, true);
       translateBtn.disabled = true;
       removeBtn.disabled = true;
@@ -1189,6 +1824,8 @@
         showToast('Translation cancelled', 'success');
       } else {
         resultDiv.textContent = '';
+        row.dataset.failed = 'true';
+        dom.retryBatchFailed.classList.remove('hidden');
         if (err.message.includes('API key')) {
           dom.apiKeyInput.focus();
           dom.apiKeyInput.select();
@@ -1196,6 +1833,7 @@
         showToast(err.message, 'error');
       }
     } finally {
+      isLoading = false;
       showCancelButton(dom.cancelBatch, false);
       delete row.dataset.translating;
       row._updateCopyBtn();
@@ -1205,14 +1843,25 @@
     }
   }
 
-  async function translateBatchAll() {
-    const rows = [...dom.batchRows.querySelectorAll('.batch-row')];
+  // rowsOverride lets Retry Failed re-run just the rows still marked
+  // dataset.failed, instead of every row in the batch.
+  async function translateBatchAll(rowsOverride) {
+    // Don't start on top of a single-row translation still in flight —
+    // same shared-Cancel / shared-job hazard as the guard in
+    // translateBatchRow. (setButtonLoading below then owns isLoading.)
+    if (isLoading) {
+      showToast('A translation is already in progress', 'error');
+      return;
+    }
+
+    const rows = rowsOverride || [...dom.batchRows.querySelectorAll('.batch-row')];
     let translations = 0;
     let emptySkipped = 0;
     let sameLangSkipped = 0;
     let errors = 0;
     let truncatedCount = 0;
     let cancelled = false;
+    let completed = 0;
 
     // Build the work list up front; rows that need no API call are
     // resolved synchronously exactly as before.
@@ -1242,6 +1891,8 @@
     setButtonLoading(dom.translateBatch, true);
     setBatchRowsLocked(true);
     showCancelButton(dom.cancelBatch, true);
+    dom.retryBatchFailed.classList.add('hidden');
+    dom.batchProgress.textContent = work.length ? `0/${work.length}` : '';
 
     // One shared cancellation job for the whole run — the Cancel button
     // aborts every in-flight row request at once.
@@ -1250,6 +1901,7 @@
     try {
       await Translator._runPool(work, async ({ row, text, sourceLang, targetLang, resultDiv }) => {
         row.dataset.translating = 'true';
+        delete row.dataset.failed;
         resultDiv.textContent = 'Translating...';
 
         try {
@@ -1303,6 +1955,7 @@
             return false; // tells the pool to stop launching new rows
           }
           resultDiv.textContent = 'Error: ' + err.message;
+          row.dataset.failed = 'true';
           errors++;
           if (err.message.includes('API key') && translations === 0) {
             dom.apiKeyInput.focus();
@@ -1311,6 +1964,8 @@
         } finally {
           delete row.dataset.translating;
           if (row._updateCopyBtn) row._updateCopyBtn();
+          completed++;
+          dom.batchProgress.textContent = `${completed}/${work.length}`;
         }
         return true;
       }, BATCH_CONCURRENCY);
@@ -1319,6 +1974,10 @@
       setButtonLoading(dom.translateBatch, false);
       setBatchRowsLocked(false);
       showCancelButton(dom.cancelBatch, false);
+      dom.batchProgress.textContent = '';
+      const anyFailed = [...dom.batchRows.querySelectorAll('.batch-row')]
+        .some(row => row.dataset.failed === 'true');
+      dom.retryBatchFailed.classList.toggle('hidden', !anyFailed);
     }
 
     const skippedTotal = emptySkipped + sameLangSkipped;
@@ -1463,11 +2122,11 @@
     modal.className = 'text-modal';
     modal.innerHTML = `
       <div class="text-modal-overlay"></div>
-      <div class="text-modal-content">
+      <div class="text-modal-content" role="dialog" aria-modal="true" aria-label="${escapeHtml(title)}">
         <div class="text-modal-header">
           <h3>${escapeHtml(title)}</h3>
-          <button class="text-modal-close" title="Close (Esc)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button class="text-modal-close" title="Close (Esc)" aria-label="Close dialog">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="text-modal-body">${escapeHtml(text).replace(/\n/g, '<br>')}</div>
@@ -1479,7 +2138,17 @@
     `;
     document.body.appendChild(modal);
 
-    const closeModal = () => modal.remove();
+    // Focus management: move focus into the dialog, restore it to the
+    // element that opened the modal on close.
+    const previouslyFocused = document.activeElement;
+    modal.querySelector('.text-modal-close').focus();
+
+    const closeModal = () => {
+      modal.remove();
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus();
+      }
+    };
     modal.querySelector('.text-modal-close').addEventListener('click', closeModal);
     modal.querySelector('.text-modal-close-btn').addEventListener('click', closeModal);
     modal.querySelector('.text-modal-overlay').addEventListener('click', closeModal);
@@ -1570,6 +2239,165 @@
     });
     const blob = await docx.Packer.toBlob(doc);
     triggerDownload(blob, filename);
+  }
+
+  // ===== Keep-format .docx export =====
+  // JSZip (~100KB) is only needed for the keep-format export, so it's
+  // lazy-loaded from the CDN on first use — same pattern as the docx lib.
+  let jsZipPromise = null;
+  function loadJsZip() {
+    if (window.JSZip) return Promise.resolve();
+    if (!jsZipPromise) {
+      jsZipPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        script.onload = () => resolve();
+        script.onerror = () => {
+          jsZipPromise = null; // allow retry
+          reject(new Error('Failed to load the .docx packer library. Check your internet connection and try again.'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+    return jsZipPromise;
+  }
+
+  const WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+  // Translate the loaded .docx in place: a .docx is a ZIP whose
+  // word/document.xml holds the text as <w:t> runs inside <w:p> paragraphs.
+  // We translate paragraph-by-paragraph (exact 1:1 mapping — no fragile
+  // delimiter) and write each translation back into the paragraph's first
+  // run, so paragraph styles (headings, lists, alignment), tables, and the
+  // dominant run's formatting are all preserved. Intra-paragraph run
+  // formatting (e.g. one bold word mid-sentence) and header/footer text are
+  // NOT preserved — a documented, common trade-off.
+  async function downloadDocxKeepingFormat() {
+    if (!currentFileObject || !/\.docx$/i.test(currentFileObject.name)) {
+      showToast('Load a .docx file first', 'error');
+      return;
+    }
+    const sourceLang = dom.fileSourceLang.value;
+    const targetLang = dom.fileTargetLang.value;
+    if (sourceLang !== 'auto' && sourceLang === targetLang) {
+      showToast('Source and target languages are the same', 'error');
+      return;
+    }
+
+    const job = Translator.createJob();
+    try {
+      showExtracting(true, true);
+      dom.loadingText.textContent = 'Loading .docx packer…';
+      await loadJsZip();
+
+      const buffer = await currentFileObject.arrayBuffer();
+      const zip = await JSZip.loadAsync(buffer);
+      const docXmlFile = zip.file('word/document.xml');
+      if (!docXmlFile) throw new Error('This .docx is missing word/document.xml and cannot be processed.');
+
+      const xmlText = await docXmlFile.async('string');
+      const xmlDoc = new DOMParser().parseFromString(xmlText, 'application/xml');
+      if (xmlDoc.getElementsByTagName('parsererror').length) {
+        throw new Error('Could not parse the document XML.');
+      }
+
+      // Collect translatable paragraphs (those with non-empty text).
+      const paras = [...xmlDoc.getElementsByTagNameNS(WORD_NS, 'p')];
+      const targets = [];
+      for (const p of paras) {
+        const ts = [...p.getElementsByTagNameNS(WORD_NS, 't')];
+        if (!ts.length) continue;
+        const text = ts.map(t => t.textContent).join('');
+        if (!text.trim()) continue;
+        targets.push({ ts, text });
+      }
+
+      if (!targets.length) {
+        throw new Error('No selectable text found in this .docx (it may be scanned images).');
+      }
+
+      let done = 0;
+      dom.loadingText.textContent = `Translating… 0/${targets.length} paragraphs`;
+
+      // Translate paragraphs concurrently through the shared pool; a single
+      // shared job lets the overlay's Cancel abort them all at once.
+      await Translator._runPool(targets, async (target) => {
+        try {
+          const result = await Translator.translate(target.text, sourceLang, targetLang, {
+            domain: dom.fileDomain.value,
+            tone: dom.fileTone.value,
+            glossary: dom.fileGlossary.value,
+            context: dom.fileContext.value,
+            job
+          });
+          target.translated = result.text;
+        } catch (err) {
+          if (err.cancelled) return false; // stop the pool
+          // Leave a failed paragraph untranslated rather than aborting the
+          // whole document.
+          target.translated = null;
+          target.error = true;
+        }
+        done++;
+        dom.loadingText.textContent = `Translating… ${done}/${targets.length} paragraphs`;
+        return true;
+      }, BATCH_CONCURRENCY);
+
+      Translator._throwIfCancelled(job);
+
+      // Write each translation back into the paragraph's first run and empty
+      // the rest, preserving that run's formatting and the paragraph style.
+      let failed = 0;
+      for (const target of targets) {
+        if (typeof target.translated !== 'string') { failed++; continue; }
+        target.ts[0].textContent = target.translated;
+        target.ts[0].setAttribute('xml:space', 'preserve');
+        for (let k = 1; k < target.ts.length; k++) target.ts[k].textContent = '';
+      }
+
+      // Serialize back (XMLSerializer drops the XML declaration — re-add it).
+      const serialized = new XMLSerializer().serializeToString(xmlDoc);
+      const withDecl = serialized.startsWith('<?xml')
+        ? serialized
+        : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + serialized;
+      zip.file('word/document.xml', withDecl);
+
+      const blob = await zip.generateAsync({
+        type: 'blob',
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      });
+
+      const base = (currentFileObject.name.replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').trim()) || 'translation';
+      triggerDownload(blob, `${base}_translated_${targetLang}.docx`);
+
+      History.add({
+        sourceLang: sourceLang === 'auto' ? 'Auto' : sourceLang,
+        targetLang,
+        sourceText: targets.map(t => t.text).join('\n'),
+        translatedText: targets.map(t => (typeof t.translated === 'string' ? t.translated : t.text)).join('\n'),
+        type: 'file',
+        domain: dom.fileDomain.value
+      });
+
+      if (failed) {
+        showToast(`Downloaded — but ${failed} paragraph(s) failed and kept the original text`, 'error');
+      } else {
+        showToast('Downloaded translated .docx with formatting preserved', 'success');
+      }
+    } catch (err) {
+      if (err.cancelled) {
+        showToast('Translation cancelled', 'success');
+      } else {
+        if (err.message.includes('API key')) {
+          dom.apiKeyInput.focus();
+          dom.apiKeyInput.select();
+        }
+        showToast(err.message, 'error');
+      }
+    } finally {
+      Translator.endJob(job);
+      showExtracting(false);
+    }
   }
 
   // ===== Batch CSV import/export =====
@@ -1728,10 +2556,16 @@
     showToast(`Exported ${items.length} history entr${items.length === 1 ? 'y' : 'ies'} to CSV`, 'success');
   }
 
+  // Escapes for BOTH text-content and quoted-attribute contexts — a
+  // textContent-based helper leaves " and ' intact, which is unsafe for
+  // values placed inside value="..." (e.g. glossary preset <option>s).
   function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   // ===== Start =====
