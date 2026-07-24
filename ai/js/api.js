@@ -77,9 +77,44 @@ window.API = (() => {
     return text;
   };
 
+  // Gộp các message cùng role liên tiếp thành một. Anthropic & Gemini bắt buộc
+  // role phải xen kẽ user/assistant — nếu convo có 2 user liền nhau (ví dụ khi
+  // compare gửi câu hỏi nhưng người dùng không chọn đáp án nào, để lại user "mồ côi")
+  // thì request sẽ bị từ chối 400. Chuẩn hoá tại đây vá mọi đường sinh ra role trùng.
+  const COALESCE_REQUEST_FLAGS = ['translateTo', 'imageGen', 'slides', 'excel', 'document', 'pdf'];
+
+  const coalesceMessages = (messages) => {
+    const out = [];
+    for (const m of (messages || [])) {
+      if (m.role !== 'user' && m.role !== 'assistant') {
+        out.push(m);
+        continue;
+      }
+      const prev = out[out.length - 1];
+      if (prev && prev.role === m.role) {
+        const prevText = prev.content || '';
+        const curText = m.content || '';
+        const merged = {
+          ...prev,
+          content: prevText && curText ? prevText + '\n\n' + curText : (prevText || curText),
+        };
+        if (prev.images || m.images) merged.images = [...(prev.images || []), ...(m.images || [])];
+        if (prev.files || m.files) merged.files = [...(prev.files || []), ...(m.files || [])];
+        // Ưu tiên cờ yêu cầu của message mới nhất (câu hỏi đang hoạt động).
+        for (const k of COALESCE_REQUEST_FLAGS) {
+          if (m[k] !== undefined) merged[k] = m[k];
+        }
+        out[out.length - 1] = merged;
+      } else {
+        out.push(m);
+      }
+    }
+    return out;
+  };
+
   const buildAnthropicMessages = (convo) => {
     const msgs = [];
-    const all = convo.messages || [];
+    const all = coalesceMessages(convo.messages);
     for (let i = 0; i < all.length; i++) {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
@@ -121,7 +156,7 @@ window.API = (() => {
 
   const buildGeminiContents = (convo) => {
     const contents = [];
-    const all = convo.messages || [];
+    const all = coalesceMessages(convo.messages);
     for (let i = 0; i < all.length; i++) {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
@@ -170,7 +205,7 @@ window.API = (() => {
 
   const buildConversationMessages = (convo, format = 'chat') => {
     const msgs = [];
-    const all = convo.messages || [];
+    const all = coalesceMessages(convo.messages);
     for (let i = 0; i < all.length; i++) {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
@@ -567,7 +602,7 @@ window.API = (() => {
     if (systemPrompt && systemPrompt.trim()) {
       msgs.push({ role: 'system', content: systemPrompt });
     }
-    const all = convo.messages || [];
+    const all = coalesceMessages(convo.messages);
     for (let i = 0; i < all.length; i++) {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
@@ -702,7 +737,7 @@ window.API = (() => {
       msgs.push({ role: 'system', content: systemPrompt });
     }
     const preserved = window.APP_CONFIG.kimiRequiresPreservedThinking(modelId);
-    const all = convo.messages || [];
+    const all = coalesceMessages(convo.messages);
     for (let i = 0; i < all.length; i++) {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;

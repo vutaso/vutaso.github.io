@@ -47,14 +47,6 @@ window.DocxCreate = (() => {
 
   const buildFilename = (data) => sanitizeFilename(data?.title) + '.docx';
 
-  const tryParseJson = (raw) => {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  };
-
   const parseInlineMarkdown = (text, docxLib) => {
     const { TextRun, ShadingType } = docxLib;
     const runs = [];
@@ -91,11 +83,17 @@ window.DocxCreate = (() => {
     return map[String(type || '').toLowerCase()] || 0;
   };
 
+  const MAX_BLOCKS = 2000;
+
   const normalizeDocumentData = (parsed) => {
     if (!parsed || typeof parsed !== 'object') return null;
     const title = String(parsed.title || 'Document').trim();
-    const blocks = Array.isArray(parsed.blocks) ? parsed.blocks.filter(Boolean) : null;
+    let blocks = Array.isArray(parsed.blocks) ? parsed.blocks.filter(Boolean) : null;
     if (!blocks || !blocks.length) return null;
+    if (blocks.length > MAX_BLOCKS) {
+      console.warn('[DocxCreate] Cắt bớt block: ' + blocks.length + ' -> ' + MAX_BLOCKS);
+      blocks = blocks.slice(0, MAX_BLOCKS);
+    }
     return {
       title,
       blocks,
@@ -104,23 +102,10 @@ window.DocxCreate = (() => {
   };
 
   const extractDocumentData = (text) => {
-    const source = String(text || '');
-    if (!source.trim()) return null;
-
-    const fenced = source.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fenced) {
-      const parsed = tryParseJson(fenced[1].trim());
+    for (const parsed of window.Utils.extractJsonCandidates(text)) {
       const normalized = normalizeDocumentData(parsed);
       if (normalized) return normalized;
     }
-
-    const objectMatch = source.match(/\{[\s\S]*"blocks"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
-    if (objectMatch) {
-      const parsed = tryParseJson(objectMatch[0]);
-      const normalized = normalizeDocumentData(parsed);
-      if (normalized) return normalized;
-    }
-
     return null;
   };
 
@@ -138,7 +123,7 @@ window.DocxCreate = (() => {
     });
     if (!dataRows.length) return null;
 
-    const colCount = Math.max(1, ...dataRows.map((cells) => cells.length));
+    const colCount = dataRows.reduce((max, cells) => Math.max(max, cells.length), 1);
     const contentWidth = DOCX_PAGE_WIDTH_TWIPS - DOCX_H_MARGIN_TWIPS * 2;
     const colWidthTwips = Math.floor(contentWidth / colCount);
     const columnWidths = Array(colCount).fill(colWidthTwips);

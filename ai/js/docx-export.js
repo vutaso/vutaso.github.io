@@ -119,7 +119,12 @@ window.DocxExport = (() => {
     );
     if (!parsedRows.length) return null;
 
-    const colCount = Math.max(1, ...parsedRows.map((cells) => cells.length));
+    // Chỉ coi hàng đầu là header khi nó thực sự chứa <th>.
+    // Bảng có hàng đầu là dữ liệu (không có th) sẽ không bị tô nền header.
+    const firstRow = tableEl.querySelector('tr');
+    const firstRowIsHeader = !!(firstRow && firstRow.querySelector('th'));
+
+    const colCount = parsedRows.reduce((max, cells) => Math.max(max, cells.length), 1);
     const contentWidth = DOCX_PAGE_WIDTH_TWIPS - DOCX_H_MARGIN_TWIPS * 2;
     const colWidthTwips = Math.floor(contentWidth / colCount);
     const columnWidths = Array(colCount).fill(colWidthTwips);
@@ -133,7 +138,7 @@ window.DocxExport = (() => {
     const tableRows = parsedRows.map((cells, rowIndex) => {
       const padded = cells.slice();
       while (padded.length < colCount) padded.push('');
-      const isHeader = rowIndex === 0 || tableEl.querySelectorAll('th').length > 0 && rowIndex === 0;
+      const isHeader = firstRowIsHeader && rowIndex === 0;
 
       return new TableRow({
         tableHeader: isHeader,
@@ -212,15 +217,56 @@ window.DocxExport = (() => {
           shading: { fill: 'EEEEEE', type: ShadingType.CLEAR },
         }));
       } else if (tag === 'A') {
-        runs.push(new TextRun({ text: el.textContent || '', color: '2563EB', underline: {} }));
+        const href = el.getAttribute?.('href') || '';
+        const linkText = el.textContent || '';
+        const { ExternalHyperlink } = docxLib;
+        if (ExternalHyperlink && /^(https?:|mailto:)/i.test(href)) {
+          runs.push(new ExternalHyperlink({
+            link: href,
+            children: [new TextRun({ text: linkText, color: '2563EB', underline: {} })],
+          }));
+        } else {
+          runs.push(new TextRun({ text: linkText, color: '2563EB', underline: {} }));
+        }
       } else if (tag === 'BR') {
         runs.push(new TextRun({ text: '\n', break: 1 }));
+      } else if (tag === 'UL' || tag === 'OL') {
+        // List lồng nhau được xử lý ở cấp block (convertList) để giữ bullet/xuống dòng.
+        continue;
       } else {
         runs.push(...await walkInline(el, docxLib));
       }
     }
 
     return runs;
+  };
+
+  // Chuyển list (ul/ol) thành các Paragraph, xử lý list lồng nhau đệ quy:
+  // mỗi cấp tăng indent, ol đánh số riêng theo cấp và tôn trọng thuộc tính `start`.
+  const convertList = async (listEl, docxLib, { ordered = false, depth = 0 } = {}) => {
+    const { Paragraph, TextRun } = docxLib;
+    const blocks = [];
+    const startAttr = ordered ? parseInt(listEl.getAttribute('start'), 10) : NaN;
+    let index = Number.isNaN(startAttr) ? 0 : startAttr - 1;
+
+    for (const li of listEl.querySelectorAll(':scope > li')) {
+      index += 1;
+      const marker = ordered ? index + '. ' : '• ';
+      // walkInline đã bỏ qua ul/ol lồng bên trong li → chỉ lấy nội dung của chính li.
+      const runs = await walkInline(li, docxLib);
+      blocks.push(new Paragraph({
+        indent: { left: 360 * (depth + 1) },
+        children: runs.length ? [new TextRun({ text: marker }), ...runs] : [new TextRun({ text: marker })],
+      }));
+
+      for (const sub of li.querySelectorAll(':scope > ul, :scope > ol')) {
+        blocks.push(...await convertList(sub, docxLib, {
+          ordered: sub.tagName === 'OL',
+          depth: depth + 1,
+        }));
+      }
+    }
+    return blocks;
   };
 
   const convertBlock = async (el, docxLib) => {
@@ -268,29 +314,12 @@ window.DocxExport = (() => {
     }
 
     if (tag === 'UL') {
-      for (const li of el.querySelectorAll(':scope > li')) {
-        const runs = await walkInline(li, docxLib);
-        blocks.push(new Paragraph({
-          indent: { left: 360 },
-          children: runs.length
-            ? [new TextRun({ text: '• ' }), ...runs]
-            : [new TextRun({ text: '• ' + (li.textContent || '') })],
-        }));
-      }
+      blocks.push(...await convertList(el, docxLib, { ordered: false, depth: 0 }));
       return blocks;
     }
 
     if (tag === 'OL') {
-      let index = 0;
-      for (const li of el.querySelectorAll(':scope > li')) {
-        index += 1;
-        const runs = await walkInline(li, docxLib);
-        blocks.push(new Paragraph({
-          children: runs.length
-            ? [new TextRun({ text: index + '. ' }), ...runs]
-            : [new TextRun({ text: index + '. ' + (li.textContent || '') })],
-        }));
-      }
+      blocks.push(...await convertList(el, docxLib, { ordered: true, depth: 0 }));
       return blocks;
     }
 

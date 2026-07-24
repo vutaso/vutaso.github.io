@@ -16,6 +16,8 @@
 - **Chọn khoảng trang** cho PDF nhiều trang
 - **Progress** hiển thị tiến trình xử lý (trích xuất, OCR)
 - Xuất kết quả dưới dạng `.txt` hoặc `.docx`
+- **Upload nhiều file cùng lúc**: kéo-thả hoặc chọn nhiều file → xếp thành hàng đợi, dịch tuần tự từng file
+- **Keep-format DOCX export**: dịch file DOCX gốc mà giữ nguyên layout, heading, style, bảng — tái dùng `JSZip` để sửa XML trong ZIP
 
 ### Dịch hàng loạt (Batch)
 - Thêm nhiều dòng văn bản, dịch **một lúc với 3 luồng đồng thời**
@@ -56,6 +58,15 @@
 - **Dark/Light theme** tự động theo hệ thống, có nút chuyển
 - Thiết kế responsive, phông chữ Inter
 - Toast thông báo, loading overlay, empty state
+- **Mobile-first UI**: header 1 hàng gọn, ô API key đủ rộng; nút điều khiển to dễ bấm
+- **Fixed layout**: khung dịch cố định chiều cao + cuộn nội bộ (không tràn trang)
+
+### Accessibility (A11y)
+- **ARIA labels & roles**: tab pattern, live regions, dialog, status updates
+- **Keyboard navigation**: Tab, Enter/Space để kích hoạt; focus ring hiển thị rõ
+- **Focus management**: modal trap focus, khôi phục vị trí cũ khi đóng
+- **Screen reader support**: label gắn control, placeholder text, động thái thông báo qua aria-live
+- **Tất cả nút icon** có `aria-label` mô tả chức năng
 
 ## Cách dùng
 
@@ -89,6 +100,7 @@ translate/
 - **Mammoth.js** (CDN) — đọc DOCX
 - **Tesseract.js** (lazy-load từ CDN) — OCR cho PDF scan
 - **docx** (lazy-load từ CDN) — tạo file DOCX
+- **JSZip** (lazy-load từ CDN) — giải nén/nén DOCX để giữ format khi dịch
 - **Inter** font (Google Fonts)
 
 ## Lưu ý

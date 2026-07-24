@@ -44,40 +44,25 @@ window.PptxExport = (() => {
 
   const buildFilename = (data) => sanitizeFilename(data?.title) + '.pptx';
 
-  const tryParseJson = (raw) => {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  };
+  const MAX_SLIDES = 100;
 
   const normalizeSlidesData = (parsed) => {
     if (!parsed || typeof parsed !== 'object') return null;
-    const slides = Array.isArray(parsed.slides) ? parsed.slides : null;
+    let slides = Array.isArray(parsed.slides) ? parsed.slides : null;
     if (!slides || !slides.length) return null;
+    if (slides.length > MAX_SLIDES) {
+      console.warn('[PptxExport] Cắt bớt slide: ' + slides.length + ' -> ' + MAX_SLIDES);
+      slides = slides.slice(0, MAX_SLIDES);
+    }
     const title = String(parsed.title || slides[0]?.title || 'Presentation').trim();
     return { title, slides };
   };
 
   const extractSlidesData = (text) => {
-    const source = String(text || '');
-    if (!source.trim()) return null;
-
-    const fenced = source.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fenced) {
-      const parsed = tryParseJson(fenced[1].trim());
+    for (const parsed of window.Utils.extractJsonCandidates(text)) {
       const normalized = normalizeSlidesData(parsed);
       if (normalized) return normalized;
     }
-
-    const objectMatch = source.match(/\{[\s\S]*"slides"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
-    if (objectMatch) {
-      const parsed = tryParseJson(objectMatch[0]);
-      const normalized = normalizeSlidesData(parsed);
-      if (normalized) return normalized;
-    }
-
     return null;
   };
 

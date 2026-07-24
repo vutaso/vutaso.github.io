@@ -475,7 +475,7 @@ window.Utils = (() => {
       Table, TableRow, TableCell, Paragraph, WidthType, ShadingType, BorderStyle, TableLayoutType,
     } = docxLib;
     const parsedRows = rows.map(parseMarkdownTableCells);
-    const colCount = Math.max(1, ...parsedRows.map((cells) => cells.length));
+    const colCount = parsedRows.reduce((max, cells) => Math.max(max, cells.length), 1);
     const contentWidth = DOCX_PAGE_WIDTH_TWIPS - DOCX_H_MARGIN_TWIPS * 2;
     const colWidthTwips = Math.floor(contentWidth / colCount);
     const columnWidths = Array(colCount).fill(colWidthTwips);
@@ -758,6 +758,65 @@ window.Utils = (() => {
     return (code?.textContent ?? '').replace(/\r\n/g, '\n');
   };
 
+  // Cắt các object {...} cân bằng ngoặc ở cấp cao nhất, có nhận biết chuỗi
+  // (không bị cắt nhầm bởi { } nằm trong string). Thay cho regex greedy dễ over-match.
+  const balancedJsonSlices = (source) => {
+    const slices = [];
+    let depth = 0;
+    let start = -1;
+    let inStr = false;
+    let quote = '';
+    let esc = false;
+    for (let i = 0; i < source.length; i++) {
+      const ch = source[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (ch === '\\') esc = true;
+        else if (ch === quote) inStr = false;
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        inStr = true;
+        quote = ch;
+      } else if (ch === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (ch === '}') {
+        if (depth > 0) {
+          depth--;
+          if (depth === 0 && start >= 0) {
+            slices.push(source.slice(start, i + 1));
+            start = -1;
+          }
+        }
+      }
+    }
+    return slices;
+  };
+
+  // Trả về danh sách object JSON đã parse được từ text của model:
+  // thử MỌI fenced code block (```json ... ```) rồi tới các object cân bằng ngoặc.
+  // Caller tự chạy normalize và lấy candidate đầu tiên hợp lệ.
+  const extractJsonCandidates = (text) => {
+    const source = String(text || '');
+    if (!source.trim()) return [];
+    const seen = new Set();
+    const out = [];
+    const add = (raw) => {
+      const s = (raw || '').trim();
+      if (!s || seen.has(s)) return;
+      seen.add(s);
+      try {
+        out.push(JSON.parse(s));
+      } catch {}
+    };
+    const fenceRe = /```(?:json)?\s*([\s\S]*?)```/gi;
+    let m;
+    while ((m = fenceRe.exec(source)) !== null) add(m[1]);
+    for (const slice of balancedJsonSlices(source)) add(slice);
+    return out;
+  };
+
   return {
     escapeHTML, formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
     getCodeBlockSource,
@@ -766,6 +825,7 @@ window.Utils = (() => {
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
     formatConversation, formatConversationPlainText,
     downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice, prefersCoarsePointer,
-    exportToDocx, readFileAsDataUrl
+    exportToDocx, readFileAsDataUrl,
+    extractJsonCandidates
   };
 })();

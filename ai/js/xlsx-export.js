@@ -48,15 +48,21 @@ window.XlsxExport = (() => {
     return cleaned || 'Sheet' + (index + 1);
   };
 
-  const buildFilename = (data) => sanitizeFilename(data?.title) + '.xlsx';
-
-  const tryParseJson = (raw) => {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
+  // Excel: tên sheet phải duy nhất (không phân biệt hoa/thường) và tối đa 31 ký tự.
+  // book_append_sheet sẽ THROW nếu trùng — nên phải khử trùng trước.
+  const dedupeSheetName = (name, used) => {
+    let candidate = name;
+    let n = 2;
+    while (used.has(candidate.toLowerCase())) {
+      const suffix = ' (' + n + ')';
+      candidate = name.slice(0, 31 - suffix.length) + suffix;
+      n += 1;
     }
+    used.add(candidate.toLowerCase());
+    return candidate;
   };
+
+  const buildFilename = (data) => sanitizeFilename(data?.title) + '.xlsx';
 
   const toCellValue = (value) => {
     if (value === null || value === undefined) return '';
@@ -75,21 +81,33 @@ window.XlsxExport = (() => {
     return [['']];
   };
 
+  const MAX_SHEETS = 50;
+  const MAX_ROWS_PER_SHEET = 50000;
+
   const normalizeExcelData = (parsed) => {
     if (!parsed || typeof parsed !== 'object') return null;
-    const sheets = Array.isArray(parsed.sheets) ? parsed.sheets : null;
+    let sheets = Array.isArray(parsed.sheets) ? parsed.sheets : null;
     if (!sheets || !sheets.length) return null;
+    if (sheets.length > MAX_SHEETS) {
+      console.warn('[XlsxExport] Cắt bớt sheet: ' + sheets.length + ' -> ' + MAX_SHEETS);
+      sheets = sheets.slice(0, MAX_SHEETS);
+    }
 
+    const usedNames = new Set();
     const normalizedSheets = sheets
       .map((sheet, index) => {
         if (!sheet || typeof sheet !== 'object') return null;
-        const aoa = sheetToAoa(sheet);
+        let aoa = sheetToAoa(sheet);
         if (!aoa.length) return null;
+        if (aoa.length > MAX_ROWS_PER_SHEET) {
+          console.warn('[XlsxExport] Cắt bớt hàng ở sheet ' + index + ': ' + aoa.length + ' -> ' + MAX_ROWS_PER_SHEET);
+          aoa = aoa.slice(0, MAX_ROWS_PER_SHEET);
+        }
         return {
-          name: sanitizeSheetName(sheet.name, index),
+          name: dedupeSheetName(sanitizeSheetName(sheet.name, index), usedNames),
           rows: aoa,
           rowCount: aoa.length,
-          colCount: Math.max(...aoa.map((row) => row.length), 1),
+          colCount: aoa.reduce((max, row) => Math.max(max, row.length), 1),
         };
       })
       .filter(Boolean);
@@ -106,23 +124,10 @@ window.XlsxExport = (() => {
   };
 
   const extractExcelData = (text) => {
-    const source = String(text || '');
-    if (!source.trim()) return null;
-
-    const fenced = source.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fenced) {
-      const parsed = tryParseJson(fenced[1].trim());
+    for (const parsed of window.Utils.extractJsonCandidates(text)) {
       const normalized = normalizeExcelData(parsed);
       if (normalized) return normalized;
     }
-
-    const objectMatch = source.match(/\{[\s\S]*"sheets"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
-    if (objectMatch) {
-      const parsed = tryParseJson(objectMatch[0]);
-      const normalized = normalizeExcelData(parsed);
-      if (normalized) return normalized;
-    }
-
     return null;
   };
 

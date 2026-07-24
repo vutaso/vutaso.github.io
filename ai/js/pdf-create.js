@@ -60,19 +60,17 @@ window.PdfCreate = (() => {
 
   const buildFilename = (data) => sanitizeFilename(data?.title) + '.pdf';
 
-  const tryParseJson = (raw) => {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  };
+  const MAX_BLOCKS = 2000;
 
   const normalizePdfData = (parsed) => {
     if (!parsed || typeof parsed !== 'object') return null;
     const title = String(parsed.title || 'Document').trim();
-    const blocks = Array.isArray(parsed.blocks) ? parsed.blocks.filter(Boolean) : null;
+    let blocks = Array.isArray(parsed.blocks) ? parsed.blocks.filter(Boolean) : null;
     if (!blocks || !blocks.length) return null;
+    if (blocks.length > MAX_BLOCKS) {
+      console.warn('[PdfCreate] Cắt bớt block: ' + blocks.length + ' -> ' + MAX_BLOCKS);
+      blocks = blocks.slice(0, MAX_BLOCKS);
+    }
     return {
       title,
       blocks,
@@ -81,23 +79,10 @@ window.PdfCreate = (() => {
   };
 
   const extractPdfData = (text) => {
-    const source = String(text || '');
-    if (!source.trim()) return null;
-
-    const fenced = source.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fenced) {
-      const parsed = tryParseJson(fenced[1].trim());
+    for (const parsed of window.Utils.extractJsonCandidates(text)) {
       const normalized = normalizePdfData(parsed);
       if (normalized) return normalized;
     }
-
-    const objectMatch = source.match(/\{[\s\S]*"blocks"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
-    if (objectMatch) {
-      const parsed = tryParseJson(objectMatch[0]);
-      const normalized = normalizePdfData(parsed);
-      if (normalized) return normalized;
-    }
-
     return null;
   };
 
