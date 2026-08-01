@@ -67,6 +67,12 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ---
 
+- Model **Claude Opus 5** (Anthropic, `claude-opus-5`) — thinking adaptive mặc định, effort tới `max`, web search; $5/$25.
+- Model **Claude Opus 5** (OpenRouter, `anthropic/claude-opus-5`) — reasoning bắt buộc, vision, effort tới `max`; $5/$25.
+- Model **GPT-5.6 Sol** (OpenAI, `gpt-5.6-sol`) — flagship, web search, image gen, reasoning; $5/$30.
+- Model **GPT-5.6 Terra** (OpenAI, `gpt-5.6-terra`) — cân bằng, web search, image gen, reasoning; $2/$12.
+- Model **GPT-5.6 Luna** (OpenAI, `gpt-5.6-luna`) — chi phí thấp, web search, image gen, reasoning; $0.20/$1.20.
+- Model **DeepSeek V4 Flash 0731** (OpenRouter, `deepseek/deepseek-v4-flash-0731`) — revision re-post-trained, reasoning.
 - Model **Grok 4.5** (OpenRouter, `x-ai/grok-4.5`) — reasoning, vision, context 500K.
 - Model **North Mini Code** (OpenRouter, `cohere/north-mini-code:free`) — agentic coding, reasoning, miễn phí.
 - Model **Mistral Nemo** (OpenRouter, `mistralai/mistral-nemo`) — 12B, context 128K.

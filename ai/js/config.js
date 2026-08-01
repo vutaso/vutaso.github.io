@@ -6,16 +6,21 @@ window.APP_CONFIG = {
     { id: 'gpt-5.4-mini', label: 'GPT-5.4 mini', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'gpt-5.4', label: 'GPT-5.4', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'gpt-5.5', label: 'GPT-5.5', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-5.6-sol', label: 'GPT-5.6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-5.6-luna', label: 'GPT-5.6 Luna', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
+    { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-gpt-oss-120b', apiModel: 'gpt-oss-120b-250805', label: 'GPT OSS 120B', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-deepseek-v4-flash', apiModel: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
+    { id: 'openrouter-deepseek-v4-flash-0731', apiModel: 'deepseek/deepseek-v4-flash-0731', label: 'DeepSeek V4 Flash 0731 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
     { id: 'openrouter-deepseek-v4-pro', apiModel: 'deepseek/deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-glm-5-2', apiModel: 'z-ai/glm-5.2', label: 'GLM 5.2 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-mimo-v2-5', apiModel: 'xiaomi/mimo-v2.5', label: 'MiMo V2.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 32000 },
@@ -26,6 +31,7 @@ window.APP_CONFIG = {
     { id: 'openrouter-claude-haiku-4-5', apiModel: 'anthropic/claude-haiku-4.5', label: 'Claude Haiku 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
     { id: 'openrouter-claude-sonnet-5', apiModel: 'anthropic/claude-sonnet-5', label: 'Claude Sonnet 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-claude-opus-4-8', apiModel: 'anthropic/claude-opus-4.8', label: 'Claude Opus 4.8 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-claude-opus-5', apiModel: 'anthropic/claude-opus-5', label: 'Claude Opus 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
     { id: 'openrouter-gemini-2.5-flash-lite', apiModel: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-gemini-2.5-flash', apiModel: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-gemini-3.5-flash', apiModel: 'google/gemini-3.5-flash', label: 'Gemini 3.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
@@ -91,16 +97,21 @@ window.APP_CONFIG = {
     'gpt-5.4-mini': { input: 0.75, output: 4.50 },
     'gpt-5.4': { input: 2.50, output: 15.00 },
     'gpt-5.5': { input: 5.00, output: 30.00 },
+    'gpt-5.6-sol': { input: 5.00, output: 30.00 },
+    'gpt-5.6-terra': { input: 2.00, output: 12.00 },
+    'gpt-5.6-luna': { input: 0.20, output: 1.20 },
     'claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
+    'claude-opus-5': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
     'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
     'openrouter-gpt-oss-120b': { input: 0.03, output: 0.15 },
     'openrouter-deepseek-v4-flash': { input: 0.09, output: 0.18 },
+    'openrouter-deepseek-v4-flash-0731': { input: 0.09, output: 0.18 },
     'openrouter-deepseek-v4-pro': { input: 0.435, output: 0.87 },
     'openrouter-glm-5-2': { input: 0.93, output: 3.00 },
     'openrouter-mimo-v2-5': { input: 0.105, output: 0.28 },
@@ -111,6 +122,7 @@ window.APP_CONFIG = {
     'openrouter-claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'openrouter-claude-sonnet-5': { input: 2.00, output: 10.00 },
     'openrouter-claude-opus-4-8': { input: 5.00, output: 25.00 },
+    'openrouter-claude-opus-5': { input: 5.00, output: 25.00 },
     'openrouter-gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
     'openrouter-gemini-2.5-flash': { input: 0.30, output: 2.50 },
     'openrouter-gemini-3.5-flash': { input: 1.50, output: 9.00 },
@@ -215,7 +227,11 @@ window.APP_CONFIG = {
   },
 
   MODEL_EFFORT_LEVELS: {
+    'gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-sonnet-4-6': ['low', 'medium', 'high', 'max'],
     'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
     'gemini-2.5-flash-lite': ['low', 'medium', 'high'],
@@ -239,6 +255,7 @@ window.APP_CONFIG = {
     'byteplus-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-deepseek-v4-flash': ['high', 'xhigh'],
+    'openrouter-deepseek-v4-flash-0731': ['high', 'xhigh'],
     'openrouter-deepseek-v4-pro': ['high', 'xhigh'],
     'openrouter-glm-5-2': ['high', 'xhigh'],
     'openrouter-mimo-v2-5': ['low', 'medium', 'high'],
@@ -248,6 +265,7 @@ window.APP_CONFIG = {
     'openrouter-claude-haiku-4-5': ['low', 'medium', 'high'],
     'openrouter-claude-sonnet-5': ['low', 'medium', 'high', 'max'],
     'openrouter-claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gemini-2.5-flash-lite': ['low', 'medium', 'high'],
     'openrouter-gemini-2.5-flash': ['low', 'medium', 'high'],
     'openrouter-gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
@@ -443,16 +461,16 @@ window.APP_CONFIG = {
     if (modelId === 'nvidia-mistral-small-4') return 'medium';
     if (modelId === 'nvidia-mistral-medium-3-5-128b') return 'high';
     if (modelId === 'openrouter-gpt-oss-120b') return 'medium';
-    if (modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
+    if (modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-flash-0731' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
     if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
     if (modelId === 'nvidia-nemotron-3-super') return 'high';
     if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
-    if (modelId === 'openrouter-gpt-5.6-luna') return 'low';
-    if (modelId === 'openrouter-gpt-5.6-terra') return 'medium';
+    if (modelId === 'gpt-5.6-luna' || modelId === 'openrouter-gpt-5.6-luna') return 'low';
+    if (modelId === 'gpt-5.6-terra' || modelId === 'openrouter-gpt-5.6-terra') return 'medium';
     if (modelId === 'openrouter-kimi-k3') return 'max';
     if (modelId === 'openrouter-muse-spark-1.1') return 'medium';
-    if (modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
+    if (modelId === 'gpt-5.6-sol' || modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-claude-opus-5' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
     if (modelId === 'opencode-go-glm-5-2' || modelId === 'opencode-go-glm-5-1' || modelId === 'opencode-go-deepseek-v4-pro' || modelId === 'opencode-go-deepseek-v4-flash') return 'high';
     if (modelId === 'opencode-go-mimo-v2-5' || modelId === 'opencode-go-mimo-v2.5-pro' || modelId === 'opencode-go-minimax-m3' || modelId === 'opencode-go-minimax-m2.7' || modelId === 'opencode-go-minimax-m2.5' || modelId === 'opencode-go-qwen3.7-plus' || modelId === 'opencode-go-qwen3.6-plus') return 'medium';
     if (modelId === 'opencode-go-kimi-k2.7-code' || modelId === 'opencode-go-kimi-k2.6' || modelId === 'opencode-go-qwen3.7-max') return 'high';
@@ -487,7 +505,7 @@ window.APP_CONFIG = {
 
   modelUsesAnthropicAdaptiveThinking(modelId) {
     const id = modelId || '';
-    return id === 'claude-sonnet-4-6' || id === 'claude-sonnet-5' || id === 'claude-opus-4-8';
+    return id === 'claude-sonnet-4-6' || id === 'claude-sonnet-5' || id === 'claude-opus-4-8' || id === 'claude-opus-5';
   },
 
   modelUsesAnthropicManualThinking(modelId) {
