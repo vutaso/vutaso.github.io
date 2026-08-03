@@ -11,13 +11,18 @@
 - **Huỷ** dịch giữa chừng — giữ lại phần đã dịch
 
 ### Dịch file
-- Hỗ trợ: **PDF, DOCX, TXT** (tối đa 10MB)
+- Hỗ trợ: **PDF, DOCX, PPTX, XLSX, TXT** (tối đa 10MB)
+- **File dài không giới hạn số ký tự**: text vượt 200.000 ký tự tự động chia theo đoạn văn thành nhiều section, dịch tuần tự rồi ghép lại nguyên vẹn
 - **PDF scan**: Tesseract.js OCR tự động (tối đa 20 trang/lần)
 - **Chọn khoảng trang** cho PDF nhiều trang
 - **Progress** hiển thị tiến trình xử lý (trích xuất, OCR)
 - Xuất kết quả dưới dạng `.txt` hoặc `.docx`
 - **Upload nhiều file cùng lúc**: kéo-thả hoặc chọn nhiều file → xếp thành hàng đợi, dịch tuần tự từng file
-- **Keep-format DOCX export**: dịch file DOCX gốc mà giữ nguyên layout, heading, style, bảng — tái dùng `JSZip` để sửa XML trong ZIP
+- **Keep-format Office export**: dịch file DOCX/PPTX/XLSX gốc mà giữ nguyên layout, heading, style, bảng, hình ảnh, font, header/footer (DOCX) và formatting từng run (bold/italic giữa câu) — tái dùng `JSZip` để sửa XML trong ZIP. Có thể bật checkbox **Keep original format** ngay từ trước khi upload để nút Translate xuất thẳng file định dạng
+- **Keep-format PDF export**: render từng trang bằng `pdf.js`, gom text layer thành đoạn, dịch rồi **vẽ đè bản dịch lên đúng vị trí** trên trang, đóng gói lại bằng `jsPDF` — layout/hình/bảng giữ nguyên tuyệt đối về mặt hiển thị (trang trở thành ảnh nên text không chọn được)
+- **Chế độ song ngữ (Bilingual)**: xen kẽ đoạn gốc/đoạn dịch trong keep-format DOCX/PPTX — bản dịch chèn thành đoạn mới ngay sau đoạn gốc, thừa hưởng style gốc
+- **Xem song ngữ trên màn hình**: nút Bilingual ở ô kết quả (tab Text & File) hiển thị mỗi đoạn gốc kèm bản dịch ngay bên dưới — đọc đối chiếu kiểu immersive translate; Copy/Download vẫn chỉ lấy bản dịch
+- **Dịch hình ảnh trong file**: OCR ảnh nhúng (PNG/JPEG/WebP) bằng Tesseract chạy local, dịch theo đoạn (1 API call/đoạn) rồi **vẽ lại trực tiếp lên ảnh** tại đúng vị trí/kích thước gốc — ảnh giữ nguyên kích thước nên layout file không đổi
 
 ### Dịch hàng loạt (Batch)
 - Thêm nhiều dòng văn bản, dịch **một lúc với 3 luồng đồng thời**
@@ -100,7 +105,7 @@ translate/
 - **Mammoth.js** (CDN) — đọc DOCX
 - **Tesseract.js** (lazy-load từ CDN) — OCR cho PDF scan
 - **docx** (lazy-load từ CDN) — tạo file DOCX
-- **JSZip** (lazy-load từ CDN) — giải nén/nén DOCX để giữ format khi dịch
+- **JSZip** (lazy-load từ CDN) — giải nén/nén DOCX/PPTX/XLSX để giữ format khi dịch
 - **Inter** font (Google Fonts)
 
 ## Lưu ý

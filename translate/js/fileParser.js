@@ -1,5 +1,7 @@
 const FileParser = {
-  SUPPORTED_EXTENSIONS: ['txt', 'pdf', 'docx'],
+  SUPPORTED_EXTENSIONS: ['txt', 'pdf', 'docx', 'pptx', 'xlsx'],
+  DRAWING_NS: 'http://schemas.openxmlformats.org/drawingml/2006/main',
+  SHEET_NS: 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
   // OCR is slow (seconds per page) — cap it so a huge scanned PDF can't
   // run forever. Pages beyond the cap are skipped (the UI warns about it).
   OCR_MAX_PAGES: 20,
@@ -11,13 +13,13 @@ const FileParser = {
   // between pages.
   async parseFile(file, { onProgress, signal } = {}) {
     if (!file.name.includes('.')) {
-      throw new Error('File has no extension. Supported types: .pdf, .docx, .txt');
+      throw new Error('File has no extension. Supported types: .pdf, .docx, .pptx, .xlsx, .txt');
     }
 
     const extension = file.name.split('.').pop().toLowerCase();
 
     if (!this.SUPPORTED_EXTENSIONS.includes(extension)) {
-      throw new Error(`Unsupported file type: .${extension}. Supported types: .pdf, .docx, .txt`);
+      throw new Error(`Unsupported file type: .${extension}. Supported types: .pdf, .docx, .pptx, .xlsx, .txt`);
     }
 
     if (file.size === 0) {
@@ -28,8 +30,15 @@ const FileParser = {
       return { text: await this._parseTxt(file), pages: null };
     } else if (extension === 'pdf') {
       return this._parsePdf(file, onProgress, signal);
+    } else if (extension === 'docx') {
+      const { text, imageCount } = await this._parseDocx(file);
+      return { text, pages: null, imageCount };
+    } else if (extension === 'pptx') {
+      const { text, imageCount } = await this._parsePptx(file);
+      return { text, pages: null, imageCount };
     } else {
-      return { text: await this._parseDocx(file), pages: null };
+      const { text, imageCount } = await this._parseXlsx(file);
+      return { text, pages: null, imageCount };
     }
   },
 
@@ -292,7 +301,7 @@ const FileParser = {
   },
 
   async _parseDocx(file) {
-    return new Promise((resolve, reject) => {
+    const text = await new Promise((resolve, reject) => {
       if (typeof mammoth === 'undefined') {
         reject(new Error('Mammoth.js library not loaded. Please refresh the page.'));
         return;
@@ -307,5 +316,115 @@ const FileParser = {
       reader.onerror = () => reject(new Error('Failed to read DOCX file.'));
       reader.readAsArrayBuffer(file);
     });
+
+    // Image-only DOCX: mammoth returns empty text. Detect embedded images
+    // so the UI can offer the image-translation path instead of a dead
+    // end. The extra unzip only runs for textless files — the common path
+    // stays on mammoth alone.
+    let imageCount = 0;
+    if (!text.trim()) {
+      try {
+        const zip = await this._openOfficeZip(file, 'DOCX');
+        imageCount = this._countOfficeImages(zip);
+      } catch { /* keep the plain "no text" outcome */ }
+    }
+    return { text, imageCount };
+  },
+
+  // JSZip (~100KB) is needed to unzip PPTX/XLSX (both are ZIP+XML, like
+  // DOCX) — lazy-loaded from the CDN on first use, same pattern as the
+  // Tesseract loader above.
+  _loadJsZip() {
+    if (window.JSZip) return Promise.resolve();
+    if (!this._jsZipPromise) {
+      this._jsZipPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        script.onload = () => resolve();
+        script.onerror = () => {
+          this._jsZipPromise = null; // allow retry
+          reject(new Error('Failed to load the Office parser library. Check your internet connection and try again.'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+    return this._jsZipPromise;
+  },
+
+  async _openOfficeZip(file, label) {
+    await this._loadJsZip();
+    const data = await this._readAsArrayBuffer(file);
+    try {
+      return await JSZip.loadAsync(data);
+    } catch {
+      throw new Error(`Failed to open ${label}. The file may be corrupted or not a valid .${label.toLowerCase()} document.`);
+    }
+  },
+
+  // Parse one XML part from an Office ZIP; returns null when the part is
+  // missing or malformed (callers decide whether that's fatal).
+  async _parseXmlPart(zip, name) {
+    const partFile = zip.file(name);
+    if (!partFile) return null;
+    const xmlDoc = new DOMParser().parseFromString(await partFile.async('string'), 'application/xml');
+    return xmlDoc.getElementsByTagName('parsererror').length ? null : xmlDoc;
+  },
+
+  // PPTX text lives in ppt/slides/slideN.xml as <a:t> runs inside <a:p>
+  // paragraphs (DrawingML). Extract slide-by-slide, in slide order.
+  async _parsePptx(file) {
+    const zip = await this._openOfficeZip(file, 'PPTX');
+    const slideNames = Object.keys(zip.files)
+      .filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+      .sort((a, b) => this._partNumber(a) - this._partNumber(b));
+
+    const slides = [];
+    for (const name of slideNames) {
+      const xmlDoc = await this._parseXmlPart(zip, name);
+      if (!xmlDoc) continue;
+      const lines = [];
+      for (const p of xmlDoc.getElementsByTagNameNS(this.DRAWING_NS, 'p')) {
+        const line = [...p.getElementsByTagNameNS(this.DRAWING_NS, 't')]
+          .map(t => t.textContent).join('').trim();
+        if (line) lines.push(line);
+      }
+      slides.push(lines.join('\n'));
+    }
+    return { text: slides.filter(s => s).join('\n\n').trim(), imageCount: this._countOfficeImages(zip) };
+  },
+
+  // XLSX text lives in xl/sharedStrings.xml as <si> items (each with one
+  // or more <t> runs). Cell positions across sheets are NOT recoverable
+  // from sharedStrings alone, so the plain-text path returns the unique
+  // strings in document order — use the keep-format export to translate
+  // the workbook in place with full fidelity.
+  async _parseXlsx(file) {
+    const zip = await this._openOfficeZip(file, 'XLSX');
+    const xmlDoc = await this._parseXmlPart(zip, 'xl/sharedStrings.xml');
+    const strings = [];
+    if (xmlDoc) {
+      for (const si of xmlDoc.getElementsByTagNameNS(this.SHEET_NS, 'si')) {
+        const text = [...si.getElementsByTagNameNS(this.SHEET_NS, 't')]
+          .map(t => t.textContent).join('').trim();
+        if (text) strings.push(text);
+      }
+    }
+    return { text: strings.join('\n'), imageCount: this._countOfficeImages(zip) };
+  },
+
+  // Count OCR-translatable raster images embedded in an Office ZIP
+  // (matches the set ImageTranslator can process).
+  _countOfficeImages(zip) {
+    return Object.keys(zip.files)
+      .filter(name => /^(word|ppt|xl)\/media\//.test(name) && /\.(png|jpe?g|webp)$/i.test(name))
+      .length;
+  },
+
+  // Extract the trailing number of a part name (slide2.xml → 2) so slide
+  // parts sort numerically instead of lexicographically (slide10 after
+  // slide9, not after slide1).
+  _partNumber(name) {
+    const m = name.match(/(\d+)\.xml$/);
+    return m ? parseInt(m[1], 10) : 0;
   }
 };

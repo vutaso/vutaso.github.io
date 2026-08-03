@@ -235,6 +235,84 @@ const Translator = {
     }
   },
 
+  // Translates texts longer than MAX_CHARS (used by the File tab, where
+  // there is no hard length cap): the text is first split into
+  // MAX_CHARS-sized segments at paragraph boundaries, then each segment is
+  // translated sequentially via translate() — which chunks it internally
+  // as usual. Segments run sequentially (not via _runPool) so output
+  // order, streaming prefixes and detected-language handling stay correct.
+  // Same options/return shape as translate(); onProgress reports segment
+  // numbers ({current, total}) when there is more than one segment.
+  async translateLong(text, sourceLang, targetLang, options = {}) {
+    if (text.length <= this.MAX_CHARS) {
+      return this.translate(text, sourceLang, targetLang, options);
+    }
+
+    const job = options.job || this.createJob();
+    const implicitJob = !options.job;
+    const segments = this._splitIntoChunks(text, this.MAX_CHARS);
+
+    let combined = '';
+    let anyTruncated = false;
+    let totalChunks = 0;
+    let detectedLang = null;
+    const usageTotal = { promptTokens: 0, completionTokens: 0 };
+
+    try {
+      for (let i = 0; i < segments.length; i++) {
+        this._throwIfCancelled(job);
+        const segment = segments[i];
+        // Whitespace-only segments pass through untouched — no point
+        // spending an API call on stray separators.
+        if (!segment.text.trim()) {
+          combined += segment.sepBefore + segment.text;
+          continue;
+        }
+        const result = await this.translate(segment.text, sourceLang, targetLang, {
+          ...options,
+          job,
+          onDetectedLang: (lang) => {
+            if (!detectedLang) {
+              detectedLang = lang;
+              if (typeof options.onDetectedLang === 'function') {
+                options.onDetectedLang(lang);
+              }
+            }
+          },
+          onProgress: (p) => {
+            if (typeof options.onProgress === 'function') {
+              options.onProgress({ current: i + 1, total: segments.length });
+            }
+          },
+          onStream: (s) => {
+            if (typeof options.onStream === 'function') {
+              options.onStream({ ...s, text: combined + segment.sepBefore + s.text });
+            }
+          }
+        });
+        combined += segment.sepBefore + result.text;
+        totalChunks += result.chunks || 1;
+        if (result.truncated) anyTruncated = true;
+        usageTotal.promptTokens += result.usage.promptTokens;
+        usageTotal.completionTokens += result.usage.completionTokens;
+      }
+
+      return {
+        text: combined,
+        truncated: anyTruncated,
+        chunks: totalChunks,
+        detectedLang,
+        usage: {
+          promptTokens: usageTotal.promptTokens,
+          completionTokens: usageTotal.completionTokens,
+          totalTokens: usageTotal.promptTokens + usageTotal.completionTokens
+        }
+      };
+    } finally {
+      if (implicitJob) this.endJob(job);
+    }
+  },
+
   // Wraps the caller's onStream callback so every emission carries the
   // full text translated so far (completed chunks + separator + partial
   // current chunk) — the UI renders it verbatim, and a mid-stream retry

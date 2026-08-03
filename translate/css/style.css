@@ -802,6 +802,38 @@ body::before {
   border-color: var(--primary);
 }
 
+/* Pre-upload keep-format options (File tab): pick the formatted-export
+   mode before choosing a file */
+.keep-format-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-top: 1px solid var(--separator);
+}
+
+.keep-format-row .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.keep-format-row .checkbox-label input[type="checkbox"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.keep-format-hint {
+  font-size: 0.75rem;
+  color: var(--text-quaternary);
+}
+
 /* OCR prompt for scanned PDFs */
 .ocr-prompt {
   display: flex;
@@ -1045,6 +1077,27 @@ body::before {
   color: var(--text-quaternary);
 }
 
+/* Bilingual result view: each original paragraph with its translation right
+   underneath, distinguished by the primary color. */
+.translate-result .bl-src {
+  margin: 0 0 2px;
+}
+
+.translate-result .bl-tgt {
+  margin: 0 0 16px;
+  color: var(--primary);
+}
+
+.translate-result .bl-tgt:last-child {
+  margin-bottom: 0;
+}
+
+/* Active state for toggle-style text buttons (e.g. the Bilingual view toggle) */
+.btn-text.active {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
 .io-footer {
   display: flex;
   align-items: center;
@@ -1053,6 +1106,10 @@ body::before {
   border-top: 1px solid var(--separator);
   background: var(--glass-tint-light);
   flex-shrink: 0;
+  /* Many controls (downloads, mode select, copy) share this row — wrap to
+     a second line instead of clipping them off the edge. */
+  flex-wrap: wrap;
+  row-gap: 6px;
 }
 
 .io-footer-end {
@@ -1873,4 +1930,27 @@ body::before {
 
 .footer a:hover {
   color: var(--primary);
+}
+
+/* Advanced options: checkbox row + hint text (e.g. translate-images) */
+.advanced-section .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.advanced-section .checkbox-label input[type="checkbox"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.advanced-hint {
+  margin: 4px 0 0;
+  font-size: 0.73rem;
+  color: var(--text-tertiary);
+  line-height: 1.45;
 }

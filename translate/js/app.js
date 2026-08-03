@@ -24,6 +24,7 @@
     textTranslateProgress: document.getElementById('textTranslateProgress'),
     cancelTextTranslate: document.getElementById('cancelTextTranslate'),
     reuseTextResult: document.getElementById('reuseTextResult'),
+    bilingualViewText: document.getElementById('bilingualViewText'),
     textDomain: document.getElementById('textDomain'),
     textTone: document.getElementById('textTone'),
     textGlossary: document.getElementById('textGlossary'),
@@ -53,10 +54,14 @@
     downloadFileTxt: document.getElementById('downloadFileTxt'),
     downloadFileDocx: document.getElementById('downloadFileDocx'),
     downloadFileDocxFormatted: document.getElementById('downloadFileDocxFormatted'),
+    bilingualMode: document.getElementById('bilingualMode'),
+    bilingualViewFile: document.getElementById('bilingualViewFile'),
+    keepFormatToggle: document.getElementById('keepFormatToggle'),
     fileDomain: document.getElementById('fileDomain'),
     fileTone: document.getElementById('fileTone'),
     fileGlossary: document.getElementById('fileGlossary'),
     fileContext: document.getElementById('fileContext'),
+    fileTranslateImages: document.getElementById('fileTranslateImages'),
     toggleFileAdvanced: document.getElementById('toggleFileAdvanced'),
     fileAdvancedOptions: document.getElementById('fileAdvancedOptions'),
     fileDetectedLang: document.getElementById('fileDetectedLang'),
@@ -111,12 +116,23 @@
 
   let currentFileText = '';
   let currentFileName = '';
-  let currentFileObject = null; // the loaded File itself (for keep-format .docx export)
+  let currentFileObject = null; // the loaded File itself (for keep-format Office export)
   let currentFilePages = null; // per-page text for PDFs (page-range feature)
   let pendingOcrFile = null;   // scanned PDF waiting for a user-triggered OCR
   let pendingOcrNumPages = 0;  // total pages of pendingOcrFile (for the OCR range UI)
   let extractAbort = null;     // AbortController for file extraction / OCR
   let lastTextDetected = null; // auto-detected source lang of the last text translation
+  // Last finished (or partial) translations, kept separately from the DOM so
+  // the bilingual view can mix source+translation in the result box without
+  // polluting what Copy/Download/Reuse read back. The source is snapshotted
+  // at translation start so the bilingual pairing stays correct even if the
+  // user edits the input (or changes the PDF page range) afterwards.
+  let lastTextTranslation = '';
+  let lastTextSource = '';
+  let lastFileTranslation = '';
+  let lastFileSource = '';
+  let textBilingualView = false;
+  let fileBilingualView = false;
   let batchRowCounter = 0;
   let isLoading = false;
 
@@ -549,6 +565,70 @@
     };
   }
 
+  // ===== Bilingual result view =====
+  // Interleaves source/translation paragraphs (translation right under its
+  // original, like immersive-reading tools). Pairing is by paragraph index:
+  // the translation prompt asks the model to preserve paragraph breaks, so
+  // counts usually match; leftover paragraphs on either side are appended
+  // in order at the end.
+  function renderBilingualResult(container, sourceText, translatedText) {
+    const splitParas = (t) => t.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+    const srcParas = splitParas(sourceText);
+    const tgtParas = splitParas(translatedText);
+    const count = Math.max(srcParas.length, tgtParas.length);
+    container.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      if (srcParas[i]) {
+        const p = document.createElement('p');
+        p.className = 'bl-src';
+        p.textContent = srcParas[i];
+        frag.appendChild(p);
+      }
+      if (tgtParas[i]) {
+        const p = document.createElement('p');
+        p.className = 'bl-tgt';
+        p.textContent = tgtParas[i];
+        frag.appendChild(p);
+      }
+    }
+    container.appendChild(frag);
+  }
+
+  // Re-render a result box from the stored translation — plain text, or the
+  // interleaved bilingual view when its toggle is on.
+  function renderTextResult() {
+    if (textBilingualView && lastTextTranslation) {
+      renderBilingualResult(dom.textResult, lastTextSource, lastTextTranslation);
+    } else {
+      dom.textResult.textContent = lastTextTranslation;
+    }
+  }
+
+  function renderFileResult() {
+    if (fileBilingualView && lastFileTranslation) {
+      renderBilingualResult(dom.fileResult, lastFileSource, lastFileTranslation);
+    } else {
+      dom.fileResult.textContent = lastFileTranslation;
+    }
+  }
+
+  // `streamBtn` is the tab's own Translate button: while IT is loading the
+  // streaming writer owns the result DOM, so re-rendering is deferred to
+  // completion. The global isLoading flag is deliberately not used here —
+  // it is also set by other tabs (batch, file queue) and would wrongly
+  // freeze this toggle while they run.
+  function wireBilingualViewToggle(button, rerender, streamBtn) {
+    button.addEventListener('click', () => {
+      const on = !button.classList.contains('active');
+      button.classList.toggle('active', on);
+      button.setAttribute('aria-pressed', String(on));
+      if (button === dom.bilingualViewText) textBilingualView = on;
+      else fileBilingualView = on;
+      if (!streamBtn.classList.contains('btn-loading')) rerender();
+    });
+  }
+
   // ===== Clipboard =====
   async function copyToClipboard(text) {
     try {
@@ -623,6 +703,7 @@
     // Clear input
     dom.clearTextInput.addEventListener('click', () => {
       dom.textInput.value = '';
+      lastTextTranslation = '';
       dom.textResult.textContent = '';
       dom.textDetectedLang.textContent = '';
       dom.textCharCount.textContent = '0 characters';
@@ -634,7 +715,7 @@
     // direction — handy for back-and-forth conversations and for
     // checking a translation by translating it back.
     dom.reuseTextResult.addEventListener('click', () => {
-      const resultText = dom.textResult.textContent;
+      const resultText = lastTextTranslation;
       if (!resultText) return;
 
       const newSource = dom.textTargetLang.value;
@@ -651,6 +732,7 @@
 
       dom.textInput.value = resultText;
       dom.textInput.dispatchEvent(new Event('input'));
+      lastTextTranslation = '';
       dom.textResult.textContent = '';
       dom.textDetectedLang.textContent = '';
       dom.textUsage.textContent = '';
@@ -676,12 +758,14 @@
 
     // Copy result
     dom.copyTextResult.addEventListener('click', () => {
-      if (dom.textResult.textContent) {
-        copyToClipboard(dom.textResult.textContent);
+      if (lastTextTranslation) {
+        copyToClipboard(lastTextTranslation);
       } else {
         showToast('Nothing to copy', 'error');
       }
     });
+
+    wireBilingualViewToggle(dom.bilingualViewText, renderTextResult, dom.translateText);
 
     // Initial state (also refreshes the char count for a restored draft)
     updateTextResultCopyBtn();
@@ -716,6 +800,8 @@
     try {
       setButtonLoading(dom.translateText, true);
       showCancelButton(dom.cancelTextTranslate, true);
+      lastTextTranslation = '';
+      lastTextSource = text;
       dom.textResult.textContent = '';
       dom.textDetectedLang.textContent = '';
       dom.textUsage.textContent = '';
@@ -734,6 +820,7 @@
             : '';
         },
         onStream: (s) => {
+          lastTextTranslation = s.text;
           renderer.push(s.text);
         },
         onDetectedLang: (lang) => {
@@ -745,7 +832,8 @@
       const result = await Translator.translate(text, sourceLang, targetLang, options);
       renderer.flush();
       if (result.detectedLang) lastTextDetected = result.detectedLang;
-      dom.textResult.textContent = result.text;
+      lastTextTranslation = result.text;
+      renderTextResult();
       dom.textUsage.textContent = formatUsage(result.usage);
       dom.textUsage.title = usageTitle(result.usage);
 
@@ -764,9 +852,10 @@
     } catch (err) {
       // Show the newest partial text that may still be queued in the renderer
       renderer.flush();
+      // Keep whatever partial translation streamed in — re-rendered in the
+      // current view mode (plain or bilingual).
+      renderTextResult();
       if (err.cancelled) {
-        // Keep whatever partial translation already streamed into the
-        // result area — the user may still want to copy it.
         showToast('Translation cancelled', 'success');
       } else {
         if (err.message.includes('API key')) {
@@ -925,16 +1014,34 @@
       dom.ocrPageRange.classList.add('hidden');
       dom.pageRangeRow.classList.add('hidden');
       dom.downloadFileDocxFormatted.classList.add('hidden');
+      updateKeepFormatControls();
       dom.dropZone.style.display = '';
+      lastFileTranslation = '';
       dom.fileResult.textContent = '';
       dom.fileDetectedLang.textContent = '';
       dom.fileUsage.textContent = '';
       updateFileResultCopyBtn();
     });
 
-    // Translate
-    dom.translateFile.addEventListener('click', () => translateFileTab());
+    // Translate — with the pre-upload "Keep original format" toggle on, an
+    // Office file goes straight to the formatted export (it runs its own
+    // translation pass and downloads the result file).
+    dom.translateFile.addEventListener('click', () => {
+      if (dom.keepFormatToggle.checked && currentFileObject) {
+        const kfExt = (currentFileName.match(/\.(docx|pptx|xlsx|pdf)$/i) || [])[1];
+        if (kfExt) {
+          downloadKeepingFormat();
+          return;
+        }
+        showToast('Keep format only applies to DOCX/PPTX/XLSX/PDF — translating as plain text', 'error');
+      }
+      translateFileTab();
+    });
     wireCancelButton(dom.cancelFileTranslate);
+
+    // The bilingual-mode dropdown only makes sense once keep-format is
+    // on, and only for paragraph-based formats (DOCX/PPTX).
+    dom.keepFormatToggle.addEventListener('change', updateKeepFormatControls);
 
     // Update copy/download button states for file result (locked while a
     // translation is streaming in, so partial text can't be copied)
@@ -951,7 +1058,7 @@
 
     // Download as .txt
     dom.downloadFileTxt.addEventListener('click', () => {
-      const text = dom.fileResult.textContent;
+      const text = lastFileTranslation;
       if (!text) {
         showToast('Nothing to download', 'error');
         return;
@@ -964,7 +1071,7 @@
 
     // Download as .docx (library is lazy-loaded on first use)
     dom.downloadFileDocx.addEventListener('click', async () => {
-      const text = dom.fileResult.textContent;
+      const text = lastFileTranslation;
       if (!text) {
         showToast('Nothing to download', 'error');
         return;
@@ -976,22 +1083,24 @@
       } catch (err) {
         showToast(err.message, 'error');
       } finally {
-        dom.downloadFileDocx.disabled = !dom.fileResult.textContent;
+        dom.downloadFileDocx.disabled = !lastFileTranslation;
       }
     });
 
-    // Download .docx keeping the original formatting (translates the
-    // original document in place; runs its own translation pass)
-    dom.downloadFileDocxFormatted.addEventListener('click', () => downloadDocxKeepingFormat());
+    // Download keeping the original formatting (translates the original
+    // document in place; runs its own translation pass)
+    dom.downloadFileDocxFormatted.addEventListener('click', () => downloadKeepingFormat());
 
     // Copy result
     dom.copyFileResult.addEventListener('click', () => {
-      if (dom.fileResult.textContent) {
-        copyToClipboard(dom.fileResult.textContent);
+      if (lastFileTranslation) {
+        copyToClipboard(lastFileTranslation);
       } else {
         showToast('Nothing to copy', 'error');
       }
     });
+
+    wireBilingualViewToggle(dom.bilingualViewFile, renderFileResult, dom.translateFile);
 
     // Initial state
     updateFileResultCopyBtn();
@@ -1040,6 +1149,16 @@
           } else {
             dom.ocrPageRange.classList.add('hidden');
           }
+        } else if (result.imageCount > 0) {
+          // Image-only Office file: nothing to show in the text preview,
+          // but keep-format export can still translate the embedded
+          // images — load the file and point the user there.
+          dom.ocrPrompt.classList.add('hidden');
+          dom.ocrPageRange.classList.add('hidden');
+          pendingOcrFile = null;
+          pendingOcrNumPages = 0;
+          commitParsedFile(file, result);
+          showToast(`This file has no selectable text — only ${result.imageCount} image(s). Enable "Translate text inside embedded images" (Advanced) and use keep-format export.`, 'error');
         } else {
           showToast('No text could be extracted from this file.', 'error');
         }
@@ -1095,7 +1214,7 @@
       accepted.push(file);
     }
     if (!accepted.length) {
-      showToast('No supported files to add (PDF, DOCX, TXT up to 10MB).', 'error');
+      showToast('No supported files to add (PDF, DOCX, PPTX, XLSX, TXT up to 10MB).', 'error');
       return;
     }
     if (rejected) showToast(`Skipped ${rejected} unsupported or too-large file(s)`, 'error');
@@ -1245,6 +1364,12 @@
   // while this runs are picked up by the live array iterator.
   async function processFileQueue() {
     if (fileQueueRunning) return;
+    // The keep-format flow needs the original file object and its own
+    // translate-and-repack pass — the queue only does plain-text output,
+    // so warn instead of silently ignoring the toggle.
+    if (dom.keepFormatToggle.checked) {
+      showToast('Keep original format is not applied in the multi-file queue — files are translated as plain text. Upload one file at a time for formatted output.', 'error');
+    }
     fileQueueRunning = true;
     isLoading = true;
     dom.fileQueueCancel.classList.remove('hidden');
@@ -1300,12 +1425,6 @@
           updateQueueItemRow(item); updateQueueSummary();
           continue;
         }
-        if (text.length > Translator.MAX_CHARS) {
-          item.status = 'error'; item.error = `Too long (${text.length.toLocaleString()} characters).`; item.progress = '';
-          updateQueueItemRow(item); updateQueueSummary();
-          continue;
-        }
-
         // ---- Translate ----
         item.status = 'translating';
         item.progress = '⟳ Translating…';
@@ -1316,7 +1435,7 @@
         const resultEl = dom.fileQueueList.querySelector(`[data-qid="${item.id}"] .fq-result`);
         const renderer = makeStreamRenderer(resultEl);
         try {
-          const result = await Translator.translate(text, sourceLang, targetLang, {
+          const result = await Translator.translateLong(text, sourceLang, targetLang, {
             domain: dom.fileDomain.value,
             tone: dom.fileTone.value,
             glossary: dom.fileGlossary.value,
@@ -1435,20 +1554,38 @@
     }
   }
 
+  // Show the bilingual-mode dropdown only when keep-format is requested AND
+  // the loaded file (if any) can actually hold interleaved paragraphs — a
+  // spreadsheet cell can't, so XLSX hides it.
+  function updateKeepFormatControls() {
+    const officeExt = (currentFileName.match(/\.(docx|pptx|xlsx)$/i) || [])[1]?.toLowerCase();
+    const bilingualCapable = !currentFileObject || officeExt === 'docx' || officeExt === 'pptx';
+    dom.bilingualMode.classList.toggle('hidden', !dom.keepFormatToggle.checked || !bilingualCapable);
+  }
+
   // Commit a successfully parsed file to the preview/translation state
   function commitParsedFile(file, result) {
     currentFileText = result.text;
     currentFileName = file.name;
     currentFileObject = file;
     currentFilePages = result.pages || null;
+    lastFileTranslation = '';
     dom.fileResult.textContent = '';
     dom.fileUsage.textContent = '';
 
     dom.fileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
-    // The keep-format export only applies to real .docx sources (it edits
-    // the original document's XML in place).
-    const isDocx = /\.docx$/i.test(file.name);
-    dom.downloadFileDocxFormatted.classList.toggle('hidden', !isDocx);
+    // The keep-format export applies to Office sources (XML edited in
+    // place) and PDFs (pages re-rendered with translated text drawn in) —
+    // show the button with a label matching the loaded file's extension.
+    const kfExt = (file.name.match(/\.(docx|pptx|xlsx|pdf)$/i) || [])[1]?.toLowerCase();
+    dom.downloadFileDocxFormatted.classList.toggle('hidden', !kfExt);
+    if (kfExt) {
+      dom.downloadFileDocxFormatted.textContent = `Download .${kfExt} (keep format)`;
+      dom.downloadFileDocxFormatted.title = kfExt === 'pdf'
+        ? 'Translate the original PDF keeping its visual layout — pages are re-rendered as images with translations drawn in place (text not selectable)'
+        : `Translate the original .${kfExt} keeping its layout, styles, tables, images and fonts`;
+    }
+    updateKeepFormatControls();
     setupPageRangeUI();
     refreshFilePreview();
     dom.dropZone.style.display = 'none';
@@ -1491,22 +1628,24 @@
 
   function refreshFilePreview() {
     const text = currentFileText;
-    const maxChars = Translator.MAX_CHARS;
     let warning = '';
-    if (text.length > maxChars) {
-      warning = ' 🔴 Exceeds limit - file too large to translate';
+    if (text.length > Translator.MAX_CHARS) {
+      const sections = Math.ceil(text.length / Translator.MAX_CHARS);
+      warning = ` ℹ️ Very long file — will be translated in ${sections} sections (~${Math.ceil(text.length / Translator.CHUNK_SIZE)} parts total)`;
     } else if (text.length > Translator.CHUNK_SIZE) {
       const parts = Math.ceil(text.length / Translator.CHUNK_SIZE);
       warning = ` ℹ️ Long file — will be translated in ~${parts} parts`;
     }
 
     dom.extractedText.textContent = text.length > 5000 ? text.substring(0, 5000) + '\n\n(truncated for preview...)' : text;
-    dom.fileCharCount.textContent = `${text.length.toLocaleString()} / ${maxChars.toLocaleString()} characters${warning}`;
+    dom.fileCharCount.textContent = `${text.length.toLocaleString()} characters${warning}`;
   }
 
   async function translateFileTab() {
     if (!currentFileText) {
-      showToast('Please upload a file first', 'error');
+      showToast(currentFileObject
+        ? 'This file has no selectable text to translate. For image-only files, use keep-format export with "Translate images" enabled.'
+        : 'Please upload a file first', 'error');
       return;
     }
 
@@ -1521,6 +1660,8 @@
     try {
       setButtonLoading(dom.translateFile, true);
       showCancelButton(dom.cancelFileTranslate, true);
+      lastFileTranslation = '';
+      lastFileSource = currentFileText;
       dom.fileResult.textContent = '';
       dom.fileDetectedLang.textContent = '';
       dom.fileUsage.textContent = '';
@@ -1538,6 +1679,7 @@
             : '';
         },
         onStream: (s) => {
+          lastFileTranslation = s.text;
           dom.fileResult.textContent = s.text;
         },
         onDetectedLang: (lang) => {
@@ -1545,8 +1687,9 @@
         }
       };
 
-      const result = await Translator.translate(currentFileText, sourceLang, targetLang, options);
-      dom.fileResult.textContent = result.text;
+      const result = await Translator.translateLong(currentFileText, sourceLang, targetLang, options);
+      lastFileTranslation = result.text;
+      renderFileResult();
       dom.fileUsage.textContent = formatUsage(result.usage);
       dom.fileUsage.title = usageTitle(result.usage);
 
@@ -1563,9 +1706,10 @@
         showToast('Part of the output was truncated by the API length limit', 'error');
       }
     } catch (err) {
+      // Keep whatever partial translation streamed in — re-rendered in the
+      // current view mode (plain or bilingual).
+      renderFileResult();
       if (err.cancelled) {
-        // Keep whatever partial translation already streamed into the
-        // result area — the user may still want to copy/download it.
         showToast('Translation cancelled', 'success');
       } else {
         if (err.message.includes('API key')) {
@@ -1578,7 +1722,7 @@
       showCancelButton(dom.cancelFileTranslate, false);
       dom.fileTranslateProgress.textContent = '';
       setButtonLoading(dom.translateFile, false);
-      const ready = !!dom.fileResult.textContent;
+      const ready = !!lastFileTranslation;
       dom.copyFileResult.disabled = !ready;
       dom.downloadFileTxt.disabled = !ready;
       dom.downloadFileDocx.disabled = !ready;
@@ -2241,7 +2385,7 @@
     triggerDownload(blob, filename);
   }
 
-  // ===== Keep-format .docx export =====
+  // ===== Keep-format Office export (.docx / .pptx / .xlsx) =====
   // JSZip (~100KB) is only needed for the keep-format export, so it's
   // lazy-loaded from the CDN on first use — same pattern as the docx lib.
   let jsZipPromise = null;
@@ -2254,7 +2398,7 @@
         script.onload = () => resolve();
         script.onerror = () => {
           jsZipPromise = null; // allow retry
-          reject(new Error('Failed to load the .docx packer library. Check your internet connection and try again.'));
+          reject(new Error('Failed to load the Office packer library. Check your internet connection and try again.'));
         };
         document.head.appendChild(script);
       });
@@ -2262,19 +2406,75 @@
     return jsZipPromise;
   }
 
-  const WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  // Keep-format export config per Office format: which ZIP parts hold
+  // translatable text, the namespace of that XML, and the element that
+  // groups runs into a translatable unit (a paragraph for docx/pptx, a
+  // shared-string item for xlsx). PPTX has no single "main" part, so
+  // requiredPart is null — having at least one matching part is enough.
+  const OFFICE_FORMATS = {
+    docx: {
+      ns: 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+      partRe: /^word\/(document|header\d*|footer\d*)\.xml$/,
+      requiredPart: 'word/document.xml',
+      unitTag: 'p',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    },
+    pptx: {
+      ns: 'http://schemas.openxmlformats.org/drawingml/2006/main',
+      partRe: /^ppt\/(slides\/slide\d+|notesSlides\/notesSlide\d+)\.xml$/,
+      requiredPart: null,
+      unitTag: 'p',
+      mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    },
+    xlsx: {
+      ns: 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
+      partRe: /^xl\/sharedStrings\.xml$/,
+      requiredPart: 'xl/sharedStrings.xml',
+      unitTag: 'si',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    }
+  };
 
-  // Translate the loaded .docx in place: a .docx is a ZIP whose
-  // word/document.xml holds the text as <w:t> runs inside <w:p> paragraphs.
-  // We translate paragraph-by-paragraph (exact 1:1 mapping — no fragile
-  // delimiter) and write each translation back into the paragraph's first
-  // run, so paragraph styles (headings, lists, alignment), tables, and the
-  // dominant run's formatting are all preserved. Intra-paragraph run
-  // formatting (e.g. one bold word mid-sentence) and header/footer text are
-  // NOT preserved — a documented, common trade-off.
-  async function downloadDocxKeepingFormat() {
-    if (!currentFileObject || !/\.docx$/i.test(currentFileObject.name)) {
-      showToast('Load a .docx file first', 'error');
+  // Spread `translated` across a paragraph's <w:t> nodes, giving each node
+  // a share proportional to its original text length (the last node takes
+  // the remainder). This keeps intra-paragraph run formatting: a bold
+  // phrase stays bold over the roughly corresponding span of the
+  // translation. Boundaries are approximate when the translation's length
+  // differs from the original — a documented trade-off.
+  function writeAcrossRuns(ts, translated) {
+    const lengths = ts.map(t => t.textContent.length);
+    const total = lengths.reduce((a, b) => a + b, 0);
+    if (!total) return;
+    let offset = 0;
+    for (let i = 0; i < ts.length; i++) {
+      const share = i === ts.length - 1
+        ? translated.length - offset
+        : Math.min(Math.round(translated.length * lengths[i] / total), translated.length - offset);
+      ts[i].textContent = translated.slice(offset, offset + Math.max(0, share));
+      ts[i].setAttribute('xml:space', 'preserve');
+      offset += Math.max(0, share);
+    }
+  }
+
+  // Translate the loaded Office file in place: docx/pptx/xlsx are all ZIPs
+  // of XML parts whose text sits in <t> runs grouped into units (<w:p> /
+  // <a:p> paragraphs, <si> shared strings). We translate unit-by-unit
+  // (exact 1:1 mapping — no fragile delimiter) and write each translation
+  // back across the unit's original runs, so styles, tables, images,
+  // fonts, and intra-unit run formatting are all preserved. Everything
+  // else in the ZIP (media, rels, theme) is left untouched. In bilingual
+  // mode (docx/pptx only) the original unit is kept and a translated clone
+  // is inserted after it instead.
+  async function downloadKeepingFormat() {
+    const ext = currentFileObject?.name.includes('.')
+      ? currentFileObject.name.split('.').pop().toLowerCase()
+      : '';
+    if (ext === 'pdf') {
+      return downloadPdfKeepingFormat();
+    }
+    const format = OFFICE_FORMATS[ext];
+    if (!currentFileObject || !format) {
+      showToast('Load a .docx, .pptx, .xlsx or .pdf file first', 'error');
       return;
     }
     const sourceLang = dom.fileSourceLang.value;
@@ -2287,102 +2487,168 @@
     const job = Translator.createJob();
     try {
       showExtracting(true, true);
-      dom.loadingText.textContent = 'Loading .docx packer…';
+      dom.loadingText.textContent = 'Loading Office packer…';
       await loadJsZip();
 
       const buffer = await currentFileObject.arrayBuffer();
       const zip = await JSZip.loadAsync(buffer);
-      const docXmlFile = zip.file('word/document.xml');
-      if (!docXmlFile) throw new Error('This .docx is missing word/document.xml and cannot be processed.');
 
-      const xmlText = await docXmlFile.async('string');
-      const xmlDoc = new DOMParser().parseFromString(xmlText, 'application/xml');
-      if (xmlDoc.getElementsByTagName('parsererror').length) {
-        throw new Error('Could not parse the document XML.');
+      // Translatable parts for this format. Everything else in the ZIP
+      // (media, fonts, styles, rels) is untouched.
+      const partNames = Object.keys(zip.files)
+        .filter(name => format.partRe.test(name));
+      if (format.requiredPart && !partNames.includes(format.requiredPart)) {
+        throw new Error(`This .${ext} is missing ${format.requiredPart} and cannot be processed.`);
+      }
+      if (!partNames.length) {
+        throw new Error(`No translatable XML parts found in this .${ext} file.`);
       }
 
-      // Collect translatable paragraphs (those with non-empty text).
-      const paras = [...xmlDoc.getElementsByTagNameNS(WORD_NS, 'p')];
-      const targets = [];
-      for (const p of paras) {
-        const ts = [...p.getElementsByTagNameNS(WORD_NS, 't')];
-        if (!ts.length) continue;
-        const text = ts.map(t => t.textContent).join('');
-        if (!text.trim()) continue;
-        targets.push({ ts, text });
-      }
-
-      if (!targets.length) {
-        throw new Error('No selectable text found in this .docx (it may be scanned images).');
-      }
-
-      let done = 0;
-      dom.loadingText.textContent = `Translating… 0/${targets.length} paragraphs`;
-
-      // Translate paragraphs concurrently through the shared pool; a single
-      // shared job lets the overlay's Cancel abort them all at once.
-      await Translator._runPool(targets, async (target) => {
-        try {
-          const result = await Translator.translate(target.text, sourceLang, targetLang, {
-            domain: dom.fileDomain.value,
-            tone: dom.fileTone.value,
-            glossary: dom.fileGlossary.value,
-            context: dom.fileContext.value,
-            job
-          });
-          target.translated = result.text;
-        } catch (err) {
-          if (err.cancelled) return false; // stop the pool
-          // Leave a failed paragraph untranslated rather than aborting the
-          // whole document.
-          target.translated = null;
-          target.error = true;
+      // Parse each part and collect translatable units (those with
+      // non-empty text). A malformed non-required part is skipped rather
+      // than failing the whole export.
+      const parts = [];
+      for (const name of partNames) {
+        const xmlText = await zip.file(name).async('string');
+        const xmlDoc = new DOMParser().parseFromString(xmlText, 'application/xml');
+        if (xmlDoc.getElementsByTagName('parsererror').length) {
+          if (name === format.requiredPart) {
+            throw new Error('Could not parse the document XML.');
+          }
+          continue;
         }
-        done++;
-        dom.loadingText.textContent = `Translating… ${done}/${targets.length} paragraphs`;
-        return true;
-      }, BATCH_CONCURRENCY);
-
-      Translator._throwIfCancelled(job);
-
-      // Write each translation back into the paragraph's first run and empty
-      // the rest, preserving that run's formatting and the paragraph style.
-      let failed = 0;
-      for (const target of targets) {
-        if (typeof target.translated !== 'string') { failed++; continue; }
-        target.ts[0].textContent = target.translated;
-        target.ts[0].setAttribute('xml:space', 'preserve');
-        for (let k = 1; k < target.ts.length; k++) target.ts[k].textContent = '';
+        const targets = [];
+        for (const unit of xmlDoc.getElementsByTagNameNS(format.ns, format.unitTag)) {
+          const ts = [...unit.getElementsByTagNameNS(format.ns, 't')];
+          if (!ts.length) continue;
+          const text = ts.map(t => t.textContent).join('');
+          if (!text.trim()) continue;
+          targets.push({ unit, ts, text });
+        }
+        if (targets.length) parts.push({ name, xmlDoc, targets });
       }
 
-      // Serialize back (XMLSerializer drops the XML declaration — re-add it).
-      const serialized = new XMLSerializer().serializeToString(xmlDoc);
-      const withDecl = serialized.startsWith('<?xml')
-        ? serialized
-        : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + serialized;
-      zip.file('word/document.xml', withDecl);
+      const allTargets = parts.flatMap(part => part.targets);
+      if (!allTargets.length) {
+        // Image-only file: still exportable when image translation is on
+        // and there is something to OCR — otherwise a dead end.
+        const hasTranslatableImages = dom.fileTranslateImages.checked &&
+          Object.keys(zip.files).some(name =>
+            /^(word|ppt|xl)\/media\//.test(name) && ImageTranslator.SUPPORTED_IMAGE_RE.test(name));
+        if (!hasTranslatableImages) {
+          throw new Error(`No selectable text found in this .${ext}. For image-only files, enable "Translate text inside embedded images" in Advanced first.`);
+        }
+      }
+
+      if (allTargets.length) {
+        let done = 0;
+        dom.loadingText.textContent = `Translating… 0/${allTargets.length} items`;
+
+        // Translate paragraphs concurrently through the shared pool; a single
+        // shared job lets the overlay's Cancel abort them all at once.
+        await Translator._runPool(allTargets, async (target) => {
+          try {
+            const result = await Translator.translate(target.text, sourceLang, targetLang, {
+              domain: dom.fileDomain.value,
+              tone: dom.fileTone.value,
+              glossary: dom.fileGlossary.value,
+              context: dom.fileContext.value,
+              job
+            });
+            target.translated = result.text;
+          } catch (err) {
+            if (err.cancelled) return false; // stop the pool
+            // Leave a failed paragraph untranslated rather than aborting the
+            // whole document.
+            target.translated = null;
+            target.error = true;
+          }
+          done++;
+          dom.loadingText.textContent = `Translating… ${done}/${allTargets.length} items`;
+          return true;
+        }, BATCH_CONCURRENCY);
+
+        Translator._throwIfCancelled(job);
+      }
+
+      // Bilingual mode: keep every original unit untouched and insert a
+      // translated clone right after it, so the document reads as
+      // alternating original/translated paragraphs. The clone inherits the
+      // original's style, and writeAcrossRuns preserves its run formatting.
+      const bilingual = dom.bilingualMode.value === 'bilingual' && (ext === 'docx' || ext === 'pptx');
+
+      // Write translations back: into a clone after the original unit
+      // (bilingual) or across the original runs (replace mode).
+      let failed = 0;
+      for (const target of allTargets) {
+        if (typeof target.translated !== 'string') { failed++; continue; }
+        if (bilingual) {
+          const clone = target.unit.cloneNode(true);
+          target.unit.parentNode.insertBefore(clone, target.unit.nextSibling);
+          writeAcrossRuns([...clone.getElementsByTagNameNS(format.ns, 't')], target.translated);
+        } else {
+          writeAcrossRuns(target.ts, target.translated);
+        }
+      }
+
+      // Serialize each modified part back into the ZIP (XMLSerializer drops
+      // the XML declaration — re-add it).
+      for (const part of parts) {
+        const serialized = new XMLSerializer().serializeToString(part.xmlDoc);
+        const withDecl = serialized.startsWith('<?xml')
+          ? serialized
+          : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + serialized;
+        zip.file(part.name, withDecl);
+      }
+
+      // Optionally translate text embedded in images (OCR + redraw the
+      // media bytes in place — dimensions stay, so the layout is intact).
+      // Image translation is an add-on: its failure (e.g. the OCR library
+      // couldn't load) must not kill an otherwise successful export.
+      let imageResult = { processed: 0, capped: false, totalMedia: 0 };
+      if (dom.fileTranslateImages.checked) {
+        try {
+          imageResult = await translateEmbeddedImages(zip, { sourceLang, targetLang, job });
+        } catch (err) {
+          if (err.cancelled) throw err;
+          showToast(`Image translation skipped: ${err.message}`, 'error');
+        }
+      }
 
       const blob = await zip.generateAsync({
         type: 'blob',
-        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        mimeType: format.mimeType
       });
 
       const base = (currentFileObject.name.replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').trim()) || 'translation';
-      triggerDownload(blob, `${base}_translated_${targetLang}.docx`);
+      triggerDownload(blob, `${base}_translated_${targetLang}.${ext}`);
 
-      History.add({
-        sourceLang: sourceLang === 'auto' ? 'Auto' : sourceLang,
-        targetLang,
-        sourceText: targets.map(t => t.text).join('\n'),
-        translatedText: targets.map(t => (typeof t.translated === 'string' ? t.translated : t.text)).join('\n'),
-        type: 'file',
-        domain: dom.fileDomain.value
-      });
+      // Image-only exports have no text worth recording in History.
+      if (allTargets.length) {
+        History.add({
+          sourceLang: sourceLang === 'auto' ? 'Auto' : sourceLang,
+          targetLang,
+          sourceText: allTargets.map(t => t.text).join('\n'),
+          translatedText: allTargets.map(t => (typeof t.translated === 'string' ? t.translated : t.text)).join('\n'),
+          type: 'file',
+          domain: dom.fileDomain.value
+        });
+      }
 
       if (failed) {
-        showToast(`Downloaded — but ${failed} paragraph(s) failed and kept the original text`, 'error');
+        showToast(`Downloaded — but ${failed} item(s) failed and kept the original text`, 'error');
+      } else if (!allTargets.length && !imageResult.processed) {
+        // Image-only file where OCR found nothing usable — the download
+        // is byte-identical to the original; say so instead of "success".
+        showToast('Downloaded — but no translatable text was found in the images', 'error');
       } else {
-        showToast('Downloaded translated .docx with formatting preserved', 'success');
+        let imgNote = '';
+        if (imageResult.processed) {
+          imgNote = imageResult.capped
+            ? ` (+ ${imageResult.processed} of ${imageResult.totalMedia} images — capped at ${ImageTranslator.MAX_IMAGES})`
+            : ` (+ ${imageResult.processed} image${imageResult.processed > 1 ? 's' : ''} translated)`;
+        }
+        showToast(`Downloaded translated .${ext} with formatting preserved${imgNote}`, 'success');
       }
     } catch (err) {
       if (err.cancelled) {
@@ -2398,6 +2664,123 @@
       Translator.endJob(job);
       showExtracting(false);
     }
+  }
+
+  // Keep-format export for PDFs — delegates the heavy lifting (page
+  // rendering, text-layer paragraph grouping, redraw, PDF packing) to
+  // PdfTranslator. Output pages are raster images: layout/images/fonts
+  // look identical, but text is no longer selectable.
+  async function downloadPdfKeepingFormat() {
+    if (!currentFileObject) {
+      showToast('Load a .pdf file first', 'error');
+      return;
+    }
+    const sourceLang = dom.fileSourceLang.value;
+    const targetLang = dom.fileTargetLang.value;
+    if (sourceLang !== 'auto' && sourceLang === targetLang) {
+      showToast('Source and target languages are the same', 'error');
+      return;
+    }
+
+    const job = Translator.createJob();
+    try {
+      showExtracting(true, true);
+      dom.loadingText.textContent = 'Loading PDF writer…';
+
+      const result = await PdfTranslator.translatePdf(currentFileObject, {
+        sourceLang,
+        targetLang,
+        promptOptions: {
+          domain: dom.fileDomain.value,
+          tone: dom.fileTone.value,
+          glossary: dom.fileGlossary.value,
+          context: dom.fileContext.value
+        },
+        job,
+        onProgress: (p) => {
+          dom.loadingText.textContent = `Translating page ${p.page}/${p.pages}…`;
+        }
+      });
+
+      const base = (currentFileObject.name.replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').trim()) || 'translation';
+      triggerDownload(result.blob, `${base}_translated_${targetLang}.pdf`);
+
+      if (result.failedParas) {
+        showToast(`Downloaded — but ${result.failedParas} paragraph(s) failed and kept the original text`, 'error');
+      } else if (result.cappedAtPage) {
+        showToast(`Downloaded — translated the first ${result.cappedAtPage} of ${result.pages} pages (page cap)`, 'error');
+      } else {
+        showToast('Downloaded translated .pdf with layout preserved (pages are rendered as images)', 'success');
+      }
+    } catch (err) {
+      if (err.cancelled) {
+        showToast('Translation cancelled', 'success');
+      } else {
+        if (err.message.includes('API key')) {
+          dom.apiKeyInput.focus();
+          dom.apiKeyInput.select();
+        }
+        showToast(err.message, 'error');
+      }
+    } finally {
+      Translator.endJob(job);
+      showExtracting(false);
+    }
+  }
+
+  // OCR + translate + redraw the embedded raster images of the loaded
+  // Office file, replacing the media bytes in the ZIP. Returns
+  // { processed, capped, totalMedia } — processed counts images actually
+  // translated, capped is true when MAX_IMAGES left images out.
+  async function translateEmbeddedImages(zip, { sourceLang, targetLang, job }) {
+    const allMedia = Object.keys(zip.files)
+      .filter(name => /^(word|ppt|xl)\/media\//.test(name) && ImageTranslator.SUPPORTED_IMAGE_RE.test(name));
+    const mediaNames = allMedia.slice(0, ImageTranslator.MAX_IMAGES);
+    const capped = allMedia.length > mediaNames.length;
+    if (!mediaNames.length) return { processed: 0, capped: false, totalMedia: 0 };
+
+    dom.loadingText.textContent = 'Loading OCR engine…';
+    const worker = await ImageTranslator.createOcrWorker(FileParser.tesseractLangFor(sourceLang));
+    let processed = 0;
+    try {
+      for (let i = 0; i < mediaNames.length; i++) {
+        // Cancellation lands between images; the in-flight line
+        // translation inside processImage also aborts via the shared job.
+        Translator._throwIfCancelled(job);
+        dom.loadingText.textContent = `Translating images… ${i + 1}/${mediaNames.length}`;
+        const name = mediaNames[i];
+        const ext = name.split('.').pop().toLowerCase();
+        try {
+          const result = await ImageTranslator.processImage(
+            await zip.file(name).async('uint8array'), ext, {
+              worker,
+              sourceLang,
+              targetLang,
+              job,
+              promptOptions: {
+                domain: dom.fileDomain.value,
+                tone: dom.fileTone.value,
+                glossary: dom.fileGlossary.value,
+                context: dom.fileContext.value
+              }
+            });
+          if (result) {
+            zip.file(name, result.bytes);
+            processed++;
+          }
+        } catch (err) {
+          // A worker terminated mid-OCR rejects with a generic Tesseract
+          // error — normalize to a clean cancellation when the job was
+          // cancelled, so the export stops instead of skipping ahead.
+          if (job.cancelled) Translator._throwIfCancelled(job);
+          if (err.cancelled) throw err;
+          // A single bad image never aborts the export — keep the original.
+        }
+      }
+    } finally {
+      await worker.terminate().catch(() => {});
+    }
+    return { processed, capped, totalMedia: allMedia.length };
   }
 
   // ===== Batch CSV import/export =====
