@@ -22,7 +22,7 @@
 
     <main>
       <section class="hero">
-        <div class="eyebrow">XCODE ASSET TOOLKIT <span>·</span> V1.0</div>
+        <div class="eyebrow">APP ICON TOOLKIT <span>·</span> V1.0</div>
         <h1>Biến một hình ảnh<br /><em>thành App Icon.</em></h1>
         <p class="hero-copy">Tạo bộ icon legacy đúng chuẩn <code>.appiconset</code> cho các nền tảng Apple trong vài giây. Ảnh của bạn không bao giờ rời khỏi thiết bị.</p>
       </section>
@@ -44,13 +44,19 @@
           </div>
           <div class="tip"><span>✦</span> Ảnh vuông sẽ cho kết quả tốt nhất. Icon iOS tự động bo góc khi hiển thị.</div>
           <div class="platform-picker">
-            <label for="platformSelect">NỀN TẢNG XCODE</label>
+            <label for="platformSelect">NỀN TẢNG</label>
             <select id="platformSelect">
               <option value="ios">iOS / iPadOS</option>
               <option value="macos">macOS</option>
               <option value="watchos">watchOS</option>
               <option value="tvos">tvOS</option>
+              <option value="android">Android / Android Studio</option>
             </select>
+          </div>
+          <div class="android-options hidden" id="androidOptions">
+            <label for="androidBackgroundColor">MÀU NỀN ADAPTIVE ICON</label>
+            <input id="androidBackgroundColor" type="color" value="#3b9cff" />
+            <span>Foreground giữ vùng an toàn 66 × 66dp</span>
           </div>
         </div>
 
@@ -63,6 +69,10 @@
           <div class="preview-meta">
             <span><i class="legend-dot"></i> Các kích thước được tạo</span>
             <span id="dimensionText">—</span>
+          </div>
+          <div class="android-mask-preview hidden" id="androidMaskPreview" aria-label="Android adaptive icon preview">
+            <span class="mask-circle"></span><span class="mask-rounded"></span><span class="mask-square"></span>
+            <small>Preview mask Android: circle · rounded square · square</small>
           </div>
           <div class="validation-status" id="validationStatus" aria-live="polite"></div>
           <button class="confirm-upscale hidden" id="upscaleButton" type="button">Cho phép upscale ảnh nhỏ</button>
@@ -80,12 +90,20 @@
         <div class="error-message hidden" id="errorMessage" role="alert"></div>
       </section>
 
-      <section class="guide">
+      <section class="guide" id="appleGuide">
         <div class="guide-title"><span class="guide-number">i</span><div><div class="panel-label">DÙNG TRONG XCODE</div><h2>Ba bước để bắt đầu.</h2></div></div>
         <ol>
           <li><span>01</span><div><strong>Tải file ZIP</strong><p>Giải nén file vừa tải về máy.</p></div></li>
           <li><span>02</span><div><strong>Mở Assets.xcassets</strong><p>Kéo thư mục <code>AppIcon.appiconset</code> vào trong.</p></div></li>
           <li><span>03</span><div><strong>Chọn App Icon</strong><p>Vào Target → General → App Icons Source.</p></div></li>
+        </ol>
+      </section>
+      <section class="guide hidden" id="androidGuide">
+        <div class="guide-title"><span class="guide-number">A</span><div><div class="panel-label">DÙNG TRONG ANDROID STUDIO</div><h2>Ba bước để bắt đầu.</h2></div></div>
+        <ol>
+          <li><span>01</span><div><strong>Tải file ZIP</strong><p>Giải nén file vừa tải về máy.</p></div></li>
+          <li><span>02</span><div><strong>Mở res</strong><p>Chép các thư mục <code>mipmap-*</code> vào <code>app/src/main/res</code>.</p></div></li>
+          <li><span>03</span><div><strong>Khai báo launcher</strong><p>Dùng <code>@mipmap/ic_launcher</code> trong AndroidManifest hoặc Android Studio Image Asset.</p></div></li>
         </ol>
       </section>
     </main>
