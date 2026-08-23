@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d0e13" />
+    <title>AppIcon — Tạo App Icon cho Xcode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="AppIcon trang chủ">
+        <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
+        <span>App<span>Icon</span></span>
+      </a>
+      <div class="header-note"><span class="status-dot"></span> Chạy hoàn toàn trên trình duyệt</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">XCODE ASSET TOOLKIT <span>·</span> V1.0</div>
+        <h1>Biến một hình ảnh<br /><em>thành App Icon.</em></h1>
+        <p class="hero-copy">Tạo bộ icon legacy đúng chuẩn <code>.appiconset</code> cho các nền tảng Apple trong vài giây. Ảnh của bạn không bao giờ rời khỏi thiết bị.</p>
+      </section>
+
+      <section class="workspace" aria-label="Công cụ tạo App Icon">
+        <div class="upload-panel">
+          <div class="panel-label"><span>01</span> TẢI ẢNH GỐC</div>
+          <label class="drop-zone" id="dropZone" for="fileInput">
+            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
+            <div class="upload-icon" aria-hidden="true">↑</div>
+            <strong id="uploadTitle">Kéo thả ảnh vào đây</strong>
+            <span id="uploadHint">hoặc <u>chọn file</u> từ máy tính</span>
+            <small>PNG, JPG hoặc WEBP · tối thiểu 1024 × 1024 px</small>
+          </label>
+          <div class="file-info hidden" id="fileInfo">
+            <span class="file-icon">✦</span>
+            <div><strong id="fileName"></strong><small id="fileSize"></small></div>
+            <button id="removeButton" type="button" aria-label="Xóa ảnh">×</button>
+          </div>
+          <div class="tip"><span>✦</span> Ảnh vuông sẽ cho kết quả tốt nhất. Icon iOS tự động bo góc khi hiển thị.</div>
+          <div class="platform-picker">
+            <label for="platformSelect">NỀN TẢNG XCODE</label>
+            <select id="platformSelect">
+              <option value="ios">iOS / iPadOS</option>
+              <option value="macos">macOS</option>
+              <option value="watchos">watchOS</option>
+              <option value="tvos">tvOS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="panel-label"><span>02</span> XEM TRƯỚC</div>
+          <div class="preview-stage" id="previewStage">
+            <div class="empty-preview"><div class="empty-grid"></div><span>Preview sẽ xuất hiện ở đây</span></div>
+            <div class="preview-orbit orbit-one"></div><div class="preview-orbit orbit-two"></div>
+          </div>
+          <div class="preview-meta">
+            <span><i class="legend-dot"></i> Các kích thước được tạo</span>
+            <span id="dimensionText">—</span>
+          </div>
+          <div class="validation-status" id="validationStatus" aria-live="polite"></div>
+          <button class="confirm-upscale hidden" id="upscaleButton" type="button">Cho phép upscale ảnh nhỏ</button>
+        </div>
+      </section>
+
+      <section class="output-section">
+        <div class="output-heading">
+          <div class="panel-label"><span>03</span> XUẤT FILE</div>
+          <p id="outputDescription">Gói ZIP chứa toàn bộ PNG và <code>Contents.json</code> đã sẵn sàng cho Xcode.</p>
+        </div>
+          <button class="download-button" id="downloadButton" type="button" disabled>
+          <span class="button-icon">↓</span><span id="downloadLabel">Tải AppIcon.appiconset.zip</span><span class="button-arrow">↗</span>
+        </button>
+        <div class="error-message hidden" id="errorMessage" role="alert"></div>
+      </section>
+
+      <section class="guide">
+        <div class="guide-title"><span class="guide-number">i</span><div><div class="panel-label">DÙNG TRONG XCODE</div><h2>Ba bước để bắt đầu.</h2></div></div>
+        <ol>
+          <li><span>01</span><div><strong>Tải file ZIP</strong><p>Giải nén file vừa tải về máy.</p></div></li>
+          <li><span>02</span><div><strong>Mở Assets.xcassets</strong><p>Kéo thư mục <code>AppIcon.appiconset</code> vào trong.</p></div></li>
+          <li><span>03</span><div><strong>Chọn App Icon</strong><p>Vào Target → General → App Icons Source.</p></div></li>
+        </ol>
+      </section>
+    </main>
+    <aside class="composer-note">
+      <strong>Icon Composer và Xcode mới</strong>
+      <p>Gói PNG legacy này phù hợp với asset catalog truyền thống. Với Xcode mới, hãy đưa artwork nguồn vào Icon Composer để tạo các biến thể Default, Dark, Tinted hoặc Clear theo workflow của Apple.</p>
+    </aside>
+    <footer><span>APPICON / MADE FOR APP BUILDERS</span><span>© 2025 VUTASO.com · LOCAL · PRIVATE · OPEN</span></footer>
+    <script src="vendor/jszip.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
