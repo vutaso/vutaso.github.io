@@ -136,6 +136,7 @@
 .compare-model-chip[data-provider="byteplus"] .compare-chip-dot { background: #8b5cf6; }
 .compare-model-chip[data-provider="nvidia"] .compare-chip-dot { background: #76b900; }
 .compare-model-chip[data-provider="openrouter"] .compare-chip-dot { background: #a78bfa; }
+.compare-model-chip[data-provider="orcarouter"] .compare-chip-dot { background: #f59e0b; }
 
 .compare-model-select {
   flex: 1;
@@ -461,6 +462,7 @@ body.model-compare-open {
 .model-compare-col[data-provider="byteplus"] .model-compare-col-dot { background: #8b5cf6; color: #8b5cf6; }
 .model-compare-col[data-provider="nvidia"] .model-compare-col-dot { background: #76b900; color: #76b900; }
 .model-compare-col[data-provider="openrouter"] .model-compare-col-dot { background: #a78bfa; color: #a78bfa; }
+.model-compare-col[data-provider="orcarouter"] .model-compare-col-dot { background: #f59e0b; color: #f59e0b; }
 
 .model-compare-col-titles {
   display: flex;
