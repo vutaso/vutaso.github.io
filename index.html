@@ -1569,7 +1569,7 @@
 
     .n-links a,
     .n-drop-toggle {
-      color: #718096;
+      color: #111827;
       font-size: .86rem;
       padding-bottom: 5px;
     }
@@ -2229,20 +2229,23 @@
   <!-- MOBILE MENU -->
   <div class="mob-menu" id="mob">
     <a href="#products" onclick="closeMob()" data-i18n="nav_products">Sản phẩm</a>
-    <a href="#why" onclick="closeMob()" data-i18n="nav_why">Tại sao VUTASO</a>
-    <a href="#faq" onclick="closeMob()">FAQ</a>
-    <a href="https://blog.vutaso.com" target="_blank" onclick="closeMob()">Blog</a>
     <div class="mob-utils" id="mob-utils-wrap">
       <button type="button" class="mob-utils-toggle" onclick="toggleMobUtils()" aria-expanded="false">
-        <span data-i18n="nav_utils">Tiện ích</span>
+        <span data-i18n="nav_tools">Công cụ</span>
         <svg class="n-drop-chevron" viewBox="0 0 24 24" aria-hidden="true">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
       <div class="mob-utils-menu" id="mob-utils-menu">
-        <a href="https://vutaso.com/qr/" onclick="closeMob()" data-i18n="nav_qr_free">Tạo mã QR Free</a>
+        <a href="https://vutaso.com/ai/" target="_blank" rel="noopener noreferrer" onclick="closeMob()" data-i18n="nav_tool_ai">AI</a>
+        <a href="https://vutaso.com/translate/" target="_blank" rel="noopener noreferrer" onclick="closeMob()" data-i18n="nav_tool_translate">AI Translate</a>
+        <a href="https://vutaso.com/qr/" target="_blank" rel="noopener noreferrer" onclick="closeMob()" data-i18n="nav_tool_qr">QR Generator</a>
+        <a href="https://vutaso.com/appicon/" target="_blank" rel="noopener noreferrer" onclick="closeMob()" data-i18n="nav_tool_appicon">App Icon Generator</a>
       </div>
     </div>
+    <a href="#why" onclick="closeMob()" data-i18n="nav_why">Tại sao VUTASO</a>
+    <a href="#faq" onclick="closeMob()">FAQ</a>
+    <a href="https://blog.vutaso.com" target="_blank" onclick="closeMob()">Blog</a>
     <div class="lang-toggle" style="margin-top:12px">
       <button class="lang-btn" data-lang="vi" onclick="switchLang('vi');closeMob()">VI</button>
       <button class="lang-btn" data-lang="en" onclick="switchLang('en');closeMob()">EN</button>
@@ -2256,19 +2259,22 @@
     </a>
     <div class="n-links">
       <a href="#products" data-i18n="nav_products">Sản phẩm</a>
-      <a href="#why" data-i18n="nav_why">Tại sao VUTASO</a>
-      <a href="#faq">FAQ</a>
       <div class="n-dropdown" id="nav-utils">
         <button type="button" class="n-drop-toggle" aria-expanded="false" aria-haspopup="true">
-          <span data-i18n="nav_utils">Tiện ích</span>
+          <span data-i18n="nav_tools">Công cụ</span>
           <svg class="n-drop-chevron" viewBox="0 0 24 24" aria-hidden="true">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
         <div class="n-drop-menu" role="menu">
-          <a href="https://vutaso.com/qr/" role="menuitem" data-i18n="nav_qr_free">Tạo mã QR Free</a>
+          <a href="https://vutaso.com/ai/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="nav_tool_ai">AI</a>
+          <a href="https://vutaso.com/translate/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="nav_tool_translate">AI Translate</a>
+          <a href="https://vutaso.com/qr/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="nav_tool_qr">QR Generator</a>
+          <a href="https://vutaso.com/appicon/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="nav_tool_appicon">App Icon Generator</a>
         </div>
       </div>
+      <a href="#why" data-i18n="nav_why">Tại sao VUTASO</a>
+      <a href="#faq">FAQ</a>
       <a href="https://blog.vutaso.com" target="_blank">Blog</a>
     </div>
     <div class="n-right">
@@ -2677,8 +2683,9 @@
       vi: {
         nav_products: 'Sản phẩm',
         nav_why: 'Tại sao VUTASO',
-        nav_utils: 'Tiện ích',
-        nav_qr_free: 'Tạo mã QR Free',
+        nav_tools: 'Công cụ',
+        nav_tool_ai: 'AI', nav_tool_translate: 'AI Translate',
+        nav_tool_qr: 'QR Generator', nav_tool_appicon: 'App Icon Generator',
         nav_download: 'Tải App',
         hero_badge: 'Ứng dụng iOS — Miễn phí',
         hero_title: 'Ứng dụng cho cuộc sống<br><span class="gtext">hiện đại</span>',
@@ -2733,8 +2740,9 @@
       en: {
         nav_products: 'Products',
         nav_why: 'Why VUTASO',
-        nav_utils: 'Utilities',
-        nav_qr_free: 'Free QR Generator',
+        nav_tools: 'Tools',
+        nav_tool_ai: 'AI', nav_tool_translate: 'AI Translate',
+        nav_tool_qr: 'QR Generator', nav_tool_appicon: 'App Icon Generator',
         nav_download: 'Download',
         hero_badge: 'iOS Apps — Free',
         hero_title: 'Apps for<br><span class="gtext">modern life</span>',
