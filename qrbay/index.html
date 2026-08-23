@@ -769,10 +769,10 @@
             height: 500px;
             background: linear-gradient(160deg, #0D1832, #060E1E);
             border-radius: 44px;
-            border: 2px solid rgba(255, 107, 0, 0.35);
+            border: 2px solid rgba(67, 125, 244, .35);
             box-shadow:
                 0 50px 100px rgba(0, 0, 0, 0.6),
-                0 0 80px rgba(255, 107, 0, 0.2),
+                0 0 80px rgba(67, 125, 244, .26),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
             position: relative;
             overflow: hidden;
@@ -2448,6 +2448,608 @@
                 cursor: pointer
             }
         }
+
+        /* ============================================================
+           LUNARBAY LIGHT THEME
+           ============================================================ */
+        :root {
+            --bg: #f7f9fc;
+            --bg-2: #ffffff;
+            --bg-card: #ffffff;
+            --primary: #e49b43;
+            --primary-light: #d28b31;
+            --primary-dark: #b47727;
+            --accent: #437df4;
+            --accent2: #69b5ff;
+            --success: #2c9e79;
+            --warning: #d28b31;
+            --danger: #d96d63;
+            --text: #172235;
+            --text-muted: #647186;
+            --text-dim: #9aa5b5;
+            --border: #e5eaf2;
+            --border-bright: #f1d39e;
+            --glass: rgba(255, 255, 255, .78);
+            --gradient: linear-gradient(135deg, #e49b43, #f4ba56);
+            --gradient-soft: linear-gradient(135deg, rgba(228, 155, 67, .12), rgba(244, 186, 86, .06));
+            --glow: 0 0 40px rgba(228, 155, 67, .18);
+            --glow-sm: 0 0 20px rgba(228, 155, 67, .12);
+            --shadow: 0 9px 28px rgba(32, 67, 125, .08);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 7% 0%, rgba(105, 181, 255, .15), transparent 28%),
+                radial-gradient(circle at 94% 16%, rgba(98, 185, 155, .1), transparent 25%),
+                var(--bg);
+            color: var(--text);
+        }
+
+        #cur-dot {
+            background: var(--accent);
+        }
+
+        #cur-ring {
+            border-color: rgba(67, 125, 244, .55);
+        }
+
+        nav {
+            background: rgba(247, 249, 252, .82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        nav.scrolled {
+            background: rgba(255, 255, 255, .94);
+            border-bottom-color: var(--border);
+            box-shadow: 0 5px 18px rgba(32, 67, 125, .06);
+        }
+
+        .n-logo-text {
+            color: var(--text);
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+
+        .n-logo svg circle {
+            stroke: var(--accent);
+        }
+
+        .n-logo svg path {
+            stroke: var(--accent);
+        }
+
+        .n-logo svg path:last-of-type {
+            stroke: var(--primary);
+        }
+
+        .n-links a {
+            color: #718096;
+        }
+
+        .n-links a:hover,
+        .n-dropdown.open .n-drop-toggle,
+        .n-drop-toggle:hover {
+            color: var(--accent);
+        }
+
+        .btn-nav {
+            background: #e9f0ff;
+            color: #2859c7;
+            box-shadow: none;
+        }
+
+        .btn-nav:hover {
+            background: #dce8ff;
+            color: #2859c7;
+            box-shadow: none;
+        }
+
+        .mob-menu {
+            background: rgba(247, 249, 252, .98);
+        }
+
+        .mob-menu a {
+            color: var(--text);
+        }
+
+        #hero {
+            background:
+                radial-gradient(ellipse 60% 48% at 50% 16%, rgba(255, 255, 255, .96), transparent 72%),
+                radial-gradient(ellipse 48% 70% at 8% 50%, rgba(105, 181, 255, .2), transparent 72%),
+                radial-gradient(ellipse 46% 65% at 94% 42%, rgba(170, 153, 255, .15), transparent 70%),
+                linear-gradient(135deg, #f4f8ff 0%, #f8f7ff 52%, #f3f9ff 100%);
+        }
+
+        #hero::before {
+            background-image:
+                linear-gradient(rgba(67, 125, 244, .045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(67, 125, 244, .045) 1px, transparent 1px);
+        }
+
+        .orb1 {
+            background: rgba(105, 181, 255, .2);
+        }
+
+        .orb2 {
+            background: rgba(244, 186, 86, .13);
+        }
+
+        .hero-badge,
+        .hstat,
+        .fc {
+            background: rgba(255, 255, 255, .82);
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+            color: var(--text-muted);
+        }
+
+        h1.hero-title,
+        .s-title,
+        .feat-title,
+        .stat-n {
+            color: var(--text);
+        }
+
+        .gtext,
+        .s-label {
+            color: var(--accent);
+        }
+
+        .hero-sub,
+        .s-sub,
+        .feat-desc,
+        .stat-l {
+            color: var(--text-muted);
+        }
+
+        .btn-main {
+            background: var(--accent);
+            box-shadow: 0 12px 25px rgba(67, 125, 244, .22);
+        }
+
+        .btn-main:hover {
+            background: #2859c7;
+        }
+
+        .btn-ghost {
+            color: #2859c7;
+            border-color: #ccdcfc;
+            background: rgba(255, 255, 255, .62);
+        }
+
+        .btn-ghost:hover {
+            background: #edf3ff;
+            border-color: #9bbafc;
+        }
+
+        section,
+        #features,
+        #faq {
+            background: transparent;
+        }
+
+        #features,
+        #faq {
+            background: #ffffff;
+        }
+
+        .feat-card,
+        .widget-card,
+        .price-card,
+        .faq-item {
+            background: #ffffff;
+            border-color: var(--border);
+            box-shadow: none;
+        }
+
+        .feat-card:hover,
+        .widget-card:hover,
+        .price-card:hover,
+        .faq-item:hover {
+            border-color: var(--border-bright);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feat-tag {
+            color: var(--accent) !important;
+            background: #edf3ff !important;
+            border-color: #ccdcfc !important;
+        }
+
+        .faq-q {
+            color: var(--text);
+        }
+
+        .faq-a {
+            color: var(--text-muted);
+        }
+
+        #stats-bar {
+            background: linear-gradient(120deg, #edf4ff, #eefbf7);
+            border-color: transparent;
+        }
+
+        footer {
+            background:
+                radial-gradient(circle at 8% 0%, rgba(105, 181, 255, .14), transparent 28%),
+                linear-gradient(180deg, #f4f8ff 0%, #ffffff 72%);
+            border-top-color: #e2ebfa;
+        }
+
+        .ft-tag,
+        .ft-col ul a,
+        .ft-bot {
+            color: var(--text-muted);
+        }
+
+        .soc {
+            background: #ffffff;
+            border-color: var(--border);
+        }
+
+        .soc:hover {
+            background: #edf3ff;
+            border-color: var(--accent);
+        }
+
+        .ft-col h4 {
+            color: var(--text);
+        }
+
+        .ft-bot {
+            border-top-color: var(--border);
+            justify-content: center;
+            text-align: center;
+        }
+
+        @media(max-width:860px) {
+            nav {
+                padding: 14px 20px;
+            }
+        }
+
+        /* Lightweight mode: remove decorative animation and interaction effects */
+        html {
+            scroll-behavior: auto;
+        }
+
+        body {
+            cursor: auto;
+        }
+
+        #hcv,
+        #cur-dot,
+        #cur-ring,
+        .hero-orb,
+        .feat-spot,
+        .phone-shine,
+        .scan-pulse,
+        .scan-line {
+            display: none !important;
+        }
+
+        *,
+        *::before,
+        *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        nav,
+        nav.scrolled {
+            position: sticky;
+            padding: 12px 6%;
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #hero {
+            min-height: 620px;
+            padding: 100px 6% 80px;
+            background: #f7f9fc;
+        }
+
+        #hero::before,
+        #hero::after {
+            display: none;
+        }
+
+        .hero-sub,
+        .hero-btns,
+        .hero-stats {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .feat-card:hover,
+        .widget-card:hover,
+        .price-card:hover,
+        .faq-item:hover,
+        .soc:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .feat-card,
+        .widget-card,
+        .price-card,
+        .faq-item {
+            box-shadow: 0 4px 16px rgba(32, 67, 125, .05);
+        }
+
+        @media(max-width:860px) {
+            nav,
+            nav.scrolled {
+                padding: 11px 20px;
+            }
+        }
+
+        /* Blue QRBay accent */
+        :root {
+            --primary: #437df4;
+            --primary-light: #69b5ff;
+            --primary-dark: #2859c7;
+            --accent: #437df4;
+            --warning: #437df4;
+            --gradient: linear-gradient(135deg, #2859c7, #69b5ff);
+            --gradient-soft: linear-gradient(135deg, rgba(67, 125, 244, .12), rgba(105, 181, 255, .06));
+            --border-bright: #ccdcfc;
+            --glow: 0 0 40px rgba(67, 125, 244, .18);
+            --glow-sm: 0 0 20px rgba(67, 125, 244, .12);
+        }
+
+        .n-logo-text,
+        .gtext,
+        .s-label,
+        .feat-tag,
+        .ft-col ul a:hover {
+            color: var(--accent);
+        }
+
+        .n-logo-text {
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+
+        .hero-badge .badge-dot,
+        .app-dot,
+        .scan-corner,
+        .scan-line {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+        }
+
+        .btn-main,
+        .btn-nav {
+            background: var(--accent);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+
+        .btn-main:hover,
+        .btn-nav:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-ghost,
+        .hstat-icon,
+        .faq-ic {
+            color: var(--accent);
+        }
+
+        .feat-ic,
+        .wid-ic,
+        .soc:hover {
+            background: #edf3ff !important;
+            border-color: #ccdcfc !important;
+        }
+
+        .feat-ic svg,
+        .wid-ic svg,
+        .scan-result-icon {
+            stroke: var(--accent) !important;
+            color: var(--accent) !important;
+        }
+
+        .scan-result-icon {
+            background: #edf3ff !important;
+        }
+
+        .rev-av {
+            background: linear-gradient(135deg, #437df4, #69b5ff) !important;
+        }
+
+        .ft-bot + div a {
+            background: none !important;
+            color: var(--accent) !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        [style*="#FFB800"],
+        [style*="#ffb800"],
+        [style*="rgba(255,184,0"] {
+            background: #edf3ff !important;
+            border-color: #ccdcfc !important;
+            color: var(--accent) !important;
+            stroke: var(--accent) !important;
+        }
+
+        /* Clean download call-to-action */
+        #dl {
+            padding: 78px 6%;
+            background: linear-gradient(135deg, #2859c7, #437df4);
+        }
+
+        #dl::before,
+        #dl::after,
+        .dl-orb,
+        .qr-sl {
+            display: none !important;
+        }
+
+        .dl-title {
+            font-weight: 400;
+            letter-spacing: -.04em;
+        }
+
+        #dl .gtext {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            background: none !important;
+        }
+
+        .dl-sub {
+            color: #dce7ff;
+            margin-bottom: 28px;
+        }
+
+        .dl-btns {
+            margin-bottom: 28px;
+        }
+
+        .btn-store {
+            padding: 13px 22px;
+            border-radius: 13px;
+            background: #ffffff;
+            border: 0;
+            box-shadow: 0 12px 24px rgba(17, 48, 124, .2);
+        }
+
+        .btn-store svg,
+        .bst strong {
+            color: #2859c7;
+            fill: #2859c7;
+        }
+
+        .bst small {
+            color: #718096;
+        }
+
+        .qr-box {
+            padding: 12px;
+            border-radius: 17px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .3);
+        }
+
+        .qr-label {
+            color: #dce7ff;
+        }
+
+        /* Remove remaining warm blur/glow accents */
+        .hero-orb,
+        .dl-orb,
+        .feat-spot,
+        .ph-chart-wrap,
+        .price-card.pop {
+            filter: none !important;
+            box-shadow: none !important;
+        }
+
+        .ph-bar {
+            background: rgba(67, 125, 244, .5);
+        }
+
+        .ph-bar.hi {
+            background: var(--gradient);
+        }
+
+        .price-card.pop {
+            border-color: #ccdcfc;
+        }
+
+        .step-n {
+            filter: none !important;
+            text-shadow: none !important;
+        }
+
+        .step-icon {
+            background: #edf3ff !important;
+            border: 1px solid #d8e4ff;
+            box-shadow: none !important;
+        }
+
+        .step-icon svg {
+            stroke: var(--accent) !important;
+        }
+
+        .faq-ic {
+            background: #edf3ff !important;
+            border-color: #ccdcfc !important;
+            color: #437df4 !important;
+        }
+
+        .faq-ic svg {
+            stroke: #437df4 !important;
+        }
+
+        .faq-item.open .faq-ic {
+            background: #dce8ff !important;
+        }
+
+        #stats-bar {
+            background: linear-gradient(135deg, #2859c7 0%, #437df4 58%, #69b5ff 100%) !important;
+        }
+
+        #stats-bar::before {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, .12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(20, 62, 150, .12) 0%, transparent 60%);
+        }
+
+        #stats-bar .stat-n,
+        #stats-bar .stat-l {
+            color: #ffffff;
+            text-shadow: none;
+        }
+
+        .ft-social .soc svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent);
+            fill: none !important;
+            stroke: var(--accent) !important;
+        }
+
+        .ft-social .soc:nth-child(n + 2) svg {
+            fill: var(--accent) !important;
+            stroke: none !important;
+        }
+
+        /* Keep the native pointer visible on interactive elements. */
+        body,
+        a,
+        button,
+        input,
+        select,
+        textarea,
+        summary,
+        .soc,
+        .feat-card,
+        .widget-card,
+        .price-card,
+        .faq-q,
+        .car-btn,
+        .btn-store {
+            cursor: auto !important;
+        }
+
+        a,
+        button,
+        summary,
+        .soc,
+        .feat-card,
+        .widget-card,
+        .price-card,
+        .faq-q,
+        .car-btn,
+        .btn-store {
+            cursor: pointer !important;
+        }
     </style>
 </head>
 
@@ -2537,11 +3139,6 @@
         </div>
 
         <div class="hero-right">
-            <!-- Floating card top left -->
-            <div class="fc fc1">
-                <div class="fc-label">Mã vừa quét</div>
-                <div class="fc-val" style="color:var(--success)">✓ Thành công</div>
-            </div>
             <!-- Floating card bottom right -->
             <div class="fc fc2">
                 <div class="fc-label">Định dạng</div>
@@ -2726,7 +3323,7 @@
                             <rect x="5" y="5" width="14" height="14" rx="2" />
                         </svg>
                     </div>
-                    <div class="feat-tag">⚡️ Quét nhanh</div>
+                    <div class="feat-tag">Quét nhanh</div>
                     <div class="feat-title">Quét nhanh & chính xác</div>
                     <div class="feat-desc">Sử dụng camera để quét mọi mã QR và mã vạch trong vài giây, kể cả trong điều
                         kiện thiếu
@@ -2748,8 +3345,7 @@
                         </svg>
                     </div>
                     <div class="feat-tag"
-                        style="background:rgba(0,214,143,0.1);color:var(--success);border-color:rgba(0,214,143,0.2)">🔍
-                        Tra cứu
+                        style="background:#edf3ff;color:#437df4;border-color:#ccdcfc">Tra cứu
                     </div>
                     <div class="feat-title">Tra cứu giá sản phẩm</div>
                     <div class="feat-desc">Quét mã vạch tại siêu thị để so sánh giá, xem đánh giá và đưa ra quyết định
@@ -2775,7 +3371,7 @@
                     </div>
                     <div class="feat-tag"
                         style="background:rgba(123,97,255,0.1);color:#7B61FF;border-color:rgba(123,97,255,0.2)">
-                        🎨 Tùy chỉnh</div>
+                        Tùy chỉnh</div>
                     <div class="feat-title">Tạo & Tùy chỉnh QR</div>
                     <div class="feat-desc">Tạo mã QR cho Wi-Fi, liên hệ, URL... và cá nhân hóa với màu sắc, logo theo
                         phong cách
@@ -2797,8 +3393,7 @@
                         </svg>
                     </div>
                     <div class="feat-tag"
-                        style="background:rgba(255,184,0,0.1);color:var(--warning);border-color:rgba(255,184,0,0.2)">📂
-                        Lịch sử
+                        style="background:#edf3ff;color:#437df4;border-color:#ccdcfc">Lịch sử
                     </div>
                     <div class="feat-title">Quản lý lịch sử</div>
                     <div class="feat-desc">Tự động lưu lại toàn bộ lịch sử quét và tạo mã. Dễ dàng tìm kiếm, sắp xếp và
@@ -2822,8 +3417,7 @@
                         </svg>
                     </div>
                     <div class="feat-tag"
-                        style="background:rgba(255,91,91,0.1);color:var(--danger);border-color:rgba(255,91,91,0.2)">📑
-                        Hàng loạt
+                        style="background:#edf3ff;color:#437df4;border-color:#ccdcfc">Hàng loạt
                     </div>
                     <div class="feat-title">Quét hàng loạt</div>
                     <div class="feat-desc">Tiết kiệm thời gian tối đa bằng cách quét nhiều mã QR hoặc mã vạch cùng một
@@ -2844,7 +3438,7 @@
                             <line x1="12" y1="2" x2="12" y2="15" />
                         </svg>
                     </div>
-                    <div class="feat-tag">📤 Chia sẻ</div>
+                    <div class="feat-tag">Chia sẻ</div>
                     <div class="feat-title">Xuất & Chia sẻ</div>
                     <div class="feat-desc">Dễ dàng xuất lịch sử ra file CSV, văn bản hoặc hình ảnh và chia sẻ mã QR của
                         bạn lên
@@ -3614,7 +4208,6 @@
         </div>
         <div class="ft-bot">
             <span>© 2025 QRBay. All rights reserved.</span>
-            <span>Được làm với ❤️ tại Việt Nam 🇻🇳</span>
         </div>
         <div
             style="text-align:center;padding-top:16px;margin-top:12px;border-top:1px solid rgba(255,107,0,0.08);font-size:0.82rem;color:var(--text-muted);letter-spacing:0.5px;">
@@ -3624,13 +4217,14 @@
     </footer>
 
     <script>
-        /* Start hero immediately (no loading screen) */
+        /* Start the lightweight hero immediately. */
         startHero();
 
         /* ============================================================
            HERO CANVAS PARTICLES
            ============================================================ */
         (function () {
+            return;
             const cv = document.getElementById('hcv');
             const cx = cv.getContext('2d');
             let W, H, ps = [], raf;
@@ -3698,37 +4292,14 @@
            TYPEWRITER
            ============================================================ */
         function startHero() {
-            const lines = ['Quét QR & mã vạch thông minh'];
             const el = document.getElementById('tw-el');
             const cur = document.getElementById('tw-c');
-            let text = lines[0], i = 0;
-
-            function type() {
-                if (i < text.length) {
-                    const ch = text[i];
-                    if (ch === '\n') {
-                        el.innerHTML += '<br>';
-                    } else if (i === 0) {
-                        el.innerHTML = '<span class="gtext">' + ch;
-                    } else {
-                        const sp = el.querySelector('.gtext');
-                        if (sp) sp.innerHTML += ch;
-                        else el.innerHTML += ch;
-                    }
-                    i++;
-                    setTimeout(type, ch === '\n' ? 180 : 60);
-                } else {
-                    // Close span
-                    cur.style.display = 'none';
-                    document.getElementById('hsub').classList.add('vis');
-                    setTimeout(() => {
-                        document.getElementById('hbtns').classList.add('vis');
-                        document.getElementById('hstats').classList.add('vis');
-                    }, 200);
-                    buildPhoneChart();
-                }
-            }
-            setTimeout(type, 400);
+            el.innerHTML = '<span class="gtext">Quét QR & mã vạch thông minh</span>';
+            cur.style.display = 'none';
+            document.getElementById('hsub').classList.add('vis');
+            document.getElementById('hbtns').classList.add('vis');
+            document.getElementById('hstats').classList.add('vis');
+            buildPhoneChart();
         }
 
         /* Phone chart bars */
@@ -3750,6 +4321,7 @@
            CUSTOM CURSOR
            ============================================================ */
         (function () {
+            return;
             const dot = document.getElementById('cur-dot');
             const ring = document.getElementById('cur-ring');
             let mx = 0, my = 0, rx = 0, ry = 0;
@@ -3903,15 +4475,13 @@
                 }, 80);
             }
 
-            function startAuto() {
-                timer = setInterval(() => goTo(idx + 1), 4200);
-            }
+            function startAuto() { }
 
             window.carNext = () => { clearInterval(timer); goTo(idx + 1); startAuto(); };
             window.carPrev = () => { clearInterval(timer); goTo(idx - 1); startAuto(); };
 
             animStars();
-            startAuto();
+            // Automatic carousel playback is disabled for a lighter page.
         })();
 
         /* ============================================================

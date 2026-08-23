@@ -374,6 +374,262 @@
                 font-size: 1.15rem;
             }
         }
+
+        /* LunarBay visual language */
+        :root {
+            --bg: #f7f9fc;
+            --bg-2: #ffffff;
+            --bg-card: #ffffff;
+            --primary: #437df4;
+            --primary-light: #437df4;
+            --accent: #62b99b;
+            --orange: #e49b43;
+            --orange-light: #d28b31;
+            --success: #2c9e79;
+            --text: #172235;
+            --text-muted: #647186;
+            --border: #e5eaf2;
+            --border-bright: #ccdcfc;
+            --glass: rgba(255, 255, 255, .78);
+            --gradient: linear-gradient(135deg, #2859c7, #69b5ff);
+            --gradient-orange: linear-gradient(135deg, #d28b31, #f4ba56);
+            --shadow: 0 24px 70px rgba(32, 67, 125, .13);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 8% 0%, rgba(105, 181, 255, .16), transparent 29%),
+                radial-gradient(circle at 92% 18%, rgba(98, 185, 155, .1), transparent 25%),
+                var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .22;
+            background-image: radial-gradient(rgba(67, 125, 244, .2) 1px, transparent 1px);
+            background-size: 34px 34px;
+            mask-image: radial-gradient(ellipse 60% 45% at 50% 0%, #000, transparent 80%);
+        }
+
+        .bg-orb { filter: blur(100px); }
+        .bg-orb.a { background: rgba(105, 181, 255, .14); }
+        .bg-orb.b { background: rgba(98, 185, 155, .1); }
+
+        .top-nav {
+            padding: 14px max(24px, 6%);
+            background: rgba(247, 249, 252, .82);
+            border-bottom: 1px solid transparent;
+            box-shadow: none;
+        }
+
+        .nav-content { max-width: 1160px; }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            background: none;
+            -webkit-text-fill-color: initial;
+            font-size: 1rem;
+            letter-spacing: .02em;
+        }
+
+        .logo::before {
+            content: '☾';
+            display: grid;
+            place-items: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 400;
+            background: linear-gradient(145deg, #69b5ff, #3768db);
+            box-shadow: 0 8px 18px rgba(67, 125, 244, .24);
+        }
+
+        .nav-links { gap: 8px; }
+
+        .nav-link {
+            border-radius: 99px;
+            color: #718096;
+            padding: 8px 15px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary);
+            background: #e9f0ff;
+            border-color: transparent;
+        }
+
+        .container {
+            max-width: 860px;
+            padding: 74px 30px 92px;
+        }
+
+        .page-header { margin-bottom: 46px; }
+
+        .page-header h1 {
+            color: var(--text);
+            font-weight: 400;
+            letter-spacing: -.045em;
+        }
+
+        .page-header h1 span {
+            background: none;
+            color: var(--primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .last-updated { color: var(--text-muted); }
+        .apps-badge { gap: 8px; }
+
+        .app-tag {
+            border-radius: 99px;
+            box-shadow: 0 4px 14px rgba(32, 67, 125, .05);
+        }
+
+        .app-tag.blue {
+            background: #edf3ff;
+            border-color: #d8e4ff;
+            color: var(--primary);
+        }
+
+        .app-tag.orange {
+            background: #fff2dc;
+            border-color: #f7dfae;
+            color: #b47727;
+        }
+
+        .highlight,
+        .warning-box,
+        .success-box {
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(32, 67, 125, .05);
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #edf4ff, #f7fbff);
+            border: 1px solid #dce8ff;
+            border-left: 4px solid var(--primary);
+            color: var(--text-muted);
+        }
+
+        h2 {
+            color: var(--text);
+            background: none;
+            -webkit-text-fill-color: initial;
+            font-weight: 400;
+            letter-spacing: -.025em;
+            border-bottom-color: var(--border);
+        }
+
+        h3 { color: var(--text); font-weight: 600; }
+        h4 { color: var(--primary); }
+        p, ul li { color: var(--text-muted); }
+        ul li { border-bottom-color: #eef2f8; }
+
+        ul li::before {
+            background: var(--primary);
+            box-shadow: 0 0 0 3px #edf3ff;
+        }
+
+        ul li strong { color: var(--text); }
+
+        .definition-item {
+            background: rgba(255, 255, 255, .78);
+            border-color: var(--border);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(32, 67, 125, .04);
+        }
+
+        .definition-term { color: var(--primary); }
+
+        .warning-box {
+            background: #fff4f2;
+            border-left-color: #e57c6e;
+        }
+
+        .warning-box p { color: #bb6157; }
+
+        .success-box {
+            background: #eaf8f2;
+            border-left-color: var(--success);
+        }
+
+        .success-box p { color: #258164; }
+
+        .footer {
+            padding: 34px 24px 28px;
+            background: rgba(255, 255, 255, .72);
+            border-top-color: var(--border);
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            background: none;
+            color: var(--primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .footer .divider { background: var(--border); }
+
+        @media (max-width: 600px) {
+            .top-nav { padding: 11px 16px; }
+            .container { padding: 54px 20px 68px; }
+            .page-header { margin-bottom: 36px; }
+        }
+
+        /* Clean white reading theme */
+        body {
+            background: #ffffff;
+            color: #111827;
+        }
+
+        body::before,
+        .bg-orb {
+            display: none;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, .94);
+            border-bottom-color: #e5e7eb;
+        }
+
+        .page-header h1,
+        h2,
+        h3,
+        ul li strong {
+            color: #111827;
+        }
+
+        .last-updated,
+        p,
+        ul li {
+            color: #374151;
+        }
+
+        .definition-item {
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 5px 18px rgba(17, 24, 39, .04);
+        }
+
+        .highlight {
+            background: #f8fbff;
+            color: #374151;
+        }
+
+        .footer {
+            background: #ffffff;
+        }
     </style>
 </head>
 
@@ -551,8 +807,6 @@
 
     <div class="footer">
         <p>&copy; 2025 <a href="https://vutaso.com">VUTASO.com</a></p>
-        <div class="divider"></div>
-        <p class="made-in">Được làm với ❤️ tại Việt Nam 🇻🇳</p>
     </div>
 </body>
 

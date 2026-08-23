@@ -47,6 +47,200 @@
   <link rel="stylesheet" href="assets/vendor/pickr.nano.min.css">
   <link rel="stylesheet" href="assets/css/style.css?v=5">
 
+  <style id="lunarbay-qr-theme">
+    :root {
+      --bg: #f7f9fc;
+      --bg-panel: #ffffff;
+      --bg-hover: #edf3ff;
+      --text: #172235;
+      --text-muted: #647186;
+      --border: #e5eaf2;
+      --accent: #437df4;
+      --accent-hover: #2859c7;
+      --accent-mid: #69b5ff;
+      --accent-light: #edf3ff;
+      --moneybay: #437df4;
+      --moneybay-hover: #2859c7;
+      --qrbay: #e49b43;
+      --qrbay-hover: #c47d2a;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-lg: 20px;
+      --shadow: 0 9px 28px rgba(32, 67, 125, .08);
+      --shadow-lg: 0 24px 70px rgba(32, 67, 125, .13);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 7% 0%, rgba(105, 181, 255, .14), transparent 28%),
+        radial-gradient(circle at 94% 14%, rgba(98, 185, 155, .1), transparent 25%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .2;
+      background-image: radial-gradient(rgba(67, 125, 244, .2) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(ellipse 60% 42% at 50% 0%, #000, transparent 80%);
+    }
+
+    .header {
+      background: rgba(247, 249, 252, .84);
+      border-bottom-color: transparent;
+      box-shadow: 0 5px 18px rgba(32, 67, 125, .04);
+    }
+
+    .logo__img {
+      height: 30px;
+      filter: brightness(0) saturate(100%) invert(32%) sepia(91%) saturate(1228%) hue-rotate(202deg) brightness(96%);
+    }
+
+    .header__app-link {
+      border-radius: 13px;
+      box-shadow: none;
+    }
+
+    .header__app-link:hover {
+      box-shadow: 0 10px 22px rgba(67, 125, 244, .2);
+    }
+
+    .header__app-link--qrbay:hover {
+      box-shadow: 0 10px 22px rgba(228, 155, 67, .22);
+    }
+
+    .lang-switch {
+      padding: 3px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      background: #fff;
+    }
+
+    .lang-btn {
+      border-radius: 99px;
+      color: var(--text-muted);
+    }
+
+    .lang-btn--active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .main {
+      position: relative;
+      z-index: 1;
+      padding-top: 34px;
+    }
+
+    .panel {
+      border-color: var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .panel__title {
+      color: var(--text);
+      letter-spacing: .08em;
+    }
+
+    .type-btn {
+      border-radius: 13px;
+    }
+
+    .type-btn:hover,
+    .type-btn.active {
+      background: var(--accent-light);
+      border-color: #d8e4ff;
+      color: var(--accent);
+    }
+
+    .customizer__section,
+    .accordion__item {
+      border-color: var(--border);
+    }
+
+    .accordion__item {
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .accordion__header {
+      background: #fbfcff;
+    }
+
+    .accordion__header:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .btn {
+      border-radius: 13px;
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      box-shadow: 0 10px 22px rgba(67, 125, 244, .2);
+    }
+
+    .btn--primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn--secondary,
+    .btn--ghost {
+      border-color: var(--border);
+      color: var(--text-muted);
+      background: #fff;
+    }
+
+    .btn--secondary:hover,
+    .btn--ghost:hover {
+      border-color: #ccdcfc;
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    input,
+    select,
+    textarea,
+    .input,
+    .select {
+      border-color: var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    .input:focus,
+    .select:focus {
+      border-color: #9bbafc;
+      box-shadow: 0 0 0 3px rgba(67, 125, 244, .12);
+      outline: none;
+    }
+
+    .footer {
+      background: rgba(255, 255, 255, .78);
+      border-top-color: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        background: rgba(247, 249, 252, .94);
+      }
+
+      .main {
+        padding-top: 20px;
+      }
+    }
+  </style>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
