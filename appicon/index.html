@@ -3,85 +3,136 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AppIcon — Tạo App Icon iOS &amp; Android | VUTASO</title>
+    <meta name="description" content="Tạo bộ app icon trên trình duyệt cho iOS, iPadOS, macOS, watchOS, tvOS và Android. Xuất .appiconset, brandassets và mipmap. Ảnh không rời khỏi thiết bị." />
+    <meta name="keywords" content="app icon, appiconset, iOS icon, Android icon, Xcode, Android Studio, adaptive icon, watchOS, tvOS, VUTASO" />
+    <meta name="author" content="VUTASO" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d0e13" />
-    <title>AppIcon — Tạo App Icon cho Xcode</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="canonical" href="https://vutaso.com/appicon/" />
+    <link rel="alternate" hreflang="vi" href="https://vutaso.com/appicon/" />
+    <link rel="alternate" hreflang="en" href="https://vutaso.com/appicon/" />
+    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/appicon/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AppIcon — Tạo App Icon iOS &amp; Android | VUTASO" />
+    <meta property="og:description" content="Tạo bộ app icon cho Apple và Android ngay trên trình duyệt. Ảnh không rời khỏi thiết bị." />
+    <meta property="og:url" content="https://vutaso.com/appicon/" />
+    <meta property="og:site_name" content="VUTASO" />
+    <meta property="og:image" content="https://vutaso.com/appicon/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="vi_VN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AppIcon — Tạo App Icon iOS &amp; Android | VUTASO" />
+    <meta name="twitter:description" content="Generate iOS and Android app icons in your browser. Images never leave your device." />
+    <meta name="twitter:image" content="https://vutaso.com/appicon/og-image.png" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css?v=1.5" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "AppIcon",
+        "url": "https://vutaso.com/appicon/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "VUTASO", "url": "https://vutaso.com" },
+        "description": "Browser-based app icon generator for iOS, iPadOS, macOS, watchOS, tvOS, and Android."
+      }
+    </script>
   </head>
   <body>
+    <noscript>
+      <p>AppIcon needs JavaScript to generate icons in your browser. / AppIcon cần JavaScript để tạo icon trên trình duyệt.</p>
+    </noscript>
     <div class="noise"></div>
     <header class="site-header">
-      <a class="brand" href="./" aria-label="AppIcon trang chủ">
-        <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
-        <span>App<span>Icon</span></span>
-      </a>
-      <div class="header-note"><span class="status-dot"></span> Chạy hoàn toàn trên trình duyệt</div>
+      <div class="brand-wrap">
+        <a class="vutaso-link" href="../" data-i18n="brand.home">VUTASO</a>
+        <a class="brand" href="./" data-i18n-aria="brand.app" aria-label="AppIcon trang chủ">
+          <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
+          <span>App<span>Icon</span></span>
+        </a>
+      </div>
+      <div class="header-actions">
+        <div class="header-note"><span class="status-dot"></span><span data-i18n="header.note">Chạy hoàn toàn trên trình duyệt</span></div>
+        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Ngôn ngữ">
+          <button type="button" class="lang-btn is-active" data-lang="vi" aria-pressed="true">VI</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
     </header>
 
     <main>
       <section class="hero">
-        <div class="eyebrow">APP ICON TOOLKIT <span>·</span> V1.0</div>
-        <h1>Biến một hình ảnh<br /><em>thành App Icon.</em></h1>
-        <p class="hero-copy">Tạo bộ icon legacy đúng chuẩn <code>.appiconset</code> cho các nền tảng Apple trong vài giây. Ảnh của bạn không bao giờ rời khỏi thiết bị.</p>
+        <div class="eyebrow"><span data-i18n="hero.eyebrow">APP ICON TOOLKIT</span> <span>·</span> V1.0</div>
+        <h1 data-i18n-html="hero.title">Biến một hình ảnh<br /><em>thành App Icon.</em></h1>
+        <p class="hero-copy" data-i18n="hero.copy">Tạo bộ icon cho iOS, iPadOS, macOS, watchOS, tvOS và Android ngay trên trình duyệt. Ảnh của bạn không bao giờ rời khỏi thiết bị.</p>
       </section>
 
-      <section class="workspace" aria-label="Công cụ tạo App Icon">
+      <section class="workspace" data-i18n-aria="workspace.label" aria-label="Công cụ tạo App Icon">
         <div class="upload-panel">
-          <div class="panel-label"><span>01</span> TẢI ẢNH GỐC</div>
+          <div class="panel-label"><span>01</span> <span data-i18n="upload.step">TẢI ẢNH GỐC</span></div>
           <label class="drop-zone" id="dropZone" for="fileInput">
-            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
+            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" data-i18n-aria="upload.choose" aria-label="Chọn ảnh PNG, JPG hoặc WEBP" />
             <div class="upload-icon" aria-hidden="true">↑</div>
             <strong id="uploadTitle">Kéo thả ảnh vào đây</strong>
             <span id="uploadHint">hoặc <u>chọn file</u> từ máy tính</span>
-            <small>PNG, JPG hoặc WEBP · tối thiểu 1024 × 1024 px</small>
+            <small data-i18n="upload.formats">PNG, JPG hoặc WEBP · tối thiểu 1024 × 1024 px</small>
           </label>
           <div class="file-info hidden" id="fileInfo">
             <span class="file-icon">✦</span>
             <div><strong id="fileName"></strong><small id="fileSize"></small></div>
-            <button id="removeButton" type="button" aria-label="Xóa ảnh">×</button>
+            <button id="removeButton" type="button" data-i18n-aria="upload.remove" aria-label="Xóa ảnh">×</button>
           </div>
-          <div class="tip"><span>✦</span> Ảnh vuông sẽ cho kết quả tốt nhất. Icon iOS tự động bo góc khi hiển thị.</div>
+          <div class="tip"><span>✦</span> <span data-i18n="upload.tip">Ảnh vuông sẽ cho kết quả tốt nhất. Icon iOS tự động bo góc khi hiển thị.</span></div>
           <div class="platform-picker">
-            <label for="platformSelect">NỀN TẢNG</label>
+            <label for="platformSelect" data-i18n="platform.label">NỀN TẢNG</label>
             <select id="platformSelect">
-              <option value="ios">iOS / iPadOS</option>
-              <option value="macos">macOS</option>
-              <option value="watchos">watchOS</option>
-              <option value="tvos">tvOS</option>
-              <option value="android">Android / Android Studio</option>
+              <option value="ios" data-i18n="platform.ios">iOS / iPadOS</option>
+              <option value="macos" data-i18n="platform.macos">macOS</option>
+              <option value="watchos" data-i18n="platform.watchos">watchOS</option>
+              <option value="tvos" data-i18n="platform.tvos">tvOS</option>
+              <option value="android" data-i18n="platform.android">Android / Android Studio</option>
             </select>
           </div>
           <div class="android-options hidden" id="androidOptions">
-            <label for="androidBackgroundColor">MÀU NỀN ADAPTIVE ICON</label>
+            <label for="androidBackgroundColor" data-i18n="android.bg">MÀU NỀN ADAPTIVE ICON</label>
             <input id="androidBackgroundColor" type="color" value="#3b9cff" />
-            <span>Foreground giữ vùng an toàn 66 × 66dp</span>
+            <span data-i18n="android.safe">Foreground giữ vùng an toàn 66 × 66dp</span>
           </div>
         </div>
 
         <div class="preview-panel">
-          <div class="panel-label"><span>02</span> XEM TRƯỚC</div>
+          <div class="panel-label"><span>02</span> <span data-i18n="preview.step">XEM TRƯỚC</span></div>
           <div class="preview-stage" id="previewStage">
-            <div class="empty-preview"><div class="empty-grid"></div><span>Preview sẽ xuất hiện ở đây</span></div>
+            <div class="empty-preview"><div class="empty-grid"></div><span data-i18n="preview.empty">Preview sẽ xuất hiện ở đây</span></div>
             <div class="preview-orbit orbit-one"></div><div class="preview-orbit orbit-two"></div>
           </div>
           <div class="preview-meta">
-            <span><i class="legend-dot"></i> Các kích thước được tạo</span>
+            <span><i class="legend-dot"></i> <span data-i18n="preview.meta">Các kích thước được tạo</span></span>
             <span id="dimensionText">—</span>
           </div>
-          <div class="android-mask-preview hidden" id="androidMaskPreview" aria-label="Android adaptive icon preview">
-            <span class="mask-circle"></span><span class="mask-rounded"></span><span class="mask-square"></span>
-            <small>Preview mask Android: circle · rounded square · square</small>
+          <div class="android-mask-preview hidden" id="androidMaskPreview" data-i18n-aria="preview.masksAria" aria-label="Preview mask Android">
+            <span class="mask-circle" data-mask><i></i></span>
+            <span class="mask-rounded" data-mask><i></i></span>
+            <span class="mask-square" data-mask><i></i></span>
+            <small data-i18n="preview.masks">Preview mask Android: circle · rounded square · square</small>
           </div>
           <div class="validation-status" id="validationStatus" aria-live="polite"></div>
-          <button class="confirm-upscale hidden" id="upscaleButton" type="button">Cho phép upscale ảnh nhỏ</button>
+          <button class="confirm-upscale hidden" id="upscaleButton" type="button" data-i18n="upscale">Cho phép upscale ảnh nhỏ</button>
         </div>
       </section>
 
       <section class="output-section">
         <div class="output-heading">
-          <div class="panel-label"><span>03</span> XUẤT FILE</div>
+          <div class="panel-label"><span>03</span> <span data-i18n="output.step">XUẤT FILE</span></div>
           <p id="outputDescription">Gói ZIP chứa toàn bộ PNG và <code>Contents.json</code> đã sẵn sàng cho Xcode.</p>
         </div>
           <button class="download-button" id="downloadButton" type="button" disabled>
@@ -91,28 +142,36 @@
       </section>
 
       <section class="guide" id="appleGuide">
-        <div class="guide-title"><span class="guide-number">i</span><div><div class="panel-label">DÙNG TRONG XCODE</div><h2>Ba bước để bắt đầu.</h2></div></div>
+        <div class="guide-title"><span class="guide-number">i</span><div><div class="panel-label" data-i18n="guide.apple.label">DÙNG TRONG XCODE</div><h2 data-i18n="guide.heading">Ba bước để bắt đầu.</h2></div></div>
         <ol>
-          <li><span>01</span><div><strong>Tải file ZIP</strong><p>Giải nén file vừa tải về máy.</p></div></li>
-          <li><span>02</span><div><strong>Mở Assets.xcassets</strong><p>Kéo thư mục <code>AppIcon.appiconset</code> vào trong.</p></div></li>
-          <li><span>03</span><div><strong>Chọn App Icon</strong><p>Vào Target → General → App Icons Source.</p></div></li>
+          <li><span>01</span><div><strong data-i18n="guide.zip">Tải file ZIP</strong><p data-i18n="guide.zipBody">Giải nén file vừa tải về máy.</p></div></li>
+          <li><span>02</span><div><strong id="appleGuideTitle">Mở Assets.xcassets</strong><p id="appleGuideBody">Kéo thư mục <code>AppIcon.appiconset</code> vào trong.</p></div></li>
+          <li><span>03</span><div><strong data-i18n="guide.apple.select">Chọn App Icon</strong><p data-i18n="guide.apple.selectBody">Vào Target → General → App Icons Source.</p></div></li>
         </ol>
       </section>
       <section class="guide hidden" id="androidGuide">
-        <div class="guide-title"><span class="guide-number">A</span><div><div class="panel-label">DÙNG TRONG ANDROID STUDIO</div><h2>Ba bước để bắt đầu.</h2></div></div>
+        <div class="guide-title"><span class="guide-number">A</span><div><div class="panel-label" data-i18n="guide.android.label">DÙNG TRONG ANDROID STUDIO</div><h2 data-i18n="guide.heading">Ba bước để bắt đầu.</h2></div></div>
         <ol>
-          <li><span>01</span><div><strong>Tải file ZIP</strong><p>Giải nén file vừa tải về máy.</p></div></li>
-          <li><span>02</span><div><strong>Mở res</strong><p>Chép các thư mục <code>mipmap-*</code> vào <code>app/src/main/res</code>.</p></div></li>
-          <li><span>03</span><div><strong>Khai báo launcher</strong><p>Dùng <code>@mipmap/ic_launcher</code> trong AndroidManifest hoặc Android Studio Image Asset.</p></div></li>
+          <li><span>01</span><div><strong data-i18n="guide.zip">Tải file ZIP</strong><p data-i18n="guide.zipBody">Giải nén file vừa tải về máy.</p></div></li>
+          <li><span>02</span><div><strong data-i18n="guide.android.merge">Trộn vào res</strong><p data-i18n-html="guide.android.mergeBody">Chép nội dung thư mục <code>res</code> (<code>mipmap-*</code>, <code>drawable-*</code>, <code>values/ic_launcher_colors.xml</code>) vào <code>app/src/main/res</code>. Không chép cả thư mục <code>res</code> (tránh <code>res/res</code>).</p></div></li>
+          <li><span>03</span><div><strong data-i18n="guide.android.manifest">Khai báo launcher</strong><p data-i18n-html="guide.android.manifestBody">Gán <code>android:icon="@mipmap/ic_launcher"</code> và <code>android:roundIcon="@mipmap/ic_launcher_round"</code> trên <code>&lt;application&gt;</code>.</p></div></li>
         </ol>
       </section>
     </main>
     <aside class="composer-note">
-      <strong>Icon Composer và Xcode mới</strong>
-      <p>Gói PNG legacy này phù hợp với asset catalog truyền thống. Với Xcode mới, hãy đưa artwork nguồn vào Icon Composer để tạo các biến thể Default, Dark, Tinted hoặc Clear theo workflow của Apple.</p>
+      <strong data-i18n="composer.title">Icon Composer và Xcode mới</strong>
+      <p data-i18n="composer.body">Gói PNG legacy này phù hợp với asset catalog truyền thống. Với Xcode mới, hãy đưa artwork nguồn vào Icon Composer để tạo các biến thể Default, Dark, Tinted hoặc Clear theo workflow của Apple.</p>
     </aside>
-    <footer><span>APPICON / MADE FOR APP BUILDERS</span><span>© 2025 VUTASO.com · LOCAL · PRIVATE · OPEN</span></footer>
-    <script src="vendor/jszip.min.js"></script>
-    <script src="app.js"></script>
+    <footer>
+      <span data-i18n="footer.left">APPICON / MADE FOR APP BUILDERS</span>
+      <span class="footer-meta">
+        <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
+        <a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a>
+        <a href="../terms/" data-i18n="footer.terms">Điều khoản</a>
+      </span>
+    </footer>
+    <script src="i18n.js?v=1.5"></script>
+    <script src="vendor/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG"></script>
+    <script src="app.js?v=1.5"></script>
   </body>
 </html>

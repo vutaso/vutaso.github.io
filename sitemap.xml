@@ -44,6 +44,14 @@
     <priority>0.5</priority>
   </url>
 
+  <!-- AppIcon -->
+  <url>
+    <loc>https://vutaso.com/appicon/</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Translate Tool -->
   <url>
     <loc>https://vutaso.com/translate/</loc>

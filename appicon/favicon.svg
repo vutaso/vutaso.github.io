@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="AppIcon">
+  <rect width="32" height="32" rx="8" fill="#0d0e13"/>
+  <g transform="translate(16 16) rotate(45)">
+    <rect x="-7" y="-7" width="6" height="6" rx="1.2" fill="#3b9cff"/>
+    <rect x="1" y="-7" width="6" height="6" rx="1.2" fill="#d9ff67"/>
+    <rect x="-7" y="1" width="6" height="6" rx="1.2" fill="#d9ff67"/>
+    <rect x="1" y="1" width="6" height="6" rx="1.2" fill="#3b9cff"/>
+  </g>
+</svg>
