@@ -404,7 +404,9 @@ Important:
     const second = await this._translateChunk(ctx, text.slice(splitAt), depth + 1,
       stream ? { emit: (p) => stream.emit(first.text + joiner + p) } : undefined);
 
-    return { text: first.text + joiner + second.text, truncated: second.truncated };
+    // Either half may have hit the output cap — losing the first half's
+    // flag would silently swallow the truncation warning.
+    return { text: first.text + joiner + second.text, truncated: first.truncated || second.truncated };
   },
 
   // A multi-chunk translation is only as strong as its weakest chunk, so

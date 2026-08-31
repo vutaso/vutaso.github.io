@@ -82,7 +82,11 @@ const PdfTranslator = {
         canvas.width = Math.floor(viewport.width);
         canvas.height = Math.floor(viewport.height);
         const ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        // A page without an explicit background fill renders transparent,
+        // and the JPEG encode below turns transparency solid black.
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ctx, viewport, background: '#ffffff' }).promise;
 
         // A PDF whose first pages have no text layer at all is almost
         // certainly scanned — bail out before rendering the whole file.

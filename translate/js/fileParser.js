@@ -5,6 +5,9 @@ const FileParser = {
   // OCR is slow (seconds per page) — cap it so a huge scanned PDF can't
   // run forever. Pages beyond the cap are skipped (the UI warns about it).
   OCR_MAX_PAGES: 20,
+  // Rendered pages must stay under the browser's canvas dimension cap —
+  // an oversized page (A0 scan, blueprint) at 2x would fail to render.
+  OCR_MAX_CANVAS_DIM: 4096,
 
   // Returns { text, pages: string[] | null, numPages?: number }
   // `pages` is the per-page text for PDFs (enables page-range selection);
@@ -145,7 +148,7 @@ const FileParser = {
     } finally {
       // Release the pdf.js worker + buffers — without this every opened
       // PDF stays in memory for the lifetime of the page.
-      pdf.destroy();
+      pdf.destroy().catch(() => {});
     }
   },
 
@@ -177,15 +180,25 @@ const FileParser = {
       for (let i = first; i <= last; i++) {
         this._throwIfAborted(signal);
         const page = await pdf.getPage(i);
-        // 2x scale noticeably improves OCR accuracy on small fonts
-        const viewport = page.getViewport({ scale: 2 });
+        // 2x scale noticeably improves OCR accuracy on small fonts; very
+        // large pages are scaled down to stay under the canvas cap.
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(2,
+          this.OCR_MAX_CANVAS_DIM / Math.max(baseViewport.width, baseViewport.height));
+        const viewport = page.getViewport({ scale });
         const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        const ocrCtx = canvas.getContext('2d');
+        // A page with no background fill renders transparent, which
+        // Tesseract effectively reads as black — wrecking recognition.
+        ocrCtx.fillStyle = '#ffffff';
+        ocrCtx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ocrCtx, viewport, background: '#ffffff' }).promise;
 
         const result = await worker.recognize(canvas);
         pages.push((result.data.text || '').trim());
+        canvas.width = canvas.height = 0; // release the bitmap promptly
         if (onProgress) {
           onProgress({ stage: 'ocr', current: i - first + 1, total: last - first + 1 });
         }
@@ -207,7 +220,7 @@ const FileParser = {
     } finally {
       if (signal) signal.removeEventListener('abort', onAbort);
       await worker.terminate().catch(() => {});
-      pdf.destroy();
+      pdf.destroy().catch(() => {});
     }
   },
 

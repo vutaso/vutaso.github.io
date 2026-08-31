@@ -118,6 +118,11 @@
   let currentFileName = '';
   let currentFileObject = null; // the loaded File itself (for keep-format Office export)
   let currentFilePages = null; // per-page text for PDFs (page-range feature)
+  // 1-based page number of currentFilePages[0] in the source document, and
+  // the document's total page count. Only different from 1 / pages.length
+  // after a partial OCR run, where pages holds just the OCR'd range.
+  let currentFilePageBase = 1;
+  let currentFileNumPages = 0;
   let pendingOcrFile = null;   // scanned PDF waiting for a user-triggered OCR
   let pendingOcrNumPages = 0;  // total pages of pendingOcrFile (for the OCR range UI)
   let extractAbort = null;     // AbortController for file extraction / OCR
@@ -916,6 +921,13 @@
       savePreferences();
     });
 
+    // Dropping a file anywhere OUTSIDE a drop zone makes the browser
+    // navigate to it — wiping the page (and any in-flight translation).
+    // Swallow the default globally; the zones below still receive their
+    // events normally (these listeners only prevent the default).
+    window.addEventListener('dragover', (e) => e.preventDefault());
+    window.addEventListener('drop', (e) => e.preventDefault());
+
     // Drag & drop — use a counter to prevent flicker from child elements
     let dragCounter = 0;
 
@@ -1006,6 +1018,8 @@
       currentFileName = '';
       currentFileObject = null;
       currentFilePages = null;
+      currentFilePageBase = 1;
+      currentFileNumPages = 0;
       pendingOcrFile = null;
       pendingOcrNumPages = 0;
       dom.fileInput.value = '';
@@ -1233,6 +1247,8 @@
     currentFileText = '';
     currentFileName = '';
     currentFilePages = null;
+    currentFilePageBase = 1;
+    currentFileNumPages = 0;
     pendingOcrFile = null;
     pendingOcrNumPages = 0;
     dom.filePreview.classList.add('hidden');
@@ -1569,6 +1585,8 @@
     currentFileName = file.name;
     currentFileObject = file;
     currentFilePages = result.pages || null;
+    currentFilePageBase = typeof result.from === 'number' ? result.from : 1;
+    currentFileNumPages = result.numPages || (result.pages ? result.pages.length : 0);
     lastFileTranslation = '';
     dom.fileResult.textContent = '';
     dom.fileUsage.textContent = '';
@@ -1594,12 +1612,21 @@
 
   function setupPageRangeUI() {
     if (currentFilePages && currentFilePages.length > 1) {
+      // After a partial OCR, currentFilePages holds only the OCR'd range —
+      // show the ORIGINAL page numbers (mapped back via currentFilePageBase)
+      // so "page 7" means page 7 of the document, not of the subset.
+      const base = currentFilePageBase;
+      const last = base + currentFilePages.length - 1;
       dom.pageRangeRow.classList.remove('hidden');
-      dom.pageFrom.max = currentFilePages.length;
-      dom.pageTo.max = currentFilePages.length;
-      dom.pageFrom.value = 1;
-      dom.pageTo.value = currentFilePages.length;
-      dom.pageRangeInfo.textContent = `of ${currentFilePages.length} pages`;
+      dom.pageFrom.min = base;
+      dom.pageFrom.max = last;
+      dom.pageTo.min = base;
+      dom.pageTo.max = last;
+      dom.pageFrom.value = base;
+      dom.pageTo.value = last;
+      dom.pageRangeInfo.textContent = currentFileNumPages > currentFilePages.length
+        ? `OCR'd pages ${base}–${last} of ${currentFileNumPages}`
+        : `of ${currentFileNumPages} pages`;
     } else {
       dom.pageRangeRow.classList.add('hidden');
     }
@@ -1607,11 +1634,15 @@
 
   function onPageRangeChange() {
     if (!currentFilePages) return;
-    const from = Math.max(1, Math.min(parseInt(dom.pageFrom.value, 10) || 1, currentFilePages.length));
-    const to = Math.max(from, Math.min(parseInt(dom.pageTo.value, 10) || currentFilePages.length, currentFilePages.length));
+    // Inputs show original document page numbers; currentFilePages[0] is
+    // page `base` (only different from 1 after a partial OCR).
+    const base = currentFilePageBase;
+    const last = base + currentFilePages.length - 1;
+    const from = Math.max(base, Math.min(parseInt(dom.pageFrom.value, 10) || base, last));
+    const to = Math.max(from, Math.min(parseInt(dom.pageTo.value, 10) || last, last));
     dom.pageFrom.value = from;
     dom.pageTo.value = to;
-    currentFileText = FileParser.joinPages(currentFilePages, from, to);
+    currentFileText = FileParser.joinPages(currentFilePages, from - base + 1, to - base + 1);
     refreshFilePreview();
   }
 
@@ -1657,6 +1688,11 @@
       return;
     }
 
+    // Coalesce per-token DOM writes to one per animation frame — a long
+    // file streamed token-by-token into textContent directly is O(n²)
+    // and visibly stalls the page.
+    const renderer = makeStreamRenderer(dom.fileResult);
+
     try {
       setButtonLoading(dom.translateFile, true);
       showCancelButton(dom.cancelFileTranslate, true);
@@ -1680,7 +1716,7 @@
         },
         onStream: (s) => {
           lastFileTranslation = s.text;
-          dom.fileResult.textContent = s.text;
+          renderer.push(s.text);
         },
         onDetectedLang: (lang) => {
           dom.fileDetectedLang.textContent = `Detected: ${lang}`;
@@ -1688,6 +1724,7 @@
       };
 
       const result = await Translator.translateLong(currentFileText, sourceLang, targetLang, options);
+      renderer.flush();
       lastFileTranslation = result.text;
       renderFileResult();
       dom.fileUsage.textContent = formatUsage(result.usage);
@@ -1706,8 +1743,10 @@
         showToast('Part of the output was truncated by the API length limit', 'error');
       }
     } catch (err) {
-      // Keep whatever partial translation streamed in — re-rendered in the
+      // Flush the newest partial text that may still be queued in the
+      // renderer, then keep whatever streamed in — re-rendered in the
       // current view mode (plain or bilingual).
+      renderer.flush();
       renderFileResult();
       if (err.cancelled) {
         showToast('Translation cancelled', 'success');
@@ -2617,7 +2656,10 @@
 
       const blob = await zip.generateAsync({
         type: 'blob',
-        mimeType: format.mimeType
+        mimeType: format.mimeType,
+        // JSZip defaults to STORE (uncompressed) — Office output would
+        // come out noticeably larger than the original file.
+        compression: 'DEFLATE'
       });
 
       const base = (currentFileObject.name.replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').trim()) || 'translation';
