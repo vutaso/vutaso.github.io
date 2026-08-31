@@ -24,11 +24,11 @@
   <main class="main container legal-page">
     <article class="panel legal-content">
       <h1>Privacy Policy</h1>
-      <p class="legal-meta">Last updated: May 25, 2026</p>
+      <p class="legal-meta">Last updated: August 31, 2026</p>
 
       <section>
         <h2>Overview</h2>
-        <p>Free QR Generator ("we", "our", "the Service") is a client-side web application that lets you create QR codes directly in your browser. We are committed to protecting your privacy.</p>
+        <p>VUTASO QR Generator ("we", "our", "the Service") at vutaso.com/qr is a client-side web application that lets you create QR codes directly in your browser. We are committed to protecting your privacy.</p>
       </section>
 
       <section>
@@ -37,29 +37,31 @@
       </section>
 
       <section>
-        <h2>Cookies &amp; Analytics</h2>
-        <p>We may load privacy-friendly analytics (e.g. Plausible) to understand usage patterns. Analytics does not receive your QR content.</p>
+        <h2>Analytics</h2>
+        <p>We may load privacy-friendly analytics (Plausible) to understand aggregate usage (page views, feature events). Analytics does not receive your QR content. Requests go to plausible.io when enabled.</p>
       </section>
 
       <section>
         <h2>Local Storage</h2>
-        <p>We use your browser's <code>localStorage</code> to save your theme preference (dark/light mode). This data stays on your device and is never sent to us.</p>
+        <p>We use your browser's <code>localStorage</code> on your device only:</p>
+        <ul>
+          <li>Theme preference (light / dark)</li>
+          <li>Language preference (English / Vietnamese)</li>
+          <li>Recent QR history (type, encoded payload, style snapshot)</li>
+          <li>Custom color themes you save</li>
+          <li>Logos you embed in saved themes or history (stored as images on this device only)</li>
+        </ul>
+        <p>This data never leaves your device. Clearing site data in your browser removes it.</p>
       </section>
 
       <section>
         <h2>Third-Party Services</h2>
-        <p>The Service loads the following third-party resources from CDNs:</p>
-        <ul>
-          <li>JavaScript libraries (QR rendering, export, color picker)</li>
-          <li>Google Fonts (Inter typeface)</li>
-          <li>Font Awesome (icons)</li>
-        </ul>
-        <p>These providers may log your IP address when your browser requests their files. Please refer to their respective privacy policies for details.</p>
+        <p>The Service loads Font Awesome icons from cdnjs.cloudflare.com. QR libraries, the color picker, export tools, and Inter fonts are self-hosted on this site. CDN providers may log your IP address when your browser requests their files.</p>
       </section>
 
       <section>
         <h2>Cookies</h2>
-        <p>We do not set cookies. Third-party CDNs may use cookies according to their own policies.</p>
+        <p>We do not set first-party cookies. Third-party CDNs or analytics may use cookies according to their own policies.</p>
       </section>
 
       <section>
@@ -81,10 +83,8 @@
 
   <footer class="footer">
     <div class="footer__bottom container">
-      <p>&copy; <span id="year"></span> Free QR Generator · <a href="./">Home</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+      <p>&copy; 2026 VUTASO · <a href="./">Home</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
     </div>
   </footer>
-  <script src="site.config.js"></script>
-  <script>document.getElementById('year').textContent = SITE.year;</script>
 </body>
 </html>

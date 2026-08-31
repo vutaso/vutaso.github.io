@@ -141,6 +141,22 @@
     $('#qr-form').addEventListener('change', onFormChange);
   }
 
+  function translateFieldLabel(typeId, field) {
+    if (typeof I18n === 'undefined') return field.label;
+    const specific = I18n.t('field.' + typeId + '.' + field.name);
+    if (specific != null) return specific;
+    const generic = I18n.t('field.' + field.name);
+    if (generic != null) return generic;
+    return field.label;
+  }
+
+  function translateOptionLabel(typeId, option) {
+    if (typeof I18n === 'undefined') return option.label;
+    const key = 'opt.' + typeId + '.' + option.value;
+    const translated = I18n.t(key);
+    return translated != null ? translated : option.label;
+  }
+
   function renderForm() {
     const form = $('#qr-form');
     const type = getTypeById(state.typeId);
@@ -158,20 +174,21 @@
 
       const fieldName = escapeAttr(field.name);
       const fieldId = `field-${fieldName}`;
+      const labelText = translateFieldLabel(type.id, field);
 
       if (field.type === 'checkbox') {
         group.innerHTML = `
           <label class="checkbox-label">
             <input type="checkbox" name="${fieldName}" ${state.formData[field.name] ? 'checked' : ''}>
-            ${escapeHtml(field.label)}
+            ${escapeHtml(labelText)}
           </label>`;
       } else {
         const req = field.required ? ' <span class="required">*</span>' : '';
-        group.innerHTML = `<label for="${fieldId}">${escapeHtml(field.label)}${req}</label>`;
+        group.innerHTML = `<label for="${fieldId}">${escapeHtml(labelText)}${req}</label>`;
 
         if (field.type === 'select') {
           const opts = field.options.map(o =>
-            `<option value="${escapeAttr(o.value)}" ${state.formData[field.name] === o.value ? 'selected' : ''}>${escapeHtml(o.label)}</option>`
+            `<option value="${escapeAttr(o.value)}" ${state.formData[field.name] === o.value ? 'selected' : ''}>${escapeHtml(translateOptionLabel(type.id, o))}</option>`
           ).join('');
           group.innerHTML += `<select id="${fieldId}" name="${fieldName}" class="select">${opts}</select>`;
         } else if (field.type === 'textarea') {
@@ -300,6 +317,25 @@
   }
 
   /* ── Customizer ── */
+  function refreshScanTips() {
+    const style = QRCustomizer.getStyleOptions();
+    QRScanTips.render(style, !!style.image);
+  }
+
+  function setLogoError(code) {
+    const el = $('#logo-error');
+    if (!el) return;
+    if (!code) {
+      el.hidden = true;
+      el.textContent = '';
+      delete el.dataset.errorCode;
+      return;
+    }
+    el.dataset.errorCode = code;
+    el.textContent = I18n.t('ui.logoError.' + code) || code;
+    el.hidden = false;
+  }
+
   function initCustomizerControls() {
     $$('input[name="color-mode"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
@@ -364,6 +400,8 @@
 
     $('#style-reset').addEventListener('click', () => {
       QRCustomizer.resetStyle();
+      setLogoError(null);
+      refreshScanTips();
       showToast(I18n.t('toast.styleReset'));
     });
 
@@ -387,7 +425,7 @@
       const val = parseInt(e.target.value, 10);
       $('#qr-size-val').textContent = val + 'px';
       QRCustomizer.setStyleOptions({ width: val, height: val });
-      QRScanTips.render(QRCustomizer.getStyleOptions(), !!QRCustomizer.getStyleOptions().image);
+      refreshScanTips();
     });
 
     $('#qr-margin').addEventListener('input', (e) => {
@@ -396,7 +434,50 @@
       QRCustomizer.updateStyle('margin', val);
     });
 
-    $('#error-correction').addEventListener('change', (e) => QRCustomizer.updateStyle('qrOptions.errorCorrectionLevel', e.target.value));
+    $('#error-correction').addEventListener('change', (e) => {
+      QRCustomizer.updateStyle('qrOptions.errorCorrectionLevel', e.target.value);
+      refreshScanTips();
+    });
+
+    $('#logo-file').addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const result = await QRCustomizer.setImageFromFile(file);
+      if (!result.ok) {
+        setLogoError(result.error);
+        showToast(I18n.t('ui.logoError.' + result.error) || I18n.t('toast.exportFail'), 'error');
+        return;
+      }
+      setLogoError(null);
+      showToast(I18n.t('ui.logoAdded'));
+      refreshScanTips();
+      QRAnalytics.track('logo_upload');
+    });
+
+    $('#logo-remove').addEventListener('click', () => {
+      QRCustomizer.clearImage();
+      setLogoError(null);
+      showToast(I18n.t('ui.logoRemoved'));
+      refreshScanTips();
+    });
+
+    $('#logo-size').addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10);
+      $('#logo-size-val').textContent = pct + '%';
+      QRCustomizer.updateStyle('imageOptions.imageSize', pct / 100);
+      refreshScanTips();
+    });
+
+    $('#logo-hide-dots').addEventListener('change', (e) => {
+      QRCustomizer.updateStyle('imageOptions.hideBackgroundDots', e.target.checked);
+    });
+
+    document.addEventListener('i18n:change', () => {
+      if (typeof QRCustomizer.syncLogoUI === 'function') QRCustomizer.syncLogoUI();
+      const err = $('#logo-error');
+      if (err && err.dataset.errorCode) setLogoError(err.dataset.errorCode);
+    });
 
     QRCustomizer.initPickr();
     QRCustomizer.renderStylePickers();
@@ -412,7 +493,7 @@
 
     document.addEventListener('pro:change', () => {
       if (sizeSlider) sizeSlider.max = QRPro.getMaxQrSize();
-      QRScanTips.render(QRCustomizer.getStyleOptions(), !!QRCustomizer.getStyleOptions().image);
+      refreshScanTips();
     });
   }
 

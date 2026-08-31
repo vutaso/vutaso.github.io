@@ -1,5 +1,5 @@
 /**
- * QR Type definitions — 12 types with field descriptors and encode functions
+ * QR Type definitions — 11 types with field descriptors and encode functions
  */
 const QR_TYPES = [
   {

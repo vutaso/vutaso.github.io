@@ -60,6 +60,7 @@ const QRCustomizer = (() => {
   let container = null;
   let debounceTimer = null;
   let pickrInstances = {};
+  let renderSeq = 0;
 
   function cloneDefaultStyle() {
     return {
@@ -135,6 +136,139 @@ const QRCustomizer = (() => {
     }
   }
 
+  const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'image/gif'];
+
+  function maxLogoBytes() {
+    return (typeof SITE !== 'undefined' && SITE.maxLogoBytes) || 2 * 1024 * 1024;
+  }
+
+  function maxLogoPx() {
+    return (typeof SITE !== 'undefined' && SITE.maxLogoPx) || 256;
+  }
+
+  function guessLogoType(file) {
+    if (file.type && ALLOWED_LOGO_TYPES.includes(file.type)) return file.type;
+    const n = (file.name || '').toLowerCase();
+    if (n.endsWith('.png')) return 'image/png';
+    if (n.endsWith('.jpg') || n.endsWith('.jpeg')) return 'image/jpeg';
+    if (n.endsWith('.webp')) return 'image/webp';
+    if (n.endsWith('.svg')) return 'image/svg+xml';
+    if (n.endsWith('.gif')) return 'image/gif';
+    return '';
+  }
+
+  function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('decode_failed'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadHtmlImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('decode_failed'));
+      img.src = src;
+    });
+  }
+
+  async function rasterizeLogoToPng(src) {
+    const img = await loadHtmlImage(src);
+    const max = maxLogoPx();
+    const nw = img.naturalWidth || img.width || 1;
+    const nh = img.naturalHeight || img.height || 1;
+    const scale = Math.min(1, max / Math.max(nw, nh, 1));
+    const w = Math.max(1, Math.round(nw * scale));
+    const h = Math.max(1, Math.round(nh * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('decode_failed');
+    ctx.drawImage(img, 0, 0, w, h);
+    try {
+      return canvas.toDataURL('image/png');
+    } catch {
+      throw new Error('decode_failed');
+    }
+  }
+
+  function bumpEclForLogo() {
+    const ecl = styleOptions.qrOptions.errorCorrectionLevel;
+    if (ecl === 'L' || ecl === 'M') {
+      styleOptions.qrOptions.errorCorrectionLevel = 'H';
+    }
+  }
+
+  function applyUserImage(dataUrl) {
+    const hadImage = !!styleOptions.image;
+    styleOptions.image = dataUrl;
+    if (!hadImage && (styleOptions.imageOptions.imageSize == null || styleOptions.imageOptions.imageSize >= 0.4)) {
+      styleOptions.imageOptions.imageSize = 0.25;
+    }
+    if (styleOptions.imageOptions.hideBackgroundDots !== false) {
+      styleOptions.imageOptions.hideBackgroundDots = true;
+    }
+    bumpEclForLogo();
+    styleOptions.activeTheme = 'custom';
+    sanitizeImageOptions();
+    invalidateQRInstance();
+    syncUIControls();
+    refreshThemeHighlights();
+    render();
+  }
+
+  async function setImageFromFile(file) {
+    if (!file) return { ok: false, error: 'invalid_type' };
+    if (file.size > maxLogoBytes()) return { ok: false, error: 'too_large' };
+    if (!guessLogoType(file)) return { ok: false, error: 'invalid_type' };
+    try {
+      const raw = await readFileAsDataURL(file);
+      const png = await rasterizeLogoToPng(raw);
+      if (png.length > 900000) return { ok: false, error: 'too_large' };
+      applyUserImage(png);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'decode_failed' };
+    }
+  }
+
+  function clearImage() {
+    styleOptions.image = null;
+    delete styleOptions.imageOptions.crossOrigin;
+    styleOptions.activeTheme = 'custom';
+    invalidateQRInstance();
+    syncUIControls();
+    refreshThemeHighlights();
+    render();
+  }
+
+  function syncLogoUI() {
+    const has = !!styleOptions.image;
+    const wrap = document.getElementById('logo-preview-wrap');
+    const img = document.getElementById('logo-preview-img');
+    const remove = document.getElementById('logo-remove');
+    const opts = document.getElementById('logo-options');
+    const size = document.getElementById('logo-size');
+    const sizeVal = document.getElementById('logo-size-val');
+    const hideDots = document.getElementById('logo-hide-dots');
+    if (wrap) wrap.hidden = !has;
+    if (remove) remove.hidden = !has;
+    if (opts) opts.hidden = !has;
+    if (img) {
+      img.src = has ? styleOptions.image : '';
+      const alt = typeof I18n !== 'undefined' ? I18n.t('ui.logoPreviewAlt') : 'Logo';
+      img.alt = has && alt ? alt : '';
+    }
+    const pct = Math.round((styleOptions.imageOptions.imageSize || 0.25) * 100);
+    if (size) size.value = String(Math.min(36, Math.max(12, pct)));
+    if (sizeVal) sizeVal.textContent = pct + '%';
+    if (hideDots) hideDots.checked = styleOptions.imageOptions.hideBackgroundDots !== false;
+  }
+
   function buildImageOptions() {
     const opts = {
       margin: styleOptions.imageOptions.margin,
@@ -151,7 +285,8 @@ const QRCustomizer = (() => {
     const config = {
       width: overrides.width ?? styleOptions.width,
       height: overrides.height ?? styleOptions.height,
-      type: 'canvas',
+      /* canvas+nested logo is blank in Chromium (SVG-as-image cannot load inner data URLs). */
+      type: styleOptions.image ? 'svg' : 'canvas',
       data: overrides.data ?? styleOptions.data ?? ' ',
       margin: overrides.margin ?? styleOptions.margin,
       qrOptions: { errorCorrectionLevel: styleOptions.qrOptions.errorCorrectionLevel },
@@ -169,11 +304,50 @@ const QRCustomizer = (() => {
     qrInstance = null;
   }
 
-  /** Warm canvas draw on WebKit; failures must not blank the preview. */
-  async function warmQRRender(instance) {
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('timeout')), ms);
+      })
+    ]);
+  }
+
+  function injectLogoIntoSvg(svg, dataUrl) {
+    if (!svg || !dataUrl) return;
+    if (svg.querySelector('image')) return;
+    const w = parseFloat(svg.getAttribute('width')) || svg.clientWidth || 300;
+    const h = parseFloat(svg.getAttribute('height')) || svg.clientHeight || 300;
+    const frac = styleOptions.imageOptions.imageSize || 0.25;
+    const size = Math.max(16, Math.min(w, h) * frac);
+    const x = (w - size) / 2;
+    const y = (h - size) / 2;
+    const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    img.setAttribute('href', dataUrl);
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
+    img.setAttribute('x', String(x));
+    img.setAttribute('y', String(y));
+    img.setAttribute('width', String(size));
+    img.setAttribute('height', String(size));
+    img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.appendChild(img);
+  }
+
+  function fitPreviewSvg(svg) {
+    if (!svg) return;
+    const w = parseFloat(svg.getAttribute('width')) || svg.viewBox?.baseVal?.width || 300;
+    const h = parseFloat(svg.getAttribute('height')) || svg.viewBox?.baseVal?.height || w;
+    if (!svg.getAttribute('viewBox')) {
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.style.overflow = 'hidden';
+  }
+
+  async function warmQRRender(instance, hasImage) {
     if (!instance || typeof instance.getRawData !== 'function') return;
     try {
-      await instance.getRawData('png');
+      await withTimeout(instance.getRawData(hasImage ? 'svg' : 'png'), 1500);
     } catch {
       /* preview may still be valid without warm-up */
     }
@@ -201,9 +375,10 @@ const QRCustomizer = (() => {
 
   async function renderNow() {
     if (!container) return;
+    const seq = ++renderSeq;
     sanitizeImageOptions();
     const config = buildConfig();
-    const needsFresh = !!config.image || !qrInstance;
+    const needsFresh = !!config.image || config.type === 'svg' || !qrInstance;
     if (needsFresh) {
       mountQRInstance(config);
     } else {
@@ -211,7 +386,10 @@ const QRCustomizer = (() => {
       qrInstance.update(config);
       qrInstance.append(container);
     }
-    if (config.image) await warmQRRender(qrInstance);
+    await warmQRRender(qrInstance, !!config.image);
+    if (seq !== renderSeq) return;
+    if (config.image) injectLogoIntoSvg(container.querySelector('svg'), config.image);
+    fitPreviewSvg(container.querySelector('svg'));
     if (!hasPreviewGraphic(container)) throw new Error('preview_render_failed');
     updateFrameDOM();
   }
@@ -220,13 +398,14 @@ const QRCustomizer = (() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       renderNow().catch(() => {
-        invalidateQRInstance();
         if (!container) return;
         try {
+          sanitizeImageOptions();
           mountQRInstance(buildConfig());
+          fitPreviewSvg(container.querySelector('svg'));
           updateFrameDOM();
         } catch {
-          container.innerHTML = '';
+          invalidateQRInstance();
         }
       });
     }, 150);
@@ -537,6 +716,8 @@ const QRCustomizer = (() => {
     hide('gradient-rotation-wrap', styleOptions.colorMode !== 'linear');
     hide('bg-gradient-rotation-wrap', styleOptions.bgColorMode !== 'linear');
 
+    syncLogoUI();
+
     const pickrMap = {
       fg: styleOptions.dotsOptions.color, fg2: styleOptions.fgColor2,
       bg: styleOptions.backgroundOptions.color, bg2: styleOptions.bgColor2,
@@ -719,6 +900,7 @@ const QRCustomizer = (() => {
     createInstance, renderThemePresets, renderFramePresets, renderStylePickers, renderCustomThemePresets,
     saveCustomTheme, deleteCustomTheme, applyCustomTheme, render, renderNow,
     exportStyleJSON, importStyleJSON, resetStyle, downloadStylePreset, getFrameLabelText,
-    buildConfig, syncUIControls, refreshThemeHighlights, refreshFrameHighlights, applyTemplateStyle
+    buildConfig, syncUIControls, refreshThemeHighlights, refreshFrameHighlights, applyTemplateStyle,
+    setImageFromFile, clearImage, syncLogoUI, injectLogoIntoSvg
   };
 })();

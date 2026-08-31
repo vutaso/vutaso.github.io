@@ -12,7 +12,7 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VUTASO — Tạo mã QR miễn phí</title>
-  <meta name="description" content="Tạo mã QR đẹp, miễn phí trên trình duyệt — URL, WiFi, vCard, email, mạng xã hội và hơn 12 loại. Xuất PNG, SVG, JPEG, PDF.">
+  <meta name="description" content="Tạo mã QR đẹp, miễn phí trên trình duyệt — URL, WiFi, vCard, email, mạng xã hội và 11 loại. Xuất PNG, SVG, JPEG, PDF.">
   <meta name="keywords" content="QR code generator, tạo mã QR, VUTASO, WiFi QR, vCard QR, batch QR">
   <meta name="author" content="VUTASO">
   <meta name="robots" content="index, follow">
@@ -22,7 +22,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="VUTASO — Tạo mã QR miễn phí">
-  <meta property="og:description" content="Tạo mã QR đẹp, miễn phí — 12 loại, tùy chỉnh đầy đủ, batch, xuất nhiều định dạng.">
+  <meta property="og:description" content="Tạo mã QR đẹp, miễn phí — 11 loại, tùy chỉnh đầy đủ, batch, xuất nhiều định dạng.">
   <meta property="og:url" content="https://vutaso.com/qr/">
   <meta property="og:site_name" content="VUTASO">
   <meta property="og:image" content="https://vutaso.com/qr/assets/img/og-image.png">
@@ -33,7 +33,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="VUTASO — Tạo mã QR miễn phí">
-  <meta name="twitter:description" content="Create beautiful custom QR codes for free. 12 types, full styling, batch mode.">
+  <meta name="twitter:description" content="Create beautiful custom QR codes for free. 11 types, full styling, batch mode.">
   <meta name="twitter:image" content="https://vutaso.com/qr/assets/img/og-image.png">
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=4">
@@ -41,14 +41,20 @@
   <link rel="preload" href="assets/css/fonts.css" as="style">
   <link rel="preload" href="assets/css/style.css" as="style">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' https://plausible.io; base-uri 'self'; form-action 'self' mailto: https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' data: blob: https://plausible.io; base-uri 'self'; form-action 'self' mailto: https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="assets/vendor/pickr.nano.min.css">
-  <link rel="stylesheet" href="assets/css/style.css?v=5">
+  <link rel="stylesheet" href="assets/css/style.css?v=9">
 
   <style id="qr-theme">
     :root {
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-lg: 20px;
+    }
+
+    [data-theme="light"] {
       --bg: #f7f9fc;
       --bg-panel: #ffffff;
       --bg-hover: #edf3ff;
@@ -59,15 +65,33 @@
       --accent-hover: #2859c7;
       --accent-mid: #69b5ff;
       --accent-light: #edf3ff;
+      --input-bg: #ffffff;
       --moneybay: #437df4;
       --moneybay-hover: #2859c7;
       --qrbay: #e49b43;
       --qrbay-hover: #c47d2a;
-      --radius: 16px;
-      --radius-sm: 12px;
-      --radius-lg: 20px;
       --shadow: 0 9px 28px rgba(32, 67, 125, .08);
       --shadow-lg: 0 24px 70px rgba(32, 67, 125, .13);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f1a;
+      --bg-panel: #1a1a2e;
+      --bg-hover: #252540;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #2d2d4a;
+      --accent: #42a5f5;
+      --accent-hover: #2196f3;
+      --accent-mid: #64b5f6;
+      --accent-light: #0d2847;
+      --input-bg: #252540;
+      --moneybay: #437df4;
+      --moneybay-hover: #2859c7;
+      --qrbay: #e49b43;
+      --qrbay-hover: #c47d2a;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 4px 12px rgba(0, 0, 0, .2);
+      --shadow-lg: 0 4px 24px rgba(0, 0, 0, .4);
     }
 
     body {
@@ -76,6 +100,13 @@
         radial-gradient(circle at 94% 14%, rgba(98, 185, 155, .1), transparent 25%),
         var(--bg);
       color: var(--text);
+    }
+
+    [data-theme="dark"] body {
+      background:
+        radial-gradient(circle at 7% 0%, rgba(66, 165, 245, .08), transparent 28%),
+        radial-gradient(circle at 94% 14%, rgba(98, 185, 155, .06), transparent 25%),
+        var(--bg);
     }
 
     body::before {
@@ -89,15 +120,28 @@
       mask-image: radial-gradient(ellipse 60% 42% at 50% 0%, #000, transparent 80%);
     }
 
+    [data-theme="dark"] body::before {
+      opacity: .12;
+      background-image: radial-gradient(rgba(66, 165, 245, .25) 1px, transparent 1px);
+    }
+
     .header {
-      background: rgba(247, 249, 252, .84);
+      background: color-mix(in srgb, var(--bg) 84%, transparent);
       border-bottom-color: transparent;
       box-shadow: 0 5px 18px rgba(32, 67, 125, .04);
     }
 
-    .logo__img {
+    [data-theme="dark"] .header {
+      box-shadow: 0 5px 18px rgba(0, 0, 0, .25);
+    }
+
+    [data-theme="light"] .logo__img {
       height: 30px;
       filter: brightness(0) saturate(100%) invert(32%) sepia(91%) saturate(1228%) hue-rotate(202deg) brightness(96%);
+    }
+
+    [data-theme="dark"] .logo__img {
+      height: 30px;
     }
 
     .header__app-link {
@@ -117,7 +161,7 @@
       padding: 3px;
       border: 1px solid var(--border);
       border-radius: 99px;
-      background: #fff;
+      background: var(--bg-panel);
     }
 
     .lang-btn {
@@ -151,9 +195,9 @@
     }
 
     .type-btn:hover,
-    .type-btn.active {
+    .type-btn--active {
       background: var(--accent-light);
-      border-color: #d8e4ff;
+      border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
       color: var(--accent);
     }
 
@@ -168,7 +212,7 @@
     }
 
     .accordion__header {
-      background: #fbfcff;
+      background: var(--bg-hover);
     }
 
     .accordion__header:hover {
@@ -194,12 +238,12 @@
     .btn--ghost {
       border-color: var(--border);
       color: var(--text-muted);
-      background: #fff;
+      background: var(--bg-panel);
     }
 
     .btn--secondary:hover,
     .btn--ghost:hover {
-      border-color: #ccdcfc;
+      border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
       color: var(--accent);
       background: var(--accent-light);
     }
@@ -211,7 +255,7 @@
     .select {
       border-color: var(--border);
       border-radius: 12px;
-      background: #fff;
+      background: var(--input-bg);
       color: var(--text);
     }
 
@@ -220,19 +264,19 @@
     textarea:focus,
     .input:focus,
     .select:focus {
-      border-color: #9bbafc;
-      box-shadow: 0 0 0 3px rgba(67, 125, 244, .12);
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
       outline: none;
     }
 
     .footer {
-      background: rgba(255, 255, 255, .78);
+      background: color-mix(in srgb, var(--bg-panel) 78%, transparent);
       border-top-color: var(--border);
     }
 
     @media (max-width: 768px) {
       .header {
-        background: rgba(247, 249, 252, .94);
+        background: color-mix(in srgb, var(--bg) 94%, transparent);
       }
 
       .main {
@@ -246,7 +290,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "VUTASO QR Generator",
-    "description": "Create custom QR codes online for free with 12 types, full styling, and multi-format export.",
+    "description": "Create custom QR codes online for free with 11 types, full styling, and multi-format export.",
     "applicationCategory": "UtilityApplication",
     "operatingSystem": "Any",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -354,21 +398,55 @@
             <div id="frame-presets" class="frame-grid"></div>
           </div>
 
-          <!-- Style Accordion -->
+            <!-- Style Accordion -->
           <div class="accordion" id="style-accordion">
+            <details class="accordion__item" open>
+              <summary class="accordion__header" data-i18n="accordion.logo">Logo</summary>
+              <div class="accordion__body">
+                <p class="field-hint" data-i18n="ui.logoHint">Add an image to the center of the QR code. PNG, JPEG, WebP or SVG. Error correction is raised to H so the code still scans.</p>
+                <div class="logo-upload">
+                  <div id="logo-preview-wrap" class="logo-preview" hidden>
+                    <img id="logo-preview-img" alt="">
+                  </div>
+                  <div class="logo-upload__actions">
+                    <label class="btn btn--secondary btn--sm file-btn">
+                      <i class="fa-solid fa-image" aria-hidden="true"></i>
+                      <span data-i18n="ui.logoChoose">Choose image</span>
+                      <input type="file" id="logo-file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif,.png,.jpg,.jpeg,.webp,.svg,.gif" hidden>
+                    </label>
+                    <button type="button" id="logo-remove" class="btn btn--ghost btn--sm" hidden>
+                      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                      <span data-i18n="ui.logoRemove">Remove</span>
+                    </button>
+                  </div>
+                </div>
+                <p id="logo-error" class="field-error" role="alert" hidden></p>
+                <div id="logo-options" hidden>
+                  <div class="field-row">
+                    <label for="logo-size"><span data-i18n="ui.logoSize">Logo size</span> <span id="logo-size-val">25%</span></label>
+                    <input type="range" id="logo-size" min="12" max="36" value="25" step="1" class="range">
+                  </div>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="logo-hide-dots" checked>
+                    <span data-i18n="ui.logoHideDots">Hide dots behind logo</span>
+                  </label>
+                </div>
+              </div>
+            </details>
+
             <details class="accordion__item" open>
               <summary class="accordion__header" data-i18n="accordion.dots">Dot &amp; Corner Styles</summary>
               <div class="accordion__body">
-                <label class="field-label field-label--sm">Quick Style Combos</label>
+                <label class="field-label field-label--sm" data-i18n="ui.quickCombos">Quick Style Combos</label>
                 <div id="style-combo-grid" class="style-combo-grid"></div>
 
-                <label class="field-label field-label--sm">Dot Style</label>
+                <label class="field-label field-label--sm" data-i18n="ui.dotStyle">Dot Style</label>
                 <div id="dot-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Dot style"></div>
 
-                <label class="field-label field-label--sm">Corner Square</label>
+                <label class="field-label field-label--sm" data-i18n="ui.cornerSquare">Corner Square</label>
                 <div id="corner-square-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Corner square style"></div>
 
-                <label class="field-label field-label--sm">Corner Dot</label>
+                <label class="field-label field-label--sm" data-i18n="ui.cornerDot">Corner Dot</label>
                 <div id="corner-dot-style-grid" class="dot-style-grid" role="radiogroup" aria-label="Corner dot style"></div>
               </div>
             </details>
@@ -377,65 +455,65 @@
               <summary class="accordion__header" data-i18n="accordion.colors">Colors</summary>
               <div class="accordion__body">
                 <div class="field-row">
-                  <label>Color Mode</label>
+                  <label data-i18n="ui.colorMode">Color Mode</label>
                   <div class="radio-group" role="radiogroup" aria-label="Color mode">
-                    <label class="radio-pill"><input type="radio" name="color-mode" value="solid" checked> Solid</label>
-                    <label class="radio-pill"><input type="radio" name="color-mode" value="linear"> Linear</label>
-                    <label class="radio-pill"><input type="radio" name="color-mode" value="radial"> Radial</label>
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="solid" checked> <span data-i18n="ui.solid">Solid</span></label>
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="linear"> <span data-i18n="ui.linear">Linear</span></label>
+                    <label class="radio-pill"><input type="radio" name="color-mode" value="radial"> <span data-i18n="ui.radial">Radial</span></label>
                   </div>
                 </div>
                 <div class="color-pickers">
                   <div class="color-picker-wrap">
-                    <label>Foreground</label>
+                    <label data-i18n="ui.foreground">Foreground</label>
                     <div id="fg-color-picker"></div>
                   </div>
                   <div class="color-picker-wrap" id="fg-color2-wrap" hidden>
-                    <label>Foreground 2</label>
+                    <label data-i18n="ui.foreground2">Foreground 2</label>
                     <div id="fg-color2-picker"></div>
                   </div>
                   <div class="color-picker-wrap">
-                    <label>Background</label>
+                    <label data-i18n="ui.background">Background</label>
                     <div id="bg-color-picker"></div>
                   </div>
                 </div>
                 <label class="checkbox-label">
                   <input type="checkbox" id="transparent-bg">
-                  Transparent background
+                  <span data-i18n="ui.transparentBg">Transparent background</span>
                 </label>
                 <div class="field-row">
-                  <label>Background Mode</label>
+                  <label data-i18n="ui.bgMode">Background Mode</label>
                   <div class="radio-group" role="radiogroup">
-                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="solid" checked> Solid</label>
-                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="linear"> Linear</label>
-                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="radial"> Radial</label>
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="solid" checked> <span data-i18n="ui.solid">Solid</span></label>
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="linear"> <span data-i18n="ui.linear">Linear</span></label>
+                    <label class="radio-pill"><input type="radio" name="bg-color-mode" value="radial"> <span data-i18n="ui.radial">Radial</span></label>
                   </div>
                 </div>
                 <div class="color-pickers">
                   <div class="color-picker-wrap" id="bg-color2-wrap" hidden>
-                    <label>Background 2</label>
+                    <label data-i18n="ui.background2">Background 2</label>
                     <div id="bg-color2-picker"></div>
                   </div>
                 </div>
                 <div class="field-row" id="bg-gradient-rotation-wrap" hidden>
-                  <label for="bg-gradient-rotation">BG Gradient Angle <span id="bg-gradient-rotation-val">45°</span></label>
+                  <label for="bg-gradient-rotation"><span data-i18n="ui.bgGradientAngle">BG Gradient Angle</span> <span id="bg-gradient-rotation-val">45°</span></label>
                   <input type="range" id="bg-gradient-rotation" min="0" max="360" value="45" step="5" class="range">
                 </div>
                 <label class="checkbox-label">
                   <input type="checkbox" id="unified-colors" checked>
-                  Same color for dots &amp; corners
+                  <span data-i18n="ui.unifiedColors">Same color for dots &amp; corners</span>
                 </label>
                 <div id="corner-colors-wrap" class="color-pickers" hidden>
                   <div class="color-picker-wrap">
-                    <label>Corner Square Color</label>
+                    <label data-i18n="ui.cornerSquareColor">Corner Square Color</label>
                     <div id="corner-square-color-picker"></div>
                   </div>
                   <div class="color-picker-wrap">
-                    <label>Corner Dot Color</label>
+                    <label data-i18n="ui.cornerDotColor">Corner Dot Color</label>
                     <div id="corner-dot-color-picker"></div>
                   </div>
                 </div>
                 <div class="field-row" id="gradient-rotation-wrap" hidden>
-                  <label for="gradient-rotation">Dot Gradient Angle <span id="gradient-rotation-val">0°</span></label>
+                  <label for="gradient-rotation"><span data-i18n="ui.dotGradientAngle">Dot Gradient Angle</span> <span id="gradient-rotation-val">0°</span></label>
                   <input type="range" id="gradient-rotation" min="0" max="360" value="0" step="5" class="range">
                 </div>
               </div>
@@ -445,16 +523,16 @@
               <summary class="accordion__header" data-i18n="accordion.size">Size &amp; Quality</summary>
               <div class="accordion__body">
                 <div class="field-row">
-                  <label for="qr-size">QR Size <span id="qr-size-val">300px</span></label>
+                  <label for="qr-size"><span data-i18n="ui.qrSize">QR Size</span> <span id="qr-size-val">300px</span></label>
                   <input type="range" id="qr-size" min="200" max="2048" value="300" step="10" class="range">
                   <small id="qr-size-limit" class="field-hint" hidden></small>
                 </div>
                 <div class="field-row">
-                  <label for="qr-margin">Margin <span id="qr-margin-val">1</span></label>
+                  <label for="qr-margin"><span data-i18n="ui.margin">Margin</span> <span id="qr-margin-val">1</span></label>
                   <input type="range" id="qr-margin" min="0" max="4" value="1" class="range">
                 </div>
                 <div class="field-row">
-                  <label for="error-correction">Error Correction</label>
+                  <label for="error-correction" data-i18n="ui.errorCorrection">Error Correction</label>
                   <select id="error-correction" class="select">
                     <option value="L">L — Low (7%)</option>
                     <option value="M" selected>M — Medium (15%)</option>
@@ -470,14 +548,14 @@
               <div class="accordion__body">
                 <div class="preset-actions">
                   <button type="button" id="style-save" class="btn btn--secondary btn--sm">
-                    <i class="fa-solid fa-download" aria-hidden="true"></i> Save Style JSON
+                    <i class="fa-solid fa-download" aria-hidden="true"></i> <span data-i18n="ui.saveStyle">Save Style JSON</span>
                   </button>
                   <label class="btn btn--secondary btn--sm file-btn">
-                    <i class="fa-solid fa-upload" aria-hidden="true"></i> Load Style
+                    <i class="fa-solid fa-upload" aria-hidden="true"></i> <span data-i18n="ui.loadStyle">Load Style</span>
                     <input type="file" id="style-load" accept=".json,application/json" hidden>
                   </label>
                   <button type="button" id="style-reset" class="btn btn--ghost btn--sm">
-                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> <span data-i18n="ui.resetStyle">Reset</span>
                   </button>
                 </div>
               </div>
@@ -700,20 +778,20 @@ wifi,MyWiFi|password|WPA,Office WiFi"></textarea>
   <script src="assets/vendor/pickr.min.js"></script>
 
   <script src="site.config.js"></script>
-  <script src="assets/js/types.js?v=4" defer></script>
+  <script src="assets/js/types.js?v=5" defer></script>
   <script src="assets/js/brand-logos.js?v=5" defer></script>
   <script src="assets/js/templates.js?v=4" defer></script>
-  <script src="assets/js/validation.js?v=8" defer></script>
-  <script src="assets/js/customizer.js?v=10" defer></script>
+  <script src="assets/js/validation.js?v=9" defer></script>
+  <script src="assets/js/customizer.js?v=14" defer></script>
   <script src="assets/js/frame-renderer.js?v=4" defer></script>
-  <script src="assets/js/exporter.js?v=4" defer></script>
-  <script src="assets/js/batch.js?v=4" defer></script>
+  <script src="assets/js/exporter.js?v=6" defer></script>
+  <script src="assets/js/batch.js?v=5" defer></script>
   <script src="assets/js/pro.js?v=4" defer></script>
-  <script src="assets/js/i18n.js?v=8" defer></script>
+  <script src="assets/js/i18n.js?v=10" defer></script>
   <script src="assets/js/analytics.js?v=4" defer></script>
-  <script src="assets/js/history.js?v=4" defer></script>
-  <script src="assets/js/scan-tips.js?v=4" defer></script>
-  <script src="assets/js/app.js?v=9" defer></script>
+  <script src="assets/js/history.js?v=5" defer></script>
+  <script src="assets/js/scan-tips.js?v=5" defer></script>
+  <script src="assets/js/app.js?v=11" defer></script>
 
   <script>
     (function () {

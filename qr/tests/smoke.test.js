@@ -34,6 +34,9 @@ test('index.html exists and has main sections', () => {
 test('site.config.js has free limits and analytics', () => {
   const cfg = read('site.config.js');
   if (!cfg.includes('maxBatchRows')) throw new Error('missing maxBatchRows');
+  if (!cfg.includes('maxBatchPreview')) throw new Error('missing maxBatchPreview');
+  if (!cfg.includes('maxPayloadChars')) throw new Error('missing maxPayloadChars');
+  if (!cfg.includes('maxExportPx')) throw new Error('missing maxExportPx');
   if (!cfg.includes('maxQrSize')) throw new Error('missing maxQrSize');
   if (!cfg.includes("enabled: false")) throw new Error('pro should be disabled');
 });
@@ -209,8 +212,8 @@ test('analytics attaches qr page_path to events', () => {
 
 test('form render escapes labels and placeholders', () => {
   const src = read('assets/js/app.js');
-  if (!src.includes('escapeHtml(field.label)')) throw new Error('field.label not escaped');
-  if (!src.includes('escapeHtml(o.label)')) throw new Error('option.label not escaped');
+  if (!src.includes('escapeHtml(labelText)')) throw new Error('field label not escaped');
+  if (!src.includes('escapeHtml(translateOptionLabel')) throw new Error('option label not escaped');
   if (!src.includes('escapeAttr(field.placeholder')) throw new Error('placeholder not escaped');
 });
 
@@ -269,6 +272,78 @@ test('templates marketplace has 50+ templates', () => {
   const src = read('assets/js/templates.js');
   const count = (src.match(/cat: '/g) || []).length;
   if (count < 50) throw new Error('expected 50+ templates, got ' + count);
+});
+
+test('i18n keeps empty-string translations', () => {
+  const src = read('assets/js/i18n.js');
+  if (!src.includes('hasOwnProperty.call(dict, key)')) {
+    throw new Error('I18n.t still uses || fallback that drops empty strings');
+  }
+  if (!src.includes("'contentSuffix': ''")) throw new Error('vi contentSuffix should be empty string');
+});
+
+test('JPEG awaits toBlob and PDF keeps aspect ratio', () => {
+  const src = read('assets/js/exporter.js');
+  if (!src.includes('JPEG encode failed')) throw new Error('downloadJPEG must await toBlob');
+  if (src.includes('pdf.addImage(imgData, \'PNG\', x, y, qrSize, qrSize)')) {
+    throw new Error('PDF still forces square qrSize');
+  }
+  if (!src.includes('drawW') || !src.includes('drawH')) throw new Error('PDF missing aspect-ratio draw size');
+  if (!src.includes('maxExportPx')) throw new Error('PNG scale cap missing');
+});
+
+test('WhatsApp requires digits and payload length is capped', () => {
+  const src = read('assets/js/validation.js');
+  if (!src.includes('invalid_whatsapp')) throw new Error('WhatsApp digit check missing');
+  if (!src.includes('payload_too_long')) throw new Error('payload length cap missing');
+});
+
+test('batch preview is capped separately from ZIP rows', () => {
+  const src = read('assets/js/batch.js');
+  if (!src.includes('getMaxPreview')) throw new Error('getMaxPreview missing');
+  if (!src.includes('previewCapped')) throw new Error('preview cap notice missing');
+});
+
+test('logo upload UI and customizer helpers exist', () => {
+  const html = read('index.html');
+  if (!html.includes("connect-src 'self' data: blob:")) {
+    throw new Error('CSP connect-src must allow data: blob: for logo XHR');
+  }
+  if (!html.includes('id="logo-remove"')) throw new Error('logo remove missing');
+  if (!html.includes('id="logo-size"')) throw new Error('logo size slider missing');
+  const customizer = read('assets/js/customizer.js');
+  if (!customizer.includes('setImageFromFile')) throw new Error('setImageFromFile missing');
+  if (!customizer.includes("type: styleOptions.image ? 'svg'")) {
+    throw new Error('logo preview must use SVG type (canvas nested-image is blank)');
+  }
+  if (!customizer.includes('fitPreviewSvg')) {
+    throw new Error('preview SVG must set viewBox so QR scales inside the frame');
+  }
+  const css = read('assets/css/style.css');
+  if (!/qr-preview canvas,\s*\.qr-preview svg \{[^}]*min-width:\s*0/.test(css)) {
+    throw new Error('preview CSS must let QR shrink inside the frame');
+  }
+  const exporter = read('assets/js/exporter.js');
+  if (!exporter.includes('rasterizeSvgBlobToPng')) throw new Error('PNG export must flatten SVG logos');
+  if (!customizer.includes('clearImage')) throw new Error('clearImage missing');
+  if (!customizer.includes('bumpEclForLogo')) throw new Error('ECL bump for logo missing');
+  const cfg = read('site.config.js');
+  if (!cfg.includes('maxLogoBytes')) throw new Error('maxLogoBytes missing');
+  if (!cfg.includes('maxLogoPx')) throw new Error('maxLogoPx missing');
+  const i18n = read('assets/js/i18n.js');
+  if (!i18n.includes("'ui.logoChoose'")) throw new Error('logo i18n missing');
+  if (!i18n.includes('upload PNG, JPEG')) throw new Error('FAQ should mention logo upload');
+});
+
+test('dark theme tokens are not overridden by light :root', () => {
+  const html = read('index.html');
+  const block = html.match(/<style id="qr-theme">([\s\S]*?)<\/style>/);
+  if (!block) throw new Error('qr-theme style missing');
+  const root = block[1].match(/:root\s*\{([^}]*)\}/);
+  if (root && /--bg\s*:/.test(root[1])) {
+    throw new Error('qr-theme still sets --bg on :root (breaks dark mode)');
+  }
+  if (!html.includes('[data-theme="dark"]')) throw new Error('qr-theme missing dark token block');
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

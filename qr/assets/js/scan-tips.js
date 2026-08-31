@@ -10,6 +10,10 @@ const QRScanTips = (() => {
       tips.push({ level: 'warn', key: 'logo_ecl' });
     }
 
+    if (hasLogo && (style.imageOptions?.imageSize || 0) > 0.32) {
+      tips.push({ level: 'warn', key: 'logo_large' });
+    }
+
     if (style.colorMode !== 'solid' && style.transparentBg) {
       tips.push({ level: 'warn', key: 'gradient_transparent' });
     }

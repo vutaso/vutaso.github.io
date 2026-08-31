@@ -82,9 +82,20 @@ const QRValidation = (() => {
       if (addr && addr.length < 10) errors.address = 'invalid_address';
     }
 
+    if (typeId === 'social' && formData.platform === 'whatsapp') {
+      const val = String(formData.username || '').trim();
+      if (val && !/^https?:\/\//i.test(val)) {
+        const digits = val.replace(/\D/g, '');
+        if (digits.length < 7) errors.username = 'invalid_whatsapp';
+      }
+    }
+
     const encoded = encodeQRData(typeId, formData);
     if (!encoded || !encoded.trim()) {
       errors._form = 'empty_payload';
+    } else {
+      const maxPayload = (window.SITE && SITE.maxPayloadChars) || 2953;
+      if (encoded.length > maxPayload) errors._form = 'payload_too_long';
     }
 
     return {

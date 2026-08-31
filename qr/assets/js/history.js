@@ -14,7 +14,20 @@ const QRHistory = (() => {
   }
 
   function save(list) {
-    localStorage.setItem(KEY, JSON.stringify(list.slice(0, MAX)));
+    const trimmed = list.slice(0, MAX);
+    try {
+      localStorage.setItem(KEY, JSON.stringify(trimmed));
+    } catch {
+      try {
+        const stripped = trimmed.map((item) => {
+          if (!item?.style?.image) return item;
+          return { ...item, style: { ...item.style, image: null } };
+        });
+        localStorage.setItem(KEY, JSON.stringify(stripped));
+      } catch {
+        /* quota exceeded */
+      }
+    }
   }
 
   function add(entry) {

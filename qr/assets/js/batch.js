@@ -90,6 +90,10 @@ const QRBatch = (() => {
     return result;
   }
 
+  function getMaxPreview() {
+    return (window.SITE && SITE.maxBatchPreview) || 50;
+  }
+
   function renderPreview(container, result) {
     const gen = ++previewGeneration;
     const { rows, truncated } = result;
@@ -116,10 +120,21 @@ const QRBatch = (() => {
       container.appendChild(note);
     }
 
+    const previewMax = getMaxPreview();
+    const previewRows = rows.slice(0, previewMax);
+    if (rows.length > previewMax) {
+      const capNote = document.createElement('p');
+      capNote.className = 'batch-note';
+      capNote.textContent = typeof I18n !== 'undefined'
+        ? I18n.t('batch.previewCapped', { shown: previewMax, total: rows.length })
+        : `Showing ${previewMax} of ${rows.length} in preview. ZIP still includes all rows.`;
+      container.appendChild(capNote);
+    }
+
     const grid = document.createElement('div');
     grid.className = 'batch-grid';
 
-    rows.forEach((row, idx) => {
+    previewRows.forEach((row, idx) => {
       const card = document.createElement('div');
       card.className = 'batch-card';
       card.innerHTML = `
@@ -207,6 +222,7 @@ const QRBatch = (() => {
     downloadZip,
     cancelDownload,
     getParsedRows,
-    getMaxRows
+    getMaxRows,
+    getMaxPreview
   };
 })();

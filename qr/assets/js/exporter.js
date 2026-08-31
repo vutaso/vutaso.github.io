@@ -12,18 +12,114 @@ const QRExporter = (() => {
     return `${prefix}-${ts}`;
   }
 
+  function loadImageSrc(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const timer = setTimeout(() => reject(new Error('image timeout')), 8000);
+      img.onload = () => { clearTimeout(timer); resolve(img); };
+      img.onerror = () => { clearTimeout(timer); reject(new Error('image load failed')); };
+      img.src = src;
+    });
+  }
+
+  function canvasToPngBlob(canvas) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error('PNG encode failed'));
+      }, 'image/png');
+    });
+  }
+
+  /**
+   * Chromium will not paint nested <image href="data:..."> when an SVG is used as an Image.
+   * Strip logo nodes, rasterize the QR modules, then draw logos onto the canvas.
+   */
+  async function rasterizeSvgBlobToPng(svgBlob) {
+    const text = await svgBlob.text();
+    const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    const svg = doc.documentElement;
+    if (!svg || svg.nodeName.toLowerCase() === 'parsererror') {
+      throw new Error('Invalid SVG');
+    }
+
+    const logos = [];
+    svg.querySelectorAll('image').forEach((el) => {
+      const href = el.getAttribute('href')
+        || el.getAttributeNS('http://www.w3.org/1999/xlink', 'href')
+        || '';
+      logos.push({
+        href,
+        x: parseFloat(el.getAttribute('x')) || 0,
+        y: parseFloat(el.getAttribute('y')) || 0,
+        w: parseFloat(String(el.getAttribute('width') || '0')) || 0,
+        h: parseFloat(String(el.getAttribute('height') || '0')) || 0
+      });
+      el.remove();
+    });
+
+    const w = parseFloat(svg.getAttribute('width')) || 300;
+    const h = parseFloat(svg.getAttribute('height')) || 300;
+    const xml = new XMLSerializer().serializeToString(svg);
+    const qrImg = await loadImageSrc('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('PNG encode failed');
+    ctx.drawImage(qrImg, 0, 0, w, h);
+
+    for (const logo of logos) {
+      if (!logo.href || logo.w <= 0 || logo.h <= 0) continue;
+      try {
+        const logoImg = await loadImageSrc(logo.href);
+        ctx.drawImage(logoImg, logo.x, logo.y, logo.w, logo.h);
+      } catch {
+        /* keep QR without this logo rather than failing export */
+      }
+    }
+
+    return canvasToPngBlob(canvas);
+  }
+
   async function getRawBlob(qrInstance, extension) {
+    const hasLogo = !!(typeof QRCustomizer !== 'undefined' && QRCustomizer.getStyleOptions()?.image);
+    if (extension === 'png' && hasLogo) {
+      let svgBlob = null;
+      try {
+        svgBlob = await Promise.race([
+          qrInstance.getRawData('svg'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+        ]);
+      } catch {
+        svgBlob = null;
+      }
+      if (!svgBlob) {
+        const previewSvg = document.querySelector('#qr-preview svg');
+        if (previewSvg) {
+          if (typeof QRCustomizer.injectLogoIntoSvg === 'function') {
+            QRCustomizer.injectLogoIntoSvg(previewSvg, QRCustomizer.getStyleOptions().image);
+          }
+          const xml = new XMLSerializer().serializeToString(previewSvg);
+          svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        }
+      }
+      if (!svgBlob) throw new Error('SVG export failed');
+      return rasterizeSvgBlobToPng(svgBlob);
+    }
     return qrInstance.getRawData(extension);
   }
 
   async function getExportBlob(qrInstance, scale = 1) {
     const style = QRCustomizer.getStyleOptions();
     const baseSize = style.width || 300;
-    const size = baseSize * scale;
+    const maxPx = (window.SITE && SITE.maxExportPx) || 4096;
+    const size = Math.min(Math.max(1, baseSize * scale), maxPx);
     const frameId = style.activeFrame || 'none';
 
     let qr;
-    if (scale === 1 && qrInstance) {
+    if (scale === 1 && qrInstance && size === baseSize) {
       qr = qrInstance;
     } else {
       qr = QRCustomizer.createInstance(style.data, { width: size, height: size });
@@ -76,21 +172,26 @@ const QRExporter = (() => {
     const blob = await getExportBlob(qrInstance, 1);
     const img = await blobToImage(blob);
     const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0);
 
-    canvas.toBlob((jpegBlob) => {
-      saveAs(jpegBlob, `${getFilename()}.jpg`);
-    }, 'image/jpeg', 0.92);
+    const jpegBlob = await new Promise((resolve, reject) => {
+      canvas.toBlob((result) => {
+        if (result) resolve(result);
+        else reject(new Error('JPEG encode failed'));
+      }, 'image/jpeg', 0.92);
+    });
+    saveAs(jpegBlob, `${getFilename()}.jpg`);
   }
 
   async function downloadPDF(qrInstance, title = '') {
     const { jsPDF } = window.jspdf;
     const blob = await getExportBlob(qrInstance, 1);
+    const img = await blobToImage(blob);
     const imgData = await blobToDataURL(blob);
 
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -102,10 +203,20 @@ const QRExporter = (() => {
       pdf.text(title, pageW / 2, 20, { align: 'center' });
     }
 
-    const qrSize = 90;
-    const x = (pageW - qrSize) / 2;
-    const y = title ? 40 : (pageH - qrSize) / 2;
-    pdf.addImage(imgData, 'PNG', x, y, qrSize, qrSize);
+    const imgW = img.naturalWidth || img.width || 1;
+    const imgH = img.naturalHeight || img.height || 1;
+    const maxW = 90;
+    const maxH = title ? Math.min(140, pageH - 55) : 90;
+    const ratio = imgW / imgH;
+    let drawW = maxW;
+    let drawH = maxW / ratio;
+    if (drawH > maxH) {
+      drawH = maxH;
+      drawW = maxH * ratio;
+    }
+    const x = (pageW - drawW) / 2;
+    const y = title ? 40 : (pageH - drawH) / 2;
+    pdf.addImage(imgData, 'PNG', x, y, drawW, drawH);
 
     pdf.setFontSize(10);
     pdf.setTextColor(150);
