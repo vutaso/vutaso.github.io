@@ -26,8 +26,10 @@ const QRHistory = (() => {
         localStorage.setItem(KEY, JSON.stringify(stripped));
       } catch {
         /* quota exceeded */
+        return false;
       }
     }
+    return true;
   }
 
   function add(entry) {
@@ -35,7 +37,13 @@ const QRHistory = (() => {
       !(item.typeId === entry.typeId && item.encoded === entry.encoded)
     );
     list.unshift({ ...entry, ts: Date.now() });
-    save(list);
+    const ok = save(list);
+    if (!ok && typeof window.__showToast === 'function') {
+      window.__showToast(
+        typeof I18n !== 'undefined' ? I18n.t('history.saveFailed') : 'Could not save history (storage full).',
+        'error'
+      );
+    }
     render();
   }
 

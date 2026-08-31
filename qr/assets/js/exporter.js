@@ -95,16 +95,6 @@ const QRExporter = (() => {
       } catch {
         svgBlob = null;
       }
-      if (!svgBlob) {
-        const previewSvg = document.querySelector('#qr-preview svg');
-        if (previewSvg) {
-          if (typeof QRCustomizer.injectLogoIntoSvg === 'function') {
-            QRCustomizer.injectLogoIntoSvg(previewSvg, QRCustomizer.getStyleOptions().image);
-          }
-          const xml = new XMLSerializer().serializeToString(previewSvg);
-          svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
-        }
-      }
       if (!svgBlob) throw new Error('SVG export failed');
       return rasterizeSvgBlobToPng(svgBlob);
     }

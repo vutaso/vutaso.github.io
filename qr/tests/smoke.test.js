@@ -335,6 +335,68 @@ test('logo upload UI and customizer helpers exist', () => {
   if (!i18n.includes('upload PNG, JPEG')) throw new Error('FAQ should mention logo upload');
 });
 
+test('vCard website is normalized to https', () => {
+  const src = read('assets/js/types.js');
+  const encode = src.match(/id: 'vcard'[\s\S]*?encode\(data\) \{([\s\S]*?)\n\s*\}/);
+  if (!encode) throw new Error('vcard encode missing');
+  if (!encode[1].includes('https://')) throw new Error('vCard website must prepend https://');
+});
+
+test('history quota failure is not silent', () => {
+  const src = read('assets/js/history.js');
+  if (!src.includes('history.saveFailed')) throw new Error('history quota toast missing');
+  if (!src.includes('__showToast')) throw new Error('history must call __showToast on failure');
+});
+
+test('batch parse reports skipped rows', () => {
+  const src = read('assets/js/batch.js');
+  if (!src.includes('skipped.push')) throw new Error('batch must track skipped rows');
+  const app = read('assets/js/app.js');
+  if (!app.includes('batch.parsedSkipped')) throw new Error('batch parse toast must mention skipped rows');
+});
+
+test('asset versions are in sync with site.config', () => {
+  const html = read('index.html');
+  const cfg = read('site.config.js');
+  const m = cfg.match(/assetVersion:\s*(\d+)/);
+  if (!m) throw new Error('assetVersion missing');
+  const av = m[1];
+  const versions = [...html.matchAll(/\?v=(\d+)/g)].map((x) => x[1]);
+  if (!versions.length) throw new Error('no cache-busting ?v= found');
+  const bad = versions.filter((v) => parseInt(v, 10) > parseInt(av, 10));
+  if (bad.length) throw new Error(`?v=${bad.join(',')} exceeds assetVersion ${av}`);
+});
+
+test('WiFi string has no trailing empty segment', () => {
+  const src = read('assets/js/types.js');
+  const encode = src.match(/id: 'wifi'[\s\S]*?encode\(data\) \{([\s\S]*?)\n\s*\}/);
+  if (!encode) throw new Error('wifi encode missing');
+  if (encode[1].includes('`;${hidden};`') || /`\s*;\s*`/.test(encode[1])) {
+    throw new Error('WiFi payload should not end with ;;');
+  }
+});
+
+test('vCard escapes special characters', () => {
+  const src = read('assets/js/types.js');
+  const encode = src.match(/id: 'vcard'[\s\S]*?encode\(data\) \{([\s\S]*?)\n\s*\}/);
+  if (!encode) throw new Error('vcard encode missing');
+  if (!encode[1].includes('replace(/([\\\\;,])/g')) throw new Error('vCard must escape ; , backslash');
+  if (!encode[1].includes("\\\\n")) throw new Error('vCard must escape newlines');
+});
+
+test('crypto custom requires explicit scheme', () => {
+  const src = read('assets/js/types.js');
+  const encode = src.match(/id: 'crypto'[\s\S]*?encode\(data\) \{([\s\S]*?)\n\s*\}/);
+  if (!encode) throw new Error('crypto encode missing');
+  if (!encode[1].includes('customScheme')) throw new Error('crypto custom must use customScheme field');
+  if (!encode[1].includes("if (!scheme) return ''")) throw new Error('crypto custom should fail without scheme');
+});
+
+test('phone validation requires 7+ digits', () => {
+  const src = read('assets/js/validation.js');
+  if (!src.includes('digits.length < 7')) throw new Error('phone validation must count digits');
+});
+
 test('dark theme tokens are not overridden by light :root', () => {
   const html = read('index.html');
   const block = html.match(/<style id="qr-theme">([\s\S]*?)<\/style>/);
@@ -344,6 +406,33 @@ test('dark theme tokens are not overridden by light :root', () => {
     throw new Error('qr-theme still sets --bg on :root (breaks dark mode)');
   }
   if (!html.includes('[data-theme="dark"]')) throw new Error('qr-theme missing dark token block');
+});
+
+test('library-load fallback is deferred (CSP safe)', () => {
+  const html = read('index.html');
+  const cspIdx = html.indexOf('Content-Security-Policy');
+  const inline = html.match(/<script>\s*[\s\S]*?QRCodeStyling[\s\S]*?<\/script>/);
+  if (inline && html.indexOf(inline[0]) > cspIdx) {
+    throw new Error('CSP blocks inline QRCodeStyling fallback script');
+  }
+  const app = read('assets/js/app.js');
+  if (!app.includes("typeof QRCodeStyling !== 'function'")) {
+    throw new Error('app.js must handle missing QRCodeStyling (CSP-safe fallback)');
+  }
+});
+
+test('logo PNG export never falls back to preview SVG', () => {
+  const src = read('assets/js/exporter.js');
+  if (src.includes("#qr-preview svg") || src.includes('previewSvg')) {
+    throw new Error('export fallback must not read #qr-preview svg (wrong scale)');
+  }
+});
+
+test('SVG export discloses embedded raster', () => {
+  const i18n = read('assets/js/i18n.js');
+  if (!i18n.includes('raster embedded') && !i18n.includes('ảnh raster nhúng')) {
+    throw new Error('FAQ should disclose SVG is raster-embedded');
+  }
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

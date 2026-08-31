@@ -621,9 +621,24 @@
       $('#batch-download-png').disabled = !hasRows;
       $('#batch-download-svg').disabled = !hasRows;
 
-      const msg = result.rows.length
-        ? (result.truncated ? I18n.t('batch.truncated', { max: QRBatch.getMaxRows() }) : `✓ ${result.rows.length} QR`)
-        : I18n.t('batch.empty');
+      let msg;
+      if (result.rows.length) {
+        if (result.truncated) {
+          msg = I18n.t('batch.truncated', { max: QRBatch.getMaxRows() });
+        } else if (result.skipped && result.skipped.length) {
+          const lines = result.skipped.slice(0, 5).map((s) => s.line).join(', ');
+          const more = result.skipped.length > 5 ? '…' : '';
+          msg = I18n.t('batch.parsedSkipped', {
+            count: result.rows.length,
+            skipped: result.skipped.length,
+            lines: lines + more
+          });
+        } else {
+          msg = I18n.t('batch.parsed', { count: result.rows.length });
+        }
+      } else {
+        msg = I18n.t('batch.empty');
+      }
       showToast(msg, result.rows.length ? 'success' : 'error');
       QRAnalytics.track('batch_parse', { count: result.rows.length });
     });
@@ -704,6 +719,13 @@
   /* ── Init ── */
   function init() {
     I18n.init();
+    if (typeof QRCodeStyling !== 'function') {
+      const main = document.getElementById('main-content');
+      if (main) {
+        main.innerHTML = '<div class="panel" style="text-align:center;padding:48px;margin:24px auto;max-width:520px;"><h2>Unable to load app</h2><p style="color:var(--text-muted);margin:16px 0;">Required libraries failed to load. Check your internet connection and refresh the page.</p><button type="button" class="btn btn--primary" onclick="location.reload()">Refresh</button></div>';
+      }
+      return;
+    }
     initTheme();
     initLangToggle();
     QRAnalytics.init();

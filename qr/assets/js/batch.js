@@ -17,6 +17,7 @@ const QRBatch = (() => {
     if (lines.length === 0) return { rows: [], truncated: false, total: 0 };
 
     const rows = [];
+    const skipped = [];
     let startIdx = 0;
     let truncated = false;
 
@@ -33,7 +34,10 @@ const QRBatch = (() => {
       }
 
       const cols = parseCSVLine(lines[i]);
-      if (cols.length < 2) continue;
+      if (cols.length < 2) {
+        skipped.push({ line: i + 1, reason: 'columns' });
+        continue;
+      }
 
       const type = cols[0].trim().toLowerCase();
       let data;
@@ -53,16 +57,25 @@ const QRBatch = (() => {
         label = cols[2] ? cols[2].trim() : `qr-${i}`;
       }
 
-      if (!data) continue;
-      if (!QR_TYPES.some(t => t.id === type)) continue;
+      if (!data) {
+        skipped.push({ line: i + 1, reason: 'empty_data' });
+        continue;
+      }
+      if (!QR_TYPES.some(t => t.id === type)) {
+        skipped.push({ line: i + 1, reason: 'unknown_type', type });
+        continue;
+      }
 
       const encoded = parseBatchRow(type, data, extra);
-      if (!encoded || !encoded.trim()) continue;
+      if (!encoded || !encoded.trim()) {
+        skipped.push({ line: i + 1, reason: 'encode_failed' });
+        continue;
+      }
 
       rows.push({ type, data, encoded, label, index: i, extra });
     }
 
-    return { rows, truncated, total: dataLines };
+    return { rows, truncated, total: dataLines, skipped };
   }
 
   function parseCSVLine(line) {

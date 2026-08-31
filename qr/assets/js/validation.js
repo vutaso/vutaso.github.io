@@ -16,6 +16,8 @@ const QRValidation = (() => {
   }
 
   function isValidPhone(str) {
+    const digits = str.replace(/\D/g, '');
+    if (digits.length < 7) return false;
     return /^[+]?[\d\s\-().]{7,}$/.test(str.trim());
   }
 

@@ -8,7 +8,7 @@ window.SITE = {
   email: 'vutaso.com@gmail.com',
   year: 2026,
   /** Bump when JS/CSS change to bust browser cache on GitHub Pages */
-  assetVersion: 10,
+  assetVersion: 16,
 
   /** Batch CSV — practical upper bound (browser memory) */
   maxBatchRows: 10000,

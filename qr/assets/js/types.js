@@ -67,7 +67,7 @@ const QR_TYPES = [
       const pass = escapeWifi(data.password || '');
       const sec = data.security === 'nopass' ? 'nopass' : (data.security || 'WPA');
       const hidden = data.hidden ? 'H:true;' : '';
-      return `WIFI:T:${sec};S:${ssid};P:${pass};${hidden};`;
+      return `WIFI:T:${sec};S:${ssid};P:${pass};${hidden}`;
     }
   },
   {
@@ -86,16 +86,21 @@ const QR_TYPES = [
       { name: 'address', label: 'Address', type: 'text', placeholder: '123 Main St, City' }
     ],
     encode(data) {
+      const esc = (s) => String(s || '').replace(/([\\;,])/g, '\\$1').replace(/\r?\n/g, '\\n');
       const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
       const fn = [data.firstName, data.lastName].filter(Boolean).join(' ');
-      if (fn) lines.push(`FN:${fn}`);
-      if (data.firstName) lines.push(`N:${data.lastName || ''};${data.firstName};;;`);
-      if (data.phone) lines.push(`TEL:${data.phone}`);
-      if (data.email) lines.push(`EMAIL:${data.email}`);
-      if (data.org) lines.push(`ORG:${data.org}`);
-      if (data.title) lines.push(`TITLE:${data.title}`);
-      if (data.website) lines.push(`URL:${data.website}`);
-      if (data.address) lines.push(`ADR:;;${data.address};;;;`);
+      if (fn) lines.push(`FN:${esc(fn)}`);
+      if (data.firstName) lines.push(`N:${esc(data.lastName || '')};${esc(data.firstName)};;;`);
+      if (data.phone) lines.push(`TEL:${esc(data.phone)}`);
+      if (data.email) lines.push(`EMAIL:${esc(data.email)}`);
+      if (data.org) lines.push(`ORG:${esc(data.org)}`);
+      if (data.title) lines.push(`TITLE:${esc(data.title)}`);
+      if (data.website) {
+        let site = String(data.website).trim();
+        if (site && !/^https?:\/\//i.test(site)) site = 'https://' + site;
+        lines.push(`URL:${site}`);
+      }
+      if (data.address) lines.push(`ADR:;;${esc(data.address)};;;;`);
       lines.push('END:VCARD');
       return lines.join('\n');
     }
@@ -241,6 +246,7 @@ const QR_TYPES = [
         ]
       },
       { name: 'address', label: 'Wallet Address', type: 'text', placeholder: 'Wallet address', required: true },
+      { name: 'customScheme', label: 'Custom Scheme (optional)', type: 'text', placeholder: 'litecoin, dogecoin…', showWhen: { currency: 'custom' } },
       { name: 'amount', label: 'Amount (optional)', type: 'text', placeholder: '0.001' },
       { name: 'label', label: 'Label (optional)', type: 'text', placeholder: 'Payment for...' }
     ],
@@ -249,7 +255,13 @@ const QR_TYPES = [
       if (!addr) return '';
       const cur = (data.currency || 'BTC').toUpperCase();
       const schemeMap = { BTC: 'bitcoin', ETH: 'ethereum' };
-      const scheme = schemeMap[cur] || (cur === 'CUSTOM' ? 'bitcoin' : cur.toLowerCase());
+      let scheme;
+      if (cur === 'CUSTOM') {
+        scheme = String(data.customScheme || '').trim().toLowerCase();
+        if (!scheme) return '';
+      } else {
+        scheme = schemeMap[cur] || cur.toLowerCase();
+      }
       const params = [];
       if (data.amount) params.push(`amount=${data.amount}`);
       if (data.label) params.push(`label=${encodeURIComponent(data.label)}`);
