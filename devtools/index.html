@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevTools — JSON, Base64, Hash | VUTASO</title>
+    <meta name="description" content="Format JSON, encode/decode Base64, MD5 và SHA-256 ngay trên trình duyệt. Nội dung không rời khỏi thiết bị." />
+    <meta name="keywords" content="JSON formatter, Base64 encode decode, MD5, SHA-256, hash, VUTASO" />
+    <meta name="author" content="VUTASO" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e13" />
+    <link rel="canonical" href="https://vutaso.com/devtools/" />
+    <link rel="alternate" hreflang="vi" href="https://vutaso.com/devtools/" />
+    <link rel="alternate" hreflang="en" href="https://vutaso.com/devtools/" />
+    <link rel="alternate" hreflang="x-default" href="https://vutaso.com/devtools/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DevTools — JSON, Base64, Hash | VUTASO" />
+    <meta property="og:description" content="Format JSON, encode/decode Base64, MD5 và SHA-256 ngay trên trình duyệt. Nội dung không rời khỏi thiết bị." />
+    <meta property="og:url" content="https://vutaso.com/devtools/" />
+    <meta property="og:site_name" content="VUTASO" />
+    <meta property="og:image" content="https://vutaso.com/devtools/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:locale" content="vi_VN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DevTools — JSON, Base64, Hash | VUTASO" />
+    <meta name="twitter:description" content="Format JSON, encode/decode Base64, and hash with MD5 or SHA-256 in your browser. Your content never leaves this device." />
+    <meta name="twitter:image" content="https://vutaso.com/devtools/og-image.jpg" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css?v=1.5" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "DevTools",
+        "url": "https://vutaso.com/devtools/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "VUTASO", "url": "https://vutaso.com" },
+        "description": "Browser-based JSON formatter, Base64 encoder/decoder, and MD5/SHA-256 hash tool."
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <p>DevTools needs JavaScript. / DevTools cần JavaScript.</p>
+    </noscript>
+    <div class="noise"></div>
+    <header class="site-header">
+      <div class="brand-wrap">
+        <a class="vutaso-link" href="../" data-i18n="brand.home">VUTASO</a>
+        <a class="brand" href="./" data-i18n-aria="brand.app" aria-label="DevTools trang chủ">
+          <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
+          <span>Dev<span>Tools</span></span>
+        </a>
+      </div>
+      <div class="header-actions">
+        <div class="header-note"><span class="status-dot"></span><span data-i18n="header.note">Chạy hoàn toàn trên trình duyệt</span></div>
+        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Ngôn ngữ">
+          <button type="button" class="lang-btn is-active" data-lang="vi" aria-pressed="true">VI</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-tabs" id="toolTabs" role="tablist" data-i18n-aria="tabs.label" aria-label="Công cụ">
+      <button type="button" class="tab-btn is-active" id="tab-json" role="tab" data-tool="json" data-i18n="tab.json" aria-controls="workspace" aria-selected="true" tabindex="0">JSON</button>
+      <button type="button" class="tab-btn" id="tab-base64" role="tab" data-tool="base64" data-i18n="tab.base64" aria-controls="workspace" aria-selected="false" tabindex="-1">Base64</button>
+      <button type="button" class="tab-btn" id="tab-hash" role="tab" data-tool="hash" data-i18n="tab.hash" aria-controls="workspace" aria-selected="false" tabindex="-1">Hash</button>
+    </div>
+
+    <div class="toolbar" id="toolbarJson">
+      <div class="tool-group">
+        <button type="button" class="export-btn primary" id="btnJsonFormat" data-i18n="json.format">Format</button>
+        <button type="button" class="tool-btn" id="btnJsonMinify" data-i18n="json.minify">Minify</button>
+        <div class="tool-group json-view-toggle" role="group" data-i18n-aria="json.view.label" aria-label="Chế độ xem">
+          <button type="button" class="tool-btn is-active" id="btnJsonParsed" data-i18n="json.parsed" aria-pressed="true" disabled>Parsed</button>
+          <button type="button" class="tool-btn" id="btnJsonRaw" data-i18n="json.raw" aria-pressed="false" disabled>Raw</button>
+        </div>
+        <button type="button" class="tool-btn" id="btnJsonCopy" data-i18n="json.copy">Sao chép JSON</button>
+        <button type="button" class="tool-btn" id="btnJsonClear" data-i18n="json.clear">Xóa</button>
+      </div>
+    </div>
+    <div class="toolbar hidden" id="toolbarBase64" hidden aria-hidden="true">
+      <div class="tool-group">
+        <button type="button" class="export-btn primary" id="btnB64Encode" data-i18n="b64.encode">Encode</button>
+        <button type="button" class="tool-btn" id="btnB64Decode" data-i18n="b64.decode">Decode</button>
+        <button type="button" class="tool-btn" id="btnB64Swap" data-i18n="b64.swap">Đảo chiều</button>
+        <button type="button" class="tool-btn" id="btnB64Copy" data-i18n="b64.copy">Sao chép</button>
+        <button type="button" class="tool-btn" id="btnB64Clear" data-i18n="b64.clear">Xóa</button>
+      </div>
+    </div>
+    <div class="toolbar hidden" id="toolbarHash" hidden aria-hidden="true">
+      <div class="tool-group">
+        <button type="button" class="tool-btn" id="btnHashCopyMd5" data-i18n="hash.copy.md5">Sao chép MD5</button>
+        <button type="button" class="tool-btn" id="btnHashCopySha" data-i18n="hash.copy.sha256">Sao chép SHA-256</button>
+        <button type="button" class="tool-btn" id="btnHashClear" data-i18n="hash.clear">Xóa</button>
+      </div>
+    </div>
+
+    <main class="workspace" id="workspace" data-tool="json" role="tabpanel" aria-labelledby="tab-json">
+      <section class="pane editor-pane">
+        <div class="pane-label"><span>01</span> <span data-i18n="pane.input">ĐẦU VÀO</span></div>
+        <textarea id="jsonInput" data-i18n-aria="json.label" data-i18n-placeholder="json.ph" aria-label="JSON hoặc URL" placeholder="{ &quot;hello&quot;: &quot;VUTASO&quot; }"></textarea>
+        <textarea id="b64Input" class="hidden" hidden aria-hidden="true" data-i18n-aria="b64.label" data-i18n-placeholder="b64.ph" aria-label="Văn bản hoặc Base64" placeholder="Xin chào VUTASO"></textarea>
+        <textarea id="hashInput" class="hidden" hidden aria-hidden="true" data-i18n-aria="hash.label" data-i18n-placeholder="hash.ph" aria-label="Văn bản cần hash" placeholder="Nhập văn bản…"></textarea>
+      </section>
+      <section class="pane output-pane">
+        <div class="pane-label"><span>02</span> <span data-i18n="pane.output">KẾT QUẢ</span></div>
+        <div id="jsonOutputWrap" class="json-output">
+          <div id="jsonTree" class="jf-tree" hidden aria-hidden="true" role="region" data-i18n-aria="json.out.label" data-i18n-title="json.tree.hint" aria-label="JSON đã xử lý"></div>
+          <textarea id="jsonOutput" readonly data-i18n-aria="json.out.label" aria-label="JSON đã xử lý"></textarea>
+        </div>
+        <textarea id="b64Output" class="hidden" hidden aria-hidden="true" readonly data-i18n-aria="b64.out.label" aria-label="Kết quả Base64"></textarea>
+        <div id="hashOutput" class="hash-list hidden" hidden aria-hidden="true">
+          <div class="hash-block">
+            <label data-i18n="hash.md5">MD5</label>
+            <div class="hash-row">
+              <div class="hash-out" id="hashMd5"></div>
+            </div>
+          </div>
+          <div class="hash-block">
+            <label data-i18n="hash.sha256">SHA-256</label>
+            <div class="hash-row">
+              <div class="hash-out" id="hashSha256"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span class="stats" id="stats"></span>
+      <span class="footer-meta">
+        <span data-i18n="footer.left">DEVTOOLS / JSON · BASE64 · HASH</span>
+        <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
+        <a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a>
+        <a href="../terms/" data-i18n="footer.terms">Điều khoản</a>
+      </span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="core.js?v=1.5"></script>
+    <script src="i18n.js?v=1.5"></script>
+    <script src="app.js?v=1.5"></script>
+  </body>
+</html>

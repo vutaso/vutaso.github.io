@@ -68,6 +68,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- DevTools — JSON / Base64 / Hash -->
+  <url>
+    <loc>https://vutaso.com/devtools/</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Translate Tool -->
   <url>
     <loc>https://vutaso.com/translate/</loc>
