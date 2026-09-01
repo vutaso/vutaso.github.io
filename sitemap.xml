@@ -60,6 +60,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Markdown Editor -->
+  <url>
+    <loc>https://vutaso.com/markdown/</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Translate Tool -->
   <url>
     <loc>https://vutaso.com/translate/</loc>
