@@ -137,11 +137,15 @@ assert.deepStrictEqual(xssiThrow.data, { n: 4 });
 const unsafe = core.formatJson('{"n":9007199254740993}');
 assert.ok(unsafe.ok);
 assert.strictEqual(unsafe.unsafe, true);
-assert.strictEqual(unsafe.data.n, 9007199254740992);
+assert.strictEqual(unsafe.data.n, 9007199254740993n);
+assert.ok(unsafe.value.includes("9007199254740993"));
+assert.strictEqual(core.minifyJson('{"n": 9007199254740993 }').value, '{"n":9007199254740993}');
 
 const unsafeExp = core.formatJson("1e20");
 assert.ok(unsafeExp.ok);
 assert.strictEqual(unsafeExp.unsafe, true);
+assert.strictEqual(unsafeExp.value.trim(), "1e20");
+assert.strictEqual(core.minifyJson("1e20").value, "1e20");
 
 const unsafeInString = core.formatJson('{"n":"9007199254740993"}');
 assert.ok(unsafeInString.ok);
@@ -150,18 +154,48 @@ assert.ok(!unsafeInString.unsafe);
 const safeInt = core.formatJson('{"n":9007199254740991}');
 assert.ok(safeInt.ok);
 assert.ok(!safeInt.unsafe);
+assert.strictEqual(safeInt.data.n, 9007199254740991);
 
 const pos = core.formatJson("{not json");
 assert.strictEqual(pos.ok, false);
 assert.strictEqual(pos.code, "json");
 assert.ok(pos.line >= 1);
 assert.ok(pos.col >= 1);
+assert.ok(pos.offset >= 0);
 assert.ok(!pos.error);
+assert.strictEqual(pos.reason, "expected_key");
+
+const validOk = core.validateJson('{"a":1,"b":[true,null]}');
+assert.ok(validOk.ok);
+
+const trailObj = core.validateJson('{"a":1,}');
+assert.strictEqual(trailObj.ok, false);
+assert.strictEqual(trailObj.reason, "trailing_comma");
+
+const trailArr = core.validateJson("[1,]");
+assert.strictEqual(trailArr.reason, "trailing_comma");
+
+const needColon = core.validateJson('{"a" 1}');
+assert.strictEqual(needColon.reason, "expected_colon");
+
+const unterm = core.validateJson('"hello');
+assert.strictEqual(unterm.reason, "unterminated_string");
+
+const extra = core.validateJson("true true");
+assert.strictEqual(extra.reason, "trailing");
+
+const notJson = core.validateJson("hello world");
+assert.strictEqual(notJson.ok, false);
+assert.strictEqual(notJson.reason, "not_json");
 
 const deep = "[".repeat(8000) + "1" + "]".repeat(8000);
 const deepR = core.formatJson(deep);
 assert.strictEqual(deepR.ok, false);
 assert.strictEqual(deepR.code, "depth");
+
+const nestedOk = core.minifyJson("[[[[true]]]]");
+assert.ok(nestedOk.ok);
+assert.strictEqual(nestedOk.value, "[[[[true]]]]");
 
 const redosStart = Date.now();
 const redos = core.formatJson("callback(" + " ".repeat(30000) + "x");
@@ -171,9 +205,78 @@ assert.ok(Date.now() - redosStart < 50, "jsonp unwrap should not backtrack");
 const xssi = core.formatJson(")]}'\n{\"n\":2}");
 assert.ok(xssi.ok);
 assert.deepStrictEqual(xssi.data, { n: 2 });
+assert.strictEqual(xssi.unwrapped, true);
 
 const htmlPre = core.formatJson('<html><body><pre>{"pre":true}</pre></body></html>');
 assert.ok(htmlPre.ok);
 assert.deepStrictEqual(htmlPre.data, { pre: true });
+assert.strictEqual(htmlPre.unwrapped, true);
 
-console.log("90 passed");
+assert.strictEqual(pretty.unwrapped, false);
+assert.strictEqual(jsonp.unwrapped, true);
+
+assert.strictEqual(core.minifyJson("{}").value, "{}");
+assert.strictEqual(core.minifyJson("[]").value, "[]");
+assert.strictEqual(core.minifyJson(" \n\t ").code, "empty");
+
+const uni = core.minifyJson('{"e":"👋","v":"Xin chào","esc":"a\\nb"}');
+assert.ok(uni.ok);
+assert.ok(uni.value.includes("👋"));
+assert.ok(uni.value.includes("Xin chào"));
+assert.ok(uni.value.includes("\\n"));
+
+const floats = core.minifyJson('{"a":0.1,"b":1.0,"c":-2.5e-3,"d":-0}');
+assert.ok(floats.ok);
+assert.strictEqual(floats.value, '{"a":0.1,"b":1.0,"c":-2.5e-3,"d":-0}');
+
+const order = core.minifyJson('{"z":1,"a":2}');
+assert.strictEqual(order.value, '{"z":1,"a":2}');
+
+const bom = core.minifyJson('\uFEFF{"a":1}');
+assert.ok(bom.ok);
+assert.strictEqual(bom.value, '{"a":1}');
+assert.ok(!bom.unwrapped);
+
+const crlf = core.minifyJson('{\r\n"a": 1\r\n}');
+assert.strictEqual(crlf.value, '{"a":1}');
+
+const formatted = core.formatJson('{"a":1,"b":[true,null]}');
+const again = core.minifyJson(formatted.value);
+assert.strictEqual(again.value, '{"a":1,"b":[true,null]}');
+assert.deepStrictEqual(again.data, formatted.data);
+
+const utfBad = core.decodeUtf8Document(new Uint8Array([0xc3]));
+assert.strictEqual(utfBad.ok, false);
+assert.strictEqual(utfBad.code, "encoding");
+const utfOk = core.decodeUtf8Document(new TextEncoder().encode('{"ok":true}'));
+assert.ok(utfOk.ok);
+assert.strictEqual(utfOk.value, '{"ok":true}');
+const utfSize = core.decodeUtf8Document(new Uint8Array(core.MAX_DOC_CHARS + 1));
+assert.strictEqual(utfSize.code, "size");
+
+function jsonOfSize(target) {
+  const chunks = ['{"items":['];
+  let size = chunks[0].length;
+  for (let i = 0; size < target - 2; i++) {
+    const row = (i ? "," : "") + '{"id":' + i + ',"n":9007199254740993}';
+    chunks.push(row);
+    size += row.length;
+  }
+  chunks.push("]}");
+  return chunks.join("");
+}
+
+const oneMb = jsonOfSize(1024 * 1024);
+assert.ok(oneMb.length >= 1024 * 1024);
+const benchStart = Date.now();
+const bench = core.formatJson(oneMb);
+const benchMs = Date.now() - benchStart;
+assert.ok(bench.ok, "1MB format should succeed");
+assert.ok(bench.value.includes("9007199254740993"));
+assert.ok(benchMs < core.PERF_BUDGET_1MB_MS, "1MB format " + benchMs + "ms exceeds " + core.PERF_BUDGET_1MB_MS + "ms");
+const miniBig = core.minifyJson(bench.value);
+assert.ok(miniBig.ok);
+assert.ok(miniBig.value.includes("9007199254740993"));
+assert.ok(!miniBig.value.includes("9007199254740992"));
+
+console.log("core tests passed");

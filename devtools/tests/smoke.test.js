@@ -70,22 +70,32 @@ test("i18n covers Vietnamese and English", () => {
   if (!html.includes('data-lang="en"')) throw new Error("EN toggle missing");
 });
 
-test("JSON raw/parsed toggle and window.json export", () => {
+test("JSON raw/parsed toggle, worker, and URL fetch", () => {
   const html = read("index.html");
-  if (!html.includes('id="btnJsonParsed"')) throw new Error("Parsed button missing");
+  if (!html.includes('id="btnJsonValidate"')) throw new Error("Validate button missing");
+  if (!html.includes('id="jsonStatus"')) throw new Error("JSON status panel missing");
   if (!html.includes('id="btnJsonRaw"')) throw new Error("Raw button missing");
   const js = read("app.js");
   if (!js.includes("window.json")) throw new Error("window.json export missing");
+  if (js.includes('params.get("json")')) throw new Error("?json= query must not leak editor content");
   if (!js.includes("bootFromQuery")) throw new Error("query URL bootstrap missing");
   if (!js.includes("isJsonFetchUrl") && !js.includes("readFetchUrl")) throw new Error("URL fetch missing");
   if (!js.includes("credentials: \"omit\"")) throw new Error("fetch should omit credentials");
   if (!js.includes("response.ok")) throw new Error("fetch must check HTTP status");
   if (!js.includes("jsonFetchSeq += 1")) throw new Error("local format must cancel in-flight fetch");
   if (!js.includes("hideToast")) throw new Error("fetching toast must be dismissed");
-  if (!js.includes("error.json.pos")) throw new Error("parse position i18n missing");
+  if (!js.includes("applyJsonValidate")) throw new Error("validate action missing");
+  if (!js.includes("error.json.pos.reason")) throw new Error("detailed parse error i18n missing");
   if (!js.includes("error.json.depth")) throw new Error("depth error i18n missing");
-  if (!js.includes("json.unsafe")) throw new Error("unsafe integer i18n missing");
+  if (!js.includes("json.unwrapped")) throw new Error("unwrap notice i18n missing");
   if (!js.includes("tooBig(body)")) throw new Error("fetch size check missing");
+  if (!js.includes("new Worker")) throw new Error("JSON worker missing");
+  if (!js.includes("setSelectionRange")) throw new Error("scroll/caret to parse error missing");
+  if (!js.includes("decodeUtf8Document")) throw new Error("UTF-8 file decode missing");
+  if (!js.includes("application/json;charset=utf-8")) throw new Error("UTF-8 download missing");
+  const worker = read("json-worker.js");
+  if (!worker.includes("importScripts")) throw new Error("worker must import core.js");
+  if (!worker.includes("postMessage")) throw new Error("worker must post results");
 });
 
 test("JSON tree viewer is wired", () => {
@@ -100,6 +110,10 @@ test("JSON tree viewer is wired", () => {
   if (!js.includes("jf-toggle")) throw new Error("collapse toggle missing");
   if (!js.includes("noopener")) throw new Error("URL links must be noopener");
   if (!js.includes("JF_CHUNK")) throw new Error("chunked render missing");
+  if (!js.includes("TREE_SLICE_MS")) throw new Error("tree fill must be time-sliced");
+  if (!js.includes("TREE_EXPAND_BUDGET")) throw new Error("tree auto-expand budget missing");
+  if (!js.includes("enqueueTreeFill")) throw new Error("tree fill must be scheduled, not recursive sync");
+  if (js.includes("if (depth > 0) return false")) throw new Error("Format tree must expand nested nodes");
   const css = read("styles.css");
   if (!css.includes(".jf-children")) throw new Error("indent guide container missing");
   if (!css.includes("border-left")) throw new Error("indent guides missing");
@@ -169,8 +183,17 @@ test("app.js i18n keys exist in both locales", () => {
   });
 });
 
+test("core does not parse JSON with eval and does not use innerHTML", () => {
+  const core = read("core.js");
+  const app = read("app.js");
+  if (/\beval\s*\(/.test(core) || /\beval\s*\(/.test(app)) throw new Error("eval() is not allowed");
+  if (app.includes("innerHTML")) throw new Error("app must not assign innerHTML");
+  if (!core.includes("MAX_JSON_DEPTH")) throw new Error("depth cap missing");
+  if (!core.includes("PERF_BUDGET_1MB_MS")) throw new Error("1MB budget missing");
+});
+
 test("JavaScript files parse", () => {
-  ["app.js", "i18n.js", "core.js"].forEach((file) => {
+  ["app.js", "i18n.js", "core.js", "json-worker.js"].forEach((file) => {
     execSync(`node --check "${path.join(root, file)}"`, { stdio: "pipe" });
   });
 });
@@ -187,6 +210,12 @@ test("homepage lists the devtools tool", () => {
   if (!home.includes("ft_tool_devtools")) throw new Error("footer i18n key missing");
 });
 
+test("privacy policy covers DevTools local processing", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "privacy/index.html"), "utf8");
+  if (!html.includes("DevTools")) throw new Error("privacy missing DevTools");
+  if (!html.includes("?json=")) throw new Error("privacy should document that ?json= is not used");
+});
+
 test("noscript fallback exists", () => {
   if (!read("index.html").includes("<noscript>")) throw new Error("noscript missing");
 });
@@ -198,12 +227,12 @@ test("i18n localStorage access is guarded", () => {
   if (tryCount < 2) throw new Error("expected guarded getItem and setItem");
 });
 
-test("hash input is not persisted", () => {
+test("JSON input draft is persisted locally, hash is not", () => {
   const js = read("app.js");
-  if (js.includes("localStorage.setItem") && js.includes("hash")) {
-    throw new Error("hash content must not be saved");
-  }
+  if (!js.includes("devtools-json-draft")) throw new Error("JSON draft key missing");
+  if (!js.includes("pagehide")) throw new Error("draft should flush on pagehide/F5");
   if (js.includes("devtools-doc")) throw new Error("content storage key should not exist");
+  if (/localStorage\.setItem\([^)]*hashInput/.test(js)) throw new Error("hash content must not be saved");
 });
 
 test("textarea has an accessible name", () => {

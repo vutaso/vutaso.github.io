@@ -32,7 +32,7 @@
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css?v=1.5" />
+    <link rel="stylesheet" href="styles.css?v=1.7" />
 
     <script type="application/ld+json">
       {
@@ -80,6 +80,7 @@
       <div class="tool-group">
         <button type="button" class="export-btn primary" id="btnJsonFormat" data-i18n="json.format">Format</button>
         <button type="button" class="tool-btn" id="btnJsonMinify" data-i18n="json.minify">Minify</button>
+        <button type="button" class="tool-btn" id="btnJsonValidate" data-i18n="json.validate">Validate</button>
         <div class="tool-group json-view-toggle" role="group" data-i18n-aria="json.view.label" aria-label="Chế độ xem">
           <button type="button" class="tool-btn is-active" id="btnJsonParsed" data-i18n="json.parsed" aria-pressed="true" disabled>Parsed</button>
           <button type="button" class="tool-btn" id="btnJsonRaw" data-i18n="json.raw" aria-pressed="false" disabled>Raw</button>
@@ -115,6 +116,7 @@
       <section class="pane output-pane">
         <div class="pane-label"><span>02</span> <span data-i18n="pane.output">KẾT QUẢ</span></div>
         <div id="jsonOutputWrap" class="json-output">
+          <div id="jsonStatus" class="json-status hidden" hidden role="status" aria-live="polite"></div>
           <div id="jsonTree" class="jf-tree" hidden aria-hidden="true" role="region" data-i18n-aria="json.out.label" data-i18n-title="json.tree.hint" aria-label="JSON đã xử lý"></div>
           <textarea id="jsonOutput" readonly data-i18n-aria="json.out.label" aria-label="JSON đã xử lý"></textarea>
         </div>
@@ -147,8 +149,8 @@
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="core.js?v=1.5"></script>
-    <script src="i18n.js?v=1.5"></script>
-    <script src="app.js?v=1.5"></script>
+    <script src="core.js?v=1.7"></script>
+    <script src="i18n.js?v=1.7"></script>
+    <script src="app.js?v=1.9"></script>
   </body>
 </html>

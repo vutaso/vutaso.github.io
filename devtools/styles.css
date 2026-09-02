@@ -212,6 +212,14 @@ noscript p {
 .tool-btn:hover,
 .export-btn:hover { border-color: var(--blue); }
 
+.tool-btn:focus-visible,
+.export-btn:focus-visible,
+.tab-btn:focus-visible,
+.lang-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .tool-btn.is-active {
   border-color: var(--blue);
   color: var(--ink);
@@ -253,6 +261,9 @@ noscript p {
 }
 
 .editor-pane { border-right: 1px solid var(--line); }
+.editor-pane.is-drop { outline: 2px dashed var(--blue); outline-offset: -4px; }
+
+.workspace[aria-busy="true"] .editor-pane textarea { caret-color: var(--blue); }
 
 .pane-label {
   flex: 0 0 auto;
@@ -289,6 +300,24 @@ textarea::placeholder { color: #5a5b62; }
   display: flex;
   flex-direction: column;
 }
+
+.json-status {
+  flex: 0 0 auto;
+  margin: 8px 16px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--lime);
+  color: var(--ink);
+  font: 12.5px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.json-status.is-ok { border-color: var(--lime); }
+
+.json-status.is-error {
+  border-color: #ff8d70;
+  color: #ffb7a6;
+}
+
+textarea.has-error { box-shadow: inset 3px 0 0 #ff8d70; }
 
 .jf-tree {
   flex: 1 1 auto;

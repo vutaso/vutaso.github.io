@@ -662,10 +662,11 @@
     <div class="container">
         <div class="page-header">
             <h1>Chính sách <span>Bảo mật</span></h1>
-            <p class="last-updated">🔒 Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025</p>
+            <p class="last-updated">🔒 Cập nhật lần cuối: Ngày 2 tháng 9 năm 2026</p>
             <div class="apps-badge">
                 <span class="app-tag blue"><span class="app-dot blue"></span> MoneyBay</span>
                 <span class="app-tag orange"><span class="app-dot orange"></span> QRBay</span>
+                <span class="app-tag blue"><span class="app-dot blue"></span> DevTools</span>
             </div>
         </div>
 
@@ -673,8 +674,8 @@
             <p style="margin:0">VUTASO cam kết bảo vệ quyền riêng tư và dữ liệu của bạn. Chính sách này giải thích cách
                 chúng tôi
                 thu thập, sử dụng và bảo vệ thông tin của bạn khi sử dụng các ứng dụng <strong>MoneyBay</strong> (quản
-                lý chi tiêu)
-                và <strong>QRBay</strong> (quét mã QR & mã vạch).</p>
+                lý chi tiêu),
+                <strong>QRBay</strong> (quét mã QR & mã vạch) và <strong>DevTools</strong> (JSON / Base64 / Hash trên trình duyệt).</p>
         </div>
 
         <h2>Giải thích và Định nghĩa</h2>
@@ -687,8 +688,8 @@
         <ul>
             <li><strong>Tài khoản:</strong> Tài khoản duy nhất được tạo để bạn truy cập vào ứng dụng MoneyBay hoặc
                 QRBay.</li>
-            <li><strong>Ứng dụng:</strong> Chỉ các ứng dụng phần mềm MoneyBay (quản lý chi tiêu) và QRBay (quét mã QR &
-                mã vạch) do VUTASO cung cấp.</li>
+            <li><strong>Ứng dụng:</strong> Các ứng dụng phần mềm MoneyBay (quản lý chi tiêu), QRBay (quét mã QR &
+                mã vạch) và DevTools (công cụ JSON/Base64/Hash trên trình duyệt) do VUTASO cung cấp.</li>
             <li><strong>Công ty:</strong> VUTASO (cũng được gọi là "Chúng tôi", "Của chúng tôi" hoặc "Chúng ta" trong
                 Chính sách Bảo mật này).</li>
             <li><strong>Quốc gia:</strong> Việt Nam.</li>
@@ -700,7 +701,7 @@
                 bao gồm nội dung mã và lịch sử quét.</li>
             <li><strong>Dữ liệu cá nhân:</strong> Bất kỳ thông tin nào có liên quan đến một cá nhân được xác định hoặc
                 có thể xác định được.</li>
-            <li><strong>Dịch vụ:</strong> Các ứng dụng MoneyBay và QRBay.</li>
+            <li><strong>Dịch vụ:</strong> Các ứng dụng MoneyBay, QRBay và DevTools.</li>
             <li><strong>Nhà cung cấp dịch vụ:</strong> Bất kỳ cá nhân tự nhiên hoặc pháp nhân nào xử lý dữ liệu thay mặt
                 cho Công ty.</li>
             <li><strong>Dữ liệu sử dụng:</strong> Dữ liệu được thu thập tự động, được tạo ra bởi việc sử dụng ứng dụng
@@ -728,6 +729,17 @@
             <li>Lịch sử quét mã</li>
             <li>Mã QR tùy chỉnh mà bạn tạo</li>
             <li>Thông tin sản phẩm tra cứu qua mã vạch</li>
+        </ul>
+
+        <h4>Dữ liệu DevTools</h4>
+        <p>DevTools xử lý JSON, Base64 và hash <strong>trên trình duyệt của bạn</strong>. Nội dung editor không được gửi
+            lên máy chủ VUTASO, không được ghi analytics, và không được lưu (chỉ ngôn ngữ giao diện được lưu localStorage).</p>
+        <ul>
+            <li>Format / minify / hash chạy local trên thiết bị</li>
+            <li>Clipboard chỉ được dùng khi bạn bấm Sao chép</li>
+            <li>Nếu bạn dán một URL hoặc mở <code>?url=</code>, trình duyệt sẽ fetch URL đó (CORS có thể chặn). Đây là
+                thao tác bạn chủ động chọn, không phải thu thập JSON mặc định</li>
+            <li>Không dùng tham số <code>?json=</code> để tránh lộ nội dung trên thanh địa chỉ, history hoặc Referer</li>
         </ul>
 
         <h4>Thông tin thu thập khi sử dụng ứng dụng</h4>

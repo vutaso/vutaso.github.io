@@ -1,0 +1,12 @@
+{
+  "name": "vutaso-devtools",
+  "private": true,
+  "scripts": {
+    "test": "node tests/core.test.js && node tests/fuzz.test.js && node tests/smoke.test.js",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers playwright test --config=playwright.config.js",
+    "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

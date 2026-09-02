@@ -1,5 +1,7 @@
 (function (root) {
   const MAX_DOC_CHARS = 2 * 1024 * 1024;
+  const MAX_JSON_DEPTH = 512;
+  const PERF_BUDGET_1MB_MS = 8000;
 
   function toBytes(input) {
     if (input instanceof Uint8Array) return input;
@@ -156,22 +158,17 @@
     return payload;
   }
 
-  function jsonErrorLocation(source, error) {
-    const msg = String(error && error.message ? error.message : "");
-    const fx = msg.match(/line\s+(\d+)\s+column\s+(\d+)/i);
-    if (fx) return { line: Number(fx[1]), col: Number(fx[2]) };
-    const posMatch = msg.match(/position\s+(\d+)/i);
-    if (!posMatch) return null;
-    const pos = Number(posMatch[1]);
+  function indexToLoc(source, index) {
     let line = 1;
     let col = 1;
-    for (let i = 0; i < pos && i < source.length; i++) {
+    const pos = Math.max(0, Math.min(index, source.length));
+    for (let i = 0; i < pos; i++) {
       if (source.charCodeAt(i) === 10) {
         line++;
         col = 1;
       } else col++;
     }
-    return { line, col };
+    return { line, col, offset: pos };
   }
 
   function isUnsafeNumberLiteral(lit) {
@@ -197,24 +194,29 @@
     return false;
   }
 
-  function serializeJson(value, space) {
-    try {
-      return { ok: true, value: JSON.stringify(value, null, space), data: value };
-    } catch {
-      return { ok: false, code: "depth" };
-    }
-  }
-
   function extractJsonPayload(text) {
     let raw = String(text == null ? "" : text);
+    let unwrapped = false;
     if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
     raw = raw.trim();
     if (!raw) return { ok: false, code: "empty" };
-    raw = unwrapHtmlPre(raw).trim();
-    raw = stripXssiPrefix(raw).trim();
-    raw = unwrapJsonp(raw).trim();
+    const afterPre = unwrapHtmlPre(raw).trim();
+    if (afterPre !== raw) {
+      unwrapped = true;
+      raw = afterPre;
+    }
+    const afterXssi = stripXssiPrefix(raw).trim();
+    if (afterXssi !== raw) {
+      unwrapped = true;
+      raw = afterXssi;
+    }
+    const afterJsonp = unwrapJsonp(raw).trim();
+    if (afterJsonp !== raw) {
+      unwrapped = true;
+      raw = afterJsonp;
+    }
     if (!raw) return { ok: false, code: "empty" };
-    return { ok: true, value: raw };
+    return { ok: true, value: raw, unwrapped };
   }
 
   function isJsonFetchUrl(text) {
@@ -223,36 +225,331 @@
     return isSafeHttpUrl(raw);
   }
 
+  function parseFail(source, index, code, reason) {
+    const loc = indexToLoc(source, index);
+    const out = { ok: false, code: code || "json", line: loc.line, col: loc.col, offset: loc.offset };
+    if (reason) out.reason = reason;
+    return out;
+  }
+
+  function astToData(node) {
+    switch (node.type) {
+      case "null":
+        return null;
+      case "bool":
+        return node.value;
+      case "string":
+        return node.value;
+      case "number": {
+        if (!isUnsafeNumberLiteral(node.raw)) return Number(node.raw);
+        if (!/[.eE]/.test(node.raw)) {
+          try {
+            return BigInt(node.raw);
+          } catch {
+            return node.raw;
+          }
+        }
+        return Number(node.raw);
+      }
+      case "array":
+        return node.items.map(astToData);
+      case "object": {
+        const out = {};
+        for (let i = 0; i < node.keys.length; i++) out[node.keys[i]] = astToData(node.values[i]);
+        return out;
+      }
+      default:
+        return null;
+    }
+  }
+
+  function printAst(node, space) {
+    const pretty = space > 0;
+    const unit = pretty ? (typeof space === "number" ? " ".repeat(space) : String(space)) : "";
+
+    function walk(n, level) {
+      switch (n.type) {
+        case "null":
+          return "null";
+        case "bool":
+          return n.value ? "true" : "false";
+        case "number":
+          return n.raw;
+        case "string":
+          return JSON.stringify(n.value);
+        case "array": {
+          if (!n.items.length) return "[]";
+          if (!pretty) return "[" + n.items.map((item) => walk(item, 0)).join(",") + "]";
+          const inner = n.items
+            .map((item) => unit.repeat(level + 1) + walk(item, level + 1))
+            .join(",\n");
+          return "[\n" + inner + "\n" + unit.repeat(level) + "]";
+        }
+        case "object": {
+          if (!n.keys.length) return "{}";
+          const mid = pretty ? ": " : ":";
+          const pairs = n.keys.map((key, i) => {
+            const line = JSON.stringify(key) + mid + walk(n.values[i], pretty ? level + 1 : 0);
+            return pretty ? unit.repeat(level + 1) + line : line;
+          });
+          if (!pretty) return "{" + pairs.join(",") + "}";
+          return "{\n" + pairs.join(",\n") + "\n" + unit.repeat(level) + "}";
+        }
+        default:
+          throw new Error("depth");
+      }
+    }
+
+    return walk(node, 0);
+  }
+
+  function parseLossless(source) {
+    const src = String(source);
+    const n = src.length;
+    let i = 0;
+
+    function fail(index, code, reason) {
+      const err = new Error("json");
+      err.index = index;
+      err.code = code || "json";
+      err.reason = reason || "unexpected";
+      throw err;
+    }
+
+    function skipWs() {
+      while (i < n) {
+        const c = src.charCodeAt(i);
+        if (c === 32 || c === 9 || c === 10 || c === 13) i++;
+        else break;
+      }
+    }
+
+    function parseString() {
+      const start = i;
+      i++;
+      let out = "";
+      while (i < n) {
+        const c = src.charCodeAt(i);
+        if (c === 34) {
+          i++;
+          return { type: "string", value: out };
+        }
+        if (c < 32) fail(i, "json", "control");
+        if (c !== 92) {
+          out += src.charAt(i);
+          i++;
+          continue;
+        }
+        i++;
+        if (i >= n) fail(start, "json", "unterminated_string");
+        const e = src.charCodeAt(i);
+        i++;
+        if (e === 34) out += '"';
+        else if (e === 92) out += "\\";
+        else if (e === 47) out += "/";
+        else if (e === 98) out += "\b";
+        else if (e === 102) out += "\f";
+        else if (e === 110) out += "\n";
+        else if (e === 114) out += "\r";
+        else if (e === 116) out += "\t";
+        else if (e === 117) {
+          let cp = 0;
+          for (let h = 0; h < 4; h++) {
+            if (i >= n) fail(i, "json", "bad_escape");
+            const hex = src.charCodeAt(i);
+            i++;
+            let v;
+            if (hex >= 48 && hex <= 57) v = hex - 48;
+            else if (hex >= 65 && hex <= 70) v = hex - 55;
+            else if (hex >= 97 && hex <= 102) v = hex - 87;
+            else fail(i - 1, "json", "bad_escape");
+            cp = (cp << 4) | v;
+          }
+          out += String.fromCharCode(cp);
+        } else fail(i - 1, "json", "bad_escape");
+      }
+      fail(start, "json", "unterminated_string");
+    }
+
+    function parseNumber() {
+      const start = i;
+      if (src.charCodeAt(i) === 45) i++;
+      const first = src.charCodeAt(i);
+      if (first === 48) i++;
+      else if (first >= 49 && first <= 57) {
+        i++;
+        while (src.charCodeAt(i) >= 48 && src.charCodeAt(i) <= 57) i++;
+      } else fail(start, "json", "number");
+      if (src.charCodeAt(i) === 46) {
+        i++;
+        if (!(src.charCodeAt(i) >= 48 && src.charCodeAt(i) <= 57)) fail(i, "json", "number");
+        while (src.charCodeAt(i) >= 48 && src.charCodeAt(i) <= 57) i++;
+      }
+      const exp = src.charCodeAt(i);
+      if (exp === 101 || exp === 69) {
+        i++;
+        const sign = src.charCodeAt(i);
+        if (sign === 43 || sign === 45) i++;
+        if (!(src.charCodeAt(i) >= 48 && src.charCodeAt(i) <= 57)) fail(i, "json", "number");
+        while (src.charCodeAt(i) >= 48 && src.charCodeAt(i) <= 57) i++;
+      }
+      return { type: "number", raw: src.slice(start, i) };
+    }
+
+    function parseKeyword(word, node) {
+      if (!src.startsWith(word, i)) fail(i, "json", "unexpected");
+      i += word.length;
+      return node;
+    }
+
+    function parseValue(depth) {
+      if (depth > MAX_JSON_DEPTH) fail(i, "depth");
+      skipWs();
+      if (i >= n) fail(i, "json", "unexpected");
+      const c = src.charCodeAt(i);
+      if (c === 34) return parseString();
+      if (c === 45 || (c >= 48 && c <= 57)) return parseNumber();
+      if (c === 123) {
+        i++;
+        const keys = [];
+        const values = [];
+        skipWs();
+        if (src.charCodeAt(i) === 125) {
+          i++;
+          return { type: "object", keys, values };
+        }
+        while (true) {
+          skipWs();
+          if (src.charCodeAt(i) === 125) fail(i, "json", "trailing_comma");
+          if (src.charCodeAt(i) !== 34) fail(i, "json", "expected_key");
+          const key = parseString().value;
+          skipWs();
+          if (src.charCodeAt(i) !== 58) fail(i, "json", "expected_colon");
+          i++;
+          const value = parseValue(depth + 1);
+          keys.push(key);
+          values.push(value);
+          skipWs();
+          const sep = src.charCodeAt(i);
+          if (sep === 125) {
+            i++;
+            return { type: "object", keys, values };
+          }
+          if (sep !== 44) fail(i, "json", "comma_or_end");
+          i++;
+        }
+      }
+      if (c === 91) {
+        i++;
+        const items = [];
+        skipWs();
+        if (src.charCodeAt(i) === 93) {
+          i++;
+          return { type: "array", items };
+        }
+        while (true) {
+          skipWs();
+          if (src.charCodeAt(i) === 93) fail(i, "json", "trailing_comma");
+          items.push(parseValue(depth + 1));
+          skipWs();
+          const sep = src.charCodeAt(i);
+          if (sep === 93) {
+            i++;
+            return { type: "array", items };
+          }
+          if (sep !== 44) fail(i, "json", "comma_or_end");
+          i++;
+        }
+      }
+      if (c === 116) return parseKeyword("true", { type: "bool", value: true });
+      if (c === 102) return parseKeyword("false", { type: "bool", value: false });
+      if (c === 110) return parseKeyword("null", { type: "null" });
+      fail(i, "json", "unexpected");
+    }
+
+    try {
+      const ast = parseValue(1);
+      skipWs();
+      if (i < n) fail(i, "json", "trailing");
+      return { ok: true, ast };
+    } catch (error) {
+      if (error && error.code === "depth") return parseFail(src, error.index || i, "depth");
+      return parseFail(
+        src,
+        error && error.index != null ? error.index : i,
+        "json",
+        error && error.reason
+      );
+    }
+  }
+
   function parseJsonText(text) {
     const extracted = extractJsonPayload(text);
     if (!extracted.ok) return extracted;
-    if (!looksLikeJson(extracted.value)) return { ok: false, code: "json" };
-    try {
-      const value = JSON.parse(extracted.value);
-      return { ok: true, value, unsafe: hasUnsafeNumbers(extracted.value) };
-    } catch (error) {
-      if (error && error.name === "RangeError") return { ok: false, code: "depth" };
-      const loc = jsonErrorLocation(extracted.value, error);
-      return loc ? { ok: false, code: "json", line: loc.line, col: loc.col } : { ok: false, code: "json" };
-    }
+    if (!looksLikeJson(extracted.value)) return { ok: false, code: "json", reason: "not_json" };
+    const parsed = parseLossless(extracted.value);
+    if (!parsed.ok) return parsed;
+    return {
+      ok: true,
+      ast: parsed.ast,
+      data: astToData(parsed.ast),
+      unsafe: hasUnsafeNumbers(extracted.value),
+      unwrapped: extracted.unwrapped,
+    };
   }
 
   function formatJson(text, space) {
     const parsed = parseJsonText(text);
     if (!parsed.ok) return parsed;
-    const out = serializeJson(parsed.value, space == null ? 2 : space);
-    if (!out.ok) return out;
-    if (parsed.unsafe) out.unsafe = true;
-    return out;
+    try {
+      const value = printAst(parsed.ast, space == null ? 2 : space);
+      return {
+        ok: true,
+        value,
+        data: parsed.data,
+        unsafe: parsed.unsafe,
+        unwrapped: parsed.unwrapped,
+      };
+    } catch {
+      return { ok: false, code: "depth" };
+    }
   }
 
   function minifyJson(text) {
     const parsed = parseJsonText(text);
     if (!parsed.ok) return parsed;
-    const out = serializeJson(parsed.value);
-    if (!out.ok) return out;
-    if (parsed.unsafe) out.unsafe = true;
-    return out;
+    try {
+      const value = printAst(parsed.ast, 0);
+      return {
+        ok: true,
+        value,
+        data: parsed.data,
+        unsafe: parsed.unsafe,
+        unwrapped: parsed.unwrapped,
+      };
+    } catch {
+      return { ok: false, code: "depth" };
+    }
+  }
+
+  function validateJson(text) {
+    const parsed = parseJsonText(text);
+    if (!parsed.ok) return parsed;
+    return { ok: true, unwrapped: parsed.unwrapped, unsafe: parsed.unsafe };
+  }
+
+  function decodeUtf8Document(bytes, maxChars) {
+    const cap = maxChars == null ? MAX_DOC_CHARS : maxChars;
+    if (!bytes) return { ok: false, code: "encoding" };
+    const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    if (view.byteLength > cap) return { ok: false, code: "size" };
+    try {
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(view);
+      if (text.length > cap) return { ok: false, code: "size" };
+      return { ok: true, value: text };
+    } catch {
+      return { ok: false, code: "encoding" };
+    }
   }
 
   function bytesToBase64(bytes) {
@@ -486,12 +783,16 @@
 
   const api = {
     MAX_DOC_CHARS,
+    MAX_JSON_DEPTH,
+    PERF_BUDGET_1MB_MS,
     looksLikeJson,
     isSafeHttpUrl,
     isJsonFetchUrl,
     extractJsonPayload,
     formatJson,
     minifyJson,
+    validateJson,
+    decodeUtf8Document,
     encodeBase64,
     decodeBase64,
     md5,
