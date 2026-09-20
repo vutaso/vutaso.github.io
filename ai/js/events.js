@@ -1049,6 +1049,7 @@ window.Events = (() => {
       imageGen: useImageGen,
       thinking: useThinking,
       reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+      seedGroundingMetadata: isContinue ? groundingMetadata : null,
       onSearchStatus: (status) => {
         if (status === 'searching') ui.setStreamingSearchStatus(article, 'searching');
       },
@@ -3137,7 +3138,14 @@ window.Events = (() => {
       const speakBtn = e.target.closest('[data-action="speak"]');
       if (speakBtn) {
         const msg = speakBtn.closest('.message');
-        const txt = msg?.querySelector('.content')?.innerText?.trim() || '';
+        const content = msg?.querySelector('.content');
+        if (!content) {
+          ui.showToast(t('toastSpeechEmpty'));
+          return;
+        }
+        const clone = content.cloneNode(true);
+        clone.querySelectorAll('.message-grounding').forEach((el) => el.remove());
+        const txt = clone.innerText?.trim() || '';
         if (!txt) {
           ui.showToast(t('toastSpeechEmpty'));
           return;

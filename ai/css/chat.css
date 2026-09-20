@@ -1352,51 +1352,78 @@
 }
 
 .message-grounding {
-  margin-bottom: 12px;
-  border: 1px solid color-mix(in srgb, #3b82f6 25%, var(--border));
+  margin: 14px 0 0;
+  padding: 10px 12px 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, #3b82f6 6%, var(--bg-elev));
-  overflow: hidden;
+  background: color-mix(in srgb, var(--bg-elev) 72%, var(--bg));
 }
 
-.message-grounding > summary {
+.message-grounding-header {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px 8px;
-  padding: 8px 12px;
-  cursor: pointer;
+  gap: 8px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-dim);
-  list-style: none;
-  user-select: none;
 }
 
-.message-grounding > summary::-webkit-details-marker {
-  display: none;
+.message-grounding-header .fa-globe {
+  color: var(--accent);
+}
+
+.message-grounding-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .message-grounding-queries {
+  margin: 4px 0 0;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
 }
 
 .message-grounding-sources {
-  margin: 0;
-  padding: 8px 12px 12px 28px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.message-grounding-sources li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
   font-size: 13px;
-  line-height: 1.5;
-  border-top: 1px solid color-mix(in srgb, #3b82f6 15%, var(--border));
+  line-height: 1.45;
 }
 
 .message-grounding-sources a {
   color: var(--accent);
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .message-grounding-sources a:hover {
   text-decoration: underline;
+}
+
+.message-grounding-host {
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .message-generated-images .message-image-wrap {

@@ -677,28 +677,56 @@ window.UI = (() => {
       + '</details>';
   };
 
+  const groundingHostLabel = (uri) => {
+    try {
+      return new URL(uri).hostname.replace(/^www\./i, '');
+    } catch {
+      return '';
+    }
+  };
+
   const groundingHTML = (meta) => {
     if (!meta) return '';
-    const chunks = (meta.groundingChunks || []).filter((c) => c.web?.uri);
-    const queries = meta.webSearchQueries || [];
-    if (!chunks.length && !queries.length) return '';
-    let html = '<details class="message-grounding"><summary><i class="fa-solid fa-globe" aria-hidden="true"></i> ' + escapeHTML(t('sources'));
-    if (queries.length) {
-      html += '<span class="message-grounding-queries">' + escapeHTML(queries.join(', ')) + '</span>';
+    const seen = new Set();
+    const chunks = [];
+    for (const item of meta.groundingChunks || []) {
+      const raw = item?.web?.uri || item?.retrievedContext?.uri;
+      const uri = safeHref(raw);
+      if (!uri || !/^https?:/i.test(uri) || seen.has(uri)) continue;
+      seen.add(uri);
+      const title = truncate(item.web?.title || item.retrievedContext?.title || uri, 200);
+      chunks.push({ uri, title });
+      if (chunks.length >= 24) break;
     }
-    html += '</summary>';
+    const queries = [...new Set((meta.webSearchQueries || [])
+      .map((q) => truncate(String(q || ''), 200))
+      .filter(Boolean))].slice(0, 8);
+    if (!chunks.length && !queries.length) return '';
+    let html = '<section class="message-grounding" aria-label="' + escapeHTML(t('sources')) + '">';
+    html += '<div class="message-grounding-header">';
+    html += '<i class="fa-solid fa-globe" aria-hidden="true"></i>';
+    html += '<span class="message-grounding-title">' + escapeHTML(t('sources')) + '</span>';
+    if (chunks.length) {
+      html += '<span class="message-grounding-count">' + escapeHTML(String(chunks.length)) + '</span>';
+    }
+    html += '</div>';
+    if (queries.length) {
+      html += '<p class="message-grounding-queries">' + escapeHTML(t('sourcesQuery', { q: queries.join(' · ') })) + '</p>';
+    }
     if (chunks.length) {
       html += '<ul class="message-grounding-sources">';
       chunks.forEach((chunk) => {
-        const uri = safeHref(chunk.web.uri);
-        if (!uri) return;
-        const title = chunk.web.title || uri;
-        html += '<li><a href="' + escapeHTML(uri) + '" target="_blank" rel="noopener noreferrer">'
-          + escapeHTML(title) + '</a></li>';
+        const host = groundingHostLabel(chunk.uri);
+        html += '<li><a href="' + escapeHTML(chunk.uri) + '" target="_blank" rel="noopener noreferrer">'
+          + escapeHTML(chunk.title) + '</a>';
+        if (host && host !== chunk.title) {
+          html += '<span class="message-grounding-host">' + escapeHTML(host) + '</span>';
+        }
+        html += '</li>';
       });
       html += '</ul>';
     }
-    html += '</details>';
+    html += '</section>';
     return html;
   };
 
@@ -816,13 +844,13 @@ window.UI = (() => {
     if (m.contextSummary) return contextSummaryBodyHTML(m);
     const text = window.Conversations.getAssistantContent(m);
     return reasoningHTML(m.reasoningContent)
-      + groundingHTML(m.groundingMetadata)
       + window.Markdown.render(text)
       + generatedImagesHTML(m.generatedImages)
       + slidesDownloadHTML(m)
       + excelDownloadHTML(m)
       + documentDownloadHTML(m)
-      + pdfDownloadHTML(m);
+      + pdfDownloadHTML(m)
+      + groundingHTML(m.groundingMetadata);
   };
 
   const updateModelSelect = (providerId, selectedModelId) => {
@@ -1722,8 +1750,9 @@ window.UI = (() => {
 
   const renderStreamingAssistantHTML = (text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
     return reasoningHTML(reasoning, { open: reasoningOpen })
-      + groundingHTML(groundingMetadata)
-      + window.Markdown.render(text || '') + generatedImagesHTML(images);
+      + window.Markdown.render(text || '')
+      + generatedImagesHTML(images)
+      + groundingHTML(groundingMetadata);
   };
 
   const updateStreamingAssistantContent = (contentEl, text, images, reasoning, { reasoningOpen = false, groundingMetadata = null } = {}) => {
@@ -2352,7 +2381,7 @@ window.UI = (() => {
   const CHAT_FIND_MAX = 400;
   const CHAT_FIND_SKIP = [
     'script', 'style', 'textarea', 'input', 'button', 'select', 'option', 'svg', 'canvas', 'summary',
-    '.toolbar', '.msg-edge-scroll', '.katex', '.mermaid', '.code-copy',
+    '.toolbar', '.msg-edge-scroll', '.katex', '.mermaid', '.code-copy', '.message-grounding-header',
     '.export-select-check', '.message-translate-toggle', '.chat-find-bar', '.messages-empty',
     '.line-numbers', '.pre-header', '.table-header-actions', '.table-label',
     '.message-model-label', '.message.streaming'

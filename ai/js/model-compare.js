@@ -109,7 +109,7 @@ window.ModelCompare = (() => {
       model: modelId,
       systemPrompt: settings.systemPrompt,
       convo,
-      webSearch: false,
+      webSearch: !!(settings.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId)),
       imageGen: false,
       thinking: false,
       reasoningEffort: 'default',

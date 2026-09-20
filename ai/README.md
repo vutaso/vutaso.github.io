@@ -153,7 +153,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | **Preview Markdown** | Panel bên phải xem trước nội dung trong code block `markdown`/`md` |
 | **Theme Mermaid** | Sơ đồ Mermaid đổi theme theo giao diện đang chọn |
 | **Reasoning** | Khối suy nghĩ (thinking) có thể thu gọn/mở rộng |
-| **Nguồn web (Gemini)** | Hiển thị liên kết nguồn khi dùng Google Search grounding |
+| **Nguồn web** | Khối nguồn dưới tin assistant khi bật tìm web — Gemini, OpenAI, Anthropic (và OpenRouter nếu API trả citation). So sánh model dùng cùng tool nếu đang bật tìm web |
 | **Ảnh AI sinh ra** | Hiển thị ảnh được tạo bởi model trong phản hồi |
 
 ### 6. Xuất & sao chép

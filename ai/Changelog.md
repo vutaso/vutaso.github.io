@@ -10,6 +10,17 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Trích dẫn web search thống nhất (`js/api.js`, `js/ui.js`)
+**Ý nghĩa:** Gemini đã hiện nguồn; OpenAI/Anthropic thì chưa đều. Một khối **Nguồn** dưới tin assistant giúp kiểm chứng, đúng tinh thần disclaimer “AI có thể mắc lỗi”.
+
+**Cách dùng:**
+- Bật tìm web rồi hỏi. Khi model trả citation, khối **Nguồn** hiện dưới câu trả lời (số nguồn, từ khóa đã tìm, liên kết http/https).
+- Gemini Google Search, OpenAI Responses (`url_citation` + `web_search_call.action.sources`), Anthropic `web_search` (kể cả query stream `input_json_delta`), và `search_results`/`citations` (OpenRouter) đều gom vào cùng hình dạng.
+- Tối đa 24 URL / 8 query, trùng URI thì gộp. Tiếp tục sinh giữ nguồn đã có (merge từ seed). So sánh model: nếu đang bật tìm web và model hỗ trợ thì cột đó cũng hiện nguồn.
+- HTML/PDF xuất theo DOM; Markdown/TXT/DOCX thêm appendix nguồn. Nút Phát âm bỏ khối nguồn; Copy vẫn giữ.
+
+---
+
 #### Dashboard chi phí theo ngày / model (`js/storage.js`, `js/ui.js`)
 **Ý nghĩa:** Settings vốn chỉ hiện In/Out/Tổng/$ của **chat + model đang chọn**. User BYOK cần biết tuần này tốn bao nhiêu và model nào đắt — trên mọi cuộc chat.
 

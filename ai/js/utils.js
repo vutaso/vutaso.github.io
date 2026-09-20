@@ -267,6 +267,48 @@ window.Utils = (() => {
     el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
   };
 
+  const MAX_GROUNDING_CHUNKS = 24;
+  const MAX_GROUNDING_QUERIES = 8;
+  const MAX_GROUNDING_TITLE = 200;
+
+  const collectGroundingLinks = (meta) => {
+    const seen = new Set();
+    const links = [];
+    for (const item of meta?.groundingChunks || []) {
+      const uri = item?.web?.uri || item?.retrievedContext?.uri;
+      if (!uri || !/^https?:\/\//i.test(uri) || seen.has(uri)) continue;
+      seen.add(uri);
+      const title = truncate(item.web?.title || item.retrievedContext?.title || uri, MAX_GROUNDING_TITLE);
+      links.push({ uri, title: title || uri });
+      if (links.length >= MAX_GROUNDING_CHUNKS) break;
+    }
+    const queries = [...new Set((meta?.webSearchQueries || [])
+      .map((q) => truncate(String(q || ''), 200))
+      .filter(Boolean))].slice(0, MAX_GROUNDING_QUERIES);
+    return { links, queries };
+  };
+
+  const escapeMdLinkText = (value) => String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]');
+
+  const escapeMdLinkHref = (value) => String(value || '').replace(/[()]/g, (ch) => encodeURIComponent(ch));
+
+  const formatGroundingAppendix = (meta, { plain = false } = {}) => {
+    const { links, queries } = collectGroundingLinks(meta);
+    if (!links.length && !queries.length) return '';
+    const t = (key, params) => window.I18n?.t?.(key, params) || key;
+    const lines = ['', t('sources') + ':'];
+    if (queries.length) lines.push(t('sourcesQuery', { q: queries.join(' · ') }));
+    links.forEach((link) => {
+      lines.push(plain
+        ? ('- ' + link.title + ' (' + link.uri + ')')
+        : ('- [' + escapeMdLinkText(link.title) + '](' + escapeMdLinkHref(link.uri) + ')'));
+    });
+    return lines.join('\n');
+  };
+
   const formatConversation = (convo) => {
     const parts = [];
     for (const msg of convo.messages) {
@@ -290,7 +332,7 @@ window.Utils = (() => {
           : '';
         parts.push('**' + (text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh')) + '**' + translateNote + imageGenNote + imgNote + fileNote);
       } else {
-        parts.push(window.Conversations.getAssistantContent(msg));
+        parts.push(window.Conversations.getAssistantContent(msg) + formatGroundingAppendix(msg.groundingMetadata));
       }
     }
     return parts.join('\n\n---\n\n');
@@ -325,7 +367,7 @@ window.Utils = (() => {
       } else if (msg.role === 'assistant') {
         const content = window.Conversations.getAssistantContent(msg);
         if (!content) continue;
-        parts.push('TRỢ LÝ:\n' + content);
+        parts.push('TRỢ LÝ:\n' + content + formatGroundingAppendix(msg.groundingMetadata, { plain: true }));
       } else {
         continue;
       }
@@ -776,12 +818,54 @@ window.Utils = (() => {
     return paragraphs;
   };
 
+  const buildDocxGroundingParagraphs = (meta, docxLib) => {
+    const { links, queries } = collectGroundingLinks(meta);
+    if (!links.length && !queries.length) return [];
+    const { Paragraph, TextRun, ExternalHyperlink } = docxLib;
+    const t = (key, params) => window.I18n?.t?.(key, params) || key;
+    const out = [
+      new Paragraph({
+        spacing: { before: 160, after: 60 },
+        children: [new TextRun({ text: t('sources'), bold: true, size: 20, color: '4A4A58' })],
+      }),
+    ];
+    if (queries.length) {
+      out.push(new Paragraph({
+        spacing: { after: 60 },
+        children: [new TextRun({
+          text: t('sourcesQuery', { q: queries.join(' · ') }),
+          italics: true,
+          size: 20,
+          color: '6B6B78',
+        })],
+      }));
+    }
+    links.forEach((link) => {
+      const children = [];
+      if (ExternalHyperlink && /^https?:/i.test(link.uri)) {
+        children.push(new ExternalHyperlink({
+          link: link.uri,
+          children: [new TextRun({ text: link.title, color: '2563EB', underline: {} })],
+        }));
+      } else {
+        children.push(new TextRun({ text: link.title, color: '2563EB' }));
+      }
+      children.push(new TextRun({ text: '  ' + link.uri, color: '6B6B78', size: 18 }));
+      out.push(new Paragraph({ spacing: { after: 40 }, children }));
+    });
+    return out;
+  };
+
   const buildDocxAssistantParagraphs = async (msg, docxLib) => {
     const content = window.Conversations.getAssistantContent(msg);
-    if (!content || !content.trim()) return [];
+    const grounding = buildDocxGroundingParagraphs(msg.groundingMetadata, docxLib);
+    if ((!content || !content.trim()) && !grounding.length) return [];
     return [
       buildDocxRoleParagraph('Trợ lý', docxLib),
-      ...(await window.DocxExport.markdownToDocxParagraphs(content, docxLib)),
+      ...(content && content.trim()
+        ? await window.DocxExport.markdownToDocxParagraphs(content, docxLib)
+        : []),
+      ...grounding,
     ];
   };
 

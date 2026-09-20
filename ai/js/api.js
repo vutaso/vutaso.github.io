@@ -249,6 +249,151 @@ window.API = (() => {
   };
 
 
+  const MAX_GROUNDING_CHUNKS = 24;
+  const MAX_GROUNDING_QUERIES = 8;
+  const MAX_GROUNDING_TITLE = 200;
+  const MAX_GROUNDING_QUERY = 200;
+  const MAX_GROUNDING_URL = 2048;
+
+  const clipGroundingText = (value, max) => {
+    const s = String(value || '').replace(/\s+/g, ' ').trim();
+    if (!s) return '';
+    return s.length > max ? s.slice(0, max - 1) + '…' : s;
+  };
+
+  const clipQuery = (value) => clipGroundingText(value, MAX_GROUNDING_QUERY);
+
+  const chunkFromWeb = (uri, title) => {
+    const url = String(uri || '').trim();
+    if (!/^https?:\/\//i.test(url) || url.length > MAX_GROUNDING_URL) return null;
+    const label = clipGroundingText(title, MAX_GROUNDING_TITLE) || url;
+    return { web: { uri: url, title: label } };
+  };
+
+  const collectWebResults = (list, chunks) => {
+    if (!Array.isArray(list)) return;
+    for (const item of list) {
+      if (!item) continue;
+      if (typeof item === 'string') {
+        const chunk = chunkFromWeb(item, item);
+        if (chunk) chunks.push(chunk);
+        continue;
+      }
+      const chunk = chunkFromWeb(
+        item.url || item.uri || item.href || item.link || item.web?.uri,
+        item.title || item.name || item.web?.title
+      );
+      if (chunk) chunks.push(chunk);
+    }
+  };
+
+  const collectMessageAnnotations = (content, chunks) => {
+    if (!Array.isArray(content)) return;
+    for (const part of content) {
+      if (!part || typeof part !== 'object') continue;
+      collectWebResults(part.annotations, chunks);
+      collectWebResults(part.citations, chunks);
+    }
+  };
+
+  const collectResponsesOutput = (output, chunks, queries) => {
+    if (!Array.isArray(output)) return;
+    for (const item of output) {
+      if (!item || typeof item !== 'object') continue;
+      if (item.type === 'web_search_call') {
+        const query = clipQuery(item.action?.query || item.query);
+        if (query) queries.push(query);
+        collectWebResults(item.action?.sources, chunks);
+        collectWebResults(item.results, chunks);
+      }
+      if (item.type === 'message') collectMessageAnnotations(item.content, chunks);
+    }
+  };
+
+  const emitGroundingFromEvent = (json, handlers) => {
+    if (!handlers?.onGroundingMetadata || !json || typeof json !== 'object') return;
+    const chunks = [];
+    const queries = [];
+
+    const geminiMeta = json.candidates?.[0]?.groundingMetadata;
+    if (geminiMeta) {
+      for (const item of geminiMeta.groundingChunks || []) {
+        const web = item?.web || item?.retrievedContext;
+        const chunk = chunkFromWeb(web?.uri, web?.title);
+        if (chunk) chunks.push(chunk);
+      }
+      for (const query of geminiMeta.webSearchQueries || []) {
+        const q = clipQuery(query);
+        if (q) queries.push(q);
+      }
+    }
+
+    const annotation = json.annotation || (json.delta && json.delta.annotation);
+    if (annotation && (annotation.url || annotation.uri || annotation.href || annotation.type === 'url_citation')) {
+      const chunk = chunkFromWeb(annotation.url || annotation.uri || annotation.href, annotation.title);
+      if (chunk) chunks.push(chunk);
+    }
+    collectWebResults(json.delta?.annotations, chunks);
+    collectWebResults(json.choices?.[0]?.delta?.annotations, chunks);
+    collectWebResults(json.choices?.[0]?.message?.annotations, chunks);
+
+    const item = json.item;
+    if (item?.type === 'web_search_call') {
+      const query = clipQuery(item.action?.query || item.query);
+      if (query) queries.push(query);
+      collectWebResults(item.action?.sources, chunks);
+      collectWebResults(item.results, chunks);
+    }
+    if (item?.type === 'message') collectMessageAnnotations(item.content, chunks);
+
+    if (json.response?.output) collectResponsesOutput(json.response.output, chunks, queries);
+    if (Array.isArray(json.output)) collectResponsesOutput(json.output, chunks, queries);
+
+    const block = json.content_block;
+    if (block) {
+      if (block.type === 'server_tool_use' && block.name === 'web_search') {
+        const idx = json.index ?? 0;
+        handlers._wsSearchIdx = handlers._wsSearchIdx || new Set();
+        handlers._wsSearchJson = handlers._wsSearchJson || {};
+        handlers._wsSearchIdx.add(idx);
+        handlers._wsSearchJson[idx] = '';
+        const query = clipQuery(block.input?.query);
+        if (query) queries.push(query);
+      }
+      if (block.type === 'web_search_tool_result') {
+        collectWebResults(block.content, chunks);
+      }
+      collectWebResults(block.citations, chunks);
+    }
+    if (json.delta?.type === 'input_json_delta' || json.type === 'content_block_stop') {
+      const idx = json.index ?? 0;
+      if (handlers._wsSearchIdx?.has(idx)) {
+        if (json.delta?.partial_json) {
+          handlers._wsSearchJson[idx] = (handlers._wsSearchJson[idx] || '') + json.delta.partial_json;
+        }
+        try {
+          const parsed = JSON.parse(handlers._wsSearchJson[idx] || '');
+          const query = clipQuery(parsed && parsed.query);
+          if (query) queries.push(query);
+        } catch { /* partial JSON until the tool-use block completes */ }
+      }
+    }
+    if (json.delta?.type === 'citations_delta' && json.delta.citation) {
+      const citation = json.delta.citation;
+      const chunk = chunkFromWeb(citation.url, citation.title);
+      if (chunk) chunks.push(chunk);
+    }
+
+    collectWebResults(json.search_results, chunks);
+    if (Array.isArray(json.citations)) collectWebResults(json.citations, chunks);
+
+    if (!chunks.length && !queries.length) return;
+    const payload = {};
+    if (chunks.length) payload.groundingChunks = chunks.slice(0, MAX_GROUNDING_CHUNKS);
+    if (queries.length) payload.webSearchQueries = queries.filter(Boolean).slice(0, MAX_GROUNDING_QUERIES);
+    handlers.onGroundingMetadata(payload);
+  };
+
   const mergeGroundingMetadata = (prev, next) => {
     if (!next) return prev;
     if (!prev) return { ...next };
@@ -258,16 +403,21 @@ window.API = (() => {
       merged.groundingChunks = [...(prev.groundingChunks || [])];
       for (const chunk of next.groundingChunks) {
         const uri = chunk.web?.uri;
-        if (!uri || !seen.has(uri)) {
-          merged.groundingChunks.push(chunk);
-          if (uri) seen.add(uri);
-        }
+        if (!uri || !/^https?:\/\//i.test(uri) || seen.has(uri)) continue;
+        merged.groundingChunks.push(chunk);
+        seen.add(uri);
+      }
+      if (merged.groundingChunks.length > MAX_GROUNDING_CHUNKS) {
+        merged.groundingChunks = merged.groundingChunks.slice(0, MAX_GROUNDING_CHUNKS);
       }
     }
     if (next.webSearchQueries?.length) {
       const qs = new Set(prev.webSearchQueries || []);
-      next.webSearchQueries.forEach((q) => qs.add(q));
-      merged.webSearchQueries = [...qs];
+      next.webSearchQueries.forEach((q) => {
+        const clipped = clipQuery(q);
+        if (clipped) qs.add(clipped);
+      });
+      merged.webSearchQueries = [...qs].slice(0, MAX_GROUNDING_QUERIES);
     }
     return merged;
   };
@@ -466,6 +616,7 @@ window.API = (() => {
       const json = JSON.parse(data);
       noteFinishReason(handlers, json);
       emitUsage(handlers, extractUsage(json));
+      emitGroundingFromEvent(json, handlers);
       const streamErr = getStreamError(json);
       if (streamErr) {
         const errType = (streamErr.metadata && streamErr.metadata.error_type) || '';
@@ -549,9 +700,6 @@ window.API = (() => {
         if (queries?.length && handlers.onSearchStatus) {
           handlers.onSearchStatus('searching');
         }
-        if (candidate.groundingMetadata && handlers.onGroundingMetadata) {
-          handlers.onGroundingMetadata(candidate.groundingMetadata);
-        }
         const parts = candidate.content?.parts || [];
         for (const part of parts) {
           if (part.inlineData?.data) {
@@ -586,19 +734,6 @@ window.API = (() => {
         if (delta.content) {
           if (handlers.onToken) handlers.onToken(delta.content);
         }
-      }
-      if (json.search_results?.length && handlers.onGroundingMetadata) {
-        handlers.onGroundingMetadata({
-          groundingChunks: json.search_results.map((r) => ({
-            web: { uri: r.url, title: r.title || r.url }
-          }))
-        });
-      } else if (json.citations?.length && handlers.onGroundingMetadata) {
-        handlers.onGroundingMetadata({
-          groundingChunks: json.citations.map((url) => ({
-            web: { uri: url, title: url }
-          }))
-        });
       }
     } catch (e) {
       if (e instanceof SyntaxError) {
@@ -1005,6 +1140,9 @@ window.API = (() => {
       );
       body.reasoning = { effort };
     }
+    if (tools.some((tool) => tool?.type === 'web_search' || tool?.type === 'web_search_preview')) {
+      body.include = ['web_search_call.action.sources'];
+    }
 
     const res = await fetch(RESPONSES_ENDPOINT, {
       method: 'POST',
@@ -1040,6 +1178,7 @@ window.API = (() => {
   const send = async ({
     apiKey, model, systemPrompt, convo,
     webSearch, imageGen, thinking, reasoningEffort,
+    seedGroundingMetadata,
     allowConcurrent = false,
     onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
@@ -1056,7 +1195,9 @@ window.API = (() => {
     const controller = new AbortController();
     activeControllers.add(controller);
     const releaseController = () => { activeControllers.delete(controller); };
-    let groundingMeta = null;
+    let groundingMeta = seedGroundingMetadata
+      ? mergeGroundingMetadata({ groundingChunks: [], webSearchQueries: [] }, seedGroundingMetadata)
+      : null;
     let requestUsage = null;
     const handlers = {
       onToken,

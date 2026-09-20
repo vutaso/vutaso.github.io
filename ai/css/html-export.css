@@ -397,15 +397,46 @@ body {
 }
 
 .message-grounding {
-  margin: 10px 0;
-  padding: 10px 12px;
+  margin: 14px 0 0;
+  padding: 10px 12px 8px;
   border: 1px solid #e2e4ec;
   border-radius: 8px;
   background: #f6f8fa;
 }
 
+.message-grounding-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4a58;
+}
+
+.message-grounding-count {
+  color: #2563eb;
+}
+
+.message-grounding-queries {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #6b6b78;
+}
+
+.message-grounding-sources {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
 .message-grounding-sources a {
   color: #2563eb;
+}
+
+.message-grounding-host {
+  margin-left: 8px;
+  font-size: 11px;
+  color: #6b6b78;
 }
 
 .toolbar,
