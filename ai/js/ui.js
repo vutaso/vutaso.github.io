@@ -28,8 +28,6 @@ window.UI = (() => {
     els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
     els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
-    els.byteplusApiKeyInput = $('#byteplusApiKeyInput');
-    els.byteplusApiKeyIcon = $('#byteplusApiKeyIcon');
     els.geminiApiKeyInput = $('#geminiApiKeyInput');
     els.geminiApiKeyIcon = $('#geminiApiKeyIcon');
     els.kimiApiKeyInput = $('#kimiApiKeyInput');
@@ -95,7 +93,6 @@ window.UI = (() => {
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
-    els.toggleByteplusApiKeyBtn = $('#toggleByteplusApiKeyBtn');
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
     els.toggleOpenrouterApiKeyBtn = $('#toggleOpenrouterApiKeyBtn');
@@ -2541,7 +2538,6 @@ window.UI = (() => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
-    els.byteplusApiKeyInput.value = state.byteplusApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.openrouterApiKeyInput.value = state.openrouterApiKey || '';
@@ -2558,8 +2554,6 @@ window.UI = (() => {
     els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.deepseekApiKeyInput.type = 'password';
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
-    els.byteplusApiKeyInput.type = 'password';
-    els.byteplusApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.geminiApiKeyInput.type = 'password';
     els.geminiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.kimiApiKeyInput.type = 'password';

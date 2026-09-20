@@ -2,124 +2,62 @@ window.APP_CONFIG = {
   STORAGE_KEY: 'testchatai',
 
   MODELS: [
-    { id: 'gpt-5.4-nano', label: 'GPT-5.4 nano', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.4-mini', label: 'GPT-5.4 mini', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.4', label: 'GPT-5.4', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.5', label: 'GPT-5.5', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.6-sol', label: 'GPT-5.6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'gpt-5.6-luna', label: 'GPT-5.6 Luna', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-5.6-sol', label: 'GPT-5.6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
-    { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'byteplus-gpt-oss-120b', apiModel: 'gpt-oss-120b-250805', label: 'GPT OSS 120B', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-deepseek-v4.1-flash', apiModel: 'deepseek/deepseek-v4.1-flash', label: 'DeepSeek V4.1 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-deepseek-v4-flash', apiModel: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
-    { id: 'openrouter-deepseek-v4-flash-0731', apiModel: 'deepseek/deepseek-v4-flash-0731', label: 'DeepSeek V4 Flash 0731 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
-    { id: 'openrouter-deepseek-v4-pro', apiModel: 'deepseek/deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-glm-5-2', apiModel: 'z-ai/glm-5.2', label: 'GLM 5.2 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-mimo-v2-5', apiModel: 'xiaomi/mimo-v2.5', label: 'MiMo V2.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 32000 },
-    { id: 'openrouter-mimo-v2.5-pro', apiModel: 'xiaomi/mimo-v2.5-pro', label: 'MiMo V2.5 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-minimax-m3', apiModel: 'minimax/minimax-m3', label: 'MiniMax M3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
-    { id: 'openrouter-minimax-m2.7-nitro', apiModel: 'minimax/minimax-m2.7:nitro', label: 'MiniMax M2.7 Nitro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-claude-3-haiku', apiModel: 'anthropic/claude-3-haiku', label: 'Claude 3 Haiku (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: true },
-    { id: 'openrouter-claude-haiku-4-5', apiModel: 'anthropic/claude-haiku-4.5', label: 'Claude Haiku 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
-    { id: 'openrouter-claude-sonnet-5', apiModel: 'anthropic/claude-sonnet-5', label: 'Claude Sonnet 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-claude-opus-4-8', apiModel: 'anthropic/claude-opus-4.8', label: 'Claude Opus 4.8 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-claude-opus-5', apiModel: 'anthropic/claude-opus-5', label: 'Claude Opus 5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
-    { id: 'openrouter-gemini-2.5-flash-lite', apiModel: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-gemini-2.5-flash', apiModel: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-gemini-3.5-flash', apiModel: 'google/gemini-3.5-flash', label: 'Gemini 3.5 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-north-mini-code', apiModel: 'cohere/north-mini-code:free', label: 'North Mini Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-mistral-nemo', apiModel: 'mistralai/mistral-nemo', label: 'Mistral Nemo (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: false, vision: false },
-    { id: 'openrouter-mistral-small-4', apiModel: 'mistralai/mistral-small-2603', label: 'Mistral Small 4 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-kimi-k2.7-code', apiModel: 'moonshotai/kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true },
+    { id: 'openrouter-gpt-5.6-luna', apiModel: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-5.6-terra', apiModel: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-5.6-sol', apiModel: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gemini-3.8-flash', apiModel: 'google/gemini-3.8-flash', label: 'Gemini 3.8 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-kimi-k3', apiModel: 'moonshotai/kimi-k3', label: 'Kimi K3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-grok-4.5', apiModel: 'x-ai/grok-4.5', label: 'Grok 4.5 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-muse-spark-1.1', apiModel: 'meta/muse-spark-1.1', label: 'Muse Spark 1.1 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-5.6-sol', apiModel: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-5.6-terra', apiModel: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-5.6-luna', apiModel: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'byteplus-dola-seed-2-0-mini', apiModel: 'seed-2-0-mini-260428', label: 'Dola Seed 2.0 Mini', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'byteplus-dola-seed-2-0-lite', apiModel: 'seed-2-0-lite-260428', label: 'Dola Seed 2.0 Lite', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'byteplus-dola-seed-2-0-code', apiModel: 'seed-2-0-code-preview-260328', label: 'Dola Seed 2.0 Code', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'byteplus-dola-seed-2-1-turbo', apiModel: 'dola-seed-2-1-turbo-260628', label: 'Dola Seed 2.1 Turbo', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-claude-haiku-latest', apiModel: '~anthropic/claude-haiku-latest', label: 'Claude Haiku Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
+    { id: 'openrouter-claude-sonnet-latest', apiModel: '~anthropic/claude-sonnet-latest', label: 'Claude Sonnet Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-claude-opus-latest', apiModel: '~anthropic/claude-opus-latest', label: 'Claude Opus Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 128000 },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'kimi-k2.5', label: 'Kimi K2.5', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
     { id: 'kimi-k2.6', label: 'Kimi K2.6', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
     { id: 'kimi-k2.7-code', label: 'Kimi K2.7 Code', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true }
   ],
 
-  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-06-29
+  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-09-20
   // Nguồn: openai.com/developers, platform.claude.com, api-docs.deepseek.com,
-  //        ai.google.dev/gemini-api/docs/pricing, platform.kimi.ai
+  //        ai.google.dev/gemini-api/docs/pricing, platform.kimi.ai, openrouter.ai/api/v1/models
   MODEL_PRICING: {
-    'gpt-5.4-nano': { input: 0.20, output: 1.25 },
-    'gpt-5.4-mini': { input: 0.75, output: 4.50 },
-    'gpt-5.4': { input: 2.50, output: 15.00 },
-    'gpt-5.5': { input: 5.00, output: 30.00 },
     'gpt-5.6-sol': { input: 5.00, output: 30.00 },
     'gpt-5.6-terra': { input: 2.00, output: 12.00 },
     'gpt-5.6-luna': { input: 0.20, output: 1.20 },
     'claude-haiku-4-5': { input: 1.00, output: 5.00 },
-    'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'claude-opus-5': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
-    'byteplus-deepseek-v4-flash': { input: 0.14, output: 0.28 },
-    'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
-    'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
-    'openrouter-gpt-oss-120b': { input: 0.03, output: 0.15 },
+    'openrouter-glm-flash-latest': { input: 0.075, output: 0.25 },
+    'openrouter-deepseek-flash-latest': { input: 0.13, output: 0.52 },
+    'openrouter-gpt-oss-120b': { input: 0.15, output: 0.60 },
     'openrouter-deepseek-v4.1-flash': { input: 0.15, output: 0.60 },
-    'openrouter-deepseek-v4-flash': { input: 0.09, output: 0.18 },
-    'openrouter-deepseek-v4-flash-0731': { input: 0.09, output: 0.18 },
-    'openrouter-deepseek-v4-pro': { input: 0.435, output: 0.87 },
-    'openrouter-glm-5-2': { input: 0.93, output: 3.00 },
-    'openrouter-mimo-v2-5': { input: 0.105, output: 0.28 },
-    'openrouter-mimo-v2.5-pro': { input: 0.435, output: 0.87 },
-    'openrouter-minimax-m3': { input: 0.30, output: 1.20 },
-    'openrouter-minimax-m2.7-nitro': { input: 0.18, output: 0.72 },
-    'openrouter-claude-3-haiku': { input: 0.25, output: 1.25 },
-    'openrouter-claude-haiku-4-5': { input: 1.00, output: 5.00 },
-    'openrouter-claude-sonnet-5': { input: 2.00, output: 10.00 },
-    'openrouter-claude-opus-4-8': { input: 5.00, output: 25.00 },
-    'openrouter-claude-opus-5': { input: 5.00, output: 25.00 },
-    'openrouter-gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
-    'openrouter-gemini-2.5-flash': { input: 0.30, output: 2.50 },
-    'openrouter-gemini-3.5-flash': { input: 1.50, output: 9.00 },
-    'openrouter-north-mini-code': { input: 0, output: 0 },
-    'openrouter-mistral-nemo': { input: 0.02, output: 0.03 },
-    'openrouter-mistral-small-4': { input: 0.15, output: 0.60 },
-    'openrouter-kimi-k2.7-code': { input: 0.74, output: 3.50 },
-    'openrouter-kimi-k2.6': { input: 0.66, output: 3.41 },
-    'openrouter-kimi-k3': { input: 3.00, output: 15.00 },
-    'openrouter-grok-4.5': { input: 2.00, output: 6.00 },
-    'openrouter-muse-spark-1.1': { input: 1.25, output: 4.25 },
-    'openrouter-gpt-5.6-sol': { input: 5.00, output: 30.00 },
-    'openrouter-gpt-5.6-terra': { input: 2.50, output: 15.00 },
-    'openrouter-gpt-5.6-luna': { input: 1.00, output: 6.00 },
-    'byteplus-dola-seed-2-0-lite': { input: 0.25, output: 2.00 },
-    'byteplus-dola-seed-2-0-mini': { input: 0.10, output: 0.40 },
-    'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
-    'byteplus-dola-seed-2-0-code': { input: 0.50, output: 3.00 },
-    'byteplus-dola-seed-2-1-turbo': { input: 0.15, output: 0.80 },
+    'openrouter-gpt-5.6-luna': { input: 0.20, output: 1.20 },
+    'openrouter-gemini-3.8-flash': { input: 0.75, output: 3.75 },
+    'openrouter-kimi-k2.6': { input: 0.95, output: 4.00 },
+    'openrouter-claude-haiku-latest': { input: 1.00, output: 5.00 },
+    'openrouter-kimi-k3': { input: 1.70, output: 8.50 },
+    'openrouter-gpt-5.6-sol': { input: 2.00, output: 10.00 },
+    'openrouter-claude-sonnet-latest': { input: 2.00, output: 10.00 },
+    'openrouter-gpt-5.6-terra': { input: 2.00, output: 12.00 },
+    'openrouter-claude-opus-latest': { input: 5.00, output: 25.00 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
-    'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
-    'gemini-2.5-flash': { input: 0.30, output: 2.50 },
-    'gemini-3.5-flash': { input: 1.50, output: 9.00 },
+    'gemini-3.8-flash': { input: 0.75, output: 3.75 },
     'kimi-k2.5': { input: 0.60, output: 3.00 },
     'kimi-k2.6': { input: 0.95, output: 4.00 },
     'kimi-k2.7-code': { input: 0.95, output: 4.00 },
@@ -140,13 +78,12 @@ window.APP_CONFIG = {
   LOCALES: ['en', 'vi', 'jp', 'zh'],
 
   PROVIDERS: [
-    { id: 'openrouter', label: 'OpenRouter' },
-    { id: 'deepseek', label: 'DeepSeek' },
-    { id: 'byteplus', label: 'Byte Plus' },
-    { id: 'openai', label: 'OpenAI' },
     { id: 'anthropic', label: 'Anthropic' },
+    { id: 'openai', label: 'OpenAI' },
+    { id: 'deepseek', label: 'DeepSeek' },
+    { id: 'kimi', label: 'Kimi' },
     { id: 'google', label: 'Gemini' },
-    { id: 'kimi', label: 'Kimi' }
+    { id: 'openrouter', label: 'OpenRouter' }
   ],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
@@ -161,7 +98,6 @@ window.APP_CONFIG = {
     anthropic: ['low', 'medium', 'high', 'xhigh', 'max'],
     google:    ['low', 'medium', 'high'],
     deepseek:  ['default', 'high', 'max'],
-    byteplus:  ['default', 'high', 'max'],
     openrouter: ['low', 'medium', 'high'],
     kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
   },
@@ -172,41 +108,18 @@ window.APP_CONFIG = {
     'gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'claude-sonnet-4-6': ['low', 'medium', 'high', 'max'],
     'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
-    'gemini-2.5-flash-lite': ['low', 'medium', 'high'],
-    'gemini-2.5-flash': ['low', 'medium', 'high'],
-    'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-dola-seed-2-0-lite': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-dola-seed-2-0-pro': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-dola-seed-2-0-code': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-dola-seed-2-1-turbo': ['minimal', 'low', 'medium', 'high'],
-    'byteplus-gpt-oss-120b': ['low', 'medium', 'high'],
+    'gemini-3.8-flash': ['minimal', 'low', 'medium', 'high'],
     'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-deepseek-v4.1-flash': ['high', 'xhigh'],
-    'openrouter-deepseek-v4-flash': ['high', 'xhigh'],
-    'openrouter-deepseek-v4-flash-0731': ['high', 'xhigh'],
-    'openrouter-deepseek-v4-pro': ['high', 'xhigh'],
-    'openrouter-glm-5-2': ['high', 'xhigh'],
-    'openrouter-mimo-v2-5': ['low', 'medium', 'high'],
-    'openrouter-mimo-v2.5-pro': ['low', 'medium', 'high'],
-    'openrouter-minimax-m3': ['low', 'medium', 'high'],
-    'openrouter-minimax-m2.7-nitro': ['low', 'medium', 'high'],
-    'openrouter-claude-haiku-4-5': ['low', 'medium', 'high'],
-    'openrouter-claude-sonnet-5': ['low', 'medium', 'high', 'max'],
-    'openrouter-claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gemini-2.5-flash-lite': ['low', 'medium', 'high'],
-    'openrouter-gemini-2.5-flash': ['low', 'medium', 'high'],
-    'openrouter-gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
-    'openrouter-north-mini-code': ['low', 'medium', 'high'],
-    'openrouter-mistral-small-4': ['low', 'medium', 'high'],
-    'openrouter-kimi-k2.7-code': ['low', 'medium', 'high'],
+    'openrouter-deepseek-flash-latest': ['low', 'high', 'max'],
+    'openrouter-glm-flash-latest': ['low', 'high', 'max'],
+    'openrouter-claude-haiku-latest': ['low', 'medium', 'high'],
+    'openrouter-claude-sonnet-latest': ['low', 'medium', 'high', 'max'],
+    'openrouter-claude-opus-latest': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-gemini-3.8-flash': ['minimal', 'low', 'medium', 'high'],
     'openrouter-kimi-k2.6': ['low', 'medium', 'high'],
     'openrouter-kimi-k3': ['max'],
-    'openrouter-grok-4.5': ['low', 'medium', 'high'],
-    'openrouter-muse-spark-1.1': ['low', 'medium', 'high'],
     'openrouter-gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max']
@@ -237,12 +150,9 @@ window.APP_CONFIG = {
   },
 
   modelUsesEffortLinkedThinking(modelId) {
-    if (this.modelUsesByteplusResponses(modelId)) return false;
-    if (this.modelUsesByteplusOpenAIReasoning(modelId)) return false;
     if (this.modelUsesGptOssReasoning(modelId)) return false;
     if (this.modelUsesOpenRouterReasoning(modelId)) return false;
-    const provider = this.getModelProvider(modelId);
-    return provider === 'deepseek' || provider === 'byteplus';
+    return this.getModelProvider(modelId) === 'deepseek';
   },
 
   modelUsesBinaryThinking(modelId) {
@@ -308,18 +218,13 @@ window.APP_CONFIG = {
   },
 
   getDefaultEffortForModel(modelId) {
-    if (modelId === 'gemini-3.5-flash' || modelId === 'openrouter-gemini-3.5-flash') return 'medium';
-    if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code' || modelId === 'byteplus-dola-seed-2-1-turbo') return 'medium';
-    if (modelId === 'byteplus-gpt-oss-120b') return 'medium';
+    if (modelId === 'gemini-3.8-flash' || modelId === 'openrouter-gemini-3.8-flash') return 'medium';
     if (modelId === 'openrouter-gpt-oss-120b') return 'medium';
-    if (modelId === 'openrouter-deepseek-v4.1-flash' || modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-flash-0731' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
-    if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
-    if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
+    if (modelId === 'openrouter-deepseek-v4.1-flash' || modelId === 'openrouter-deepseek-flash-latest') return 'high';
     if (modelId === 'gpt-5.6-luna' || modelId === 'openrouter-gpt-5.6-luna') return 'low';
     if (modelId === 'gpt-5.6-terra' || modelId === 'openrouter-gpt-5.6-terra') return 'medium';
-    if (modelId === 'openrouter-kimi-k3') return 'max';
-    if (modelId === 'openrouter-muse-spark-1.1') return 'medium';
-    if (modelId === 'gpt-5.6-sol' || modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-claude-opus-5' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
+    if (modelId === 'openrouter-kimi-k3' || modelId === 'openrouter-glm-flash-latest') return 'max';
+    if (modelId === 'gpt-5.6-sol' || modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
     return this.DEFAULT_EFFORT;
   },
 
@@ -351,7 +256,7 @@ window.APP_CONFIG = {
 
   modelUsesAnthropicAdaptiveThinking(modelId) {
     const id = modelId || '';
-    return id === 'claude-sonnet-4-6' || id === 'claude-sonnet-5' || id === 'claude-opus-4-8' || id === 'claude-opus-5';
+    return id === 'claude-sonnet-5' || id === 'claude-opus-4-8' || id === 'claude-opus-5';
   },
 
   modelUsesAnthropicManualThinking(modelId) {
@@ -359,10 +264,7 @@ window.APP_CONFIG = {
   },
 
   getGeminiThinkingBudget(modelId, effort) {
-    const isLite = modelId === 'gemini-2.5-flash-lite';
-    const map = isLite
-      ? { low: 512, medium: -1, high: 24576 }
-      : { low: 4096, medium: -1, high: 24576 };
+    const map = { low: 4096, medium: -1, high: 24576 };
     return map[effort] ?? map.high;
   },
 
@@ -384,7 +286,7 @@ window.APP_CONFIG = {
   getModelDisplayLabel(model) {
     if (!model) return '';
     if (model.shortLabel) return model.shortLabel;
-    return model.label.replace(/\s*\((OpenRouter|Byte Plus)\)\s*$/, '');
+    return model.label.replace(/\s*\(OpenRouter\)\s*$/, '');
   },
 
   getModel(modelId) {
@@ -451,7 +353,6 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
-    if (provider === 'byteplus') return state.byteplusApiKey || '';
     if (provider === 'openrouter') return state.openrouterApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
     if (provider === 'kimi') return state.kimiApiKey || '';
@@ -463,7 +364,6 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
-    if (provider === 'byteplus') return 'Enter your Byte Plus API key in Settings first';
     if (provider === 'openrouter') return 'Enter your OpenRouter API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
     if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
@@ -475,30 +375,14 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
-    if (provider === 'byteplus') return 'No Byte Plus API key. Open Settings to enter one.';
     if (provider === 'openrouter') return 'No OpenRouter API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
     if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 
-  getByteplusProxyRequiredError() {
-    if (window.I18n) return window.I18n.t('byteplusProxyRequired');
-    return 'Byte Plus API requires a CORS proxy. Deploy worker/ and set BYTEPLUS_PROXY_ENDPOINT in config.js.';
-  },
-
   formatApiError(err, modelId) {
-    const msg = err?.message || String(err || '');
-    const isNetwork = /load failed|failed to fetch|networkerror|network error/i.test(msg);
-    const provider = this.getModelProvider(modelId);
-    if (isNetwork && provider === 'byteplus') {
-      if (!this.getByteplusProxyEndpoint(modelId)) {
-        return this.getByteplusProxyRequiredError();
-      }
-      if (window.I18n) return window.I18n.t('byteplusProxyNetworkError');
-      return 'Could not reach Byte Plus proxy. Check API key, use a local server (not file://), and redeploy worker/.';
-    }
-    return msg;
+    return err?.message || String(err || '');
   },
 
   hasApiKey(state, modelId) {
@@ -634,56 +518,8 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
-  BYTEPLUS_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/completions',
-  BYTEPLUS_RESPONSES_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/responses',
-  // Deploy: cd worker && npx wrangler deploy → dán URL + '/byteplus' vào đây.
-  BYTEPLUS_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/byteplus',
-  BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/byteplus-responses',
   // Share snapshots: POST create / GET /share/:id (Cloudflare KV)
   SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/share',
-
-  BYTEPLUS_MCP_TOOLS: {
-    'byteplus-dola-seed-2-0-lite': [
-      {
-        type: 'mcp',
-        server_label: 'deepwiki',
-        server_url: 'https://mcp.deepwiki.com/mcp',
-        require_approval: 'never'
-      }
-    ],
-    'byteplus-dola-seed-2-0-mini': [
-      {
-        type: 'mcp',
-        server_label: 'deepwiki',
-        server_url: 'https://mcp.deepwiki.com/mcp',
-        require_approval: 'never'
-      }
-    ],
-    'byteplus-dola-seed-2-0-pro': [
-      {
-        type: 'mcp',
-        server_label: 'deepwiki',
-        server_url: 'https://mcp.deepwiki.com/mcp',
-        require_approval: 'never'
-      }
-    ],
-    'byteplus-dola-seed-2-0-code': [
-      {
-        type: 'mcp',
-        server_label: 'deepwiki',
-        server_url: 'https://mcp.deepwiki.com/mcp',
-        require_approval: 'never'
-      }
-    ],
-    'byteplus-dola-seed-2-1-turbo': [
-      {
-        type: 'mcp',
-        server_label: 'deepwiki',
-        server_url: 'https://mcp.deepwiki.com/mcp',
-        require_approval: 'never'
-      }
-    ]
-  },
   OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
   OPENROUTER_IMAGES_ENDPOINT: 'https://openrouter.ai/api/v1/images',
   // Để null: không gửi max_tokens (OpenRouter tự giới hạn theo credit). Đặt số (vd. 8192) nếu tài khoản có đủ credit.
@@ -695,30 +531,8 @@ window.APP_CONFIG = {
     return this.GEMINI_API_BASE + '/' + modelId + ':streamGenerateContent?alt=sse';
   },
 
-  getByteplusEndpoint(modelId) {
-    if (this.modelUsesByteplusResponses(modelId)) {
-      return this.BYTEPLUS_RESPONSES_PROXY_ENDPOINT || this.BYTEPLUS_RESPONSES_ENDPOINT;
-    }
-    return this.BYTEPLUS_PROXY_ENDPOINT || this.BYTEPLUS_ENDPOINT;
-  },
-
-  getByteplusProxyEndpoint(modelId) {
-    if (this.modelUsesByteplusResponses(modelId)) {
-      return this.BYTEPLUS_RESPONSES_PROXY_ENDPOINT;
-    }
-    return this.BYTEPLUS_PROXY_ENDPOINT;
-  },
-
-  modelUsesByteplusResponses(modelId) {
-    return this.getModel(modelId).apiMode === 'responses';
-  },
-
   modelUsesGptOssReasoning(modelId) {
     return /gpt-oss/i.test(this.getApiModel(modelId));
-  },
-
-  modelUsesByteplusOpenAIReasoning(modelId) {
-    return this.getModelProvider(modelId) === 'byteplus' && this.modelUsesGptOssReasoning(modelId);
   },
 
   modelUsesOpenRouterReasoning(modelId) {
@@ -751,39 +565,17 @@ window.APP_CONFIG = {
     return this.modelUsesOpenRouterImages(modelId);
   },
 
-  getByteplusMcpTools(modelId) {
-    return this.BYTEPLUS_MCP_TOOLS[modelId] || [];
-  },
-
-  getByteplusResponsesThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {
-    if (!thinkingEnabled) {
-      return { thinking: { type: 'disabled' } };
-    }
-    const effort = this.normalizeEffortForModel(
-      reasoningEffort || this.DEFAULT_EFFORT,
-      modelId
-    );
-    return { reasoning: { effort } };
-  },
-
-  byteplusRequiresProxy() {
-    return true;
-  },
-
-  // Model chat → model tạo ảnh (Nano Banana) khi bật Tạo hình ảnh
   GEMINI_IMAGE_MODEL_MAP: {
-    'gemini-2.5-flash-lite': 'gemini-2.5-flash-image',
-    'gemini-2.5-flash': 'gemini-2.5-flash-image',
-    'gemini-3.5-flash': 'gemini-3.1-flash-image'
+    'gemini-3.8-flash': 'gemini-3.1-flash-image'
   },
 
   getGeminiImageModel(modelId) {
-    return this.GEMINI_IMAGE_MODEL_MAP[modelId] || 'gemini-2.5-flash-image';
+    return this.GEMINI_IMAGE_MODEL_MAP[modelId] || 'gemini-3.1-flash-image';
   },
 
   geminiSupportsImageAspectRatio(modelId) {
     const imageModel = this.getGeminiImageModel(modelId);
-    return new Set(['gemini-2.5-flash-image', 'gemini-3.1-flash-image']).has(imageModel);
+    return new Set(['gemini-3.1-flash-image', 'gemini-3.1-flash-lite-image']).has(imageModel);
   },
 
   ACCEPTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],

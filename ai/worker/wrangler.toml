@@ -20,5 +20,4 @@ preview_id = "d886250b18d24cdd90f0b28bbdf9fa3e"
 #
 # Then set in js/config.js:
 #   DEEPSEEK_PROXY_ENDPOINT = workers.dev URL (root path)
-#   BYTEPLUS_PROXY_ENDPOINT = same URL + '/byteplus'
 #   SHARE_ENDPOINT          = same URL + '/share'

@@ -1,15 +1,5 @@
 const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions';
-const BYTEPLUS_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/completions';
-const BYTEPLUS_RESPONSES_API = 'https://ark.ap-southeast.bytepluses.com/api/v3/responses';
 const ALLOWED_DEEPSEEK_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
-const ALLOWED_BYTEPLUS_MODELS = new Set(['deepseek-v4-flash-260425', 'glm-5-2-260617', 'gpt-oss-120b-250805']);
-const ALLOWED_BYTEPLUS_RESPONSES_MODELS = new Set([
-  'seed-2-0-lite-260428',
-  'seed-2-0-mini-260428',
-  'seed-2-0-pro-260328',
-  'seed-2-0-code-preview-260328',
-  'dola-seed-2-1-turbo-260628'
-]);
 const DEFAULT_ORIGINS = [
   'https://vutaso.com',
   'https://www.vutaso.com',
@@ -82,22 +72,6 @@ const validateDeepseekBody = (body) => {
   if (!body || typeof body !== 'object') return 'Invalid request body';
   if (!ALLOWED_DEEPSEEK_MODELS.has(body.model)) return 'Model not allowed';
   if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
-  if (body.stream !== true) return 'stream must be true';
-  return null;
-};
-
-const validateByteplusBody = (body) => {
-  if (!body || typeof body !== 'object') return 'Invalid request body';
-  if (!ALLOWED_BYTEPLUS_MODELS.has(body.model)) return 'Model not allowed';
-  if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
-  if (body.stream !== true) return 'stream must be true';
-  return null;
-};
-
-const validateByteplusResponsesBody = (body) => {
-  if (!body || typeof body !== 'object') return 'Invalid request body';
-  if (!ALLOWED_BYTEPLUS_RESPONSES_MODELS.has(body.model)) return 'Model not allowed';
-  if (!Array.isArray(body.input) || !body.input.length) return 'input is required';
   if (body.stream !== true) return 'stream must be true';
   return null;
 };
@@ -330,72 +304,6 @@ const handleDeepseek = async (request, env, origin) => {
   return proxyStreamResponse(upstream, origin, env);
 };
 
-const handleByteplus = async (request, env, origin) => {
-  const auth = request.headers.get('Authorization');
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return nvidiaJsonError('Missing Authorization header', 401, origin);
-  }
-
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return nvidiaJsonError('Invalid JSON', 400, origin);
-  }
-
-  const validationError = validateByteplusBody(body);
-  if (validationError) {
-    return nvidiaJsonError(validationError, 400, origin);
-  }
-
-  const upstream = await fetch(BYTEPLUS_API, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: auth
-    },
-    body: JSON.stringify(body)
-  });
-
-  return nvidiaStreamResponse(upstream, origin);
-};
-
-const handleByteplusResponses = async (request, env, origin) => {
-  const auth = request.headers.get('Authorization');
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return nvidiaJsonError('Missing Authorization header', 401, origin);
-  }
-
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return nvidiaJsonError('Invalid JSON', 400, origin);
-  }
-
-  const validationError = validateByteplusResponsesBody(body);
-  if (validationError) {
-    return nvidiaJsonError(validationError, 400, origin);
-  }
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: auth
-  };
-  const mcpHeader = request.headers.get('ark-beta-mcp');
-  if (mcpHeader) {
-    headers['ark-beta-mcp'] = mcpHeader;
-  }
-
-  const upstream = await fetch(BYTEPLUS_RESPONSES_API, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body)
-  });
-
-  return nvidiaStreamResponse(upstream, origin);
-};
-
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -420,26 +328,6 @@ export default {
       return handleShareCreate(request, env, origin);
     }
 
-    if (pathname.endsWith('/byteplus')) {
-      if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
-      }
-      if (request.method !== 'POST') {
-        return nvidiaJsonError('Method not allowed', 405, origin);
-      }
-      return handleByteplus(request, env, origin);
-    }
-
-    if (pathname.endsWith('/byteplus-responses')) {
-      if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
-      }
-      if (request.method !== 'POST') {
-        return nvidiaJsonError('Method not allowed', 405, origin);
-      }
-      return handleByteplusResponses(request, env, origin);
-    }
-
     if (request.method === 'OPTIONS') {
       if (!resolveOrigin(origin, env)) {
         return new Response(null, { status: 403 });
@@ -449,14 +337,6 @@ export default {
 
     if (request.method !== 'POST') {
       return jsonError('Method not allowed', 405, origin, env);
-    }
-
-    if (pathname.endsWith('/byteplus')) {
-      return handleByteplus(request, env, origin);
-    }
-
-    if (pathname.endsWith('/byteplus-responses')) {
-      return handleByteplusResponses(request, env, origin);
     }
 
     return handleDeepseek(request, env, origin);

@@ -2521,21 +2521,18 @@ window.I18n = (() => {
     { sel: 'label[for="apiKeyInput"]', key: 'apiKeyLabelOpenAI' },
     { sel: 'label[for="anthropicApiKeyInput"]', key: 'apiKeyLabelAnthropic' },
     { sel: 'label[for="deepseekApiKeyInput"]', key: 'apiKeyLabelDeepSeek' },
-    { sel: 'label[for="byteplusApiKeyInput"]', key: 'apiKeyLabelByteplus' },
     { sel: 'label[for="geminiApiKeyInput"]', key: 'apiKeyLabelGemini' },
     { sel: 'label[for="kimiApiKeyInput"]', key: 'apiKeyLabelKimi' },
     { sel: 'label[for="openrouterApiKeyInput"]', key: 'apiKeyLabelOpenRouter' },
     { sel: '#apiKeyInput', attr: 'placeholder', key: 'apiKeyOpenAI', raw: 'sk-...' },
     { sel: '#anthropicApiKeyInput', attr: 'placeholder', key: 'apiKeyAnthropic', raw: 'sk-ant-...' },
     { sel: '#deepseekApiKeyInput', attr: 'placeholder', key: 'apiKeyDeepSeek', raw: 'sk-...' },
-    { sel: '#byteplusApiKeyInput', attr: 'placeholder', key: 'apiKeyByteplus', raw: 'ARK API key...' },
     { sel: '#geminiApiKeyInput', attr: 'placeholder', key: 'apiKeyGemini', raw: 'AIza...' },
     { sel: '#kimiApiKeyInput', attr: 'placeholder', key: 'apiKeyKimi', raw: 'sk-...' },
     { sel: '#openrouterApiKeyInput', attr: 'placeholder', key: 'apiKeyOpenRouter', raw: 'sk-or-...' },
     { sel: '#toggleApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleAnthropicApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleDeepseekApiKeyBtn', attr: 'title', key: 'showHide' },
-    { sel: '#toggleByteplusApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleGeminiApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleKimiApiKeyBtn', attr: 'title', key: 'showHide' },
     { sel: '#toggleOpenrouterApiKeyBtn', attr: 'title', key: 'showHide' },
@@ -2675,7 +2672,6 @@ window.I18n = (() => {
     const provider = window.APP_CONFIG.getModelProvider(modelId);
     if (provider === 'anthropic') return t('missingApiKeyAnthropic');
     if (provider === 'deepseek') return t('missingApiKeyDeepSeek');
-    if (provider === 'byteplus') return t('missingApiKeyByteplus');
     if (provider === 'google') return t('missingApiKeyGemini');
     if (provider === 'kimi') return t('missingApiKeyKimi');
     if (provider === 'openrouter') return t('missingApiKeyOpenRouter');
@@ -2686,7 +2682,6 @@ window.I18n = (() => {
     const provider = window.APP_CONFIG.getModelProvider(modelId);
     if (provider === 'anthropic') return t('missingApiKeyErrorAnthropic');
     if (provider === 'deepseek') return t('missingApiKeyErrorDeepSeek');
-    if (provider === 'byteplus') return t('missingApiKeyErrorByteplus');
     if (provider === 'google') return t('missingApiKeyErrorGemini');
     if (provider === 'kimi') return t('missingApiKeyErrorKimi');
     if (provider === 'openrouter') return t('missingApiKeyErrorOpenRouter');

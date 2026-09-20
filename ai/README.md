@@ -8,7 +8,7 @@
 
 ## Tổng quan
 
-Vutaso AI là giao diện web để trò chuyện với các model AI từ OpenAI, Anthropic, DeepSeek, Google Gemini và Kimi. Bạn tự cấu hình API key; dữ liệu hội thoại được lưu trên thiết bị của bạn (IndexedDB + localStorage). Yêu cầu chat được gửi trực tiếp từ trình duyệt tới nhà cung cấp bạn chọn.
+Vutaso AI là giao diện web để trò chuyện với các model AI từ OpenAI, Anthropic, DeepSeek, Google Gemini, Kimi và OpenRouter. Bạn tự cấu hình API key; dữ liệu hội thoại được lưu trên thiết bị của bạn (IndexedDB + localStorage). Yêu cầu chat được gửi trực tiếp từ trình duyệt tới nhà cung cấp bạn chọn.
 
 - **Frontend thuần:** HTML, CSS, JavaScript — không framework, không build step
 - **Đa ngôn ngữ:** English, Tiếng Việt, 日本語, 中文
@@ -20,12 +20,12 @@ Vutaso AI là giao diện web để trò chuyện với các model AI từ OpenA
 
 ### Chạy local
 
-1. Clone hoặc tải thư mục `TestChatAI/`.
+1. Clone hoặc tải thư mục `ai/`.
 2. Mở bằng static server (khuyến nghị — tránh lỗi CORS với một số CDN):
 
 ```bash
 # Ví dụ với Python
-cd TestChatAI
+cd ai
 python3 -m http.server 5500
 ```
 
@@ -37,21 +37,24 @@ python3 -m http.server 5500
 
 Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github.io). App có thể truy cập tại:
 
-`https://vutaso.github.io/TestChatAI/`
+`https://vutaso.github.io/ai/`
 
 ---
 
 ## Model hỗ trợ
 
+**27 model** từ **6 nhà cung cấp**. Model mặc định: `deepseek-v4-flash`. Bảng giá chi tiết: [pricing.html](pricing.html).
+
 | Nhà cung cấp | Model | Web search | Tạo ảnh | Thinking |
 |--------------|-------|:----------:|:-------:|:--------:|
-| **OpenAI** | GPT-5.4 nano, GPT-5.4 mini, GPT-5.4, GPT-5.5 | ✓ | ✓ | ✓ |
-| **Anthropic** | Claude Haiku 4.5, Sonnet 4.6, Sonnet 5, Opus 4.8 | ✓ | — | ✓ |
+| **OpenAI** | GPT-5.6 Luna, GPT-5.6 Terra, GPT-5.6 Sol | ✓ | ✓ | ✓ |
+| **Anthropic** | Claude Haiku 4.5, Sonnet 5, Opus 4.8, Opus 5 | ✓ | — | ✓ |
 | **DeepSeek** | DeepSeek V4 Flash, V4 Pro | — | — | ✓ |
-| **Google** | Gemini 2.5 Flash Lite, 2.5 Flash, 3.5 Flash | ✓ | ✓ | ✓ |
+| **Google** | Gemini 3.8 Flash | ✓ | ✓ | ✓ |
 | **Kimi** | K2.5, K2.6, K2.7 Code, K2.7 Code HighSpeed | — | — | ✓ |
+| **OpenRouter** | GLM Flash Latest, DeepSeek Flash Latest, GPT OSS 120B, DeepSeek V4.1 Flash, GPT-5.6 Luna/Terra/Sol, Gemini 3.8 Flash, Kimi K2.6, Kimi K3, Claude Haiku/Sonnet/Opus Latest | — | — | ✓ |
 
-Model mặc định: `gemini-3.5-flash`
+> Model **OpenRouter** hỗ trợ reasoning và vision; web search / tạo ảnh trong app chỉ có trên provider gốc (OpenAI, Anthropic, Google).
 
 ---
 
@@ -62,7 +65,8 @@ Model mặc định: `gemini-3.5-flash`
 | Tính năng | Mô tả |
 |-----------|--------|
 | **Trò chuyện với AI** | Gửi tin nhắn văn bản và nhận phản hồi streaming từ model đang chọn |
-| **Chọn model** | Dropdown trên header với 17 model từ 5 nhà cung cấp |
+| **Chọn model** | Dropdown trên header với 27 model từ 6 nhà cung cấp |
+| **So sánh model** | Gửi cùng câu hỏi tới 2–3 model song song, chọn bản trả lời tốt nhất |
 | **Streaming** | Hiển thị câu trả lời theo thời gian thực (token-by-token) |
 | **Dừng phản hồi** | Nút Stop để hủy yêu cầu đang chạy; nội dung đã nhận được vẫn được giữ lại |
 | **System Prompt** | Tùy chỉnh hướng dẫn hệ thống; 20+ preset (Creative, Debug, Code Review, Architecture, v.v.) |
@@ -82,7 +86,7 @@ Thanh công cụ phía trên ô nhập tin nhắn; tự ẩn/hiện tùy model �
 | Tính năng | Mô tả | Model hỗ trợ |
 |-----------|--------|--------------|
 | **Thinking** | Bật chế độ suy nghĩ; hiển thị reasoning trong khối có thể mở/đóng | Tất cả model |
-| **Reasoning Effort** | Mức suy luận (`low` → `max`, `minimal` cho Gemini 3.5) | Theo từng model |
+| **Reasoning Effort** | Mức suy luận (`low` → `max`, `minimal` cho Gemini 3.x) | Theo từng model |
 | **Tìm kiếm web** | AI tra cứu thông tin trên web khi trả lời | OpenAI, Anthropic, Google Gemini |
 | **Tạo hình ảnh** | Sinh ảnh từ mô tả văn bản | OpenAI, Google Gemini |
 | **Dịch** | Dịch văn bản sang ngôn ngữ đích; chỉ trả về bản dịch | Tất cả model |
@@ -189,6 +193,8 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | **API Key (DeepSeek)** | Dùng cho model DeepSeek |
 | **API Key (Gemini)** | Dùng cho model Google Gemini |
 | **API Key (Kimi)** | Dùng cho model Kimi |
+| **API Key (OpenRouter)** | Dùng cho model OpenRouter |
+| **Bảng giá model** | Link tới [pricing.html](pricing.html) — USD / 1M token |
 | **System Prompt** | Chỉnh prompt hệ thống hoặc chọn preset |
 | **Ngôn ngữ** | Chọn ngôn ngữ giao diện |
 | **Theme** | Chọn theme trong modal hoặc nút toggle sidebar |
@@ -217,6 +223,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
   - DeepSeek: Chat Completions (thinking) — gọi trực tiếp từ trình duyệt
   - Google: Gemini `streamGenerateContent` (web search, image gen, thinking)
   - Kimi: Chat Completions (binary thinking)
+  - OpenRouter: Chat Completions (reasoning, vision)
 - **Lưu trữ:** IndexedDB + `localStorage` (key: `testchatai`)
 - **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, PDF.js, Mammoth, SheetJS, docx, html2canvas-pro, jsPDF
 - **Tuỳ chỉnh API** (`config.js`): `API_MAX_OUTPUT_TOKENS` (65536), `REASONING_EFFORT` (`high`), `SEARCH_CONTEXT_SIZE` (`high`)
@@ -226,8 +233,9 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 ## Cấu trúc thư mục
 
 ```
-TestChatAI/
+ai/
 ├── index.html              # Giao diện chính
+├── pricing.html            # Bảng giá model
 ├── privacy.html            # Chính sách bảo mật
 ├── terms.html              # Điều khoản dịch vụ
 ├── README.md               # File này
@@ -240,6 +248,11 @@ TestChatAI/
 │   ├── storage.js          # IndexedDB + localStorage
 │   ├── conversations.js    # CRUD hội thoại & tin nhắn
 │   ├── api.js              # Streaming API đa nhà cung cấp
+│   ├── model-compare.js    # So sánh 2–3 model song song
+│   ├── context-compress.js # Nén context hội thoại dài
+│   ├── snippets.js         # Thư viện prompt / snippets
+│   ├── speech.js           # STT & TTS
+│   ├── pricing-page.js     # Render bảng giá
 │   ├── files.js            # Đọc file/ảnh đính kèm
 │   ├── markdown.js         # Render MD, KaTeX, Mermaid
 │   ├── ui.js               # DOM & render giao diện
@@ -263,7 +276,7 @@ Chỉnh sửa `js/config.js` nếu cần:
 
 | Tuỳ chọn | Mặc định | Mô tả |
 |----------|----------|--------|
-| `DEFAULT_MODEL` | `gemini-3.5-flash` | Model khi mở app lần đầu |
+| `DEFAULT_MODEL` | `deepseek-v4-flash` | Model khi mở app lần đầu |
 | `DEFAULT_LOCALE` | `en` | Ngôn ngữ giao diện |
 | `API_MAX_OUTPUT_TOKENS` | `65536` | Giới hạn token đầu ra |
 | `REASONING_EFFORT` | `high` | Mức suy luận mặc định |
@@ -275,8 +288,7 @@ Chỉnh sửa `js/config.js` nếu cần:
 
 Thư mục `worker/` chứa proxy Cloudflare:
 
-- **DeepSeek** — tránh CORS khi cần (dùng API key server-side)
-- **NVIDIA** — **bắt buộc** cho model DeepSeek V4 Flash (NVIDIA), vì `integrate.api.nvidia.com` không hỗ trợ CORS từ trình duyệt
+- **DeepSeek** — tránh CORS khi cần (dùng API key server-side; model `deepseek-v4-flash`, `deepseek-v4-pro`)
 - **Share** — lưu snapshot hội thoại vào KV (`POST/GET /share`), link `?share=id` xem được trên trình duyệt ẩn danh (chỉ đọc, hết hạn 30 ngày)
 
 Triển khai:
@@ -290,11 +302,8 @@ npx wrangler deploy
 
 Sau khi deploy, cập nhật trong `js/config.js`:
 
-- `DEEPSEEK_PROXY_ENDPOINT` — URL workers.dev (path gốc)
-- `NVIDIA_PROXY_ENDPOINT` — cùng URL + `/nvidia` (ví dụ `https://testchatai-deepseek-proxy.<account>.workers.dev/nvidia`)
+- `DEEPSEEK_PROXY_ENDPOINT` — URL workers.dev (path gốc), nếu dùng proxy DeepSeek
 - `SHARE_ENDPOINT` — cùng URL + `/share`
-
-API key NVIDIA do người dùng nhập trong Cài đặt; worker chỉ chuyển tiếp header `Authorization`, không lưu key.
 
 ---
 

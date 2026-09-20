@@ -2,11 +2,11 @@ window.ModelCompare = (() => {
   const { COMPARE_MIN_MODELS, COMPARE_MAX_MODELS, MODELS } = window.APP_CONFIG;
 
   const DEFAULT_PICKS = [
-    'gemini-2.5-flash-lite',
+    'gemini-3.8-flash',
     'deepseek-v4-flash',
     'claude-haiku-4-5',
-    'gpt-5.4-mini',
-    'openrouter-mistral-small-4',
+    'gpt-5.6-luna',
+    'openrouter-deepseek-v4.1-flash',
   ];
 
   const getDefaultModels = (currentModelId) => {

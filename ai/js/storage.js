@@ -11,7 +11,6 @@ window.Storage = (() => {
     apiKey: '',
     anthropicApiKey: '',
     deepseekApiKey: '',
-    byteplusApiKey: '',
     openrouterApiKey: '',
     geminiApiKey: '',
     kimiApiKey: '',
@@ -192,7 +191,29 @@ window.Storage = (() => {
 
     const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
     if (!validIds.includes(state.currentModel)) {
-      state.currentModel = window.APP_CONFIG.DEFAULT_MODEL;
+      if (/^gemini-/.test(state.currentModel) && validIds.includes('gemini-3.8-flash')) {
+        state.currentModel = 'gemini-3.8-flash';
+      } else if (/^openrouter-gemini-/.test(state.currentModel) && validIds.includes('openrouter-gemini-3.8-flash')) {
+        state.currentModel = 'openrouter-gemini-3.8-flash';
+      } else if (state.currentModel === 'openrouter-mistral-small-4' && validIds.includes('openrouter-deepseek-v4.1-flash')) {
+        state.currentModel = 'openrouter-deepseek-v4.1-flash';
+      } else if (state.currentModel === 'gpt-5.4-mini' && validIds.includes('gpt-5.6-luna')) {
+        state.currentModel = 'gpt-5.6-luna';
+      } else if (state.currentModel === 'gpt-5.4' && validIds.includes('gpt-5.6-terra')) {
+        state.currentModel = 'gpt-5.6-terra';
+      } else if (state.currentModel === 'gpt-5.5' && validIds.includes('gpt-5.6-sol')) {
+        state.currentModel = 'gpt-5.6-sol';
+      } else if (state.currentModel === 'claude-sonnet-4-6' && validIds.includes('claude-sonnet-5')) {
+        state.currentModel = 'claude-sonnet-5';
+      } else if (state.currentModel === 'openrouter-claude-haiku-4-5' && validIds.includes('openrouter-claude-haiku-latest')) {
+        state.currentModel = 'openrouter-claude-haiku-latest';
+      } else if (state.currentModel === 'openrouter-claude-sonnet-5' && validIds.includes('openrouter-claude-sonnet-latest')) {
+        state.currentModel = 'openrouter-claude-sonnet-latest';
+      } else if (state.currentModel === 'openrouter-claude-opus-5' && validIds.includes('openrouter-claude-opus-latest')) {
+        state.currentModel = 'openrouter-claude-opus-latest';
+      } else {
+        state.currentModel = window.APP_CONFIG.DEFAULT_MODEL;
+      }
     }
     const validLangs = window.APP_CONFIG.TRANSLATE_LANGUAGES.map((l) => l.code);
     if (!validLangs.includes(state.translateTargetLang)) {
@@ -374,7 +395,6 @@ window.Storage = (() => {
       apiKey: state.apiKey,
       anthropicApiKey: state.anthropicApiKey,
       deepseekApiKey: state.deepseekApiKey,
-      byteplusApiKey: state.byteplusApiKey,
       openrouterApiKey: state.openrouterApiKey,
       geminiApiKey: state.geminiApiKey,
       kimiApiKey: state.kimiApiKey,

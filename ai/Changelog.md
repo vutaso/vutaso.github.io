@@ -67,31 +67,85 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ---
 
+- Model **Claude Haiku Latest** (OpenRouter, `~anthropic/claude-haiku-latest`) — alias luôn trỏ tới Claude Haiku mới nhất, reasoning, vision, context 200K; $1/$5.
+- Model **Claude Sonnet Latest** (OpenRouter, `~anthropic/claude-sonnet-latest`) — alias luôn trỏ tới Claude Sonnet mới nhất, reasoning, vision, context 1M; $2/$10.
+- Model **Claude Opus Latest** (OpenRouter, `~anthropic/claude-opus-latest`) — alias luôn trỏ tới Claude Opus mới nhất, reasoning bắt buộc, vision, context 1M; $5/$25.
+- Model **DeepSeek Flash Latest** (OpenRouter, `~deepseek/deepseek-flash-latest`) — alias luôn trỏ tới DeepSeek Flash mới nhất, reasoning, vision, context 1M; $0.13/$0.52.
+- Model **GLM Flash Latest** (OpenRouter, `~z-ai/glm-flash-latest`) — alias luôn trỏ tới GLM Flash mới nhất, reasoning bắt buộc, vision (ảnh/video), context 1M; $0.075/$0.25.
+- Model **Gemini 3.8 Flash** (Google, `gemini-3.8-flash`) — flagship, web search, tạo ảnh, thinking; $0.75/$3.75.
+- Model **Gemini 3.8 Flash** (OpenRouter, `google/gemini-3.8-flash`) — reasoning, vision; $0.75/$3.75.
 - Model **Claude Opus 5** (Anthropic, `claude-opus-5`) — thinking adaptive mặc định, effort tới `max`, web search; $5/$25.
-- Model **Claude Opus 5** (OpenRouter, `anthropic/claude-opus-5`) — reasoning bắt buộc, vision, effort tới `max`; $5/$25.
 - Model **GPT-5.6 Sol** (OpenAI, `gpt-5.6-sol`) — flagship, web search, image gen, reasoning; $5/$30.
 - Model **GPT-5.6 Terra** (OpenAI, `gpt-5.6-terra`) — cân bằng, web search, image gen, reasoning; $2/$12.
 - Model **GPT-5.6 Luna** (OpenAI, `gpt-5.6-luna`) — chi phí thấp, web search, image gen, reasoning; $0.20/$1.20.
-- Model **DeepSeek V4 Flash 0731** (OpenRouter, `deepseek/deepseek-v4-flash-0731`) — revision re-post-trained, reasoning.
-- Model **Grok 4.5** (OpenRouter, `x-ai/grok-4.5`) — reasoning, vision, context 500K.
-- Model **North Mini Code** (OpenRouter, `cohere/north-mini-code:free`) — agentic coding, reasoning, miễn phí.
-- Model **Mistral Nemo** (OpenRouter, `mistralai/mistral-nemo`) — 12B, context 128K.
-- Model **Mistral Small 4** (OpenRouter, `mistralai/mistral-small-2603`) — reasoning, vision, context 262K.
-- Model **MiniMax M2.7 Nitro** (OpenRouter, `minimax/minimax-m2.7:nitro`) — reasoning, routing nhanh, context 205K.
-- Model **Kimi K2.7 Code** (OpenRouter, `moonshotai/kimi-k2.7-code`) — coding, reasoning bắt buộc, vision, context 262K.
-- Model **Kimi K2.6** (OpenRouter, `moonshotai/kimi-k2.6`) — reasoning, vision, context 262K.
+- Model **GPT-5.6 Luna/Terra/Sol** (OpenRouter, `openai/gpt-5.6-*`) — reasoning, vision; $0.20/$1.20 – $2/$10.
+- Model **GPT OSS 120B** (OpenRouter, `openai/gpt-oss-120b`) — reasoning; $0.15/$0.60.
+- Model **DeepSeek V4.1 Flash** (OpenRouter, `deepseek/deepseek-v4.1-flash`) — reasoning, vision; $0.15/$0.60.
+- Model **Kimi K2.6** (OpenRouter, `moonshotai/kimi-k2.6`) — reasoning, vision; $0.95/$4.00.
+- Model **Kimi K3** (OpenRouter, `moonshotai/kimi-k3`) — reasoning, vision; $1.70/$8.50.
 - Model **Claude Sonnet 5** (Anthropic).
-- Dropdown **Reasoning Effort** trên composer — mức suy luận theo từng provider/model (`low` → `max`, `minimal` cho Gemini 3.5).
+- Dropdown **Reasoning Effort** trên composer — mức suy luận theo từng provider/model (`low` → `max`, `minimal` cho Gemini 3.x).
 - Menu **Tải xuống** trên header — gom các tùy chọn xuất hội thoại.
 
 ### Removed
-- OpenRouter: GPT OSS Safeguard 20B, GPT-5.4 nano, Gemma 4 26B, Gemma 4 31B free, Hy3 Preview, Hy3 free, Laguna XS 2.1, Laguna XS 2.1 free, toàn bộ Nemotron (Ultra/Super/Nano/Content Safety).
-- OpenRouter: Gemini 3.1 Flash Image, GPT Image 2, Seedream 4.5, Qwen 3.7 Plus, Mistral Small 3.2 24B.
-- NVIDIA: DeepSeek V4 Flash/Pro, GPT OSS 20B, Step 3.5 Flash, toàn bộ Qwen, Gemma 4 31B, Diffusion Gemma 26B.
+
+#### Nhà cung cấp NVIDIA (giữ theme NVIDIA)
+**Ý nghĩa:** Gỡ toàn bộ tích hợp API NVIDIA — model, API key, proxy worker — để đơn giản hóa danh sách provider. **Theme giao diện NVIDIA** (`nvidia-theme.css`, chu kỳ theme) vẫn giữ nguyên.
+
+- 11 model NVIDIA (DeepSeek V4 Flash/Pro, GPT OSS 20B, Step 3.5 Flash, Mistral Small 4, toàn bộ Qwen, Gemma 4 31B, Diffusion Gemma 26B, …).
+- Trường **NVIDIA API Key** trong Cài đặt.
+- Proxy worker `/nvidia` và logic gọi API NVIDIA trong `api.js`.
+
+#### Nhà cung cấp Byte Plus
+- Toàn bộ model Byte Plus (DeepSeek V4 Flash/Pro GA, V4.1 Flash, GLM-5.2/5.3 Flash, GPT OSS 120B, Dola Seed 2.0/2.1).
+- Trường **Byte Plus API Key** trong Cài đặt.
+- Proxy worker `/byteplus`, `/byteplus-responses` và logic gọi API Byte Plus trong `api.js`.
+
+#### Nhà cung cấp OpenCode Go
+- 14 model OpenCode Go.
+- Trường **OpenCode Go API Key** trong Cài đặt.
+- Proxy worker `/opencode-go-chat`, `/opencode-go-messages` và helper `buildOpencodeGoBody` / `sendOpencodeGoMessages`.
+
+#### Nhà cung cấp Perplexity
+- Model **Sonar**, **Sonar Pro**, **Sonar Reasoning Pro**, **Perplexity Search**.
+- Trường **Perplexity API Key** trong Cài đặt.
+- Web search qua Perplexity, helper `buildPerplexityBody` / `sendPerplexitySearch` và route proxy tương ứng trên worker.
+
+#### Model Google Gemini (dọn danh sách)
+- Model **Gemini 2.5 Flash Lite**, **2.5 Flash**, **3.5 Flash** — thay bằng dòng Gemini 3.x mới nhất.
+- Model **Gemini 3.1 Flash Lite**, **3.5 Flash Lite**, **3.6 Flash**, **2.5 Pro**, **3.1 Pro Preview** (Google) — chỉ giữ **Gemini 3.8 Flash**.
+
+#### Model OpenAI (dọn danh sách)
+- **GPT-5.4 nano** (OpenAI).
+
+#### Model OpenRouter (dọn danh sách)
+- Gemini 2.5 Flash Lite, 2.5 Flash, 3.5 Flash (OpenRouter).
+- Gemini 3.1 Flash Lite, 3.5 Flash Lite, 3.6 Flash, 2.5 Pro, 3.1 Pro Preview (OpenRouter) — chỉ giữ **Gemini 3.8 Flash**.
+- **DeepSeek V4 Flash**, **DeepSeek V4 Flash 0731** (OpenRouter).
+- **North Mini Code**, **Mistral Nemo** (OpenRouter).
+- **Muse Spark 1.1** (OpenRouter).
+- **Kimi K2.7 Code** (OpenRouter).
+- **Claude Opus 4.8** (OpenRouter).
+- **Claude Haiku 4.5** (OpenRouter) — thay bằng **Claude Haiku Latest** (`~anthropic/claude-haiku-latest`).
+- **Claude Sonnet 5** (OpenRouter) — thay bằng **Claude Sonnet Latest** (`~anthropic/claude-sonnet-latest`).
+- **Claude Opus 5** (OpenRouter) — thay bằng **Claude Opus Latest** (`~anthropic/claude-opus-latest`).
+- **MiMo V2.5**, **MiMo V2.5 Pro**, **MiniMax M3**, **MiniMax M2.7 Nitro** (OpenRouter).
+- **DeepSeek V4 Pro**, **GLM 5.2** (OpenRouter).
+- **Grok 4.5** (OpenRouter).
+- **Claude 3 Haiku** (OpenRouter).
+- GPT OSS Safeguard 20B, GPT-5.4 nano, Gemma 4 26B, Gemma 4 31B free, Hy3 Preview, Hy3 free, Laguna XS 2.1, Laguna XS 2.1 free, toàn bộ Nemotron (Ultra/Super/Nano/Content Safety).
+- Gemini 3.1 Flash Image, GPT Image 2, Seedream 4.5, Qwen 3.7 Plus, Mistral Small 3.2 24B, **Mistral Small 4**.
 
 ### Changed
+- **Google Gemini:** provider chỉ còn **Gemini 3.8 Flash**; tạo ảnh dùng `gemini-3.1-flash-image` (Nano Banana 2).
+- **OpenRouter Gemini:** chỉ còn **Gemini 3.8 Flash** (`google/gemini-3.8-flash`).
+- **OpenRouter Claude Haiku:** dùng alias **Claude Haiku Latest** (`~anthropic/claude-haiku-latest`) thay `anthropic/claude-haiku-4.5`.
+- **OpenRouter Claude Sonnet:** dùng alias **Claude Sonnet Latest** (`~anthropic/claude-sonnet-latest`) thay `anthropic/claude-sonnet-5`.
+- **OpenRouter Claude Opus:** dùng alias **Claude Opus Latest** (`~anthropic/claude-opus-latest`) thay `anthropic/claude-opus-5`.
+- **OpenRouter pricing:** đồng bộ `MODEL_PRICING` theo [OpenRouter API](https://openrouter.ai/api/v1/models); sắp xếp model theo giá input tăng dần.
 - **UI so sánh model:** thanh chọn model gọn (chip A/B/C), overlay split-pane dạng card với badge trạng thái và màu theo provider.
-- Giảm `OPENROUTER_MAX_OUTPUT_TOKENS` từ 32K xuống **16K** (tránh lỗi vượt credit còn lại).
+- `OPENROUTER_MAX_OUTPUT_TOKENS` = **32768** (tránh lỗi vượt credit còn lại khi gửi `max_tokens` quá cao).
+- **README** và **bảng giá** (`pricing.html`) đồng bộ **27 model** / **6 provider** (cập nhật 2026-09-20).
 - Cải thiện xuất **PDF** và **HTML** (layout, phân trang, theme).
 - Cấu hình thinking nâng cao cho Anthropic (adaptive thinking, Haiku manual budget).
 
@@ -252,8 +306,8 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 | 1.6.0 | 12 | 4 | 4 |
 | 1.7.0 | 16 | 5 | 4 |
 | 1.8.0 | 16 | 5 | 8 |
-| Unreleased | 17 | 5 | 8 |
+| Unreleased | 27 | 6 | 8 |
 
-**Provider:** OpenAI · Anthropic · DeepSeek · Google Gemini · Kimi
+**Provider:** OpenRouter · DeepSeek · OpenAI · Anthropic · Google Gemini · Kimi
 
 **Ngôn ngữ giao diện (từ 1.5.0):** `en` · `vi` · `jp` · `zh`

@@ -248,13 +248,6 @@ window.API = (() => {
     return tools;
   };
 
-  const normalizeByteplusResponsesInput = (input) => input.map((msg) => {
-    if (msg.role !== 'user' || typeof msg.content !== 'string' || !msg.content) return msg;
-    return {
-      role: msg.role,
-      content: [{ type: 'input_text', text: msg.content }]
-    };
-  });
 
   const mergeGroundingMetadata = (prev, next) => {
     if (!next) return prev;
@@ -640,39 +633,6 @@ window.API = (() => {
     return body;
   };
 
-  const buildByteplusBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
-    const apiModel = window.APP_CONFIG.getApiModel(model);
-    const body = withStreamUsage({
-      model: apiModel,
-      messages: buildDeepseekMessages(convo, systemPrompt, model),
-      stream: true
-    });
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-
-    if (window.APP_CONFIG.modelUsesByteplusOpenAIReasoning(model)) {
-      if (thinking) {
-        body.reasoning_effort = window.APP_CONFIG.normalizeEffortForModel(
-          reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
-          model
-        );
-      }
-      if (maxOutputTokens) {
-        body.max_completion_tokens = maxOutputTokens;
-      }
-      return body;
-    }
-
-    const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
-    body.thinking = { type: cfg.thinking ? 'enabled' : 'disabled' };
-    if (cfg.reasoning_effort) {
-      body.reasoning_effort = cfg.reasoning_effort;
-    }
-    if (maxOutputTokens) {
-      body.max_tokens = maxOutputTokens;
-    }
-    return body;
-  };
-
   const buildKimiMessages = (convo, systemPrompt, modelId) => {
     const msgs = [];
     if (systemPrompt && systemPrompt.trim()) {
@@ -798,9 +758,7 @@ window.API = (() => {
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
-      : provider === 'byteplus'
-        ? buildByteplusBody(model, systemPrompt, convo, thinking, reasoningEffort)
-        : provider === 'openrouter'
+      : provider === 'openrouter'
             ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
@@ -941,56 +899,6 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
-  const sendByteplusResponses = async ({ apiKey, model, systemPrompt, convo, thinking, reasoningEffort, controller, handlers }) => {
-    const input = normalizeByteplusResponsesInput(buildConversationMessages(convo, 'responses'));
-    if (!input.length) {
-      throw new Error('Không có tin nhắn để gửi');
-    }
-
-    const mcpTools = window.APP_CONFIG.getByteplusMcpTools(model);
-    const body = {
-      model: window.APP_CONFIG.getApiModel(model),
-      input,
-      stream: true
-    };
-    if (mcpTools.length) {
-      body.tools = mcpTools;
-    }
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-    if (maxOutputTokens) {
-      body.max_output_tokens = maxOutputTokens;
-    }
-    if (systemPrompt && systemPrompt.trim()) {
-      body.instructions = systemPrompt.trim();
-    }
-    Object.assign(
-      body,
-      window.APP_CONFIG.getByteplusResponsesThinkingConfig(model, thinking, reasoningEffort)
-    );
-
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + apiKey
-    };
-    if (mcpTools.length) {
-      headers['ark-beta-mcp'] = 'true';
-    }
-
-    const res = await fetch(window.APP_CONFIG.getByteplusEndpoint(model), {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw await parseApiError(res, 'byteplus');
-    if (!res.body || !res.body.getReader) {
-      throw new Error('Trình duyệt không hỗ trợ streaming response');
-    }
-
-    await readSseStream(res.body.getReader(), handlers);
-  };
-
   const sendWithResponsesTools = async ({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort, controller, handlers }) => {
     const input = buildConversationMessages(convo, 'responses');
     if (!input.length) {
@@ -1103,20 +1011,6 @@ window.API = (() => {
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking, reasoningEffort: effort
         });
-      } else if (provider === 'byteplus') {
-        if (window.APP_CONFIG.byteplusRequiresProxy() && !window.APP_CONFIG.getByteplusProxyEndpoint(model)) {
-          throw new Error(window.APP_CONFIG.getByteplusProxyRequiredError());
-        }
-        if (window.APP_CONFIG.modelUsesByteplusResponses(model)) {
-          await sendByteplusResponses({
-            apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort
-          });
-        } else {
-          await sendChatCompletions({
-            apiKey, model, systemPrompt, convo, controller, handlers,
-            endpoint: window.APP_CONFIG.getByteplusEndpoint(model), provider: 'byteplus', thinking, reasoningEffort: effort
-          });
-        }
       } else if (provider === 'kimi') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
