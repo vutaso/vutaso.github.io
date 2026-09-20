@@ -9,8 +9,6 @@ window.I18n = (() => {
   };
 
   const THEMES = [
-    { value: 'dark', label: 'Dark' },
-    { value: 'vs-dark', label: 'Dark (Visual Studio)' },
     { value: 'apple', label: 'Apple Light' },
     { value: 'apple-dark', label: 'Apple Dark' },
     { value: 'hello-kitty', label: 'Hello Kitty Pink' },
@@ -564,7 +562,7 @@ window.I18n = (() => {
       backupConfirmImportLarge: 'This file is {size}. Restoring may freeze the tab. Continue?',
       toastBackupExportLarge: 'Backup downloaded ({size})',
       guideStep1Title: 'Configure API Key',
-      guideStep1Body: 'Click <strong>Settings</strong> (gear icon) and enter an API key for your provider: OpenAI, Anthropic, DeepSeek, or Gemini. Keys are stored locally and sent only to the matching provider. If no key is set, Settings opens automatically on startup.',
+      guideStep1Body: 'On first visit, this guide appears before Settings. Click <strong>Settings</strong> (gear icon) or close this guide to enter an API key for your provider: OpenAI, Anthropic, DeepSeek, or Gemini. Keys are stored locally and sent only to the matching provider.',
       guideStep2Title: 'Choose a model',
       guideStep2Body: 'Use the dropdown in the header to select a model. Each model supports different tools — e.g. web search, image generation, thinking. The composer toolbar shows/hides based on the selected model.',
       guideStep3Title: 'Start chatting',
@@ -1134,7 +1132,7 @@ window.I18n = (() => {
       backupConfirmImportLarge: 'File này nặng {size}. Khôi phục có thể làm đơ tab. Tiếp tục?',
       toastBackupExportLarge: 'Đã tải file sao lưu ({size})',
       guideStep1Title: 'Cấu hình API Key',
-      guideStep1Body: 'Bấm <strong>Cài đặt</strong> (icon bánh răng) và nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng. Chưa có key thì app sẽ tự mở Cài đặt khi khởi động.',
+      guideStep1Body: 'Lần đầu vào app, hướng dẫn này hiện trước Cài đặt. Bấm <strong>Cài đặt</strong> (icon bánh răng) hoặc đóng hướng dẫn để nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng.',
       guideStep2Title: 'Chọn model',
       guideStep2Body: 'Dùng dropdown trên header để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.',
       guideStep3Title: 'Bắt đầu chat',
@@ -1704,7 +1702,7 @@ window.I18n = (() => {
       backupConfirmImportLarge: 'このファイルは {size} です。復元するとタブが固まることがあります。続行しますか？',
       toastBackupExportLarge: 'バックアップをダウンロードしました（{size}）',
       guideStep1Title: 'APIキーの設定',
-      guideStep1Body: '<strong>設定</strong>（歯車アイコン）を開き、使用するプロバイダーのAPIキーを入力: OpenAI, Anthropic, DeepSeek, Gemini。キーはローカルに保存され、該当プロバイダーにのみ送信されます。キーがない場合、起動時に設定が自動で開きます。',
+      guideStep1Body: '初回アクセス時は、このガイドが設定より先に表示されます。<strong>設定</strong>（歯車アイコン）を開くか、このガイドを閉じてから API キーを入力してください: OpenAI, Anthropic, DeepSeek, Gemini。キーはローカルに保存され、該当プロバイダーにのみ送信されます。',
       guideStep2Title: 'モデルを選択',
       guideStep2Body: 'ヘッダーのドロップダウンでモデルを選択。各モデルは異なるツール（Web検索、画像生成、Thinkingなど）に対応。Composerツールバーは選択モデルに応じて表示/非表示が切り替わります。',
       guideStep3Title: 'チャットを開始',
@@ -2274,7 +2272,7 @@ window.I18n = (() => {
       backupConfirmImportLarge: '此文件大小为 {size}。恢复可能导致标签页卡住。要继续吗？',
       toastBackupExportLarge: '备份已下载（{size}）',
       guideStep1Title: '配置 API Key',
-      guideStep1Body: '点击<strong>设置</strong>（齿轮图标）并输入所用服务商的 API Key：OpenAI、Anthropic、DeepSeek 或 Gemini。Key 仅保存在本地，且仅发送至对应服务商。若未设置 Key，启动时会自动打开设置。',
+      guideStep1Body: '首次访问时，会先显示本指南，再进入设置。点击<strong>设置</strong>（齿轮图标）或关闭本指南后，再输入所用服务商的 API Key：OpenAI、Anthropic、DeepSeek 或 Gemini。Key 仅保存在本地，且仅发送至对应服务商。',
       guideStep2Title: '选择模型',
       guideStep2Body: '使用顶栏下拉菜单选择模型。各模型支持不同工具——如网络搜索、图片生成、Thinking。Composer 工具栏会根据所选模型显示/隐藏。',
       guideStep3Title: '开始聊天',
@@ -2578,8 +2576,8 @@ window.I18n = (() => {
     { sel: '#themeToggleBtn', attr: 'aria-label', key: 'toggleTheme' },
     { sel: '.app-drop-overlay-title', key: 'dropAttach' },
     { sel: '.app-drop-overlay-hint', key: 'dropAttachHint' },
-    { sel: '#providerSelect', attr: 'title', key: 'selectProvider' },
-    { sel: '#providerSelect', attr: 'aria-label', key: 'selectProvider' },
+    { sel: '#providerSelectBtn', attr: 'title', key: 'selectProvider' },
+    { sel: '#providerSelectBtn', attr: 'aria-label', key: 'selectProvider' },
     { sel: '#modelSelect', attr: 'title', key: 'selectModel' },
     { sel: '#modelSelect', attr: 'aria-label', key: 'selectModel' },
     { sel: '#effortSelect', attr: 'title', key: 'effortLabel' },
@@ -2636,27 +2634,6 @@ window.I18n = (() => {
     { sel: '#translateBtn span', key: 'translate' },
     { sel: '#translateBtn', attr: 'title', key: 'translateTitle' },
     { sel: '#translateBtn', attr: 'aria-label', key: 'translate' },
-    { sel: '#createFileBtn', attr: 'title', key: 'createFileTitle' },
-    { sel: '#createFileBtn', attr: 'aria-label', key: 'createFile' },
-    { sel: '#createFileBtnLabel', key: 'createFile' },
-    { sel: '#createFileMenuTitle', key: 'createFileMenuTitle' },
-    { sel: '#createFileMenu', attr: 'aria-label', key: 'createFileMenuTitle' },
-    { sel: '#createFileOptionSlidesLabel', key: 'slides' },
-    { sel: '#createFileOptionExcelLabel', key: 'excel' },
-    { sel: '#createFileOptionDocumentLabel', key: 'document' },
-    { sel: '#createFileOptionPdfLabel', key: 'pdf' },
-    { sel: '#composerSlidesBar .slides-chip span', key: 'slides', filter: (el) => el.closest('.slides-chip') && !el.closest('button') },
-    { sel: '#slidesChipClose', attr: 'title', key: 'disableSlides' },
-    { sel: '#slidesChipClose', attr: 'aria-label', key: 'disableSlides' },
-    { sel: '#composerExcelBar .excel-chip span', key: 'excel', filter: (el) => el.closest('.excel-chip') && !el.closest('button') },
-    { sel: '#excelChipClose', attr: 'title', key: 'disableExcel' },
-    { sel: '#excelChipClose', attr: 'aria-label', key: 'disableExcel' },
-    { sel: '#composerDocumentBar .document-chip span', key: 'document', filter: (el) => el.closest('.document-chip') && !el.closest('button') },
-    { sel: '#documentChipClose', attr: 'title', key: 'disableDocument' },
-    { sel: '#documentChipClose', attr: 'aria-label', key: 'disableDocument' },
-    { sel: '#composerPdfBar .pdf-chip span', key: 'pdf', filter: (el) => el.closest('.pdf-chip') && !el.closest('button') },
-    { sel: '#pdfChipClose', attr: 'title', key: 'disablePdf' },
-    { sel: '#pdfChipClose', attr: 'aria-label', key: 'disablePdf' },
     { sel: '#settingsTokenUsageLabel', key: 'settingsTokenUsage' },
     { sel: '#settingsTokenUsageInputLabel', key: 'settingsTokenUsageInput' },
     { sel: '#settingsTokenUsageOutputLabel', key: 'settingsTokenUsageOutput' },
@@ -2773,12 +2750,12 @@ window.I18n = (() => {
     { sel: '#settingsModal .modal-header-actions [data-modal-close]', attr: 'title', key: 'close' },
     { sel: '#settingsApiKeysLabel', key: 'settingsApiKeys' },
     { sel: '.settings-api-section', attr: 'title', key: 'apiKeyHintAll' },
-    { sel: 'label[for="apiKeyInput"]', key: 'apiKeyLabelOpenAI' },
-    { sel: 'label[for="anthropicApiKeyInput"]', key: 'apiKeyLabelAnthropic' },
-    { sel: 'label[for="deepseekApiKeyInput"]', key: 'apiKeyLabelDeepSeek' },
-    { sel: 'label[for="geminiApiKeyInput"]', key: 'apiKeyLabelGemini' },
-    { sel: 'label[for="kimiApiKeyInput"]', key: 'apiKeyLabelKimi' },
-    { sel: 'label[for="openrouterApiKeyInput"]', key: 'apiKeyLabelOpenRouter' },
+    { sel: 'label[for="apiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelOpenAI' },
+    { sel: 'label[for="anthropicApiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelAnthropic' },
+    { sel: 'label[for="deepseekApiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelDeepSeek' },
+    { sel: 'label[for="geminiApiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelGemini' },
+    { sel: 'label[for="kimiApiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelKimi' },
+    { sel: 'label[for="openrouterApiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelOpenRouter' },
     { sel: '#apiKeyInput', attr: 'placeholder', key: 'apiKeyOpenAI', raw: 'sk-...' },
     { sel: '#anthropicApiKeyInput', attr: 'placeholder', key: 'apiKeyAnthropic', raw: 'sk-ant-...' },
     { sel: '#deepseekApiKeyInput', attr: 'placeholder', key: 'apiKeyDeepSeek', raw: 'sk-...' },
@@ -2948,9 +2925,10 @@ window.I18n = (() => {
 
   const populateThemeSelect = (selectEl, selected) => {
     if (!selectEl) return;
-    const fallback = document.documentElement.getAttribute('data-theme') || 'dark';
+    const fallback = document.documentElement.getAttribute('data-theme') || window.APP_CONFIG.DEFAULT_THEME;
     const resolved = selected || selectEl.value || fallback;
-    const current = THEMES.some((t) => t.value === resolved) ? resolved : 'dark';
+    const legacy = resolved === 'dark' || resolved === 'vs-dark' ? window.APP_CONFIG.DEFAULT_THEME : resolved;
+    const current = THEMES.some((t) => t.value === legacy) ? legacy : window.APP_CONFIG.DEFAULT_THEME;
     selectEl.innerHTML = THEMES.map((t) =>
       `<option value="${t.value}">${t.label}</option>`
     ).join('');

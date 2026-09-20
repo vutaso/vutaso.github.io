@@ -32,10 +32,6 @@ window.Events = (() => {
       imageGenEnabled: s.imageGenEnabled,
       thinkingEnabled: s.thinkingEnabled,
       translateEnabled: s.translateEnabled,
-      slidesEnabled: s.slidesEnabled,
-      excelEnabled: s.excelEnabled,
-      documentEnabled: s.documentEnabled,
-      pdfEnabled: s.pdfEnabled,
       translateTargetLang: s.translateTargetLang,
       imageGenRatio: s.imageGenRatio,
       imageGenStyle: s.imageGenStyle,
@@ -66,6 +62,7 @@ window.Events = (() => {
     if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
     if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
     if (window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) imageGenEnabled = true;
+    if (imageGenEnabled && webSearchEnabled) webSearchEnabled = false;
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
     if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
       thinkingEnabled = true;
@@ -440,7 +437,7 @@ window.Events = (() => {
     }
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
-    if (compareMode || s.imageGenEnabled || s.slidesEnabled || s.excelEnabled || s.documentEnabled || s.pdfEnabled) {
+    if (compareMode || s.imageGenEnabled) {
       ui.els.sendBtn.disabled = !hasKey || !hasText;
     } else {
       ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
@@ -448,13 +445,9 @@ window.Events = (() => {
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
-      const slidesOn = s.slidesEnabled;
-      const excelOn = s.excelEnabled;
-      const documentOn = s.documentEnabled;
-      const pdfOn = s.pdfEnabled;
       const compareOn = !!s.compareEnabled;
-      ui.els.attachBtn.disabled = imageGenOn || compareOn || slidesOn || excelOn || documentOn || pdfOn;
-      if (ui.els.micBtn) ui.els.micBtn.disabled = imageGenOn || slidesOn || excelOn || documentOn || pdfOn;
+      ui.els.attachBtn.disabled = imageGenOn || compareOn;
+      if (ui.els.micBtn) ui.els.micBtn.disabled = imageGenOn;
     }
   };
 
@@ -686,8 +679,6 @@ window.Events = (() => {
     if (convoMod.getCurrent()?.id === convo.id && msg) {
       ui.updateAssistantMessage(messageIndex, msg);
     }
-    state.set({ pdfEnabled: false });
-    syncComposerTools();
     ui.showToast(t('toastPdfReady', { n: data.blockCount }));
   };
 
@@ -725,8 +716,6 @@ window.Events = (() => {
     if (convoMod.getCurrent()?.id === convo.id && msg) {
       ui.updateAssistantMessage(messageIndex, msg);
     }
-    state.set({ documentEnabled: false });
-    syncComposerTools();
     ui.showToast(t('toastDocumentReady', { n: data.blockCount }));
   };
 
@@ -762,8 +751,6 @@ window.Events = (() => {
     if (convoMod.getCurrent()?.id === convo.id && msg) {
       ui.updateAssistantMessage(messageIndex, msg);
     }
-    state.set({ excelEnabled: false });
-    syncComposerTools();
     ui.showToast(t('toastExcelReady', { sheets: data.sheetCount, rows: data.totalRows }));
   };
 
@@ -799,8 +786,6 @@ window.Events = (() => {
     if (convoMod.getCurrent()?.id === convo.id && msg) {
       ui.updateAssistantMessage(messageIndex, msg);
     }
-    state.set({ slidesEnabled: false });
-    syncComposerTools();
     ui.showToast(t('toastSlidesReady', { n: data.slides.length }));
   };
 
@@ -920,11 +905,12 @@ window.Events = (() => {
         }
       }
     }
-    const useWebSearch = !isContinue && s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const useImageGen = !isContinue && (
       window.APP_CONFIG.modelUsesOpenRouterImages(modelId)
       || !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId))
     );
+    const useWebSearch = !isContinue && !useImageGen
+      && s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
     const useThinking = isEffortThinking
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
@@ -1276,18 +1262,6 @@ window.Events = (() => {
       }
       if (s.translateEnabled && text) {
         userMsg.translateTo = s.translateTargetLang || window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
-      }
-      if (s.slidesEnabled && text) {
-        userMsg.slides = true;
-      }
-      if (s.excelEnabled && text) {
-        userMsg.excel = true;
-      }
-      if (s.documentEnabled && text) {
-        userMsg.document = true;
-      }
-      if (s.pdfEnabled && text) {
-        userMsg.pdf = true;
       }
     }
     convoMod.addMessage(convo, userMsg);
@@ -1716,7 +1690,7 @@ window.Events = (() => {
 
     ui.els.messages.addEventListener('click', (e) => {
       if (!ui.isExportSelectMode()) return;
-      if (e.target.closest('.generated-image-btn')) return;
+      if (e.target.closest('.generated-image-btn, [data-open-sources]')) return;
 
       const article = e.target.closest('.message[data-idx]');
       if (!article) return;
@@ -1729,6 +1703,21 @@ window.Events = (() => {
     ui.els.headerDownloadBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       ui.toggleHeaderDownloadMenu();
+    });
+
+    ui.els.providerSelectBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleProviderMenu();
+    });
+
+    ui.els.providerSelectMenu?.addEventListener('click', (e) => {
+      const option = e.target.closest('.header-provider-option');
+      if (!option) return;
+      const providerId = option.dataset.provider;
+      ui.closeProviderMenu();
+      if (!providerId || !ui.els.providerSelect || ui.els.providerSelect.value === providerId) return;
+      ui.els.providerSelect.value = providerId;
+      ui.els.providerSelect.dispatchEvent(new Event('change'));
     });
 
     ui.els.headerDownloadMenu?.addEventListener('click', async (e) => {
@@ -1965,7 +1954,8 @@ window.Events = (() => {
 
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
     ui.els.guideOpenSettingsBtn?.addEventListener('click', () => {
-      ui.closeGuide();
+      ui.closeGuide({ skipOnClose: true });
+      if (!state.get().guideSeen) state.set({ guideSeen: true });
       ui.openSettings(state.get());
     });
     ui.els.tokenCostWarningSettingsBtn?.addEventListener('click', () => {
@@ -2009,8 +1999,15 @@ window.Events = (() => {
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) return;
       const next = !s.webSearchEnabled;
-      state.set({ webSearchEnabled: next });
-      syncComposerTools(modelId, { webSearchEnabled: next });
+      const patch = { webSearchEnabled: next };
+      if (next) {
+        patch.imageGenEnabled = false;
+        pendingReferenceImage = null;
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
       ui.showToast(next ? t('toastWebSearchOn') : t('toastWebSearchOff'));
     });
 
@@ -2046,10 +2043,6 @@ window.Events = (() => {
         patch.webSearchEnabled = false;
         patch.imageGenEnabled = false;
         patch.translateEnabled = false;
-        patch.slidesEnabled = false;
-        patch.excelEnabled = false;
-        patch.documentEnabled = false;
-        patch.pdfEnabled = false;
         clearPendingAttachments();
         pendingReferenceImage = null;
         resetImageGenPicked();
@@ -2127,11 +2120,8 @@ window.Events = (() => {
       if (enabled && !window.APP_CONFIG.modelSupportsImageGen(modelId)) return;
       const patch = { imageGenEnabled: enabled };
       if (enabled) {
+        patch.webSearchEnabled = false;
         patch.translateEnabled = false;
-        patch.slidesEnabled = false;
-        patch.excelEnabled = false;
-        patch.documentEnabled = false;
-        patch.pdfEnabled = false;
         clearPendingAttachments();
         resetImageGenPicked();
       } else {
@@ -2246,96 +2236,12 @@ window.Events = (() => {
       const patch = { translateEnabled: enabled };
       if (enabled) {
         patch.imageGenEnabled = false;
-        patch.slidesEnabled = false;
-        patch.excelEnabled = false;
-        patch.documentEnabled = false;
-        patch.pdfEnabled = false;
         pendingReferenceImage = null;
       }
       state.set(patch);
       syncComposerTools(modelId, patch);
       updateSendEnabled();
       ui.showToast(enabled ? t('toastTranslateOn') : t('toastTranslateOff'));
-    };
-
-    const setSlidesEnabled = (enabled) => {
-      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-      const patch = { slidesEnabled: enabled };
-      if (enabled) {
-        patch.imageGenEnabled = false;
-        patch.translateEnabled = false;
-        patch.excelEnabled = false;
-        patch.documentEnabled = false;
-        patch.pdfEnabled = false;
-        patch.compareEnabled = false;
-        pendingReferenceImage = null;
-        clearPendingAttachments();
-        resetImageGenPicked();
-      }
-      state.set(patch);
-      syncComposerTools(modelId, patch);
-      updateSendEnabled();
-      ui.showToast(enabled ? t('toastSlidesOn') : t('toastSlidesOff'));
-    };
-
-    const setExcelEnabled = (enabled) => {
-      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-      const patch = { excelEnabled: enabled };
-      if (enabled) {
-        patch.imageGenEnabled = false;
-        patch.translateEnabled = false;
-        patch.slidesEnabled = false;
-        patch.documentEnabled = false;
-        patch.pdfEnabled = false;
-        patch.compareEnabled = false;
-        pendingReferenceImage = null;
-        clearPendingAttachments();
-        resetImageGenPicked();
-      }
-      state.set(patch);
-      syncComposerTools(modelId, patch);
-      updateSendEnabled();
-      ui.showToast(enabled ? t('toastExcelOn') : t('toastExcelOff'));
-    };
-
-    const setDocumentEnabled = (enabled) => {
-      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-      const patch = { documentEnabled: enabled };
-      if (enabled) {
-        patch.imageGenEnabled = false;
-        patch.translateEnabled = false;
-        patch.slidesEnabled = false;
-        patch.excelEnabled = false;
-        patch.pdfEnabled = false;
-        patch.compareEnabled = false;
-        pendingReferenceImage = null;
-        clearPendingAttachments();
-        resetImageGenPicked();
-      }
-      state.set(patch);
-      syncComposerTools(modelId, patch);
-      updateSendEnabled();
-      ui.showToast(enabled ? t('toastDocumentOn') : t('toastDocumentOff'));
-    };
-
-    const setPdfEnabled = (enabled) => {
-      const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-      const patch = { pdfEnabled: enabled };
-      if (enabled) {
-        patch.imageGenEnabled = false;
-        patch.translateEnabled = false;
-        patch.slidesEnabled = false;
-        patch.excelEnabled = false;
-        patch.documentEnabled = false;
-        patch.compareEnabled = false;
-        pendingReferenceImage = null;
-        clearPendingAttachments();
-        resetImageGenPicked();
-      }
-      state.set(patch);
-      syncComposerTools(modelId, patch);
-      updateSendEnabled();
-      ui.showToast(enabled ? t('toastPdfOn') : t('toastPdfOff'));
     };
 
     ui.els.translateBtn.addEventListener('click', () => {
@@ -2369,46 +2275,12 @@ window.Events = (() => {
       syncComposerTools(null, { translateTargetLang: langCode });
     });
 
-    ui.els.createFileBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      ui.toggleCreateFileMenu();
-    });
-
-    ui.els.createFileMenu?.addEventListener('click', (e) => {
-      const option = e.target.closest('[data-create-file]');
-      if (!option) return;
-      const mode = option.dataset.createFile;
-      ui.closeCreateFileMenu();
-      const s = state.get();
-      if (mode === 'slides') setSlidesEnabled(!s.slidesEnabled);
-      else if (mode === 'excel') setExcelEnabled(!s.excelEnabled);
-      else if (mode === 'document') setDocumentEnabled(!s.documentEnabled);
-      else if (mode === 'pdf') setPdfEnabled(!s.pdfEnabled);
-    });
-
-    ui.els.slidesChipClose?.addEventListener('click', () => {
-      setSlidesEnabled(false);
-    });
-
-    ui.els.excelChipClose?.addEventListener('click', () => {
-      setExcelEnabled(false);
-    });
-
-    ui.els.documentChipClose?.addEventListener('click', () => {
-      setDocumentEnabled(false);
-    });
-
-    ui.els.pdfChipClose?.addEventListener('click', () => {
-      setPdfEnabled(false);
-    });
-
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.translate-lang-wrap')) {
         ui.closeTranslateLangMenu();
       }
       if (!e.target.closest('.composer-dropdown-wrap')) {
         ui.closeImageGenMenus();
-        ui.closeCreateFileMenu();
       }
       if (!e.target.closest('.composer-snippets-wrap')) {
         ui.closeSnippetsMenu();
@@ -2419,12 +2291,16 @@ window.Events = (() => {
       if (!e.target.closest('.header-download-wrap')) {
         ui.closeHeaderDownloadMenu();
       }
+      if (!e.target.closest('.header-provider-wrap')) {
+        ui.closeProviderMenu();
+      }
     });
 
-    const THEME_CYCLE = ['dark', 'vs-dark', 'apple', 'apple-dark', 'hello-kitty', 'cyberpunk', 'nvidia', 'liquid-glass'];
+    const THEME_CYCLE = ['apple', 'apple-dark', 'hello-kitty', 'cyberpunk', 'nvidia', 'liquid-glass'];
 
     ui.els.themeToggleBtn.addEventListener('click', () => {
-      const current = state.get().theme || 'dark';
+      const raw = state.get().theme || window.APP_CONFIG.DEFAULT_THEME;
+      const current = raw === 'dark' || raw === 'vs-dark' ? window.APP_CONFIG.DEFAULT_THEME : raw;
       const idx = THEME_CYCLE.indexOf(current);
       const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
       state.set({ theme: next });
@@ -2679,7 +2555,7 @@ window.Events = (() => {
         const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
         const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
         const openrouterApiKey = ui.els.openrouterApiKeyInput.value.trim();
-        const theme = ui.els.settingsThemeSelect?.value || 'dark';
+        const theme = ui.els.settingsThemeSelect?.value || window.APP_CONFIG.DEFAULT_THEME;
         nextState = {
           apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey, openrouterApiKey,
           ...promptPatch, theme, locale
@@ -2875,6 +2751,10 @@ window.Events = (() => {
           ui.closeHeaderDownloadMenu();
           return;
         }
+        if (ui.isProviderMenuOpen()) {
+          ui.closeProviderMenu();
+          return;
+        }
         if (!ui.els.imageGenRatioMenu.classList.contains('hidden')
           || !ui.els.imageGenStyleMenu.classList.contains('hidden')
           || !ui.els.imageGenTemplateMenu.classList.contains('hidden')) {
@@ -3012,6 +2892,13 @@ window.Events = (() => {
     });
 
     document.addEventListener('click', async (e) => {
+      const openSourcesBtn = e.target.closest('[data-open-sources]');
+      if (openSourcesBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        ui.openSourcesPreview(openSourcesBtn);
+        return;
+      }
       const previewMdBtn = e.target.closest('[data-preview-md]');
       if (previewMdBtn) {
         e.preventDefault();

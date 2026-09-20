@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="apple-dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -99,7 +99,15 @@
         </button>
         <div class="header-title">
           <div class="header-selects">
-            <select id="providerSelect" class="select provider-select header-select" title="Chọn nhà cung cấp" aria-label="Chọn nhà cung cấp"></select>
+            <div class="header-provider-wrap">
+              <select id="providerSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <button type="button" id="providerSelectBtn" class="select header-select provider-select header-provider-btn" title="Chọn nhà cung cấp" aria-label="Chọn nhà cung cấp" aria-haspopup="listbox" aria-expanded="false" aria-controls="providerSelectMenu">
+                <span id="providerSelectBtnIcon" class="provider-logo-wrap" aria-hidden="true"></span>
+                <span id="providerSelectBtnLabel" class="header-provider-label"></span>
+                <i class="fa-solid fa-chevron-down header-provider-caret" aria-hidden="true"></i>
+              </button>
+              <div id="providerSelectMenu" class="header-provider-menu hidden" role="listbox" aria-labelledby="providerSelectBtn"></div>
+            </div>
             <select id="modelSelect" class="select model-select header-select" title="Chọn model" aria-label="Chọn model"></select>
             <select id="effortSelect" class="select header-effort-select header-select" title="Effort" aria-label="Effort"></select>
             <select id="systemPromptModeSelect" class="select header-prompt-mode-select header-select" aria-label="Chế độ"></select>
@@ -257,40 +265,6 @@
             <i class="fa-solid fa-language" aria-hidden="true"></i>
             <span>Dịch</span>
           </button>
-          <div id="createFileWrap" class="composer-tool-dropdown composer-dropdown-wrap">
-            <button type="button" id="createFileBtn" class="composer-tool-btn" title="Tạo file Office" aria-label="Tạo file" aria-haspopup="menu" aria-expanded="false" aria-pressed="false">
-              <i id="createFileBtnIcon" class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
-              <span id="createFileBtnLabel">Tạo file</span>
-              <i class="fa-solid fa-chevron-down create-file-chevron" aria-hidden="true"></i>
-            </button>
-            <div id="createFileMenu" class="composer-dropdown-menu create-file-menu hidden" role="menu" aria-label="Chọn loại file">
-              <div id="createFileMenuTitle" class="composer-dropdown-header">Tạo file</div>
-              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="document" role="menuitem">
-                <i class="fa-solid fa-file-word create-file-option-icon create-file-option-icon-docx" aria-hidden="true"></i>
-                <span class="composer-dropdown-option-text">
-                  <span class="composer-dropdown-option-title" id="createFileOptionDocumentLabel">Tạo Word</span>
-                </span>
-              </button>
-              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="excel" role="menuitem">
-                <i class="fa-solid fa-file-excel create-file-option-icon create-file-option-icon-xlsx" aria-hidden="true"></i>
-                <span class="composer-dropdown-option-text">
-                  <span class="composer-dropdown-option-title" id="createFileOptionExcelLabel">Tạo Excel</span>
-                </span>
-              </button>
-              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="slides" role="menuitem">
-                <i class="fa-solid fa-file-powerpoint create-file-option-icon create-file-option-icon-pptx" aria-hidden="true"></i>
-                <span class="composer-dropdown-option-text">
-                  <span class="composer-dropdown-option-title" id="createFileOptionSlidesLabel">Tạo Slides</span>
-                </span>
-              </button>
-              <button type="button" class="composer-dropdown-option create-file-option" data-create-file="pdf" role="menuitem">
-                <i class="fa-solid fa-file-pdf create-file-option-icon create-file-option-icon-pdf" aria-hidden="true"></i>
-                <span class="composer-dropdown-option-text">
-                  <span class="composer-dropdown-option-title" id="createFileOptionPdfLabel">Tạo PDF</span>
-                </span>
-              </button>
-            </div>
-          </div>
           <button type="button" id="compareBtn" class="composer-tool-btn" title="So sánh 2–3 model song song" aria-label="So sánh model" aria-pressed="false">
             <i class="fa-solid fa-columns" aria-hidden="true"></i>
             <span id="compareBtnLabel">So sánh</span>
@@ -404,42 +378,6 @@
                 </div>
               </div>
             </div>
-            <div id="composerSlidesBar" class="composer-slides-bar hidden" aria-hidden="true">
-              <div class="slides-chip">
-                <i class="fa-solid fa-file-powerpoint" aria-hidden="true"></i>
-                <span>Tạo Slides</span>
-                <button type="button" id="slidesChipClose" class="slides-chip-close" title="Tắt tạo slides" aria-label="Tắt tạo slides">
-                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div id="composerExcelBar" class="composer-excel-bar hidden" aria-hidden="true">
-              <div class="excel-chip">
-                <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
-                <span>Tạo Excel</span>
-                <button type="button" id="excelChipClose" class="excel-chip-close" title="Tắt tạo Excel" aria-label="Tắt tạo Excel">
-                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div id="composerDocumentBar" class="composer-document-bar hidden" aria-hidden="true">
-              <div class="document-chip">
-                <i class="fa-solid fa-file-word" aria-hidden="true"></i>
-                <span>Tạo Word</span>
-                <button type="button" id="documentChipClose" class="document-chip-close" title="Tắt tạo Word" aria-label="Tắt tạo Word">
-                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div id="composerPdfBar" class="composer-pdf-bar hidden" aria-hidden="true">
-              <div class="pdf-chip">
-                <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
-                <span>Tạo PDF</span>
-                <button type="button" id="pdfChipClose" class="pdf-chip-close" title="Tắt tạo PDF" aria-label="Tắt tạo PDF">
-                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
             <div id="composerTranslateBar" class="composer-translate-bar hidden" aria-hidden="true">
               <div class="translate-chip">
                 <i class="fa-solid fa-language" aria-hidden="true"></i>
@@ -536,7 +474,7 @@
           <p id="settingsApiKeysLabel" class="settings-section-label">API Keys</p>
           <div class="settings-api-grid">
             <div class="settings-api-row">
-              <label for="apiKeyInput">OpenAI</label>
+              <label for="apiKeyInput"><span class="settings-provider-logo" data-provider-logo="openai"></span><span class="settings-api-label-text">OpenAI</span></label>
               <div class="input-group">
                 <input id="apiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
                 <button type="button" id="toggleApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -545,7 +483,7 @@
               </div>
             </div>
             <div class="settings-api-row">
-              <label for="anthropicApiKeyInput">Anthropic</label>
+              <label for="anthropicApiKeyInput"><span class="settings-provider-logo" data-provider-logo="anthropic"></span><span class="settings-api-label-text">Anthropic</span></label>
               <div class="input-group">
                 <input id="anthropicApiKeyInput" type="password" class="input" placeholder="sk-ant-..." autocomplete="off" />
                 <button type="button" id="toggleAnthropicApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -554,7 +492,7 @@
               </div>
             </div>
             <div class="settings-api-row">
-              <label for="deepseekApiKeyInput">DeepSeek</label>
+              <label for="deepseekApiKeyInput"><span class="settings-provider-logo" data-provider-logo="deepseek"></span><span class="settings-api-label-text">DeepSeek</span></label>
               <div class="input-group">
                 <input id="deepseekApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
                 <button type="button" id="toggleDeepseekApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -563,7 +501,7 @@
               </div>
             </div>
             <div class="settings-api-row">
-              <label for="geminiApiKeyInput">Gemini</label>
+              <label for="geminiApiKeyInput"><span class="settings-provider-logo" data-provider-logo="google"></span><span class="settings-api-label-text">Gemini</span></label>
               <div class="input-group">
                 <input id="geminiApiKeyInput" type="password" class="input" placeholder="AIza..." autocomplete="off" />
                 <button type="button" id="toggleGeminiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -572,7 +510,7 @@
               </div>
             </div>
             <div class="settings-api-row">
-              <label for="kimiApiKeyInput">Kimi</label>
+              <label for="kimiApiKeyInput"><span class="settings-provider-logo" data-provider-logo="kimi"></span><span class="settings-api-label-text">Kimi</span></label>
               <div class="input-group">
                 <input id="kimiApiKeyInput" type="password" class="input" placeholder="sk-..." autocomplete="off" />
                 <button type="button" id="toggleKimiApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -581,7 +519,7 @@
               </div>
             </div>
             <div class="settings-api-row">
-              <label for="openrouterApiKeyInput">OpenRouter</label>
+              <label for="openrouterApiKeyInput"><span class="settings-provider-logo" data-provider-logo="openrouter"></span><span class="settings-api-label-text">OpenRouter</span></label>
               <div class="input-group">
                 <input id="openrouterApiKeyInput" type="password" class="input" placeholder="sk-or-..." autocomplete="off" />
                 <button type="button" id="toggleOpenrouterApiKeyBtn" class="btn btn-icon" title="Hiện/Ẩn">
@@ -862,7 +800,7 @@
           <div class="guide-step-num" aria-hidden="true">1</div>
           <div class="guide-step-body">
             <h3>Cấu hình API Key</h3>
-            <p>Bấm <strong>Cài đặt</strong> (icon bánh răng) và nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng. Chưa có key thì app sẽ tự mở Cài đặt khi khởi động.</p>
+            <p>Lần đầu vào app, hướng dẫn này hiện trước Cài đặt. Bấm <strong>Cài đặt</strong> (icon bánh răng) hoặc đóng hướng dẫn để nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng.</p>
             <button type="button" id="guideOpenSettingsBtn" class="btn btn-ghost btn-sm">Mở Cài đặt</button>
           </div>
         </section>

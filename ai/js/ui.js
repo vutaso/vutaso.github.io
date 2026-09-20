@@ -1,7 +1,8 @@
 window.UI = (() => {
   const {
     escapeHTML, safeHref, safeImageSrc, formatTime, truncate, copyToClipboard, autoResize,
-    highlightSearchText, normalizeSearchQuery, buildSearchFold, findAllSearchRangesInFold
+    highlightSearchText, normalizeSearchQuery, buildSearchFold, findAllSearchRangesInFold,
+    collectGroundingLinks
   } = window.Utils;
   const { DEFAULT_SYSTEM_PROMPT } = window.APP_CONFIG;
   const t = (key, params) => window.I18n.t(key, params);
@@ -110,18 +111,6 @@ window.UI = (() => {
     els.imageGenBtn = $('#imageGenBtn');
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
-    els.createFileBtn = $('#createFileBtn');
-    els.createFileBtnLabel = $('#createFileBtnLabel');
-    els.createFileBtnIcon = $('#createFileBtnIcon');
-    els.createFileMenu = $('#createFileMenu');
-    els.composerSlidesBar = $('#composerSlidesBar');
-    els.slidesChipClose = $('#slidesChipClose');
-    els.composerExcelBar = $('#composerExcelBar');
-    els.excelChipClose = $('#excelChipClose');
-    els.composerDocumentBar = $('#composerDocumentBar');
-    els.composerPdfBar = $('#composerPdfBar');
-    els.pdfChipClose = $('#pdfChipClose');
-    els.documentChipClose = $('#documentChipClose');
     els.systemPromptModeSelect = $('#systemPromptModeSelect');
     els.systemPromptModeHint = $('#systemPromptModeHint');
     els.settingsTokenUsageModel = $('#settingsTokenUsageModel');
@@ -228,6 +217,10 @@ window.UI = (() => {
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
     els.providerSelect = $('#providerSelect');
+    els.providerSelectBtn = $('#providerSelectBtn');
+    els.providerSelectBtnIcon = $('#providerSelectBtnIcon');
+    els.providerSelectBtnLabel = $('#providerSelectBtnLabel');
+    els.providerSelectMenu = $('#providerSelectMenu');
     els.effortSelect = $('#effortSelect');
     els.toggleSidebarSearchBtn = $('#toggleSidebarSearchBtn');
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
@@ -253,7 +246,7 @@ window.UI = (() => {
 
   const syncComposerToolsUI = (modelId, toolState) => {
     const {
-      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled, translateTargetLang,
+      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
       imageGenRatio, imageGenStyle, imageGenTemplate
     } = toolState;
     const showWebSearch = window.APP_CONFIG.modelSupportsWebSearch(modelId);
@@ -291,7 +284,6 @@ window.UI = (() => {
       els.translateBtn.classList.toggle('is-active', active);
       els.translateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
-    syncCreateFileUI({ slidesEnabled, excelEnabled, documentEnabled, pdfEnabled });
     if (els.compareBtn) {
       const compareOn = !!window.Storage.get().compareEnabled;
       els.compareBtn.classList.toggle('is-active', compareOn);
@@ -299,10 +291,6 @@ window.UI = (() => {
     }
     syncCompareBar(window.Storage.get());
     syncTranslateUI({ translateEnabled, translateTargetLang: translateTargetLang || stateTranslateLang });
-    syncSlidesUI({ slidesEnabled });
-    syncExcelUI({ excelEnabled });
-    syncDocumentUI({ documentEnabled });
-    syncPdfUI({ pdfEnabled });
     syncImageGenUI({
       imageGenEnabled: showImageGen && !!imageGenEnabled,
       imageGenRatio,
@@ -313,7 +301,7 @@ window.UI = (() => {
       imageGenStylePicked: toolState.imageGenStylePicked,
       imageGenTemplatePicked: toolState.imageGenTemplatePicked
     });
-    syncComposerPlaceholder({ imageGenEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled });
+    syncComposerPlaceholder({ imageGenEnabled, translateEnabled });
   };
 
   let stateTranslateLang = window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
@@ -360,114 +348,11 @@ window.UI = (() => {
     closeTranslateLangMenu();
   };
 
-  const closeCreateFileMenu = () => {
-    if (!els.createFileMenu) return;
-    els.createFileMenu.classList.add('hidden');
-    if (els.createFileBtn) els.createFileBtn.setAttribute('aria-expanded', 'false');
-  };
-
-  const toggleCreateFileMenu = () => {
-    if (!els.createFileMenu || !els.createFileBtn) return;
-    const open = els.createFileMenu.classList.contains('hidden');
-    closeImageGenMenus();
-    closeTranslateLangMenu();
-    if (open) {
-      els.createFileMenu.classList.remove('hidden');
-      els.createFileBtn.setAttribute('aria-expanded', 'true');
-    } else {
-      closeCreateFileMenu();
-    }
-  };
-
-  const syncCreateFileUI = ({ slidesEnabled, excelEnabled, documentEnabled, pdfEnabled }) => {
-    if (!els.createFileBtn) return;
-    const active = !!(slidesEnabled || excelEnabled || documentEnabled || pdfEnabled);
-    els.createFileBtn.classList.toggle('is-active', active);
-    els.createFileBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-
-    let label = t('createFile');
-    let iconClass = 'fa-solid fa-file-circle-plus';
-    let activeMode = '';
-    if (slidesEnabled) {
-      label = t('slides');
-      iconClass = 'fa-solid fa-file-powerpoint';
-      activeMode = 'slides';
-    } else if (excelEnabled) {
-      label = t('excel');
-      iconClass = 'fa-solid fa-file-excel';
-      activeMode = 'excel';
-    } else if (documentEnabled) {
-      label = t('document');
-      iconClass = 'fa-solid fa-file-word';
-      activeMode = 'document';
-    } else if (pdfEnabled) {
-      label = t('pdf');
-      iconClass = 'fa-solid fa-file-pdf';
-      activeMode = 'pdf';
-    }
-
-    if (els.createFileBtnLabel) els.createFileBtnLabel.textContent = label;
-    if (els.createFileBtnIcon) {
-      els.createFileBtnIcon.className = iconClass;
-      els.createFileBtnIcon.setAttribute('aria-hidden', 'true');
-    }
-
-    if (els.createFileMenu) {
-      els.createFileMenu.querySelectorAll('.create-file-option').forEach((btn) => {
-        btn.classList.toggle('is-selected', !!activeMode && btn.dataset.createFile === activeMode);
-      });
-    }
-  };
-
-  const syncSlidesUI = ({ slidesEnabled }) => {
-    if (els.composerSlidesBar) {
-      const on = !!slidesEnabled;
-      els.composerSlidesBar.classList.toggle('hidden', !on);
-      els.composerSlidesBar.setAttribute('aria-hidden', on ? 'false' : 'true');
-    }
-  };
-
-  const syncExcelUI = ({ excelEnabled }) => {
-    if (els.composerExcelBar) {
-      const on = !!excelEnabled;
-      els.composerExcelBar.classList.toggle('hidden', !on);
-      els.composerExcelBar.setAttribute('aria-hidden', on ? 'false' : 'true');
-    }
-  };
-
-  const syncDocumentUI = ({ documentEnabled }) => {
-    if (els.composerDocumentBar) {
-      const on = !!documentEnabled;
-      els.composerDocumentBar.classList.toggle('hidden', !on);
-      els.composerDocumentBar.setAttribute('aria-hidden', on ? 'false' : 'true');
-    }
-  };
-
-  const syncPdfUI = ({ pdfEnabled }) => {
-    if (els.composerPdfBar) {
-      const on = !!pdfEnabled;
-      els.composerPdfBar.classList.toggle('hidden', !on);
-      els.composerPdfBar.setAttribute('aria-hidden', on ? 'false' : 'true');
-    }
-  };
-
-  const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled, slidesEnabled, excelEnabled, documentEnabled, pdfEnabled }) => {
+  const syncComposerPlaceholder = ({ imageGenEnabled, translateEnabled }) => {
     if (!els.composerInput) return;
     if (imageGenEnabled) {
       els.composerInput.placeholder = t('composerPlaceholderImageGen');
       els.composerInput.dataset.mode = 'imagegen';
-    } else if (pdfEnabled) {
-      els.composerInput.placeholder = t('composerPlaceholderPdf');
-      els.composerInput.dataset.mode = 'pdf';
-    } else if (documentEnabled) {
-      els.composerInput.placeholder = t('composerPlaceholderDocument');
-      els.composerInput.dataset.mode = 'document';
-    } else if (excelEnabled) {
-      els.composerInput.placeholder = t('composerPlaceholderExcel');
-      els.composerInput.dataset.mode = 'excel';
-    } else if (slidesEnabled) {
-      els.composerInput.placeholder = t('composerPlaceholderSlides');
-      els.composerInput.dataset.mode = 'slides';
     } else if (translateEnabled) {
       els.composerInput.placeholder = t('composerPlaceholderTranslate');
       els.composerInput.dataset.mode = 'translate';
@@ -622,34 +507,38 @@ window.UI = (() => {
     }
   };
 
-  const setStreamingSearchStatus = (article, status) => {
+  const setStreamingToolBadge = (article, className, html, show) => {
     if (!article) return;
-    let badge = article.querySelector('.streaming-search-badge');
-    if (status === 'searching') {
-      if (!badge) {
-        badge = document.createElement('div');
-        badge.className = 'streaming-tool-badge streaming-search-badge';
-        badge.innerHTML = '<i class="fa-solid fa-globe" aria-hidden="true"></i> ' + t('searchingWeb');
-        article.querySelector('.content')?.prepend(badge);
-      }
+    let badge = article.querySelector('.' + className);
+    if (show) {
+      if (badge) return;
+      badge = document.createElement('div');
+      badge.className = 'streaming-tool-badge ' + className;
+      badge.innerHTML = html;
+      const content = article.querySelector('.content');
+      if (content) content.before(badge);
+      else article.querySelector('.body')?.prepend(badge);
     } else if (badge) {
       badge.remove();
     }
   };
 
+  const setStreamingSearchStatus = (article, status) => {
+    setStreamingToolBadge(
+      article,
+      'streaming-search-badge',
+      '<i class="fa-solid fa-globe" aria-hidden="true"></i> ' + t('searchingWeb'),
+      status === 'searching'
+    );
+  };
+
   const setStreamingImageStatus = (article, status) => {
-    if (!article) return;
-    let badge = article.querySelector('.streaming-image-badge');
-    if (status === 'generating') {
-      if (!badge) {
-        badge = document.createElement('div');
-        badge.className = 'streaming-tool-badge streaming-image-badge';
-        badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ' + t('generatingImage');
-        article.querySelector('.content')?.prepend(badge);
-      }
-    } else if (badge) {
-      badge.remove();
-    }
+    setStreamingToolBadge(
+      article,
+      'streaming-image-badge',
+      '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ' + t('generatingImage'),
+      status === 'generating'
+    );
   };
 
   const generatedImagesHTML = (images) => {
@@ -685,24 +574,61 @@ window.UI = (() => {
     }
   };
 
-  const groundingHTML = (meta) => {
-    if (!meta) return '';
-    const seen = new Set();
+  const parseGroundingMeta = (meta) => {
+    const { links, queries } = collectGroundingLinks(meta);
     const chunks = [];
-    for (const item of meta.groundingChunks || []) {
-      const raw = item?.web?.uri || item?.retrievedContext?.uri;
-      const uri = safeHref(raw);
-      if (!uri || !/^https?:/i.test(uri) || seen.has(uri)) continue;
-      seen.add(uri);
-      const title = truncate(item.web?.title || item.retrievedContext?.title || uri, 200);
-      chunks.push({ uri, title });
-      if (chunks.length >= 24) break;
+    for (const link of links) {
+      const uri = safeHref(link.uri);
+      if (!uri || !/^https?:/i.test(uri)) continue;
+      chunks.push({ uri, title: link.title || uri });
     }
-    const queries = [...new Set((meta.webSearchQueries || [])
-      .map((q) => truncate(String(q || ''), 200))
-      .filter(Boolean))].slice(0, 8);
-    if (!chunks.length && !queries.length) return '';
-    let html = '<section class="message-grounding" aria-label="' + escapeHTML(t('sources')) + '">';
+    return { chunks, queries };
+  };
+
+  const groundingFaviconSrc = (host) => {
+    if (!host) return '';
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=64';
+  };
+
+  const groundingFaviconHTML = (host) => {
+    if (!host) {
+      return '<span class="source-favicon source-favicon-fallback" aria-hidden="true"><i class="fa-solid fa-globe"></i></span>';
+    }
+    return '<img class="source-favicon" src="' + escapeHTML(groundingFaviconSrc(host)) + '" alt="" width="18" height="18" loading="lazy" decoding="async" referrerpolicy="no-referrer">';
+  };
+
+  const uniqueGroundingHosts = (chunks, max = 4) => {
+    const hosts = [];
+    const seen = new Set();
+    for (const chunk of chunks || []) {
+      const host = groundingHostLabel(chunk.uri);
+      if (!host || seen.has(host)) continue;
+      seen.add(host);
+      hosts.push(host);
+      if (hosts.length >= max) break;
+    }
+    return hosts;
+  };
+
+  const bindFaviconFallbacks = (root) => {
+    if (!root) return;
+    root.querySelectorAll('img.source-favicon').forEach((img) => {
+      if (img.dataset.faviconBound) return;
+      img.dataset.faviconBound = '1';
+      const fail = () => {
+        const span = document.createElement('span');
+        span.className = 'source-favicon source-favicon-fallback';
+        span.setAttribute('aria-hidden', 'true');
+        span.innerHTML = '<i class="fa-solid fa-globe"></i>';
+        img.replaceWith(span);
+      };
+      img.addEventListener('error', fail, { once: true });
+      if (img.complete && img.naturalWidth === 0) fail();
+    });
+  };
+
+  const groundingExportListHTML = (chunks, queries) => {
+    let html = '<div class="message-grounding-export">';
     html += '<div class="message-grounding-header">';
     html += '<i class="fa-solid fa-globe" aria-hidden="true"></i>';
     html += '<span class="message-grounding-title">' + escapeHTML(t('sources')) + '</span>';
@@ -726,6 +652,33 @@ window.UI = (() => {
       });
       html += '</ul>';
     }
+    html += '</div>';
+    return html;
+  };
+
+  const groundingHTML = (meta) => {
+    const { chunks, queries } = parseGroundingMeta(meta);
+    if (!chunks.length && !queries.length) return '';
+    const hosts = uniqueGroundingHosts(chunks);
+    const payload = JSON.stringify({ chunks, queries }).replace(/</g, '\\u003c');
+    let html = '<section class="message-grounding" aria-label="' + escapeHTML(t('sources')) + '">';
+    html += '<button type="button" class="message-grounding-btn" data-open-sources aria-expanded="false" aria-controls="markdownPreviewPanel" title="'
+      + escapeHTML(t('sources')) + '">';
+    if (hosts.length) {
+      html += '<span class="message-grounding-favicons" aria-hidden="true">';
+      hosts.forEach((host) => { html += groundingFaviconHTML(host); });
+      html += '</span>';
+    } else {
+      html += '<i class="fa-solid fa-globe" aria-hidden="true"></i>';
+    }
+    html += '<span class="message-grounding-title">' + escapeHTML(t('sources')) + '</span>';
+    if (chunks.length) {
+      html += '<span class="message-grounding-count">' + escapeHTML(String(chunks.length)) + '</span>';
+    }
+    html += '<i class="fa-solid fa-chevron-right message-grounding-chevron" aria-hidden="true"></i>';
+    html += '</button>';
+    html += '<template class="message-grounding-json">' + payload + '</template>';
+    html += groundingExportListHTML(chunks, queries);
     html += '</section>';
     return html;
   };
@@ -867,20 +820,54 @@ window.UI = (() => {
     return selected;
   };
 
+  const providerLogoHTML = (providerId) => window.APP_CONFIG.getProviderLogoHTML(providerId);
+
+  const updateProviderPickerUI = (providerId) => {
+    const p = window.APP_CONFIG.PROVIDERS.find((x) => x.id === providerId);
+    const label = p?.label || providerId;
+    if (els.providerSelectBtnIcon) els.providerSelectBtnIcon.innerHTML = providerLogoHTML(providerId);
+    if (els.providerSelectBtnLabel) els.providerSelectBtnLabel.textContent = label;
+    if (els.providerSelectBtn) els.providerSelectBtn.dataset.provider = providerId;
+    els.providerSelectMenu?.querySelectorAll('.header-provider-option').forEach((opt) => {
+      const selected = opt.dataset.provider === providerId;
+      opt.classList.toggle('is-selected', selected);
+      opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
+  };
+
+  const closeProviderMenu = () => {
+    if (!els.providerSelectMenu) return;
+    els.providerSelectMenu.classList.add('hidden');
+    if (els.providerSelectBtn) els.providerSelectBtn.setAttribute('aria-expanded', 'false');
+    els.providerSelectBtn?.closest('.header-selects')?.classList.remove('is-provider-open');
+  };
+
+  const isProviderMenuOpen = () => !!els.providerSelectMenu && !els.providerSelectMenu.classList.contains('hidden');
+
+  const toggleProviderMenu = () => {
+    if (!els.providerSelectMenu || !els.providerSelectBtn) return;
+    closeHeaderDownloadMenu();
+    const open = els.providerSelectMenu.classList.contains('hidden');
+    els.providerSelectMenu.classList.toggle('hidden', !open);
+    els.providerSelectBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    els.providerSelectBtn.closest('.header-selects')?.classList.toggle('is-provider-open', open);
+  };
+
   const syncProviderSelect = (providerId) => {
     if (!els.providerSelect) return;
     if (els.providerSelect.value !== providerId) {
       els.providerSelect.value = providerId;
     }
+    updateProviderPickerUI(providerId);
   };
 
   const initProviderSelects = (currentModel) => {
     const { DEFAULT_MODEL } = window.APP_CONFIG;
     const modelId = currentModel || DEFAULT_MODEL;
     const providerId = window.APP_CONFIG.getModelProvider(modelId);
+    const providers = window.APP_CONFIG.getProviders();
 
     if (els.providerSelect) {
-      const providers = window.APP_CONFIG.getProviders();
       els.providerSelect.innerHTML = providers.map((p) =>
         '<option value="' + escapeHTML(p.id) + '"' + (p.id === providerId ? ' selected' : '') + '>'
         + escapeHTML(p.label) + '</option>'
@@ -888,6 +875,21 @@ window.UI = (() => {
       els.providerSelect.value = providerId;
     }
 
+    if (els.providerSelectMenu) {
+      els.providerSelectMenu.innerHTML = providers.map((p) =>
+        '<button type="button" class="header-provider-option" role="option" data-provider="'
+        + escapeHTML(p.id) + '" aria-selected="' + (p.id === providerId ? 'true' : 'false') + '">'
+        + providerLogoHTML(p.id)
+        + '<span>' + escapeHTML(p.label) + '</span>'
+        + '<i class="fa-solid fa-check header-provider-check" aria-hidden="true"></i>'
+        + '</button>'
+      ).join('');
+    }
+
+    updateProviderPickerUI(providerId);
+    document.querySelectorAll('[data-provider-logo]').forEach((el) => {
+      el.innerHTML = providerLogoHTML(el.dataset.providerLogo);
+    });
     updateModelSelect(providerId, modelId);
   };
 
@@ -994,8 +996,6 @@ window.UI = (() => {
   };
 
   const THEME_META_COLORS = {
-    dark: '#0c0c0e',
-    'vs-dark': '#1e1e1e',
     apple: '#f5f5f7',
     'apple-dark': '#1c1c1e',
     'hello-kitty': '#fff5f9',
@@ -1004,8 +1004,6 @@ window.UI = (() => {
     'liquid-glass': '#0d0d0f'
   };
   const THEME_ICONS = {
-    dark: '<i class="fa-solid fa-sun"></i>',
-    'vs-dark': '<i class="fa-brands fa-microsoft"></i>',
     apple: '<i class="fa-brands fa-apple"></i>',
     'apple-dark': '<i class="fa-solid fa-moon"></i>',
     'hello-kitty': '<i class="fa-solid fa-heart"></i>',
@@ -1014,8 +1012,6 @@ window.UI = (() => {
     'liquid-glass': '<i class="fa-solid fa-droplet"></i>'
   };
   const HIGHLIGHT_THEMES = {
-    dark: 'atom-one-dark',
-    'vs-dark': 'vs2015',
     apple: 'atom-one-light',
     'apple-dark': 'atom-one-dark',
     'hello-kitty': 'atom-one-light',
@@ -1032,12 +1028,18 @@ window.UI = (() => {
     if (link.href !== next) link.href = next;
   };
 
+  const normalizeTheme = (theme) => {
+    const fallback = window.APP_CONFIG.DEFAULT_THEME;
+    if (theme === 'dark' || theme === 'vs-dark') return fallback;
+    return THEME_META_COLORS[theme] ? theme : fallback;
+  };
+
   const setTheme = (theme) => {
-    const resolved = THEME_META_COLORS[theme] ? theme : 'dark';
+    const resolved = normalizeTheme(theme);
     document.documentElement.setAttribute('data-theme', resolved);
     const mc = document.querySelector('meta[name="theme-color"]');
     if (mc) mc.setAttribute('content', THEME_META_COLORS[resolved]);
-    if (els.themeIcon) els.themeIcon.innerHTML = THEME_ICONS[resolved] || THEME_ICONS.dark;
+    if (els.themeIcon) els.themeIcon.innerHTML = THEME_ICONS[resolved] || THEME_ICONS['apple-dark'];
     updateHighlightTheme(resolved);
   };
 
@@ -1260,6 +1262,7 @@ window.UI = (() => {
     document.body.classList.remove('model-compare-open');
     if (els.modelCompareColumns) els.modelCompareColumns.innerHTML = '';
     compareOverlayModels = [];
+    if (currentSourcesPreview?.key?.startsWith('compare:')) closeMarkdownPreview();
   };
 
   const isModelCompareOpen = () => {
@@ -1888,9 +1891,11 @@ window.UI = (() => {
     window.Markdown.enhanceCodeBlocks(root);
     window.Markdown.enhanceTables(root);
     window.Markdown.enhanceLinks(root);
+    bindFaviconFallbacks(root);
     if (!streaming) rehighlight(root);
     if (!streaming) window.Markdown.typesetMath(root);
     if (renderMermaid) window.Markdown.renderMermaid(root);
+    syncOpenSourcesPreview(root);
   };
 
   const waitForLayout = () =>
@@ -2381,8 +2386,8 @@ window.UI = (() => {
   const CHAT_FIND_MAX = 400;
   const CHAT_FIND_SKIP = [
     'script', 'style', 'textarea', 'input', 'button', 'select', 'option', 'svg', 'canvas', 'summary',
-    '.toolbar', '.msg-edge-scroll', '.katex', '.mermaid', '.code-copy', '.message-grounding-header',
-    '.export-select-check', '.message-translate-toggle', '.chat-find-bar', '.messages-empty',
+    '.toolbar', '.msg-edge-scroll', '.katex', '.mermaid', '.code-copy', '.message-grounding',
+    '.streaming-tool-badge', '.export-select-check', '.message-translate-toggle', '.chat-find-bar', '.messages-empty',
     '.line-numbers', '.pre-header', '.table-header-actions', '.table-label',
     '.message-model-label', '.message.streaming'
   ].join(',');
@@ -3276,10 +3281,6 @@ window.UI = (() => {
       imageGenEnabled: appState.imageGenEnabled,
       thinkingEnabled: appState.thinkingEnabled,
       translateEnabled: appState.translateEnabled,
-      slidesEnabled: appState.slidesEnabled,
-      excelEnabled: appState.excelEnabled,
-      documentEnabled: appState.documentEnabled,
-      pdfEnabled: appState.pdfEnabled,
       translateTargetLang: appState.translateTargetLang,
       imageGenRatio: appState.imageGenRatio,
       imageGenStyle: appState.imageGenStyle,
@@ -3301,15 +3302,25 @@ window.UI = (() => {
     updateSettingsTokenUsage(appState);
   };
 
-  const openGuide = () => {
+  let guideOnClose = null;
+
+  const openGuide = (opts = {}) => {
     closeSettings();
+    guideOnClose = opts.onClose || null;
     if (!els.guideModal) return;
     els.guideModal.classList.remove('hidden');
     if (els.guideBody) els.guideBody.scrollTop = 0;
   };
 
-  const closeGuide = () => {
+  const closeGuide = (opts = {}) => {
     if (els.guideModal) els.guideModal.classList.add('hidden');
+    if (opts.skipOnClose) {
+      guideOnClose = null;
+      return;
+    }
+    const cb = guideOnClose;
+    guideOnClose = null;
+    cb?.();
   };
 
   const isGuideModalOpen = () => !!(els.guideModal && !els.guideModal.classList.contains('hidden'));
@@ -3668,6 +3679,7 @@ window.UI = (() => {
   let previewResizeCaptureEl = null;
   let currentPreviewMode = null;
   let currentArtifactPreview = null;
+  let currentSourcesPreview = null;
 
   const isPreviewResizeStartTarget = (e) => {
     if (e.target.closest('.md-preview-header button, .md-preview-header a, .md-preview-header input, .md-preview-header select, .md-preview-header textarea, .md-preview-header [role="menuitem"]')) {
@@ -3844,7 +3856,8 @@ window.UI = (() => {
     openapi: 'previewOpenapi',
     chart: 'previewChart',
     python: 'previewPython',
-    sql: 'previewSql'
+    sql: 'previewSql',
+    sources: 'sources'
   };
 
   const PREVIEW_ICONS = {
@@ -3863,7 +3876,8 @@ window.UI = (() => {
     openapi: 'fa-solid fa-book',
     chart: 'fa-solid fa-chart-column',
     python: 'fa-brands fa-python',
-    sql: 'fa-solid fa-database'
+    sql: 'fa-solid fa-database',
+    sources: 'fa-solid fa-globe'
   };
 
   const isIframeArtifactType = (type) => window.ArtifactPreview?.isIframeArtifact?.(type)
@@ -3872,6 +3886,131 @@ window.UI = (() => {
   const isDomArtifactType = (type) => window.ArtifactPreview?.isDomArtifact?.(type)
     ?? (type === 'mermaid' || type === 'json' || type === 'yaml' || type === 'graphviz'
       || type === 'csv' || type === 'openapi' || type === 'sql');
+
+  const sourcesKeyFromEl = (el) => {
+    if (!el) return '';
+    const article = el.closest('.message');
+    if (article?.dataset.idx != null && article.dataset.idx !== '') return 'msg:' + article.dataset.idx;
+    const col = el.closest('.model-compare-col');
+    if (col?.dataset.modelId) return 'compare:' + col.dataset.modelId;
+    return '';
+  };
+
+  const readGroundingPayload = (section) => {
+    const node = section?.querySelector?.('template.message-grounding-json, script.message-grounding-json');
+    if (!node) return null;
+    try {
+      const raw = node.tagName === 'TEMPLATE'
+        ? (node.content?.textContent || node.innerHTML || '')
+        : (node.textContent || '');
+      const data = JSON.parse(raw);
+      const chunks = [];
+      const seen = new Set();
+      for (const item of data.chunks || []) {
+        const uri = safeHref(item?.uri);
+        if (!uri || !/^https?:/i.test(uri) || seen.has(uri)) continue;
+        seen.add(uri);
+        chunks.push({ uri, title: truncate(item.title || uri, 200) });
+      }
+      const queries = [...new Set((data.queries || [])
+        .map((q) => truncate(String(q || ''), 200))
+        .filter(Boolean))].slice(0, 8);
+      if (!chunks.length && !queries.length) return null;
+      return { chunks, queries };
+    } catch {
+      return null;
+    }
+  };
+
+  const sourcesPanelHTML = ({ chunks = [], queries = [] } = {}) => {
+    let html = '<div class="sources-panel">';
+    if (queries.length) {
+      html += '<p class="sources-panel-query"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>'
+        + '<span>' + escapeHTML(t('sourcesQuery', { q: queries.join(' · ') })) + '</span></p>';
+    }
+    if (!chunks.length) {
+      html += '</div>';
+      return html;
+    }
+    html += '<ul class="sources-panel-list">';
+    chunks.forEach((chunk, i) => {
+      const host = groundingHostLabel(chunk.uri);
+      html += '<li><a class="sources-panel-card" href="' + escapeHTML(chunk.uri)
+        + '" target="_blank" rel="noopener noreferrer">';
+      html += '<span class="sources-panel-index">' + escapeHTML(String(i + 1)) + '</span>';
+      html += '<span class="sources-panel-favicon-wrap">' + groundingFaviconHTML(host) + '</span>';
+      html += '<span class="sources-panel-text">';
+      html += '<span class="sources-panel-card-title">' + escapeHTML(chunk.title) + '</span>';
+      if (host) html += '<span class="sources-panel-host">' + escapeHTML(host) + '</span>';
+      html += '</span>';
+      html += '<i class="fa-solid fa-arrow-up-right-from-square sources-panel-open" aria-hidden="true"></i>';
+      html += '</a></li>';
+    });
+    html += '</ul></div>';
+    return html;
+  };
+
+  const markOpenSourcesButtons = () => {
+    document.querySelectorAll('.message-grounding-btn.is-open').forEach((btn) => {
+      btn.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    if (currentPreviewMode !== 'sources' || !currentSourcesPreview?.key) return;
+    document.querySelectorAll('.message-grounding-btn').forEach((btn) => {
+      if (sourcesKeyFromEl(btn) !== currentSourcesPreview.key) return;
+      btn.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    });
+  };
+
+  const renderSourcesPreviewContent = (payload) => {
+    if (!els.markdownPreviewContent) return;
+    els.markdownPreviewContent.classList.add('is-sources-preview');
+    els.markdownPreviewPanel?.classList.add('is-sources-preview-panel');
+    els.markdownPreviewContent.innerHTML = sourcesPanelHTML(payload);
+    bindFaviconFallbacks(els.markdownPreviewContent);
+    els.markdownPreviewContent.scrollTop = 0;
+  };
+
+  const syncOpenSourcesPreview = (root) => {
+    if (currentPreviewMode !== 'sources' || !currentSourcesPreview) return;
+    const scope = root && root.querySelectorAll ? root : document;
+    const sections = scope.querySelectorAll('.message-grounding');
+    for (const section of sections) {
+      if (sourcesKeyFromEl(section) !== currentSourcesPreview.key) continue;
+      const payload = readGroundingPayload(section);
+      if (!payload) break;
+      const serialized = JSON.stringify(payload);
+      if (serialized !== currentSourcesPreview.serialized) {
+        currentSourcesPreview = { key: currentSourcesPreview.key, serialized, ...payload };
+        if (els.markdownPreviewContent?.classList.contains('is-sources-preview')) {
+          const top = els.markdownPreviewContent.scrollTop;
+          renderSourcesPreviewContent(payload);
+          els.markdownPreviewContent.scrollTop = top;
+        }
+      }
+      break;
+    }
+    markOpenSourcesButtons();
+  };
+
+  const openSourcesPreview = (triggerEl) => {
+    const section = triggerEl?.closest?.('.message-grounding');
+    const payload = readGroundingPayload(section);
+    if (!payload || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    const key = sourcesKeyFromEl(section);
+    if (currentPreviewMode === 'sources' && currentSourcesPreview?.key && currentSourcesPreview.key === key) {
+      closeMarkdownPreview();
+      return;
+    }
+    currentArtifactPreview = null;
+    currentSourcesPreview = { key, serialized: JSON.stringify(payload), ...payload };
+    setPreviewPanelTitle('sources');
+    clearArtifactPreviewContent();
+    renderSourcesPreviewContent(payload);
+    openPreviewPanel();
+    markOpenSourcesButtons();
+  };
 
   const setPreviewPanelTitle = (mode) => {
     currentPreviewMode = mode || null;
@@ -3897,11 +4036,14 @@ window.UI = (() => {
   };
 
   const clearArtifactPreviewContent = () => {
+    if (!els.markdownPreviewContent) return;
     els.markdownPreviewContent.classList.remove(
       'is-html-preview', 'is-artifact-preview', 'is-dom-artifact-preview',
       'is-mermaid-preview', 'is-json-preview', 'is-yaml-preview',
-      'is-graphviz-preview', 'is-csv-preview', 'is-openapi-preview', 'is-python-preview', 'is-sql-preview'
+      'is-graphviz-preview', 'is-csv-preview', 'is-openapi-preview', 'is-python-preview', 'is-sql-preview',
+      'is-sources-preview'
     );
+    els.markdownPreviewPanel?.classList.remove('is-sources-preview-panel');
     els.markdownPreviewContent.innerHTML = '';
   };
 
@@ -3949,7 +4091,9 @@ window.UI = (() => {
     const trimmed = (source || '').trim();
     const artifactType = type || window.ArtifactPreview?.detectArtifactType?.(lang, trimmed) || 'html';
     if (!trimmed || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
+    currentSourcesPreview = null;
     setPreviewPanelTitle(artifactType);
+    markOpenSourcesButtons();
     if (isDomArtifactType(artifactType)) {
       currentArtifactPreview = { source: trimmed, type: artifactType, lang, srcdoc: null };
       await renderDomArtifactPreview(trimmed, artifactType, lang);
@@ -3993,7 +4137,9 @@ window.UI = (() => {
   const openMarkdownPreview = (source) => {
     if (!source || !els.markdownPreviewPanel || !els.markdownPreviewContent) return;
     currentArtifactPreview = null;
+    currentSourcesPreview = null;
     setPreviewPanelTitle('markdown');
+    markOpenSourcesButtons();
     clearArtifactPreviewContent();
     els.markdownPreviewContent.innerHTML = window.Markdown.render(source);
     polishContent(els.markdownPreviewContent, { renderMermaid: true });
@@ -4020,7 +4166,9 @@ window.UI = (() => {
       clearArtifactPreviewContent();
     }
     currentArtifactPreview = null;
+    currentSourcesPreview = null;
     currentPreviewMode = null;
+    markOpenSourcesButtons();
   };
 
   const openImagePreview = (src, alt = '') => {
@@ -4077,6 +4225,7 @@ window.UI = (() => {
 
   const toggleHeaderDownloadMenu = () => {
     if (!els.headerDownloadMenu || !els.headerDownloadBtn) return;
+    closeProviderMenu();
     const open = els.headerDownloadMenu.classList.contains('hidden');
     els.headerDownloadMenu.classList.toggle('hidden', !open);
     els.headerDownloadBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -4181,7 +4330,7 @@ window.UI = (() => {
   return {
     cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect,
     initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
-    syncComposerToolsUI, syncTranslateUI, syncSlidesUI, syncExcelUI, syncDocumentUI, syncPdfUI, syncCreateFileUI, closeCreateFileMenu, toggleCreateFileMenu, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
+    syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,
     setConversationSearchQuery, toggleConversationSearch, clearConversationSearch, isConversationSearchOpen,
@@ -4206,7 +4355,7 @@ window.UI = (() => {
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
-    closeMarkdownPreview, bindPreviewResize,
+    openSourcesPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
     setPdfExportLoading, isPdfExportCancellable,
     showExportDownloadPrompt, consumeExportDownload, finishExportDownload,
@@ -4221,6 +4370,7 @@ window.UI = (() => {
     preparePdfExportRoot,
     closeAllMsgExportMenus,
     closeHeaderDownloadMenu, toggleHeaderDownloadMenu, setHeaderDownloadOptionDisabled,
+    closeProviderMenu, toggleProviderMenu, isProviderMenuOpen,
     els
   };
 })();

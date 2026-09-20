@@ -91,6 +91,41 @@ const SHARE_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 const SHARE_MAX_BYTES = 900_000; // stay under KV 1 MiB value limit
 const SHARE_MAX_MESSAGES = 200;
 const SHARE_MAX_TEXT = 100_000;
+const SHARE_MAX_GROUNDING_CHUNKS = 24;
+const SHARE_MAX_GROUNDING_QUERIES = 8;
+const SHARE_MAX_GROUNDING_TITLE = 200;
+const SHARE_MAX_GROUNDING_QUERY = 200;
+const SHARE_MAX_GROUNDING_URL = 2048;
+
+const clipShareText = (value, max) => {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  return text.length > max ? text.slice(0, max - 1) + '…' : text;
+};
+
+const sanitizeShareGrounding = (meta) => {
+  if (!meta || typeof meta !== 'object') return null;
+  const seen = new Set();
+  const groundingChunks = [];
+  for (const item of meta.groundingChunks || []) {
+    if (!item || typeof item !== 'object') continue;
+    const uri = String(item.web?.uri || item.retrievedContext?.uri || '').trim();
+    if (!/^https?:\/\//i.test(uri) || uri.length > SHARE_MAX_GROUNDING_URL || seen.has(uri)) continue;
+    seen.add(uri);
+    const title = clipShareText(item.web?.title || item.retrievedContext?.title || uri, SHARE_MAX_GROUNDING_TITLE) || uri;
+    groundingChunks.push({ web: { uri, title } });
+    if (groundingChunks.length >= SHARE_MAX_GROUNDING_CHUNKS) break;
+  }
+  const queries = [...new Set((Array.isArray(meta.webSearchQueries) ? meta.webSearchQueries : [])
+    .map((q) => clipShareText(q, SHARE_MAX_GROUNDING_QUERY))
+    .filter(Boolean))].slice(0, SHARE_MAX_GROUNDING_QUERIES);
+  if (!groundingChunks.length && !queries.length) return null;
+  const out = {};
+  if (groundingChunks.length) out.groundingChunks = groundingChunks;
+  if (queries.length) out.webSearchQueries = queries;
+  return out;
+};
+
 const SHARE_MAX_IMAGES = 8;
 const SHARE_MAX_IMAGE_CHARS = 120_000; // ~90KB base64
 
@@ -156,7 +191,8 @@ const sanitizeShareMessage = (m) => {
       out.reasoningContent = truncateText(m.reasoningContent, SHARE_MAX_TEXT);
     }
     if (m.groundingMetadata && typeof m.groundingMetadata === 'object') {
-      out.groundingMetadata = m.groundingMetadata;
+      const grounding = sanitizeShareGrounding(m.groundingMetadata);
+      if (grounding) out.groundingMetadata = grounding;
     }
     if (Array.isArray(m.generatedImages) && m.generatedImages.length) {
       const images = [];

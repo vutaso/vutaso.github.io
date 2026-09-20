@@ -12,6 +12,10 @@ window.HtmlExport = (() => {
     '.generated-image-actions',
     '.mermaid-source',
     'script.mermaid-source-raw',
+    '.message-grounding-btn',
+    'script.message-grounding-json',
+    'template.message-grounding-json',
+    '.streaming-tool-badge',
   ].join(', ');
 
   let cssCache = null;

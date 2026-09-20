@@ -1281,11 +1281,12 @@
 }
 
 .message.streaming .streaming-tool-badge,
-.message.streaming .streaming-search-badge {
+.message.streaming .streaming-search-badge,
+.message.streaming .streaming-image-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 10px;
+  margin: 0 0 10px;
   padding: 6px 10px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 12%, var(--bg-elev));
@@ -1353,23 +1354,82 @@
 
 .message-grounding {
   margin: 14px 0 0;
-  padding: 10px 12px 8px;
-  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--bg-elev) 72%, var(--bg));
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
-.message-grounding-header {
-  display: flex;
+.message-grounding-btn {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  max-width: 100%;
+  margin: 0;
+  padding: 6px 10px 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elev) 82%, var(--bg));
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-dim);
+  line-height: 1.2;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
-.message-grounding-header .fa-globe {
+.message-grounding-btn:hover,
+.message-grounding-btn:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-elev));
+  outline: none;
+}
+
+.message-grounding-btn.is-open {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-elev));
+  color: var(--text);
+}
+
+.message-grounding-favicons {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.message-grounding-favicons .source-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-elev);
+  background: var(--bg);
+  object-fit: cover;
+  margin-left: -7px;
+}
+
+.message-grounding-favicons .source-favicon:first-child {
+  margin-left: 0;
+}
+
+.source-favicon-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent);
+  font-size: 9px;
+}
+
+.message-grounding-btn > .fa-globe {
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.message-grounding-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .message-grounding-count {
@@ -1384,6 +1444,35 @@
   color: var(--accent);
   font-size: 11px;
   font-weight: 700;
+}
+
+.message-grounding-chevron {
+  font-size: 10px;
+  color: var(--text-dim);
+  transition: transform var(--transition), color var(--transition);
+}
+
+.message-grounding-btn.is-open .message-grounding-chevron {
+  transform: rotate(90deg);
+  color: var(--accent);
+}
+
+.message-grounding-json,
+.message-grounding-export {
+  display: none;
+}
+
+.message-grounding-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.message-grounding-header .fa-globe {
+  color: var(--accent);
 }
 
 .message-grounding-queries {

@@ -25,10 +25,6 @@ window.Storage = (() => {
     imageGenTemplate: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
     translateEnabled: false,
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
-    slidesEnabled: false,
-    excelEnabled: false,
-    documentEnabled: false,
-    pdfEnabled: false,
     tokenSaveEnabled: false,
     systemPromptMode: 'default',
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
@@ -42,7 +38,8 @@ window.Storage = (() => {
     promptSnippetsSeeded: false,
     compareEnabled: false,
     compareModels: [],
-    usageLedger: { resetAt: 0, days: {} }
+    usageLedger: { resetAt: 0, days: {} },
+    guideSeen: false
   });
 
   const USAGE_LEDGER_MAX_DAYS = 90;

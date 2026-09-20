@@ -321,7 +321,7 @@ a.btn {
 
 .settings-api-row {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: 108px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -335,7 +335,17 @@ a.btn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
+
+.settings-provider-logo[data-provider-logo="openai"] { color: #10a37f; }
+.settings-provider-logo[data-provider-logo="anthropic"] { color: #d97757; }
+.settings-provider-logo[data-provider-logo="google"] { color: #8e75b2; }
+.settings-provider-logo[data-provider-logo="deepseek"] { color: #4d6bfe; }
+.settings-provider-logo[data-provider-logo="kimi"] { color: #6366f1; }
+.settings-provider-logo[data-provider-logo="openrouter"] { color: #a78bfa; }
 
 .settings-api-row .input {
   padding: 6px 8px;

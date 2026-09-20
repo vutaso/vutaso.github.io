@@ -270,13 +270,15 @@ window.Utils = (() => {
   const MAX_GROUNDING_CHUNKS = 24;
   const MAX_GROUNDING_QUERIES = 8;
   const MAX_GROUNDING_TITLE = 200;
+  const MAX_GROUNDING_URL = 2048;
 
   const collectGroundingLinks = (meta) => {
     const seen = new Set();
     const links = [];
     for (const item of meta?.groundingChunks || []) {
-      const uri = item?.web?.uri || item?.retrievedContext?.uri;
-      if (!uri || !/^https?:\/\//i.test(uri) || seen.has(uri)) continue;
+      const raw = item?.web?.uri || item?.retrievedContext?.uri;
+      const uri = safeHref(raw);
+      if (!uri || !/^https?:\/\//i.test(uri) || uri.length > MAX_GROUNDING_URL || seen.has(uri)) continue;
       seen.add(uri);
       const title = truncate(item.web?.title || item.retrievedContext?.title || uri, MAX_GROUNDING_TITLE);
       links.push({ uri, title: title || uri });
@@ -286,6 +288,17 @@ window.Utils = (() => {
       .map((q) => truncate(String(q || ''), 200))
       .filter(Boolean))].slice(0, MAX_GROUNDING_QUERIES);
     return { links, queries };
+  };
+
+  const sanitizeGroundingMetadata = (meta) => {
+    const { links, queries } = collectGroundingLinks(meta);
+    if (!links.length && !queries.length) return null;
+    const out = {};
+    if (links.length) {
+      out.groundingChunks = links.map((link) => ({ web: { uri: link.uri, title: link.title } }));
+    }
+    if (queries.length) out.webSearchQueries = queries;
+    return out;
   };
 
   const escapeMdLinkText = (value) => String(value || '')
@@ -988,7 +1001,7 @@ window.Utils = (() => {
     buildSearchFold, includesSearchFold, findSearchRangeInFold, findAllSearchRangesInFold,
     buildSearchSnippet, includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
-    formatConversation, formatConversationPlainText,
+    collectGroundingLinks, sanitizeGroundingMetadata, formatConversation, formatConversationPlainText,
     downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice, prefersCoarsePointer,
     exportToDocx, readFileAsDataUrl,
     extractJsonCandidates

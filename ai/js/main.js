@@ -24,20 +24,25 @@
   ui.initSidebar();
   ui.bindSidebarResize();
   ui.bindComposerViewport();
-  ui.setTheme(state.theme || window.APP_CONFIG.DEFAULT_THEME);
+  let theme = state.theme || window.APP_CONFIG.DEFAULT_THEME;
+  if (theme === 'dark' || theme === 'vs-dark') {
+    theme = window.APP_CONFIG.DEFAULT_THEME;
+    window.Storage.set({ theme });
+  }
+  ui.setTheme(theme);
   ui.initModelSelect(state.currentModel);
   ui.syncSystemPromptModeUI(state);
   ui.initTranslateLangMenu();
   ui.initImageGenMenus();
+  if (state.webSearchEnabled && state.imageGenEnabled) {
+    window.Storage.set({ webSearchEnabled: false });
+    state.webSearchEnabled = false;
+  }
   ui.syncComposerToolsUI(state.currentModel, {
     webSearchEnabled: state.webSearchEnabled,
     imageGenEnabled: state.imageGenEnabled,
     thinkingEnabled: state.thinkingEnabled,
     translateEnabled: state.translateEnabled,
-    slidesEnabled: state.slidesEnabled,
-    excelEnabled: state.excelEnabled,
-    documentEnabled: state.documentEnabled,
-    pdfEnabled: state.pdfEnabled,
     translateTargetLang: state.translateTargetLang,
     imageGenRatio: state.imageGenRatio,
     imageGenStyle: state.imageGenStyle,
@@ -69,7 +74,22 @@
   window.Events.bind();
 
   if (!window.APP_CONFIG.hasApiKey(state, state.currentModel)) {
-    setTimeout(() => ui.openSettings(state), 200);
+    setTimeout(() => {
+      const isFirstVisit = !state.guideSeen && !(state.conversations?.length);
+      if (isFirstVisit) {
+        ui.openGuide({
+          onClose: () => {
+            window.Storage.set({ guideSeen: true });
+            const latest = window.Storage.get();
+            if (!window.APP_CONFIG.hasApiKey(latest, latest.currentModel)) {
+              ui.openSettings(latest);
+            }
+          }
+        });
+        return;
+      }
+      ui.openSettings(state);
+    }, 200);
   } else if (!window.Utils.prefersCoarsePointer()) {
     ui.els.composerInput.focus();
   }

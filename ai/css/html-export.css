@@ -404,6 +404,17 @@ body {
   background: #f6f8fa;
 }
 
+.message-grounding-btn,
+.message-grounding-json,
+.message-grounding-favicons,
+.message-grounding-chevron {
+  display: none !important;
+}
+
+.message-grounding-export {
+  display: block;
+}
+
 .message-grounding-header {
   display: flex;
   align-items: center;

@@ -177,8 +177,29 @@
 .pdf-export-root .message-reasoning,
 .pdf-export-root .message-reasoning summary,
 .pdf-export-root .grounding-chip,
-.pdf-export-root .grounding-chip-label {
+.pdf-export-root .grounding-chip-label,
+.pdf-export-root .message-grounding,
+.pdf-export-root .message-grounding-title {
   color: #111118;
+}
+
+.pdf-export-root .message-grounding {
+  margin: 14px 0 0;
+  padding: 10px 12px 8px;
+  border: 1px solid #e2e4ec;
+  border-radius: 8px;
+  background: #f6f8fa;
+}
+
+.pdf-export-root .message-grounding-btn,
+.pdf-export-root .message-grounding-json,
+.pdf-export-root .message-grounding-favicons,
+.pdf-export-root .message-grounding-chevron {
+  display: none !important;
+}
+
+.pdf-export-root .message-grounding-export {
+  display: block;
 }
 
 .pdf-export-root .content a {

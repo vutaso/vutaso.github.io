@@ -37,7 +37,8 @@ window.Share = (() => {
           : (m.content || '');
         out.content = text;
         if (m.reasoningContent) out.reasoningContent = m.reasoningContent;
-        if (m.groundingMetadata) out.groundingMetadata = m.groundingMetadata;
+        const grounding = window.Utils.sanitizeGroundingMetadata?.(m.groundingMetadata);
+        if (grounding) out.groundingMetadata = grounding;
         if (m.generatedImages?.length) {
           out.generatedImages = m.generatedImages
             .filter((img) => window.Utils.isSafeImageDataUrl(img?.dataUrl))

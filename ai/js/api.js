@@ -226,7 +226,8 @@ window.API = (() => {
   const buildAnthropicTools = ({ webSearch }) => {
     const tools = [];
     if (webSearch) {
-      tools.push({ type: 'web_search_20250305', name: 'web_search' });
+      const maxUses = Math.max(1, Number(window.APP_CONFIG.WEB_SEARCH_MAX_USES) || 5);
+      tools.push({ type: 'web_search_20250305', name: 'web_search', max_uses: maxUses });
     }
     return tools;
   };
