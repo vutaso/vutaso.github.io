@@ -1189,6 +1189,7 @@ window.Events = (() => {
   };
 
   const sendCurrent = async () => {
+    ui.confirmSlashCommand({ requireQuery: true });
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     const compareMode = !!s.compareEnabled;
@@ -1310,9 +1311,12 @@ window.Events = (() => {
     streamResponse(convo);
   };
 
-  const syncComposerInputState = () => {
+  const syncComposerInputState = (e) => {
     autoResize(ui.els.composerInput);
     updateSendEnabled();
+    if (e?.isComposing) return;
+    if (e?.type === 'keyup' && ['ArrowUp', 'ArrowDown', 'Enter', 'Escape', 'Tab'].includes(e.key)) return;
+    ui.syncSlashCommandMenu();
   };
 
   let composerClearedAt = 0;
@@ -1325,6 +1329,7 @@ window.Events = (() => {
     el.value = '';
     autoResize(el);
     composerClearedAt = Date.now();
+    ui.closeSlashCommandMenu();
     const keepEmpty = () => {
       if (!el.isConnected) return;
       if (Date.now() - composerClearedAt > 500) return;
@@ -1363,7 +1368,10 @@ window.Events = (() => {
     ui.els.composerInput.addEventListener('focus', updateSendEnabled);
     // selectionchange is a reliable Safari fallback when `input` is missed; avoid autoResize here.
     document.addEventListener('selectionchange', () => {
-      if (document.activeElement === ui.els.composerInput) updateSendEnabled();
+      if (document.activeElement === ui.els.composerInput) {
+        updateSendEnabled();
+        ui.syncSlashCommandMenu();
+      }
     });
 
     // Keep focus on touch so keyboard reflow doesn't make the send tap miss.
@@ -1374,6 +1382,45 @@ window.Events = (() => {
 
     let enterSendHandled = false;
     ui.els.composerInput.addEventListener('keydown', (e) => {
+      if (e.isComposing || e.keyCode === 229) return;
+      if (ui.isSlashCommandMenuOpen()) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          ui.moveSlashCommandHighlight(1);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          ui.moveSlashCommandHighlight(-1);
+          return;
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          if (ui.confirmSlashCommand({ requireQuery: true })) {
+            ui.showToast(t('snippetsInserted'));
+            updateSendEnabled();
+          }
+          return;
+        }
+        if (e.key === ' ' && ui.confirmSlashCommand({ requireQuery: true })) {
+          e.preventDefault();
+          ui.showToast(t('snippetsInserted'));
+          updateSendEnabled();
+          return;
+        }
+        if (isComposerEnterSend(e)) {
+          enterSendHandled = true;
+          e.preventDefault();
+          if (ui.confirmSlashCommand({ requireQuery: true })) {
+            ui.showToast(t('snippetsInserted'));
+            updateSendEnabled();
+          } else {
+            ui.closeSlashCommandMenu({ dismiss: true });
+          }
+          queueMicrotask(() => { enterSendHandled = false; });
+          return;
+        }
+      }
       if (e.key === 'Enter' && e.shiftKey && !e.isComposing && e.keyCode !== 229) {
         requestAnimationFrame(syncComposerInputState);
         return;
@@ -1389,7 +1436,25 @@ window.Events = (() => {
     // Android GBoard / some mobile keyboards send via beforeinput instead of keydown Enter.
     ui.els.composerInput.addEventListener('beforeinput', (e) => {
       if (e.isComposing || e.shiftKey) return;
+      if (e.inputType === 'insertText' && e.data === ' ' && ui.isSlashCommandMenuOpen()) {
+        if (ui.confirmSlashCommand({ requireQuery: true })) {
+          e.preventDefault();
+          ui.showToast(t('snippetsInserted'));
+          updateSendEnabled();
+        }
+        return;
+      }
       if (e.inputType !== 'insertLineBreak' && e.inputType !== 'insertParagraph') return;
+      if (ui.isSlashCommandMenuOpen()) {
+        e.preventDefault();
+        if (ui.confirmSlashCommand({ requireQuery: true })) {
+          ui.showToast(t('snippetsInserted'));
+          updateSendEnabled();
+        } else {
+          ui.closeSlashCommandMenu({ dismiss: true });
+        }
+        return;
+      }
       e.preventDefault();
       if (enterSendHandled) return;
       sendCurrent();
@@ -1427,12 +1492,25 @@ window.Events = (() => {
       onTranscript: () => {
         autoResize(ui.els.composerInput);
         updateSendEnabled();
+        ui.syncSlashCommandMenu();
       },
       onError: (msg) => ui.showToast(msg),
     });
 
     ui.els.micBtn?.addEventListener('click', () => {
       window.Speech?.toggleListening?.();
+    });
+
+    ui.els.slashCommandMenu?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const btn = e.target.closest('[data-snippet-id]');
+      if (!btn) return;
+      const snippet = window.Snippets.getById(btn.dataset.snippetId);
+      if (!snippet) return;
+      if (ui.applySlashSnippet(snippet)) {
+        ui.showToast(t('snippetsInserted'));
+        updateSendEnabled();
+      }
     });
 
     ui.els.snippetsBtn?.addEventListener('click', (e) => {
@@ -2311,6 +2389,9 @@ window.Events = (() => {
       if (!e.target.closest('.composer-snippets-wrap')) {
         ui.closeSnippetsMenu();
       }
+      if (!e.target.closest('#slashCommandMenu') && !e.target.closest('#composerInput')) {
+        ui.closeSlashCommandMenu({ dismiss: true });
+      }
       if (!e.target.closest('.msg-export-wrap')) {
         ui.closeAllMsgExportMenus();
       }
@@ -2755,6 +2836,10 @@ window.Events = (() => {
         }
         if (!ui.els.translateLangMenu.classList.contains('hidden')) {
           ui.closeTranslateLangMenu();
+          return;
+        }
+        if (ui.isSlashCommandMenuOpen()) {
+          ui.closeSlashCommandMenu({ dismiss: true });
           return;
         }
         if (ui.isSnippetsMenuOpen()) {

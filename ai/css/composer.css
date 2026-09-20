@@ -17,9 +17,11 @@
   box-shadow: var(--composer-shadow);
   transition: border-color var(--transition), box-shadow var(--transition);
   position: relative;
+  overflow: visible;
 }
 
 .composer-field {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;

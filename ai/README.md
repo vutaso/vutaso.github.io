@@ -92,6 +92,7 @@ Thanh công cụ phía trên ô nhập tin nhắn; tự ẩn/hiện tùy model �
 | **Tìm kiếm web** | AI tra cứu thông tin trên web khi trả lời | OpenAI, Anthropic, Google Gemini |
 | **Tạo hình ảnh** | Sinh ảnh từ mô tả văn bản | OpenAI, Google Gemini |
 | **Dịch** | Dịch văn bản sang ngôn ngữ đích; chỉ trả về bản dịch | Tất cả model |
+| **Thư viện prompt** | Bookmark cạnh ô nhập; gõ `/review`, `/summary`… để chèn prompt | Tất cả |
 
 #### Tạo hình ảnh — tuỳ chọn
 
@@ -216,6 +217,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | `Ctrl/Cmd + K` | Focus vào ô nhập tin nhắn |
 | `Ctrl/Cmd + F` | Tìm trong cuộc chat đang mở (highlight, prev/next, đếm số lần) |
 | `F3` / `Ctrl/Cmd + G` | Kết quả tìm tiếp theo (`Shift` để lùi) |
+| `/review`, `/summary`, … | Chèn prompt từ thư viện (Enter / Tab chọn, Esc đóng) |
 | `Escape` | Thoát sửa tin / đóng tìm trong chat / đóng tooltip Reply / đóng modal / đóng preview MD / đóng sidebar (mobile) |
 
 ---

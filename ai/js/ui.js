@@ -174,6 +174,9 @@ window.UI = (() => {
     els.imageGenTemplateChipClear = $('#imageGenTemplateChipClear');
     els.imageGenTemplateMenu = $('#imageGenTemplateMenu');
     els.imageGenTemplateOptions = $('#imageGenTemplateOptions');
+    els.slashCommandMenu = $('#slashCommandMenu');
+    els.slashCommandList = $('#slashCommandList');
+    els.slashCommandHint = $('#slashCommandHint');
     els.composerDropZone = $('#composerDropZone');
     els.appDropOverlay = $('#appDropOverlay');
     els.app = $('#app');
@@ -3300,6 +3303,8 @@ window.UI = (() => {
     syncCompressContextBar(convo);
     if (currentPreviewMode) setPreviewPanelTitle(currentPreviewMode);
     updateSettingsTokenUsage(appState);
+    refreshSnippetsViews();
+    if (isSlashCommandMenuOpen()) syncSlashCommandMenu();
   };
 
   let guideOnClose = null;
@@ -3480,6 +3485,12 @@ window.UI = (() => {
     return oneLine.slice(0, max - 1) + '…';
   };
 
+  const snippetSlashBadge = (snippet) => {
+    const cmd = window.Snippets.getSlashCommand(snippet);
+    if (!cmd) return '';
+    return '<span class="snippets-slash-badge">/' + escapeHTML(cmd) + '</span>';
+  };
+
   const renderSnippetMenuItems = (items) => {
     if (!els.snippetsMenuList) return;
     if (!items.length) {
@@ -3488,7 +3499,10 @@ window.UI = (() => {
     }
     els.snippetsMenuList.innerHTML = items.map((s) =>
       '<button type="button" class="snippets-menu-item" role="menuitem" data-snippet-id="' + escapeHTML(s.id) + '">'
+      + '<span class="snippets-menu-item-title-row">'
       + '<span class="snippets-menu-item-title">' + escapeHTML(s.title) + '</span>'
+      + snippetSlashBadge(s)
+      + '</span>'
       + '<span class="snippets-menu-item-preview">' + escapeHTML(truncateSnippetPreview(s.content)) + '</span>'
       + '</button>'
     ).join('');
@@ -3503,7 +3517,10 @@ window.UI = (() => {
     els.snippetsModalList.innerHTML = items.map((s) =>
       '<div class="snippets-modal-item" role="listitem" data-snippet-id="' + escapeHTML(s.id) + '">'
       + '<button type="button" class="snippets-modal-item-main" data-action="snippet-insert" data-snippet-id="' + escapeHTML(s.id) + '">'
+      + '<span class="snippets-menu-item-title-row">'
       + '<span class="snippets-menu-item-title">' + escapeHTML(s.title) + '</span>'
+      + snippetSlashBadge(s)
+      + '</span>'
       + '<span class="snippets-menu-item-preview">' + escapeHTML(truncateSnippetPreview(s.content, 120)) + '</span>'
       + '</button>'
       + '<div class="snippets-modal-item-actions">'
@@ -3520,9 +3537,174 @@ window.UI = (() => {
     renderSnippetModalItems(window.Snippets.search(modalQ));
   };
 
+  let slashMatches = [];
+  let slashHighlightIndex = 0;
+  let slashDismissedKey = '';
+
+  const slashTokenKey = (token) => token ? token.start + '\0' + token.query : '';
+
+  const getComposerSlashToken = () => {
+    const el = els.composerInput;
+    if (!el) return null;
+    const value = el.value;
+    const caret = el.selectionStart;
+    if (caret !== el.selectionEnd) return null;
+    const before = value.slice(0, caret);
+    const lineStart = before.lastIndexOf('\n') + 1;
+    const lineBefore = before.slice(lineStart);
+    const restOfToken = (value.slice(caret).match(/^[^\s]*/) || [''])[0];
+    const combined = lineBefore + restOfToken;
+    const m = combined.match(/^(\s*)\/([^\s]*)$/);
+    if (!m) return null;
+    const query = m[2];
+    if (query.includes('/')) return null;
+    const slashStart = lineStart + m[1].length;
+    const tokenEnd = slashStart + 1 + query.length;
+    if (caret < slashStart || caret > tokenEnd) return null;
+    return { start: slashStart, end: tokenEnd, query };
+  };
+
+  const closeSlashCommandMenu = ({ dismiss = false } = {}) => {
+    if (dismiss) slashDismissedKey = slashTokenKey(getComposerSlashToken());
+    else slashDismissedKey = '';
+    if (!els.slashCommandMenu) return;
+    els.slashCommandMenu.classList.add('hidden');
+    slashMatches = [];
+    slashHighlightIndex = 0;
+    if (els.composerInput) {
+      els.composerInput.setAttribute('aria-expanded', 'false');
+      els.composerInput.removeAttribute('aria-activedescendant');
+    }
+  };
+
+  const isSlashCommandMenuOpen = () => !!(els.slashCommandMenu && !els.slashCommandMenu.classList.contains('hidden'));
+
+  const renderSlashCommandItems = () => {
+    if (!els.slashCommandList) return;
+    if (!slashMatches.length) {
+      els.slashCommandList.innerHTML = '<p class="snippets-menu-empty">' + escapeHTML(t('slashCommandEmpty')) + '</p>';
+      if (els.composerInput) els.composerInput.removeAttribute('aria-activedescendant');
+      return;
+    }
+    if (slashHighlightIndex < 0 || slashHighlightIndex >= slashMatches.length) slashHighlightIndex = 0;
+    els.slashCommandList.innerHTML = slashMatches.map((s, i) => {
+      const cmd = window.Snippets.getSlashCommand(s);
+      const active = i === slashHighlightIndex;
+      const optId = 'slash-opt-' + i;
+      return '<button type="button" class="slash-command-item' + (active ? ' is-active' : '') + '" role="option" id="' + optId + '"'
+        + ' data-snippet-id="' + escapeHTML(s.id) + '" aria-selected="' + (active ? 'true' : 'false') + '">'
+        + '<span class="slash-command-item-cmd">' + (cmd ? '/' + escapeHTML(cmd) : '/') + '</span>'
+        + '<span class="slash-command-item-body">'
+        + '<span class="snippets-menu-item-title">' + escapeHTML(s.title) + '</span>'
+        + '<span class="snippets-menu-item-preview">' + escapeHTML(truncateSnippetPreview(s.content)) + '</span>'
+        + '</span></button>';
+    }).join('');
+    const activeEl = els.slashCommandList.querySelector('.slash-command-item.is-active');
+    if (activeEl) {
+      const list = els.slashCommandList;
+      const listTop = list.scrollTop;
+      const itemTop = activeEl.offsetTop;
+      const itemBottom = itemTop + activeEl.offsetHeight;
+      const viewBottom = listTop + list.clientHeight;
+      if (itemBottom > viewBottom) list.scrollTop = itemBottom - list.clientHeight;
+      else if (itemTop < listTop) list.scrollTop = itemTop;
+      if (els.composerInput) els.composerInput.setAttribute('aria-activedescendant', activeEl.id);
+    }
+  };
+
+  const openSlashCommandMenu = (items) => {
+    if (!els.slashCommandMenu) return;
+    closeSnippetsMenu();
+    closeImageGenMenus();
+    closeTranslateLangMenu();
+    slashMatches = items;
+    if (slashHighlightIndex >= slashMatches.length) slashHighlightIndex = 0;
+    const tools = els.composerTools;
+    const toolsH = tools && !tools.classList.contains('hidden') ? tools.offsetHeight + 8 : 8;
+    els.slashCommandMenu.style.setProperty('--slash-menu-gap', toolsH + 'px');
+    renderSlashCommandItems();
+    els.slashCommandMenu.classList.remove('hidden');
+    if (els.composerInput) els.composerInput.setAttribute('aria-expanded', 'true');
+  };
+
+  const syncSlashCommandMenu = () => {
+    const token = getComposerSlashToken();
+    if (!token) {
+      slashDismissedKey = '';
+      closeSlashCommandMenu();
+      return;
+    }
+    if (slashDismissedKey && slashDismissedKey === slashTokenKey(token)) return;
+    slashDismissedKey = '';
+    const items = window.Snippets.searchBySlash(token.query);
+    if (!items.length && token.query) {
+      closeSlashCommandMenu();
+      return;
+    }
+    if (isSlashCommandMenuOpen() && slashMatches.length && items.length) {
+      const prevId = slashMatches[slashHighlightIndex]?.id;
+      const nextIdx = items.findIndex((s) => s.id === prevId);
+      slashHighlightIndex = nextIdx >= 0 ? nextIdx : 0;
+    } else {
+      slashHighlightIndex = 0;
+    }
+    openSlashCommandMenu(items);
+  };
+
+  const moveSlashCommandHighlight = (delta) => {
+    if (!isSlashCommandMenuOpen() || !slashMatches.length) return;
+    const len = slashMatches.length;
+    slashHighlightIndex = (slashHighlightIndex + delta + len) % len;
+    renderSlashCommandItems();
+  };
+
+  const applySlashSnippet = (snippet) => {
+    const el = els.composerInput;
+    const token = getComposerSlashToken();
+    const content = snippet?.content || '';
+    if (!el || !snippet || !token || !content) return false;
+    const before = el.value.slice(0, token.start);
+    const after = el.value.slice(token.end);
+    el.value = before + content + after;
+    const caret = before.length + content.length;
+    el.setSelectionRange(caret, caret);
+    autoResize(el);
+    el.focus();
+    closeSlashCommandMenu();
+    return true;
+  };
+
+  const confirmSlashCommand = ({ requireQuery = false } = {}) => {
+    const token = getComposerSlashToken();
+    if (!token) return false;
+    if (requireQuery && !(token.query || '').trim()) return false;
+    let snippet = null;
+    if (isSlashCommandMenuOpen() && slashMatches.length) {
+      snippet = slashMatches[slashHighlightIndex] || slashMatches[0];
+    } else {
+      const items = window.Snippets.searchBySlash(token.query);
+      if (!items.length) return false;
+      const q = window.Utils.normalizeSearchQuery(token.query);
+      snippet = items.find((s) => window.Snippets.getSlashAliases(s).includes(q)) || items[0];
+    }
+    return applySlashSnippet(snippet);
+  };
+
   const insertSnippetIntoComposer = (content, { closeMenus = true } = {}) => {
-    const text = (content || '').trim();
+    const raw = content || '';
+    const text = raw.trim();
     if (!text || !els.composerInput) return false;
+    const token = getComposerSlashToken();
+    if (token) {
+      const applied = applySlashSnippet({ content: raw });
+      if (applied) {
+        if (closeMenus) {
+          closeSnippetsMenu();
+          closeSnippetsModal();
+        }
+        return true;
+      }
+    }
     const current = els.composerInput.value;
     if (!current.trim()) {
       els.composerInput.value = text;
@@ -3533,6 +3715,7 @@ window.UI = (() => {
     autoResize(els.composerInput);
     els.composerInput.focus();
     if (closeMenus) {
+      closeSlashCommandMenu();
       closeSnippetsMenu();
       closeSnippetsModal();
     }
@@ -3541,6 +3724,7 @@ window.UI = (() => {
 
   const openSnippetsMenu = () => {
     if (!els.snippetsMenu || !els.snippetsBtn) return;
+    closeSlashCommandMenu();
     closeImageGenMenus();
     closeTranslateLangMenu();
     refreshSnippetsViews();
@@ -4352,6 +4536,8 @@ window.UI = (() => {
     toggleSnippetsMenu, closeSnippetsMenu, isSnippetsMenuOpen,
     openSnippetsModal, closeSnippetsModal, isSnippetsModalOpen,
     insertSnippetIntoComposer, refreshSnippetsViews, showSnippetForm, showSnippetListView,
+    syncSlashCommandMenu, closeSlashCommandMenu, isSlashCommandMenuOpen,
+    moveSlashCommandHighlight, confirmSlashCommand, applySlashSnippet,
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
     setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,

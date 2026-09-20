@@ -303,6 +303,9 @@
               enterkeyhint="send"
               placeholder="Nhập nội dung..."
               aria-label="Nhập tin nhắn"
+              aria-autocomplete="list"
+              aria-controls="slashCommandMenu"
+              aria-expanded="false"
             ></textarea>
             <div id="composerImageGenBar" class="composer-imagegen-bar hidden" aria-hidden="true">
               <div class="mode-chip imagegen-chip">
@@ -405,6 +408,10 @@
             <button id="stopBtn" type="button" class="btn btn-stop hidden" title="Dừng" aria-label="Dừng">
               <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg>
             </button>
+          </div>
+          <div id="slashCommandMenu" class="slash-command-menu hidden" role="listbox" aria-label="Lệnh slash">
+            <div id="slashCommandList" class="slash-command-list"></div>
+            <p id="slashCommandHint" class="slash-command-hint">↑↓ chọn · Enter chèn · Esc đóng</p>
           </div>
         </div>
         <div class="composer-footer-notes">
@@ -821,6 +828,7 @@
               <li><kbd>Shift</kbd> + <kbd>Enter</kbd> — xuống dòng</li>
               <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>K</kbd> — focus ô nhập</li>
               <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>F</kbd> — tìm trong cuộc chat đang mở</li>
+              <li><kbd>/</kbd> — lệnh slash từ thư viện prompt (<kbd>/review</kbd>, <kbd>/summary</kbd>)</li>
             </ul>
           </div>
         </section>

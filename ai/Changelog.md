@@ -10,6 +10,16 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Slash command từ thư viện prompt (`js/snippets.js`, `js/ui.js`, `js/events.js`)
+**Ý nghĩa:** Bookmark vẫn dùng được, nhưng prompt hay dùng nên gõ nhanh ngay trong ô nhập — `/review`, `/summary` — không mở menu.
+
+**Cách dùng:**
+- Gõ `/` ở đầu dòng trong ô nhập để mở danh sách prompt. Tiếp tục gõ để lọc (`/rev` → Review code).
+- `↑` `↓` chọn, `Enter` / `Tab` / `Space` chèn, `Esc` đóng. Click một dòng cũng chèn.
+- Lệnh slash lấy từ tiêu đề prompt (preset: `/review`, `/summary`, `/email`, `/explain`, `/polish`). Không thêm field mới vào dữ liệu; backup JSON không đổi.
+- Menu bookmark vẫn hiện `/review` cạnh tiêu đề để dễ nhớ lệnh.
+- **Enter** khi mới gõ `/` chỉ đóng palette, không chèn prompt đầu danh sách. **Gửi** expand `/review` rồi mới gửi. Lọc theo lệnh/tiêu đề, không theo nội dung prompt.
+
 #### Trích dẫn web search thống nhất (`js/api.js`, `js/ui.js`)
 **Ý nghĩa:** Gemini đã hiện nguồn; OpenAI/Anthropic thì chưa đều. Một khối **Nguồn** dưới tin assistant giúp kiểm chứng, đúng tinh thần disclaimer “AI có thể mắc lỗi”.
 
