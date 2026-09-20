@@ -614,6 +614,7 @@ window.Events = (() => {
     if (data.generatedImages?.length) extra.generatedImages = data.generatedImages.slice();
     if (data.reasoning) extra.reasoningContent = data.reasoning;
     if (data.groundingMetadata) extra.groundingMetadata = data.groundingMetadata;
+    if (data.truncated) extra.truncated = true;
 
     convoMod.addMessage(convo, {
       role: 'assistant',
@@ -823,14 +824,45 @@ window.Events = (() => {
     }
   };
 
-  const streamResponse = async (convo, { retryIdx } = {}) => {
+  const CONTINUE_USER_PROMPT = 'Continue the previous assistant reply from the exact point it stopped. Output only the continuation. Do not repeat any text already written. Do not add a preamble, heading, or apology. Keep the same language, markdown, and formatting.';
+
+  const stripContinuationOverlap = (existing, addition) => {
+    if (!existing || !addition) return addition || '';
+    let text = addition;
+    const max = Math.min(existing.length, text.length, 600);
+    for (let n = max; n >= 8; n--) {
+      if (existing.slice(-n) === text.slice(0, n)) {
+        text = text.slice(n);
+        break;
+      }
+    }
+    return text.replace(/^\n{3,}/, '\n\n');
+  };
+
+  const streamResponse = async (convo, { retryIdx, continueIdx } = {}) => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const isContinue = continueIdx !== undefined;
+    const isRetry = !isContinue && retryIdx !== undefined;
     let article;
     let content;
     let messageIndex;
 
-    if (retryIdx !== undefined) {
+    if (isContinue) {
+      messageIndex = continueIdx;
+      const streaming = ui.beginContinueStreaming(continueIdx);
+      if (!streaming) {
+        ui.renderMessages(convo);
+        const again = ui.beginContinueStreaming(continueIdx);
+        if (!again) return;
+        article = again.article;
+        content = again.content;
+      } else {
+        article = streaming.article;
+        content = streaming.content;
+      }
+      ui.syncMessageModelLabel(article, { role: 'assistant', responseModel: modelId, variantModels: [modelId] });
+    } else if (isRetry) {
       messageIndex = retryIdx;
       const streaming = ui.beginRetryStreaming(retryIdx);
       if (!streaming) {
@@ -851,33 +883,48 @@ window.Events = (() => {
       content = streaming.content;
     }
 
-    let buffer = '';
-    let reasoningBuffer = '';
-    let generatedImages = [];
-    let groundingMetadata = null;
+    const seedMsg = isContinue ? convo.messages[messageIndex] : null;
+    const seedText = isContinue ? (convoMod.getAssistantContent(seedMsg) || '') : '';
+    let buffer = seedText;
+    let continuation = '';
+    let reasoningBuffer = isContinue ? (seedMsg?.reasoningContent || '') : '';
+    let generatedImages = isContinue && seedMsg?.generatedImages?.length
+      ? seedMsg.generatedImages.slice()
+      : [];
+    let groundingMetadata = isContinue ? (seedMsg?.groundingMetadata || null) : null;
     ui.setStreaming(true);
     ui.removeError();
-    ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
+    if (isContinue) {
+      ui.updateStreamingAssistantContent(
+        content, buffer, generatedImages, reasoningBuffer,
+        { reasoningOpen: false, groundingMetadata }
+      );
+    } else {
+      ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
+    }
 
     streamEndResolve = null;
     streamEndPromise = new Promise((resolve) => { streamEndResolve = resolve; });
 
-    streamingContext = { convo, contentEl: content, article, buffer: '', reasoningBuffer: '', generatedImages, groundingMetadata, retryIdx, discardSave: false, messageIndex };
+    streamingContext = { convo, contentEl: content, article, buffer, reasoningBuffer, generatedImages, groundingMetadata, retryIdx: isRetry ? retryIdx : undefined, continueIdx: isContinue ? continueIdx : undefined, discardSave: false, messageIndex };
 
     const users = convo.messages.filter((m) => m.role === 'user');
     let triggerUser = users[users.length - 1] || null;
-    if (retryIdx !== undefined) {
+    if (isRetry || isContinue) {
+      const fromIdx = isContinue ? continueIdx : retryIdx;
       triggerUser = null;
-      for (let i = retryIdx - 1; i >= 0; i--) {
+      for (let i = fromIdx - 1; i >= 0; i--) {
         if (convo.messages[i].role === 'user') {
           triggerUser = convo.messages[i];
           break;
         }
       }
     }
-    const useWebSearch = s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
-    const useImageGen = window.APP_CONFIG.modelUsesOpenRouterImages(modelId)
-      || !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId));
+    const useWebSearch = !isContinue && s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
+    const useImageGen = !isContinue && (
+      window.APP_CONFIG.modelUsesOpenRouterImages(modelId)
+      || !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId))
+    );
     const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
     const useThinking = isEffortThinking
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
@@ -907,17 +954,17 @@ window.Events = (() => {
       refreshStreamingContent();
     };
 
-    const saveAssistantResult = (text) => {
+    const saveAssistantResult = (text, { truncated = false } = {}) => {
       if (streamingContext?.discardSave) return;
       if (!convoMod.getById(convo.id)) return;
-      const extra = { responseModel: modelId };
+      const extra = { responseModel: modelId, truncated: !!truncated };
       if (generatedImages.length) extra.generatedImages = generatedImages.slice();
       if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
       if (groundingMetadata) extra.groundingMetadata = groundingMetadata;
-      if (retryIdx !== undefined) {
+      if (isRetry || isContinue) {
         convoMod.finalizeAssistantMessage(convo, messageIndex, text, extra);
       } else {
-        convoMod.addMessage(convo, {
+        const payload = {
           role: 'assistant',
           content: text,
           variants: [text],
@@ -926,11 +973,13 @@ window.Events = (() => {
           responseModel: modelId,
           ts: Date.now(),
           ...extra
-        });
+        };
+        if (!payload.truncated) delete payload.truncated;
+        convoMod.addMessage(convo, payload);
       }
     };
 
-    const finishStreamingResponse = (buffer, { aborted = false } = {}) => {
+    const finishStreamingResponse = (buffer, { aborted = false, truncated = false } = {}) => {
       ui.setStreamingSearchStatus(article, null);
       ui.setStreamingImageStatus(article, null);
 
@@ -960,30 +1009,42 @@ window.Events = (() => {
         syncComposerTools(modelId, { imageGenEnabled: false });
       }
 
-      if (useSlides && buffer && !aborted) {
+      const shouldProcessArtifacts = !aborted && !truncated && !!buffer;
+      if (useSlides && shouldProcessArtifacts) {
         processSlidesResponse(convo, messageIndex, buffer);
       }
 
-      if (useExcel && buffer && !aborted) {
+      if (useExcel && shouldProcessArtifacts) {
         processExcelResponse(convo, messageIndex, buffer);
       }
 
-      if (useDocument && buffer && !aborted) {
+      if (useDocument && shouldProcessArtifacts) {
         processDocumentResponse(convo, messageIndex, buffer);
       }
 
-      if (usePdf && buffer && !aborted) {
+      if (usePdf && shouldProcessArtifacts) {
         processPdfResponse(convo, messageIndex, buffer);
       }
 
       updateSendEnabled();
     };
 
+    const requestConvo = isContinue
+      ? {
+          ...convo,
+          messages: convo.messages.slice(0, continueIdx + 1).map((m, i) => (
+            i === continueIdx && m.role === 'assistant'
+              ? { ...m, content: seedText }
+              : m
+          )).concat([{ role: 'user', content: CONTINUE_USER_PROMPT }])
+        }
+      : convo;
+
     await apiSend({
       apiKey: window.APP_CONFIG.getApiKey(s, modelId),
       model: modelId,
       systemPrompt: s.systemPrompt,
-      convo,
+      convo: requestConvo,
       webSearch: useWebSearch,
       imageGen: useImageGen,
       thinking: useThinking,
@@ -1002,7 +1063,12 @@ window.Events = (() => {
       },
       onToken: (delta) => {
         ui.setStreamingSearchStatus(article, null);
-        buffer += delta;
+        if (isContinue) {
+          continuation += delta;
+          buffer = seedText + stripContinuationOverlap(seedText, continuation);
+        } else {
+          buffer += delta;
+        }
         if (streamingContext) streamingContext.buffer = buffer;
         refreshStreamingContent();
       },
@@ -1022,21 +1088,28 @@ window.Events = (() => {
         const msg = convo.messages[messageIndex];
         const hasResult = buffer || generatedImages.length;
         const aborted = !!(info && info.aborted);
+        const hasText = !!(buffer && String(buffer).trim());
         if (aborted) {
+          const truncated = isContinue && hasText;
           if (hasResult && !discard) {
-            saveAssistantResult(buffer);
+            saveAssistantResult(buffer, { truncated });
             ui.showToast(t('toastStopped'));
-          } else if (retryIdx !== undefined && !discard) {
+          } else if (isRetry && !discard) {
             convoMod.cancelRetryVariant(convo, messageIndex);
             if (msg && convoMod.getById(convo.id)) ui.updateAssistantMessage(messageIndex, msg);
           }
+          finishStreamingResponse(buffer, { aborted, truncated });
         } else if (hasResult && !discard) {
-          saveAssistantResult(buffer);
-        } else if (retryIdx !== undefined && !discard) {
+          const truncated = !!(info && info.truncated);
+          saveAssistantResult(buffer, { truncated });
+          finishStreamingResponse(buffer, { aborted, truncated });
+        } else if (isRetry && !discard) {
           convoMod.cancelRetryVariant(convo, messageIndex);
+          finishStreamingResponse(buffer, { aborted });
+        } else {
+          finishStreamingResponse(buffer, { aborted });
         }
 
-        finishStreamingResponse(buffer, { aborted });
         if (info?.usage && !discard) {
           convoMod.addTokenUsage(convo, modelId, info.usage);
           ui.updateSettingsTokenUsage(state.get());
@@ -1046,11 +1119,14 @@ window.Events = (() => {
       onError: (err) => {
         const discard = !!(streamingContext && streamingContext.discardSave);
         if (!discard) {
+          const truncated = !!(buffer && String(buffer).trim()) && !!err?.truncated;
           const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
-          saveAssistantResult(finalText);
+          saveAssistantResult(finalText, { truncated });
           ui.showError(err);
+          finishStreamingResponse(buffer || '', { truncated });
+        } else {
+          finishStreamingResponse(buffer || '');
         }
-        finishStreamingResponse(buffer || '');
       }
     });
   };
@@ -1096,6 +1172,28 @@ window.Events = (() => {
     const updated = convo.messages[idx];
     ui.updateAssistantMessage(idx, updated);
     await streamResponse(convo, { retryIdx: idx });
+  };
+
+  const continueAssistantMessage = async (idx) => {
+    if (ui.isShareViewMode?.()) return;
+    const s = state.get();
+    const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
+      ui.openSettings(s);
+      ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
+      return;
+    }
+    if (window.API.isStreaming()) return;
+
+    const convo = convoMod.getCurrent();
+    if (!convo) return;
+    if (idx !== convo.messages.length - 1) return;
+    const msg = convo.messages[idx];
+    if (!msg || msg.role !== 'assistant' || !msg.truncated) return;
+    const text = convoMod.getAssistantContent(msg);
+    if (!text || !String(text).trim()) return;
+
+    await streamResponse(convo, { continueIdx: idx });
   };
 
   const sendCurrent = async () => {
@@ -3052,6 +3150,14 @@ window.Events = (() => {
         const msgEl = retryBtn.closest('.message');
         const idx = parseInt(msgEl?.dataset.idx, 10);
         if (!isNaN(idx)) retryAssistantMessage(idx);
+        return;
+      }
+      const continueBtn = e.target.closest('[data-action="continue"]');
+      if (continueBtn) {
+        if (window.API.isStreaming()) return;
+        const msgEl = continueBtn.closest('.message');
+        const idx = parseInt(msgEl?.dataset.idx, 10);
+        if (!isNaN(idx)) continueAssistantMessage(idx);
         return;
       }
       const exportToggle = e.target.closest('[data-action="export-toggle"]');

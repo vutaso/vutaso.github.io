@@ -1515,7 +1515,7 @@ window.UI = (() => {
     return '<button type="button" class="tb-btn" data-action="branch" title="' + escapeHTML(t('branch')) + '" aria-label="' + escapeHTML(t('branch')) + '"><i class="fa-solid fa-code-branch"></i></button>';
   };
 
-  const assistantToolbarHTML = (m) => {
+  const assistantToolbarHTML = (m, idx) => {
     const variants = m.variants && m.variants.length ? m.variants : (m.content ? [m.content] : []);
     const variantIndex = m.variantIndex ?? 0;
     const total = variants.length;
@@ -1555,9 +1555,18 @@ window.UI = (() => {
       + imageExportOption
       + '</div></div>';
 
+    const convo = window.Conversations.getCurrent();
+    const isLast = Number.isInteger(idx) && convo && idx === convo.messages.length - 1;
+    const hasText = !!(window.Conversations.getAssistantContent(m) || '').trim();
+    const continueBtn = !isShareViewMode() && m.truncated && isLast && hasText
+      ? '<button type="button" class="tb-btn tb-btn-continue" data-action="continue" title="' + escapeHTML(t('continueGenerationTitle')) + '" aria-label="' + escapeHTML(t('continueGeneration')) + '">'
+        + '<i class="fa-solid fa-forward"></i><span>' + escapeHTML(t('continueGeneration')) + '</span></button>'
+      : '';
+
     return '<button type="button" class="tb-btn" data-action="speak" title="' + escapeHTML(t('speak')) + '" aria-label="' + escapeHTML(t('speak')) + '"><i class="fa-solid fa-volume-high"></i></button>'
       + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
       + '<button type="button" class="tb-btn" data-action="retry" title="' + escapeHTML(t('retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>'
+      + continueBtn
       + branchToolbarBtnHTML()
       + exportMenu
       + pager;
@@ -1589,7 +1598,7 @@ window.UI = (() => {
           + branchToolbarBtnHTML()
           + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
           + delBtn
-        : assistantToolbarHTML(m);
+        : assistantToolbarHTML(m, idx);
     return '<article class="message ' + m.role + summaryClass + '" data-role="' + m.role + '"' + idxAttr + '>'
       + avatar
       + '<div class="body">'
@@ -1635,7 +1644,9 @@ window.UI = (() => {
 
   const setAssistantToolbar = (article, m) => {
     const toolbar = article?.querySelector('.toolbar');
-    if (toolbar && m?.role === 'assistant') toolbar.innerHTML = assistantToolbarHTML(m);
+    if (!toolbar || m?.role !== 'assistant') return;
+    const idx = parseInt(article.dataset.idx, 10);
+    toolbar.innerHTML = assistantToolbarHTML(m, Number.isNaN(idx) ? undefined : idx);
   };
 
   const updateAssistantMessage = (idx, m) => {
@@ -1664,6 +1675,23 @@ window.UI = (() => {
     article.classList.add('streaming');
     const content = article.querySelector('.content');
     if (content) content.innerHTML = '';
+    updateMessageScrollRail();
+    refreshChatFind({ keepIndex: true, scroll: false });
+    return { article, content };
+  };
+
+  const beginContinueStreaming = (idx) => {
+    resetStreamingCodeScroll();
+    els.messages.querySelectorAll('.message').forEach((article) => {
+      const i = parseInt(article.dataset.idx, 10);
+      if (!isNaN(i) && i > idx) article.remove();
+    });
+
+    const article = els.messages.querySelector('[data-idx="' + idx + '"]');
+    if (!article) return null;
+
+    article.classList.add('streaming');
+    const content = article.querySelector('.content');
     updateMessageScrollRail();
     refreshChatFind({ keepIndex: true, scroll: false });
     return { article, content };
@@ -3993,7 +4021,7 @@ window.UI = (() => {
     openSnippetsModal, closeSnippetsModal, isSnippetsModalOpen,
     insertSnippetIntoComposer, refreshSnippetsViews, showSnippetForm, showSnippetListView,
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
-    setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming,
+    setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
     closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,

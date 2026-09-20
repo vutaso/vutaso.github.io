@@ -10,6 +10,18 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Tiếp tục sinh khi bị cắt (`js/api.js`, `js/events.js`, `js/ui.js`)
+**Ý nghĩa:** Output hay đụng `max_tokens` hoặc stream đứt — đặc biệt OpenRouter (credit / `max_tokens`). Nút **Tiếp tục** gửi tiếp từ đoạn đang có, không tạo phiên bản mới như Retry.
+
+**Cách dùng:**
+- Khi câu trả lời assistant bị cắt, nút **Tiếp tục** hiện cạnh Retry trên toolbar tin đó.
+- Bấm để model viết tiếp ngay sau đoạn hiện có (không lặp lại phần đã có). Có thể bấm lại nếu lần tiếp theo vẫn bị cắt.
+- Dừng thủ công (Stop) không hiện nút này. Retry vẫn tạo phiên bản mới từ đầu.
+- OpenRouter cắt giữa stream (`max_tokens_exceeded` / `token_limit_exceeded` / credit) vẫn hiện nút — kể cả khi HTTP vẫn 200.
+- Tạo file (slides/Excel/Docs/PDF) bị cắt thì chưa parse; lần Tiếp tục xong mới xuất file. Tìm web tắt khi tiếp tục. 401/429/safety không hiện nút. Cột so sánh model bị cắt: chọn cột rồi Tiếp tục trên tin đã thêm.
+
+---
+
 #### Tìm trong cuộc chat đang mở (`js/ui.js`, `js/events.js`)
 **Ý nghĩa:** Sidebar đã lọc theo tiêu đề/nội dung, nhưng chat dài không nhảy tới đoạn khớp. Find trong app (`Ctrl/Cmd + F`) highlight, prev/next, đếm số lần xuất hiện, và đánh dấu tick trên thanh cuộn câu hỏi.
 

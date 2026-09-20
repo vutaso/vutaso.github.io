@@ -73,6 +73,7 @@ Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github
 | **Vision** | Gửi ảnh kèm tin nhắn để AI phân tích (JPEG, PNG, GIF, WebP) |
 | **Đính kèm tài liệu** | Gửi nội dung file văn bản kèm tin nhắn (txt, md, csv, json, pdf, docx, xlsx, code...) |
 | **Tạo lại câu trả lời** | Nút Retry trên tin nhắn assistant để sinh phiên bản mới |
+| **Tiếp tục khi bị cắt** | Khi trả lời đụng `max_tokens`, credit OpenRouter, hoặc stream đứt, nút **Tiếp tục** sinh tiếp từ đoạn đang có |
 | **Nhiều phiên bản trả lời** | Lưu và chuyển đổi giữa các phiên bản khi dùng Retry (điều hướng 1/N) |
 | **Sửa tin nhắn người dùng** | Chỉnh sửa tin nhắn user và tự động gửi lại từ điểm đó |
 | **Xóa tin nhắn** | Xóa một tin nhắn user và toàn bộ tin nhắn phía sau |

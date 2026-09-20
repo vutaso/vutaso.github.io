@@ -1098,10 +1098,30 @@
 }
 
 .messages.is-streaming .tb-btn[data-action="retry"],
+.messages.is-streaming .tb-btn[data-action="continue"],
 .messages.is-streaming .tb-btn[data-action="export-toggle"],
 .messages.is-streaming .variant-btn {
   pointer-events: none;
   opacity: 0.35;
+}
+
+.message .toolbar .tb-btn[data-action="continue"] {
+  width: auto;
+  min-width: 30px;
+  padding: 0 8px;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.message .toolbar .tb-btn[data-action="continue"] span {
+  line-height: 1;
+}
+
+.message .toolbar .tb-btn[data-action="continue"]:hover {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .message .toolbar .tb-btn.is-speaking {

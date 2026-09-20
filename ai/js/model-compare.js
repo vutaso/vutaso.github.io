@@ -76,6 +76,7 @@ window.ModelCompare = (() => {
           generatedImages: generatedImages.slice(),
           groundingMetadata,
           error: null,
+          truncated: !!(columnData[modelId] && columnData[modelId].truncated),
         };
       }
       window.UI.setCompareColumnPickable(columnEl, isPickable());
@@ -139,12 +140,17 @@ window.ModelCompare = (() => {
             text: buffer,
             reasoning: reasoningBuffer,
             aborted: true,
+            truncated: false,
             error: null,
           });
           return;
         }
+        const truncated = !!(info && info.truncated) && !!buffer.trim();
+        if (columnData && columnData[modelId]) columnData[modelId].truncated = truncated;
         if (!buffer && !generatedImages.length) {
           setStatus('compareStatusEmpty', { state: 'warning' });
+        } else if (truncated) {
+          setStatus('compareStatusTruncated', { state: 'warning' });
         } else {
           setStatus('compareStatusDone', { state: 'done' });
         }
@@ -158,15 +164,21 @@ window.ModelCompare = (() => {
           text: buffer,
           reasoning: reasoningBuffer,
           aborted: false,
+          truncated,
           error: null,
         });
       },
       onError: (err) => {
-        setStatus('compareStatusError', { state: 'error' });
-        columnEl.classList.add('has-error');
+        const truncated = !!(err && err.truncated) && !!buffer.trim();
+        if (truncated) {
+          setStatus('compareStatusTruncated', { state: 'warning' });
+        } else {
+          setStatus('compareStatusError', { state: 'error' });
+          columnEl.classList.add('has-error');
+        }
         const errEl = columnEl.querySelector('.model-compare-col-error');
         const errMsg = err.message || String(err);
-        if (errEl) errEl.textContent = errMsg;
+        if (errEl && !truncated) errEl.textContent = errMsg;
         if (columnData) {
           columnData[modelId] = {
             text: buffer,
@@ -174,6 +186,7 @@ window.ModelCompare = (() => {
             generatedImages: generatedImages.slice(),
             groundingMetadata,
             error: errMsg,
+            truncated: !!(err && err.truncated) && !!buffer.trim(),
             done: true,
           };
         }
@@ -183,6 +196,7 @@ window.ModelCompare = (() => {
           text: buffer,
           reasoning: reasoningBuffer,
           aborted: false,
+          truncated: !!(err && err.truncated) && !!buffer.trim(),
           error: err.message || String(err),
         });
       },

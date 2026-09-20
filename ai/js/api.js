@@ -388,13 +388,97 @@ window.API = (() => {
     handlers.onUsage(usage);
   };
 
+  const LENGTH_FINISH_REASONS = new Set([
+    'length', 'max_tokens', 'max_token', 'max_output_tokens', 'maxoutputtokens',
+    'max_completion_tokens', 'output_limit', 'pause_turn', 'incomplete',
+    'max_tokens_exceeded', 'token_limit_exceeded'
+  ]);
+
+  const normalizeFinishKey = (reason) => String(reason || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+
+  const isLengthFinishReason = (reason) => LENGTH_FINISH_REASONS.has(normalizeFinishKey(reason));
+
+  const NON_CONTINUE_ERROR_RE = /invalid.?api.?key|unauthorized|\b401\b|\b403\b|forbidden|content.?filter|moderation|safety|blocked|rate.?limit|\b429\b|too many requests/i;
+  const CREDIT_OR_LENGTH_RE = /max_tokens|max.?output|token.?limit|output.?limit|length.?exceeded|insufficient.?credit|can only afford|credits? remaining|\b402\b|payment required|max_tokens_exceeded|token_limit_exceeded/i;
+  const NETWORK_ERROR_RE = /failed to fetch|network|load failed|err_connection|err_internet|err_network|timeout|timed out|\b502\b|\b503\b|\b504\b|\b500\b|bad gateway|unavailable|econnreset|connection/i;
+
+  const isContinueWorthyError = (err) => {
+    if (err && err.name === 'TypeError') return true;
+    const text = String((err && err.message) || err || '');
+    if (!text) return false;
+    if (NON_CONTINUE_ERROR_RE.test(text) && !CREDIT_OR_LENGTH_RE.test(text)) return false;
+    return CREDIT_OR_LENGTH_RE.test(text) || NETWORK_ERROR_RE.test(text);
+  };
+
+  const isNearMaxOutput = (modelId, usage) => {
+    const maxOut = window.APP_CONFIG.getMaxOutputTokens(modelId);
+    const completion = usage?.completion || 0;
+    if (!maxOut || !completion) return false;
+    return completion >= Math.floor(maxOut * 0.98);
+  };
+
+  const getStreamError = (json) => {
+    if (!json || typeof json !== 'object') return null;
+    if (json.type === 'error' || json.type === 'response.failed') {
+      if (json.error && typeof json.error === 'object') return json.error;
+      return { message: json.message || (typeof json.error === 'string' ? json.error : '') || 'API error' };
+    }
+    if (json.error && typeof json.error === 'object') return json.error;
+    if (typeof json.error === 'string' && json.error.trim()) return { message: json.error };
+    const choiceErr = json.choices && json.choices[0] && json.choices[0].error;
+    if (choiceErr && typeof choiceErr === 'object') return choiceErr;
+    return null;
+  };
+
+  const noteFinishReason = (handlers, json) => {
+    if (!handlers || !json || typeof json !== 'object') return;
+    const choice = json.choices && json.choices[0];
+    const errObj = getStreamError(json);
+    const reasons = [
+      choice && choice.native_finish_reason,
+      choice && choice.finish_reason,
+      errObj && errObj.metadata && errObj.metadata.error_type,
+      json.type === 'message_delta' && json.delta && json.delta.stop_reason,
+      json.candidates && json.candidates[0] && json.candidates[0].finishReason
+    ].filter(Boolean);
+    if (json.type === 'response.incomplete' || json.response?.status === 'incomplete') {
+      reasons.push(json.response?.incomplete_details?.reason || json.incomplete_details?.reason || 'incomplete');
+    }
+    if (json.type === 'response.completed' && json.response?.status === 'incomplete') {
+      reasons.push(json.response?.incomplete_details?.reason || 'incomplete');
+    }
+    const lengthReason = reasons.find(isLengthFinishReason);
+    if (lengthReason) {
+      handlers.finishReason = String(lengthReason);
+      handlers.streamTruncated = true;
+      return;
+    }
+    if (handlers.streamTruncated) return;
+    const first = reasons.find(Boolean);
+    if (first) handlers.finishReason = String(first);
+  };
+
   const handleStreamData = (data, handlers) => {
     if (!data || data === '[DONE]') {
       return data === '[DONE]' ? 'done' : null;
     }
     try {
       const json = JSON.parse(data);
+      noteFinishReason(handlers, json);
       emitUsage(handlers, extractUsage(json));
+      const streamErr = getStreamError(json);
+      if (streamErr) {
+        const errType = (streamErr.metadata && streamErr.metadata.error_type) || '';
+        const msg = streamErr.message || json.message || 'API error';
+        if (isLengthFinishReason(errType) || isLengthFinishReason(handlers.finishReason) || handlers.streamTruncated) {
+          handlers.streamTruncated = true;
+          if (!isLengthFinishReason(handlers.finishReason)) {
+            handlers.finishReason = errType || handlers.finishReason || 'max_tokens';
+          }
+          return null;
+        }
+        throw new Error(msg);
+      }
       if (json.type === 'response.output_text.delta' && json.delta) {
         if (handlers.onToken) handlers.onToken(json.delta);
         return null;
@@ -441,10 +525,6 @@ window.API = (() => {
           handlers.onImageComplete({ dataUrl: toImageDataUrl(result) });
         }
         return null;
-      }
-      if (json.type === 'error' || json.type === 'response.failed') {
-        const msg = json.message || (json.error && json.error.message) || 'API error';
-        throw new Error(msg);
       }
       if (json.type === 'content_block_start' && json.content_block) {
         const block = json.content_block;
@@ -1033,14 +1113,29 @@ window.API = (() => {
         await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort });
       }
       releaseController();
-      if (onDone) onDone({ usage: requestUsage });
+      if (onDone) {
+        const finishReason = handlers.finishReason || '';
+        onDone({
+          usage: requestUsage,
+          truncated: !!(handlers.streamTruncated)
+            || isLengthFinishReason(finishReason)
+            || isNearMaxOutput(model, requestUsage),
+          finishReason
+        });
+      }
     } catch (err) {
       releaseController();
       if (err.name === 'AbortError') {
-        if (onDone) onDone({ aborted: true, usage: requestUsage });
+        if (onDone) onDone({ aborted: true, usage: requestUsage, truncated: false });
         return;
       }
-      if (onError) onError(new Error(window.APP_CONFIG.formatApiError(err, model)));
+      if (onError) {
+        const e = new Error(window.APP_CONFIG.formatApiError(err, model));
+        e.truncated = !!(handlers.streamTruncated)
+          || isLengthFinishReason(handlers.finishReason)
+          || isContinueWorthyError(err);
+        onError(e);
+      }
     }
   };
 

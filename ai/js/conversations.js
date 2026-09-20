@@ -223,13 +223,15 @@ window.Conversations = (() => {
   const emptyVariantExtra = () => ({
     generatedImages: [],
     reasoningContent: '',
-    groundingMetadata: null
+    groundingMetadata: null,
+    truncated: false
   });
 
   const snapshotVariantExtra = (message) => ({
     generatedImages: Array.isArray(message.generatedImages) ? message.generatedImages.slice() : [],
     reasoningContent: message.reasoningContent || '',
-    groundingMetadata: message.groundingMetadata || null
+    groundingMetadata: message.groundingMetadata || null,
+    truncated: !!message.truncated
   });
 
   const applyVariantExtra = (message, extra) => {
@@ -240,6 +242,8 @@ window.Conversations = (() => {
     else delete message.reasoningContent;
     if (e.groundingMetadata) message.groundingMetadata = e.groundingMetadata;
     else delete message.groundingMetadata;
+    if (e.truncated) message.truncated = true;
+    else delete message.truncated;
   };
 
   const initAssistantVariants = (message) => {
@@ -348,6 +352,8 @@ window.Conversations = (() => {
       msg.variantModels[msg.variantIndex] = extra.responseModel;
       msg.responseModel = extra.responseModel;
     }
+    if (extra.truncated) msg.truncated = true;
+    else delete msg.truncated;
     msg.variantExtras[msg.variantIndex] = snapshotVariantExtra(msg);
     saveConvo(convo);
   };
