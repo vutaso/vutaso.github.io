@@ -1134,6 +1134,7 @@ window.API = (() => {
         e.truncated = !!(handlers.streamTruncated)
           || isLengthFinishReason(handlers.finishReason)
           || isContinueWorthyError(err);
+        e.usage = requestUsage;
         onError(e);
       }
     }

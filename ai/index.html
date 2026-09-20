@@ -628,6 +628,29 @@
           </p>
         </section>
 
+        <section class="settings-section settings-usage-dash-section" aria-labelledby="settingsUsageDashLabel">
+          <div class="settings-usage-dash-head">
+            <p id="settingsUsageDashLabel" class="settings-section-label">Chi phí theo ngày</p>
+            <button type="button" id="usageDashResetBtn" class="settings-usage-reset">Reset kỳ</button>
+          </div>
+          <p id="settingsUsageDashHint" class="settings-usage-dash-hint">Ước tính trên mọi cuộc chat. Reset bắt đầu kỳ mới; tổng token từng chat vẫn giữ.</p>
+          <div class="settings-usage-ranges" id="usageDashRanges" role="group" aria-label="Chi phí theo ngày">
+            <button type="button" class="settings-usage-range is-active" data-usage-range="7d" id="usageDashRange7d" aria-pressed="true">7 ngày</button>
+            <button type="button" class="settings-usage-range" data-usage-range="30d" id="usageDashRange30d" aria-pressed="false">30 ngày</button>
+            <button type="button" class="settings-usage-range" data-usage-range="period" id="usageDashRangePeriod" aria-pressed="false">Kỳ này</button>
+          </div>
+          <p class="settings-usage-dash-totals" id="usageDashTotals">
+            <span class="settings-usage-dash-cost" id="usageDashCost">$0</span>
+            <span class="settings-token-usage-sep" aria-hidden="true">·</span>
+            <span class="settings-usage-dash-inout" id="usageDashInOut">In 0 · Out 0</span>
+          </p>
+          <div class="settings-usage-chart" id="usageDashChart" hidden></div>
+          <p class="settings-usage-empty" id="usageDashEmpty">Chưa có dữ liệu trong khoảng này.</p>
+          <p class="settings-usage-reset-at" id="usageDashResetAt" hidden></p>
+          <p class="settings-usage-models-label" id="settingsUsageDashModelsLabel" hidden>Theo model</p>
+          <ul class="settings-usage-models" id="usageDashModels"></ul>
+        </section>
+
         <section class="settings-section settings-backup-section" aria-labelledby="settingsBackupLabel">
           <p id="settingsBackupLabel" class="settings-section-label">Sao lưu &amp; khôi phục</p>
           <p id="settingsBackupHint" class="settings-backup-hint">Xuất hội thoại, thư viện prompt và cài đặt ra file JSON. Khôi phục khi đổi trình duyệt hoặc xóa dữ liệu máy.</p>

@@ -41,8 +41,216 @@ window.Storage = (() => {
     promptSnippets: [],
     promptSnippetsSeeded: false,
     compareEnabled: false,
-    compareModels: []
+    compareModels: [],
+    usageLedger: { resetAt: 0, days: {} }
   });
+
+  const USAGE_LEDGER_MAX_DAYS = 90;
+  const USAGE_DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  const emptyUsageLedger = () => ({ resetAt: 0, days: {} });
+
+  const localDayKey = (ts = Date.now()) => {
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  };
+
+  const toTok = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+
+  const usageWeight = (usage) => toTok(usage?.prompt) + toTok(usage?.completion);
+
+  const addUsageDelta = (prev, delta) => {
+    const prompt = toTok(prev?.prompt) + toTok(delta?.prompt);
+    const completion = toTok(prev?.completion) + toTok(delta?.completion);
+    return { prompt, completion, total: prompt + completion };
+  };
+
+  const pickHeavierUsage = (a, b) => {
+    if (!a) return b;
+    if (!b) return a;
+    return usageWeight(b) > usageWeight(a) ? b : a;
+  };
+
+  const pruneUsageDays = (days) => {
+    const keys = Object.keys(days).filter((k) => USAGE_DAY_RE.test(k)).sort();
+    if (keys.length <= USAGE_LEDGER_MAX_DAYS) return days;
+    const keep = new Set(keys.slice(-USAGE_LEDGER_MAX_DAYS));
+    const next = {};
+    for (const key of keys) {
+      if (keep.has(key)) next[key] = days[key];
+    }
+    return next;
+  };
+
+  const sanitizeUsageLedger = (raw) => {
+    const out = emptyUsageLedger();
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+    const resetAt = Number(raw.resetAt);
+    out.resetAt = Number.isFinite(resetAt) && resetAt > 0 ? resetAt : 0;
+    const src = raw.days && typeof raw.days === 'object' && !Array.isArray(raw.days) ? raw.days : {};
+    for (const [day, models] of Object.entries(src)) {
+      if (!USAGE_DAY_RE.test(day) || !models || typeof models !== 'object' || Array.isArray(models)) continue;
+      const bucket = {};
+      for (const [modelId, usage] of Object.entries(models)) {
+        if (!modelId || !usage || typeof usage !== 'object') continue;
+        const prompt = toTok(usage.prompt);
+        const completion = toTok(usage.completion);
+        if (!prompt && !completion) continue;
+        bucket[modelId] = { prompt, completion, total: prompt + completion };
+      }
+      if (Object.keys(bucket).length) out.days[day] = bucket;
+    }
+    out.days = pruneUsageDays(out.days);
+    return out;
+  };
+
+  const mergeUsageLedgers = (a, b) => {
+    const left = sanitizeUsageLedger(a);
+    const right = sanitizeUsageLedger(b);
+    const days = { ...left.days };
+    for (const [day, models] of Object.entries(right.days)) {
+      if (!days[day]) {
+        days[day] = { ...models };
+        continue;
+      }
+      const bucket = { ...days[day] };
+      for (const [modelId, usage] of Object.entries(models)) {
+        bucket[modelId] = pickHeavierUsage(bucket[modelId], usage);
+      }
+      days[day] = bucket;
+    }
+    return {
+      resetAt: Math.max(left.resetAt || 0, right.resetAt || 0),
+      days: pruneUsageDays(days)
+    };
+  };
+
+  const parseDayKey = (key) => {
+    const parts = String(key || '').split('-').map(Number);
+    if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  };
+
+  const consecutiveDayKeysEnding = (endDate, count) => {
+    const keys = [];
+    const n = Math.max(1, count);
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(endDate);
+      d.setDate(endDate.getDate() - i);
+      keys.push(localDayKey(d.getTime()));
+    }
+    return keys;
+  };
+
+  const localDaysInclusive = (fromDate, toDate, maxCount) => {
+    const from = new Date(fromDate);
+    from.setHours(0, 0, 0, 0);
+    const to = new Date(toDate);
+    to.setHours(0, 0, 0, 0);
+    if (from > to) return 1;
+    let n = 1;
+    const cur = new Date(from);
+    while (cur < to) {
+      cur.setDate(cur.getDate() + 1);
+      n++;
+      if (n >= maxCount) break;
+    }
+    return n;
+  };
+
+  const listUsageDayKeys = (range, ledger) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (range === '30d') return consecutiveDayKeysEnding(today, 30);
+    if (range !== 'period') return consecutiveDayKeysEnding(today, 7);
+
+    const existing = Object.keys(ledger.days).filter((k) => USAGE_DAY_RE.test(k)).sort();
+    let start = null;
+    if (ledger.resetAt) {
+      start = new Date(ledger.resetAt);
+      start.setHours(0, 0, 0, 0);
+    } else if (existing.length) {
+      start = parseDayKey(existing[0]);
+    }
+    const stored = start
+      ? existing.filter((k) => {
+          const d = parseDayKey(k);
+          return d && d >= start;
+        })
+      : existing;
+    const fillCount = start
+      ? localDaysInclusive(start, today, USAGE_LEDGER_MAX_DAYS)
+      : 7;
+    const keys = new Set(consecutiveDayKeysEnding(today, fillCount));
+    for (const key of stored) keys.add(key);
+    return [...keys].sort();
+  };
+
+  const recordUsage = (modelId, delta) => {
+    if (!modelId || !delta) return;
+    const prompt = toTok(delta.prompt);
+    const completion = toTok(delta.completion);
+    if (!prompt && !completion) return;
+    const ledger = sanitizeUsageLedger(state.usageLedger);
+    const day = localDayKey();
+    if (!ledger.days[day]) ledger.days[day] = {};
+    ledger.days[day][modelId] = addUsageDelta(ledger.days[day][modelId], { prompt, completion });
+    ledger.days = pruneUsageDays(ledger.days);
+    state = { ...state, usageLedger: ledger };
+    save();
+  };
+
+  const resetUsageLedger = () => {
+    state = { ...state, usageLedger: { resetAt: Date.now(), days: {} } };
+    save();
+  };
+
+  const getUsageSummary = (range = '7d') => {
+    const ledger = sanitizeUsageLedger(state.usageLedger);
+    const keys = listUsageDayKeys(range, ledger);
+    const calcCost = (id, usage) => {
+      const cost = window.APP_CONFIG?.calcTokenUsageCost?.(id, usage);
+      const n = Number(cost);
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    };
+    const days = keys.map((key) => {
+      const models = ledger.days[key] || {};
+      let prompt = 0;
+      let completion = 0;
+      let cost = 0;
+      for (const [modelId, usage] of Object.entries(models)) {
+        prompt += usage.prompt || 0;
+        completion += usage.completion || 0;
+        cost += calcCost(modelId, usage);
+      }
+      return { key, prompt, completion, cost };
+    });
+    const byModel = {};
+    for (const key of keys) {
+      const models = ledger.days[key] || {};
+      for (const [modelId, usage] of Object.entries(models)) {
+        byModel[modelId] = addUsageDelta(byModel[modelId], usage);
+      }
+    }
+    const models = Object.entries(byModel).map(([id, usage]) => ({
+      id,
+      prompt: usage.prompt,
+      completion: usage.completion,
+      cost: calcCost(id, usage)
+    })).sort((a, b) => (b.cost - a.cost) || ((b.prompt + b.completion) - (a.prompt + a.completion)));
+    const totals = days.reduce((acc, d) => ({
+      prompt: acc.prompt + d.prompt,
+      completion: acc.completion + d.completion,
+      cost: acc.cost + d.cost
+    }), { prompt: 0, completion: 0, cost: 0 });
+    return { range, days, models, totals, resetAt: ledger.resetAt };
+  };
 
   let state = defaultState();
   let loaded = false;
@@ -278,6 +486,10 @@ window.Storage = (() => {
     }
     if ('tokenSaveEnabled' in (parsed || {})) migrated = true;
     delete state.tokenSaveEnabled;
+    const prevLedger = state.usageLedger;
+    const sanitizedLedger = sanitizeUsageLedger(state.usageLedger);
+    state.usageLedger = sanitizedLedger;
+    if (JSON.stringify(prevLedger || null) !== JSON.stringify(sanitizedLedger)) migrated = true;
     return migrated;
   };
 
@@ -645,11 +857,15 @@ window.Storage = (() => {
       const existingSnippetIds = new Set((state.promptSnippets || []).map((s) => s.id));
       const addedSnippets = incoming.promptSnippets.filter((s) => !existingSnippetIds.has(s.id));
       const keepCurrentId = state.currentConversationId;
+      const beforeLedger = sanitizeUsageLedger(state.usageLedger);
+      const mergedLedger = mergeUsageLedgers(state.usageLedger, incoming.usageLedger);
+      const usageChanged = JSON.stringify(beforeLedger) !== JSON.stringify(mergedLedger);
       const merged = {
         ...state,
         conversations: [...addedConversations, ...(state.conversations || [])],
         promptSnippets: [...(state.promptSnippets || []), ...addedSnippets],
-        promptSnippetsSeeded: true
+        promptSnippetsSeeded: true,
+        usageLedger: mergedLedger
       };
       applyLoadedState(copyApiKeys(useIncomingKeys ? incoming : currentKeys, merged));
       resolveCurrentConversationId(keepCurrentId || addedConversations[0]?.id || null);
@@ -658,7 +874,8 @@ window.Storage = (() => {
         mode: 'merge',
         conversations: addedConversations.length,
         snippets: addedSnippets.length,
-        restoredApiKeys: useIncomingKeys
+        restoredApiKeys: useIncomingKeys,
+        usageChanged
       };
     }
 
@@ -681,6 +898,7 @@ window.Storage = (() => {
   return {
     load, save, get, set, resetAll, getBackend,
     buildBackup, parseBackup, applyBackup,
+    recordUsage, resetUsageLedger, getUsageSummary,
     BACKUP_WARN_BYTES, BACKUP_MAX_BYTES
   };
 })();

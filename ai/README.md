@@ -79,6 +79,7 @@ Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github
 | **Xóa tin nhắn** | Xóa một tin nhắn user và toàn bộ tin nhắn phía sau |
 | **Reply theo đoạn chọn** | Bôi đen văn bản trong tin nhắn → tooltip Reply → chèn trích dẫn blockquote vào ô nhập |
 | **Chi phí token** | Ước tính chi phí USD theo từng tin nhắn; cảnh báo khi vượt ngưỡng phiên chat |
+| **Dashboard chi phí** | Settings: biểu đồ In/Out/$ theo ngày trên mọi chat, xếp hạng model, reset theo kỳ |
 
 ### 2. Công cụ Composer
 

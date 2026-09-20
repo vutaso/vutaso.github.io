@@ -10,6 +10,17 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Dashboard chi phí theo ngày / model (`js/storage.js`, `js/ui.js`)
+**Ý nghĩa:** Settings vốn chỉ hiện In/Out/Tổng/$ của **chat + model đang chọn**. User BYOK cần biết tuần này tốn bao nhiêu và model nào đắt — trên mọi cuộc chat.
+
+**Cách dùng:**
+- Mở **Cài đặt** → **Chi phí theo ngày**. Xem tổng ước tính, biểu đồ nhỏ theo ngày, và xếp hạng model.
+- Chọn **7 ngày** / **30 ngày** / **Kỳ này**. **Kỳ này** gồm mọi ngày còn trong sổ cái từ lúc reset (hoặc ngày cũ nhất). Reset kỳ xóa dashboard; tổng token từng chat vẫn giữ.
+- Sổ cái local (90 ngày), theo ngày máy. Backup JSON **thay thế** mang theo sổ cái; **gộp** lấy mức cao hơn theo ngày/model (không cộng dồn, tránh nhân đôi khi gộp file cũ). Chat cũ trước khi có tính năng này không được gán vào hôm nay.
+- Stream lỗi vẫn ghi token nếu API đã trả usage. So sánh/nén refresh dashboard khi Settings đang mở. Biểu đồ fallback theo token nếu chưa có giá. Ranking hiện mọi model.
+
+---
+
 #### Tiếp tục sinh khi bị cắt (`js/api.js`, `js/events.js`, `js/ui.js`)
 **Ý nghĩa:** Output hay đụng `max_tokens` hoặc stream đứt — đặc biệt OpenRouter (credit / `max_tokens`). Nút **Tiếp tục** gửi tiếp từ đoạn đang có, không tạo phiên bản mới như Retry.
 

@@ -127,7 +127,10 @@ window.ModelCompare = (() => {
         refresh();
       },
       onDone: (info) => {
-        if (info?.usage) window.Conversations.addTokenUsage(convo, modelId, info.usage);
+        if (info?.usage) {
+          window.Conversations.addTokenUsage(convo, modelId, info.usage);
+          window.UI.updateSettingsTokenUsage?.(window.Storage.get());
+        }
         if (info?.aborted) {
           setStatus(buffer ? 'compareStatusStopped' : 'compareStatusAborted', { state: 'warning' });
           window.UI.finalizeCompareColumn(columnEl, buffer, {
@@ -169,6 +172,10 @@ window.ModelCompare = (() => {
         });
       },
       onError: (err) => {
+        if (err?.usage) {
+          window.Conversations.addTokenUsage(convo, modelId, err.usage);
+          window.UI.updateSettingsTokenUsage?.(window.Storage.get());
+        }
         const truncated = !!(err && err.truncated) && !!buffer.trim();
         if (truncated) {
           setStatus('compareStatusTruncated', { state: 'warning' });

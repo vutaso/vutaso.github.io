@@ -504,6 +504,7 @@ window.Conversations = (() => {
       total: prev.total + (delta.total || (delta.prompt || 0) + (delta.completion || 0))
     };
     saveConvo(convo);
+    window.Storage.recordUsage?.(modelId, delta);
   };
 
   const markCostWarningShown = (convo, modelId) => {

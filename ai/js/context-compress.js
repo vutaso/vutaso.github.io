@@ -112,10 +112,19 @@ window.ContextCompress = (() => {
             reject(new Error(window.I18n.t('compressAborted')));
             return;
           }
-          if (info?.usage && convo) window.Conversations.addTokenUsage(convo, modelId, info.usage);
+          if (info?.usage && convo) {
+            window.Conversations.addTokenUsage(convo, modelId, info.usage);
+            window.UI.updateSettingsTokenUsage?.(window.Storage.get());
+          }
           resolve();
         },
-        onError: reject
+        onError: (err) => {
+          if (err?.usage && convo) {
+            window.Conversations.addTokenUsage(convo, modelId, err.usage);
+            window.UI.updateSettingsTokenUsage?.(window.Storage.get());
+          }
+          reject(err);
+        }
       });
     });
 

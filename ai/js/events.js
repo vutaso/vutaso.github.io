@@ -1122,6 +1122,11 @@ window.Events = (() => {
           const truncated = !!(buffer && String(buffer).trim()) && !!err?.truncated;
           const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
           saveAssistantResult(finalText, { truncated });
+          if (err?.usage) {
+            convoMod.addTokenUsage(convo, modelId, err.usage);
+            ui.updateSettingsTokenUsage(state.get());
+            ui.checkTokenCostWarning(state.get());
+          }
           ui.showError(err);
           finishStreamingResponse(buffer || '', { truncated });
         } else {
@@ -2599,8 +2604,12 @@ window.Events = (() => {
         pendingBackup = null;
         ui.closeBackupRestoreModal();
         refreshAfterBackup();
-        if (mode === 'merge' && result.conversations === 0 && result.snippets === 0) {
+        if (mode === 'merge' && result.conversations === 0 && result.snippets === 0 && !result.usageChanged) {
           ui.showToast(t('toastBackupRestoreNothing'));
+          return;
+        }
+        if (mode === 'merge' && result.conversations === 0 && result.snippets === 0 && result.usageChanged) {
+          ui.showToast(t('toastBackupRestoreUsage'));
           return;
         }
         ui.showToast(t(mode === 'merge' ? 'toastBackupRestoreMerge' : 'toastBackupRestoreReplace', {
@@ -2752,6 +2761,18 @@ window.Events = (() => {
 
     ui.els.settingsLocaleSelect?.addEventListener('change', applySettingsFromForm);
     ui.els.settingsThemeSelect?.addEventListener('change', applySettingsFromForm);
+
+    ui.els.usageDashRanges?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-usage-range]');
+      if (!btn || !ui.els.usageDashRanges.contains(btn)) return;
+      ui.setUsageDashRange(btn.getAttribute('data-usage-range'));
+    });
+    ui.els.usageDashResetBtn?.addEventListener('click', () => {
+      if (!confirm(t('settingsUsageDashResetConfirm'))) return;
+      window.Storage.resetUsageLedger();
+      ui.updateSettingsTokenUsage(state.get());
+      ui.showToast(t('settingsUsageDashResetDone'));
+    });
 
     [
       ui.els.apiKeyInput,

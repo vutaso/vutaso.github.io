@@ -129,6 +129,16 @@ window.UI = (() => {
     els.settingsTokenUsageOutput = $('#settingsTokenUsageOutput');
     els.settingsTokenUsageTotal = $('#settingsTokenUsageTotal');
     els.settingsTokenUsageCost = $('#settingsTokenUsageCost');
+    els.usageDashResetBtn = $('#usageDashResetBtn');
+    els.usageDashRanges = $('#usageDashRanges');
+    els.usageDashTotals = $('#usageDashTotals');
+    els.usageDashCost = $('#usageDashCost');
+    els.usageDashInOut = $('#usageDashInOut');
+    els.usageDashChart = $('#usageDashChart');
+    els.usageDashEmpty = $('#usageDashEmpty');
+    els.usageDashResetAt = $('#usageDashResetAt');
+    els.usageDashModels = $('#usageDashModels');
+    els.settingsUsageDashModelsLabel = $('#settingsUsageDashModelsLabel');
     els.tokenCostWarningModal = $('#tokenCostWarningModal');
     els.tokenCostWarningMessage = $('#tokenCostWarningMessage');
     els.tokenCostWarningSettingsBtn = $('#tokenCostWarningSettingsBtn');
@@ -2931,6 +2941,148 @@ window.UI = (() => {
     return '< $0.000001';
   };
 
+  const USAGE_DASH_RANGES = ['7d', '30d', 'period'];
+  let usageDashRange = '7d';
+
+  const usageLocaleTag = () => {
+    const locale = window.I18n.getLocale?.() || window.APP_CONFIG.DEFAULT_LOCALE;
+    return locale === 'vi' ? 'vi-VN' : locale === 'jp' ? 'ja-JP' : locale === 'zh' ? 'zh-CN' : 'en-US';
+  };
+
+  const parseUsageDayKey = (key) => {
+    const parts = String(key || '').split('-').map(Number);
+    if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  };
+
+  const formatUsageDayLabel = (key, dayCount) => {
+    const date = parseUsageDayKey(key);
+    if (!date || Number.isNaN(date.getTime())) return key;
+    try {
+      if (dayCount <= 8) {
+        return date.toLocaleDateString(usageLocaleTag(), { weekday: 'short' });
+      }
+      return date.toLocaleDateString(usageLocaleTag(), { month: 'numeric', day: 'numeric' });
+    } catch {
+      return key.slice(5);
+    }
+  };
+
+  const formatUsageDate = (ts) => {
+    const date = new Date(ts);
+    if (Number.isNaN(date.getTime())) return '';
+    try {
+      return date.toLocaleDateString(usageLocaleTag(), { dateStyle: 'medium' });
+    } catch {
+      return date.toISOString().slice(0, 10);
+    }
+  };
+
+  const renderUsageChartSvg = (days) => {
+    const n = days.length;
+    if (!n) return '';
+    const costs = days.map((d) => d.cost);
+    const maxCost = Math.max(0, ...costs);
+    const useTokens = maxCost <= 0;
+    const values = useTokens
+      ? days.map((d) => (d.prompt || 0) + (d.completion || 0))
+      : costs;
+    const max = Math.max(0, ...values);
+    if (max <= 0) return '';
+    const w = 320;
+    const h = 72;
+    const padL = 4;
+    const padR = 4;
+    const padT = 6;
+    const padB = 16;
+    const innerW = w - padL - padR;
+    const innerH = h - padT - padB;
+    const gap = n > 20 ? 1 : n > 10 ? 2 : 3;
+    const barW = Math.max(1.5, (innerW - gap * Math.max(0, n - 1)) / n);
+    const showLabel = (i) => {
+      if (n <= 8) return true;
+      if (i === 0 || i === n - 1) return true;
+      const step = Math.max(1, Math.round((n - 1) / 4));
+      return i % step === 0;
+    };
+    let markup = '';
+    days.forEach((d, i) => {
+      const value = values[i] || 0;
+      const barH = (value / max) * innerH;
+      const x = padL + i * (barW + gap);
+      const y = padT + (innerH - barH);
+      const title = d.key + ' · ' + formatTokenCost(d.cost)
+        + (useTokens ? ' · ' + formatTokenCount((d.prompt || 0) + (d.completion || 0)) : '');
+      markup += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(barH, value > 0 ? 1.5 : 0).toFixed(2)}" rx="1.5" fill="var(--accent)" opacity="${value > 0 ? '0.92' : '0.18'}"><title>${escapeHTML(title)}</title></rect>`;
+      if (showLabel(i)) {
+        markup += `<text x="${(x + barW / 2).toFixed(2)}" y="${h - 3}" text-anchor="middle" fill="var(--text-dim)" font-size="8">${escapeHTML(formatUsageDayLabel(d.key, n))}</text>`;
+      }
+    });
+    return `<svg class="settings-usage-chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escapeHTML(t('settingsUsageDash'))}">${markup}</svg>`;
+  };
+
+  const updateSettingsUsageDash = () => {
+    if (!els.usageDashCost) return;
+    const summary = window.Storage.getUsageSummary?.(usageDashRange) || {
+      days: [],
+      models: [],
+      totals: { prompt: 0, completion: 0, cost: 0 },
+      resetAt: 0
+    };
+    els.usageDashRanges?.querySelectorAll('[data-usage-range]').forEach((btn) => {
+      const active = btn.getAttribute('data-usage-range') === usageDashRange;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    els.usageDashCost.textContent = formatTokenCost(summary.totals.cost);
+    if (els.usageDashInOut) {
+      els.usageDashInOut.textContent = t('settingsUsageDashInOut', {
+        input: formatTokenCount(summary.totals.prompt),
+        output: formatTokenCount(summary.totals.completion)
+      });
+    }
+    const hasUsage = (summary.totals.prompt || 0) + (summary.totals.completion || 0) > 0;
+    const svg = renderUsageChartSvg(summary.days || []);
+    if (els.usageDashChart) {
+      els.usageDashChart.hidden = !svg;
+      els.usageDashChart.innerHTML = svg;
+    }
+    if (els.usageDashEmpty) els.usageDashEmpty.hidden = hasUsage;
+    if (els.usageDashResetAt) {
+      if (summary.resetAt) {
+        els.usageDashResetAt.hidden = false;
+        els.usageDashResetAt.textContent = t('settingsUsageDashResetAt', { date: formatUsageDate(summary.resetAt) });
+      } else {
+        els.usageDashResetAt.hidden = true;
+        els.usageDashResetAt.textContent = '';
+      }
+    }
+    const models = summary.models || [];
+    if (els.settingsUsageDashModelsLabel) {
+      els.settingsUsageDashModelsLabel.hidden = !models.length;
+    }
+    if (els.usageDashModels) {
+      if (!models.length) {
+        els.usageDashModels.innerHTML = '';
+      } else {
+        els.usageDashModels.innerHTML = models.map((row) => {
+          const model = window.APP_CONFIG.MODELS.find((m) => m.id === row.id);
+          const name = model?.label || row.id;
+          return `<li class="settings-usage-model"><span class="settings-usage-model-name">${escapeHTML(name)}</span><span class="settings-usage-model-cost">${escapeHTML(formatTokenCost(row.cost))}</span><span class="settings-usage-model-meta">${escapeHTML(t('settingsUsageDashInOut', {
+            input: formatTokenCount(row.prompt),
+            output: formatTokenCount(row.completion)
+          }))}</span></li>`;
+        }).join('');
+      }
+    }
+  };
+
+  const setUsageDashRange = (range) => {
+    if (!USAGE_DASH_RANGES.includes(range)) return;
+    usageDashRange = range;
+    updateSettingsUsageDash();
+  };
+
   const updateSettingsTokenUsage = (appState) => {
     if (!els.settingsTokenUsageModel) return;
     const modelId = appState?.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
@@ -2946,6 +3098,7 @@ window.UI = (() => {
     if (els.settingsTokenUsageCost) {
       els.settingsTokenUsageCost.textContent = cost == null ? '—' : formatTokenCost(cost);
     }
+    updateSettingsUsageDash();
   };
 
   const checkTokenCostWarning = (appState) => {
@@ -3116,6 +3269,7 @@ window.UI = (() => {
     syncChatFindI18n();
     syncCompressContextBar(convo);
     if (currentPreviewMode) setPreviewPanelTitle(currentPreviewMode);
+    updateSettingsTokenUsage(appState);
   };
 
   const openGuide = () => {
@@ -4009,7 +4163,7 @@ window.UI = (() => {
     scrollToBottom, scrollToBottomIfNear, scrollMessageToTop, scrollMessageToBottom,
     showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
-    openSettings, closeSettings, updateSettingsTokenUsage, syncSystemPromptModeUI, checkTokenCostWarning,
+    openSettings, closeSettings, updateSettingsTokenUsage, setUsageDashRange, syncSystemPromptModeUI, checkTokenCostWarning,
     openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
     openBackupRestoreModal, closeBackupRestoreModal, isBackupRestoreOpen,
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
