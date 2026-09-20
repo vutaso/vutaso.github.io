@@ -6,7 +6,7 @@ window.ModelCompare = (() => {
     'deepseek-v4-flash',
     'claude-haiku-4-5',
     'gpt-5.4-mini',
-    'nvidia-mistral-small-4',
+    'openrouter-mistral-small-4',
   ];
 
   const getDefaultModels = (currentModelId) => {

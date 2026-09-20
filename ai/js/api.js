@@ -1,5 +1,5 @@
 window.API = (() => {
-  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, NVIDIA_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
+  const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
   const activeControllers = new Set();
   const isStreaming = () => activeControllers.size > 0;
 
@@ -315,15 +315,9 @@ window.API = (() => {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
       } else if (provider === 'google' && errJson.error) {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
-      } else if (provider === 'nvidia') {
-        errMsg = errJson.detail || errJson.error?.message || errJson.title || errMsg;
       } else if (provider === 'openrouter') {
         const meta = errJson.error?.metadata;
         errMsg = meta?.raw || meta?.message || errJson.error?.message || errMsg;
-      } else if (provider === 'opencode-go') {
-        errMsg = errJson.error?.message || errJson.error?.type || errMsg;
-      } else if (provider === 'perplexity') {
-        errMsg = errJson.error?.message || errJson.detail || errMsg;
       } else {
         errMsg = errJson.error ? errJson.error.message || JSON.stringify(errJson.error) : errMsg;
       }
@@ -589,15 +583,26 @@ window.API = (() => {
     return text ? text + suffix : suffix.trim();
   };
 
-  const buildDeepseekMessageContent = (m) => {
+  const buildDeepseekMessageContent = (m, modelId) => {
     let text = appendFilesToText(m.content || '', m.files);
     if (m.role === 'user') {
       text = appendUserInstructions(text, m);
     }
-    return appendImagesAsTextNote(text, m.images);
+    const images = m.images || [];
+    if (m.role === 'user' && images.length > 0 && window.APP_CONFIG.modelSupportsVision(modelId)) {
+      const parts = [];
+      if (text.trim()) parts.push({ type: 'text', text });
+      for (const img of images) {
+        if (img.dataUrl) {
+          parts.push({ type: 'image_url', image_url: { url: img.dataUrl, detail: 'auto' } });
+        }
+      }
+      return parts.length ? parts : (text || '');
+    }
+    return appendImagesAsTextNote(text, images);
   };
 
-  const buildDeepseekMessages = (convo, systemPrompt) => {
+  const buildDeepseekMessages = (convo, systemPrompt, modelId) => {
     const msgs = [];
     if (systemPrompt && systemPrompt.trim()) {
       msgs.push({ role: 'system', content: systemPrompt });
@@ -607,7 +612,7 @@ window.API = (() => {
       const m = all[i];
       if (m.role !== 'user' && m.role !== 'assistant') continue;
       if (i === all.length - 1 && m.role === 'assistant' && !m.content) continue;
-      msgs.push({ role: m.role, content: buildDeepseekMessageContent(m) });
+      msgs.push({ role: m.role, content: buildDeepseekMessageContent(m, modelId) });
     }
     return msgs;
   };
@@ -621,7 +626,7 @@ window.API = (() => {
     const cfg = window.APP_CONFIG.getDeepSeekThinkingConfig(reasoningEffort, thinking);
     const body = withStreamUsage({
       model,
-      messages: buildDeepseekMessages(convo, systemPrompt),
+      messages: buildDeepseekMessages(convo, systemPrompt, model),
       stream: true,
       thinking: { type: cfg.thinking ? 'enabled' : 'disabled' }
     });
@@ -639,7 +644,7 @@ window.API = (() => {
     const apiModel = window.APP_CONFIG.getApiModel(model);
     const body = withStreamUsage({
       model: apiModel,
-      messages: buildDeepseekMessages(convo, systemPrompt),
+      messages: buildDeepseekMessages(convo, systemPrompt, model),
       stream: true
     });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
@@ -662,69 +667,6 @@ window.API = (() => {
     if (cfg.reasoning_effort) {
       body.reasoning_effort = cfg.reasoning_effort;
     }
-    if (maxOutputTokens) {
-      body.max_tokens = maxOutputTokens;
-    }
-    return body;
-  };
-
-  const buildNvidiaBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
-    const body = {
-      model: window.APP_CONFIG.getApiModel(model),
-      messages: buildMessages(convo, systemPrompt),
-      stream: true
-    };
-    if (window.APP_CONFIG.modelUsesGptOssReasoning(model)) {
-      if (thinking) {
-        body.reasoning_effort = window.APP_CONFIG.normalizeEffortForModel(
-          reasoningEffort || window.APP_CONFIG.getDefaultEffortForModel(model),
-          model
-        );
-      }
-      const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-      if (maxOutputTokens) {
-        body.max_tokens = maxOutputTokens;
-      }
-      return body;
-    }
-    if (window.APP_CONFIG.modelUsesNvidiaDeepSeekChatTemplate(model)) {
-      body.chat_template_kwargs = { thinking: !!thinking };
-    } else if (window.APP_CONFIG.modelUsesNvidiaEnableThinkingTemplate(model)) {
-      body.chat_template_kwargs = { enable_thinking: !!thinking };
-    } else if (window.APP_CONFIG.modelUsesNemotronReasoning(model)) {
-      if (window.APP_CONFIG.modelUsesNemotronBudgetReasoning(model)) {
-        if (!thinking) {
-          body.chat_template_kwargs = { enable_thinking: false };
-        } else {
-          body.reasoning_budget = window.APP_CONFIG.getNemotronReasoningBudget(model);
-          body.chat_template_kwargs = { enable_thinking: true };
-        }
-      } else {
-        const effort = thinking
-          ? window.APP_CONFIG.normalizeNemotronEffort(reasoningEffort)
-          : 'default';
-        if (effort === 'default') {
-          body.reasoning_effort = 'none';
-          body.chat_template_kwargs = { enable_thinking: false };
-        } else if (effort === 'medium') {
-          body.reasoning_effort = 'medium';
-          body.chat_template_kwargs = { enable_thinking: true, medium_effort: true };
-        } else {
-          body.reasoning_effort = 'high';
-          body.chat_template_kwargs = { enable_thinking: true };
-        }
-      }
-    } else if (window.APP_CONFIG.modelUsesNvidiaStepModel(model)) {
-      // Step trả reasoning_content mà không cần reasoning_effort.
-    } else if (!thinking) {
-      // Bỏ qua reasoning_effort — endpoint Step/Mistral và nhiều model NVIDIA khác từ chối 'none'.
-    } else if (window.APP_CONFIG.modelUsesNvidiaLmReasoningEffort(model)) {
-      body.reasoning_effort = window.APP_CONFIG.normalizeNvidiaLmReasoningEffort(reasoningEffort, model);
-    } else {
-      const effort = window.APP_CONFIG.normalizeDeepSeekEffort(reasoningEffort);
-      body.reasoning_effort = effort === 'max' ? 'max' : 'high';
-    }
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;
     }
@@ -802,133 +744,6 @@ window.API = (() => {
     return body;
   };
 
-  const buildOpencodeGoBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
-    const body = {
-      model: window.APP_CONFIG.getApiModel(model),
-      messages: buildMessages(convo, systemPrompt),
-      stream: true
-    };
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-    if (maxOutputTokens) {
-      body.max_tokens = maxOutputTokens;
-    }
-    const reasoning = window.APP_CONFIG.getOpencodeGoThinkingConfig(model, thinking, reasoningEffort);
-    if (reasoning) {
-      body.reasoning = reasoning;
-    }
-    return body;
-  };
-
-  const buildPerplexityBody = (model, systemPrompt, convo) => {
-    const body = withStreamUsage({
-      model: window.APP_CONFIG.getApiModel(model),
-      messages: buildMessages(convo, systemPrompt),
-      stream: true,
-      search_context_size: window.APP_CONFIG.getPerplexitySearchContextSize()
-    });
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-    if (maxOutputTokens) {
-      body.max_tokens = maxOutputTokens;
-    }
-    return body;
-  };
-
-  const getPerplexitySearchQueryFromConvo = (convo) => {
-    const users = (convo.messages || []).filter((m) => m.role === 'user');
-    const last = users[users.length - 1];
-    if (!last) return '';
-    let text = appendFilesToText(last.content || '', last.files);
-    text = appendUserInstructions(text, last);
-    return text.trim();
-  };
-
-  const formatPerplexitySearchResult = (item, index) => {
-    const title = item.title || item.url || ('Kết quả ' + (index + 1));
-    const snippet = (item.snippet || '').trim();
-    const url = item.url || '';
-    const meta = [item.date, item.last_updated].filter(Boolean).join(' · ');
-    let block = '### ' + (index + 1) + '. ' + title;
-    if (meta) block += '\n_' + meta + '_';
-    if (snippet) block += '\n\n' + snippet;
-    if (url) block += '\n\n' + url;
-    return block;
-  };
-
-  const sleep = (ms, signal) => new Promise((resolve, reject) => {
-    if (signal?.aborted) {
-      reject(new DOMException('Aborted', 'AbortError'));
-      return;
-    }
-    const timer = setTimeout(resolve, ms);
-    signal?.addEventListener('abort', () => {
-      clearTimeout(timer);
-      reject(new DOMException('Aborted', 'AbortError'));
-    }, { once: true });
-  });
-
-  const emitSimulatedStream = async (text, handlers, signal, { chunkSize = 28, delayMs = 14 } = {}) => {
-    if (!handlers.onToken || !text) return;
-    for (let i = 0; i < text.length; i += chunkSize) {
-      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-      handlers.onToken(text.slice(i, i + chunkSize));
-      if (i + chunkSize < text.length) await sleep(delayMs, signal);
-    }
-  };
-
-  const emitPerplexitySearchStream = async (results, handlers, signal) => {
-    if (!results.length) {
-      await emitSimulatedStream('Không tìm thấy kết quả.', handlers, signal);
-      return;
-    }
-    for (let i = 0; i < results.length; i++) {
-      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-      const block = formatPerplexitySearchResult(results[i], i);
-      const chunk = (i === 0 ? '' : '\n\n') + block;
-      await emitSimulatedStream(chunk, handlers, signal, { chunkSize: 32, delayMs: 12 });
-      if (i < results.length - 1) await sleep(80, signal);
-    }
-  };
-
-  const toPerplexitySearchGrounding = (results) => ({
-    groundingChunks: (results || []).map((r) => ({
-      web: { uri: r.url, title: r.title || r.url }
-    }))
-  });
-
-  const sendPerplexitySearch = async ({ apiKey, convo, controller, handlers, endpoint }) => {
-    const query = getPerplexitySearchQueryFromConvo(convo);
-    if (!query) {
-      throw new Error('Không có truy vấn tìm kiếm');
-    }
-
-    if (handlers.onSearchStatus) handlers.onSearchStatus('searching');
-
-    const body = {
-      query: [query],
-      max_results: 10,
-      search_context_size: window.APP_CONFIG.getPerplexitySearchContextSize()
-    };
-
-    const res = await fetch(endpoint || window.APP_CONFIG.PERPLEXITY_SEARCH_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + apiKey
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw await parseApiError(res, 'perplexity');
-
-    const json = await res.json();
-    const results = json.results || [];
-    if (handlers.onGroundingMetadata) {
-      handlers.onGroundingMetadata(toPerplexitySearchGrounding(results));
-    }
-    await emitPerplexitySearchStream(results, handlers, controller.signal);
-  };
-
   const sendOpenRouterImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
     const { prompt, images } = getOpenRouterImagePromptFromConvo(convo);
     if (!prompt) {
@@ -985,14 +800,8 @@ window.API = (() => {
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
       : provider === 'byteplus'
         ? buildByteplusBody(model, systemPrompt, convo, thinking, reasoningEffort)
-        : provider === 'nvidia'
-          ? buildNvidiaBody(model, systemPrompt, convo, thinking, reasoningEffort)
-          : provider === 'openrouter'
+        : provider === 'openrouter'
             ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
-          : provider === 'opencode-go'
-            ? buildOpencodeGoBody(model, systemPrompt, convo, thinking, reasoningEffort)
-          : provider === 'perplexity'
-            ? buildPerplexityBody(model, systemPrompt, convo)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
             : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
@@ -1012,47 +821,6 @@ window.API = (() => {
     });
 
     if (!res.ok) throw await parseApiError(res, provider || 'openai');
-    if (!res.body || !res.body.getReader) {
-      throw new Error('Trình duyệt không hỗ trợ streaming response');
-    }
-
-    await readSseStream(res.body.getReader(), handlers);
-  };
-
-  const sendOpencodeGoMessages = async ({ apiKey, model, systemPrompt, convo, thinking, reasoningEffort, controller, handlers, endpoint }) => {
-    const messages = buildAnthropicMessages(convo);
-    if (!messages.length) {
-      throw new Error('Không có tin nhắn để gửi');
-    }
-
-    const body = {
-      model: window.APP_CONFIG.getApiModel(model),
-      messages,
-      stream: true
-    };
-    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
-    if (maxOutputTokens) {
-      body.max_tokens = maxOutputTokens;
-    }
-    if (systemPrompt && systemPrompt.trim()) {
-      body.system = systemPrompt.trim();
-    }
-    const reasoning = window.APP_CONFIG.getOpencodeGoThinkingConfig(model, thinking, reasoningEffort);
-    if (reasoning) {
-      body.reasoning = reasoning;
-    }
-
-    const res = await fetch(endpoint || window.APP_CONFIG.OPENCODE_GO_MESSAGES_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + apiKey
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw await parseApiError(res, 'opencode-go');
     if (!res.body || !res.body.getReader) {
       throw new Error('Trình duyệt không hỗ trợ streaming response');
     }
@@ -1335,14 +1103,6 @@ window.API = (() => {
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking, reasoningEffort: effort
         });
-      } else if (provider === 'nvidia') {
-        if (window.APP_CONFIG.nvidiaRequiresProxy() && !window.APP_CONFIG.NVIDIA_PROXY_ENDPOINT) {
-          throw new Error(window.APP_CONFIG.getNvidiaProxyRequiredError());
-        }
-        await sendChatCompletions({
-          apiKey, model, systemPrompt, convo, controller, handlers,
-          endpoint: window.APP_CONFIG.getNvidiaEndpoint(), provider: 'nvidia', thinking, reasoningEffort: effort
-        });
       } else if (provider === 'byteplus') {
         if (window.APP_CONFIG.byteplusRequiresProxy() && !window.APP_CONFIG.getByteplusProxyEndpoint(model)) {
           throw new Error(window.APP_CONFIG.getByteplusProxyRequiredError());
@@ -1371,37 +1131,6 @@ window.API = (() => {
           await sendChatCompletions({
             apiKey, model, systemPrompt, convo, controller, handlers,
             endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
-          });
-        }
-      } else if (provider === 'opencode-go') {
-        if (window.APP_CONFIG.opencodeGoRequiresProxy() && !window.APP_CONFIG.getOpencodeGoProxyEndpoint(model)) {
-          throw new Error(window.APP_CONFIG.getOpencodeGoProxyRequiredError());
-        }
-        const opencodeEndpoint = window.APP_CONFIG.getOpencodeGoEndpoint(model);
-        if (window.APP_CONFIG.modelUsesOpencodeGoMessages(model)) {
-          await sendOpencodeGoMessages({
-            apiKey, model, systemPrompt, convo, controller, handlers,
-            endpoint: opencodeEndpoint, thinking, reasoningEffort: effort
-          });
-        } else {
-          await sendChatCompletions({
-            apiKey, model, systemPrompt, convo, controller, handlers,
-            endpoint: opencodeEndpoint, provider: 'opencode-go', thinking, reasoningEffort: effort
-          });
-        }
-      } else if (provider === 'perplexity') {
-        if (window.APP_CONFIG.perplexityRequiresProxy() && !window.APP_CONFIG.getPerplexityProxyEndpoint(model)) {
-          throw new Error(window.APP_CONFIG.getPerplexityProxyRequiredError());
-        }
-        const perplexityEndpoint = window.APP_CONFIG.getPerplexityEndpoint(model);
-        if (window.APP_CONFIG.modelUsesPerplexitySearch(model)) {
-          await sendPerplexitySearch({
-            apiKey, convo, controller, handlers, endpoint: perplexityEndpoint
-          });
-        } else {
-          await sendChatCompletions({
-            apiKey, model, systemPrompt, convo, controller, handlers,
-            endpoint: perplexityEndpoint, provider: 'perplexity', thinking: false, reasoningEffort: effort
           });
         }
       } else if (tools.length || (thinking && provider === 'openai')) {

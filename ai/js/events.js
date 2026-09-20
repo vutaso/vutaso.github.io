@@ -69,8 +69,6 @@ window.Events = (() => {
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
     if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
       thinkingEnabled = true;
-    } else if (window.APP_CONFIG.modelUsesOpencodeGoReasoning(modelId)) {
-      thinkingEnabled = false;
     }
     if (window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)) {
       thinkingEnabled = reasoningEffort !== 'default';
@@ -2336,12 +2334,6 @@ window.Events = (() => {
       ui.els.deepseekApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
-    ui.els.toggleNvidiaApiKeyBtn.addEventListener('click', () => {
-      const isPwd = ui.els.nvidiaApiKeyInput.type === 'password';
-      ui.els.nvidiaApiKeyInput.type = isPwd ? 'text' : 'password';
-      ui.els.nvidiaApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
-    });
-
     ui.els.toggleByteplusApiKeyBtn.addEventListener('click', () => {
       const isPwd = ui.els.byteplusApiKeyInput.type === 'password';
       ui.els.byteplusApiKeyInput.type = isPwd ? 'text' : 'password';
@@ -2364,18 +2356,6 @@ window.Events = (() => {
       const isPwd = ui.els.openrouterApiKeyInput.type === 'password';
       ui.els.openrouterApiKeyInput.type = isPwd ? 'text' : 'password';
       ui.els.openrouterApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
-    });
-
-    ui.els.toggleOpencodeGoApiKeyBtn.addEventListener('click', () => {
-      const isPwd = ui.els.opencodeGoApiKeyInput.type === 'password';
-      ui.els.opencodeGoApiKeyInput.type = isPwd ? 'text' : 'password';
-      ui.els.opencodeGoApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
-    });
-
-    ui.els.togglePerplexityApiKeyBtn.addEventListener('click', () => {
-      const isPwd = ui.els.perplexityApiKeyInput.type === 'password';
-      ui.els.perplexityApiKeyInput.type = isPwd ? 'text' : 'password';
-      ui.els.perplexityApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
     const handleClearAll = async () => {
@@ -2434,16 +2414,13 @@ window.Events = (() => {
         const apiKey = ui.els.apiKeyInput.value.trim();
         const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
         const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
-        const nvidiaApiKey = ui.els.nvidiaApiKeyInput.value.trim();
         const byteplusApiKey = ui.els.byteplusApiKeyInput.value.trim();
         const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
         const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
         const openrouterApiKey = ui.els.openrouterApiKeyInput.value.trim();
-        const opencodeGoApiKey = ui.els.opencodeGoApiKeyInput.value.trim();
-        const perplexityApiKey = ui.els.perplexityApiKeyInput.value.trim();
         const theme = ui.els.settingsThemeSelect?.value || 'dark';
         nextState = {
-          apiKey, anthropicApiKey, deepseekApiKey, nvidiaApiKey, byteplusApiKey, geminiApiKey, kimiApiKey, openrouterApiKey, opencodeGoApiKey, perplexityApiKey,
+          apiKey, anthropicApiKey, deepseekApiKey, byteplusApiKey, geminiApiKey, kimiApiKey, openrouterApiKey,
           ...promptPatch, theme, locale
         };
       }
@@ -2529,13 +2506,10 @@ window.Events = (() => {
       ui.els.apiKeyInput,
       ui.els.anthropicApiKeyInput,
       ui.els.deepseekApiKeyInput,
-      ui.els.nvidiaApiKeyInput,
       ui.els.byteplusApiKeyInput,
       ui.els.geminiApiKeyInput,
       ui.els.kimiApiKeyInput,
       ui.els.openrouterApiKeyInput,
-      ui.els.opencodeGoApiKeyInput,
-      ui.els.perplexityApiKeyInput,
       ui.els.systemPromptInput,
     ].forEach((input) => {
       input?.addEventListener('blur', applySettingsFromForm);

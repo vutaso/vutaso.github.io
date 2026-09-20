@@ -11,13 +11,10 @@ window.Storage = (() => {
     apiKey: '',
     anthropicApiKey: '',
     deepseekApiKey: '',
-    nvidiaApiKey: '',
     byteplusApiKey: '',
     openrouterApiKey: '',
-    opencodeGoApiKey: '',
     geminiApiKey: '',
     kimiApiKey: '',
-    perplexityApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
     imageGenEnabled: false,
@@ -223,8 +220,6 @@ window.Storage = (() => {
     }
     if (window.APP_CONFIG.modelThinkingRequired(state.currentModel)) {
       state.thinkingEnabled = true;
-    } else if (window.APP_CONFIG.modelUsesOpencodeGoReasoning(state.currentModel)) {
-      state.thinkingEnabled = false;
     }
     if (!window.APP_CONFIG.LOCALES.includes(state.locale)) {
       state.locale = window.APP_CONFIG.DEFAULT_LOCALE;
@@ -379,13 +374,10 @@ window.Storage = (() => {
       apiKey: state.apiKey,
       anthropicApiKey: state.anthropicApiKey,
       deepseekApiKey: state.deepseekApiKey,
-      nvidiaApiKey: state.nvidiaApiKey,
       byteplusApiKey: state.byteplusApiKey,
       openrouterApiKey: state.openrouterApiKey,
-      opencodeGoApiKey: state.opencodeGoApiKey,
       geminiApiKey: state.geminiApiKey,
       kimiApiKey: state.kimiApiKey,
-      perplexityApiKey: state.perplexityApiKey,
       currentModel: state.currentModel,
       systemPrompt: state.systemPrompt,
       theme: state.theme

@@ -28,8 +28,6 @@ window.UI = (() => {
     els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
     els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
-    els.nvidiaApiKeyInput = $('#nvidiaApiKeyInput');
-    els.nvidiaApiKeyIcon = $('#nvidiaApiKeyIcon');
     els.byteplusApiKeyInput = $('#byteplusApiKeyInput');
     els.byteplusApiKeyIcon = $('#byteplusApiKeyIcon');
     els.geminiApiKeyInput = $('#geminiApiKeyInput');
@@ -38,10 +36,6 @@ window.UI = (() => {
     els.kimiApiKeyIcon = $('#kimiApiKeyIcon');
     els.openrouterApiKeyInput = $('#openrouterApiKeyInput');
     els.openrouterApiKeyIcon = $('#openrouterApiKeyIcon');
-    els.opencodeGoApiKeyInput = $('#opencodeGoApiKeyInput');
-    els.opencodeGoApiKeyIcon = $('#opencodeGoApiKeyIcon');
-    els.perplexityApiKeyInput = $('#perplexityApiKeyInput');
-    els.perplexityApiKeyIcon = $('#perplexityApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
     els.settingsLocaleSelect = $('#settingsLocaleSelect');
     els.settingsThemeSelect = $('#settingsThemeSelect');
@@ -101,13 +95,10 @@ window.UI = (() => {
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
-    els.toggleNvidiaApiKeyBtn = $('#toggleNvidiaApiKeyBtn');
     els.toggleByteplusApiKeyBtn = $('#toggleByteplusApiKeyBtn');
     els.toggleGeminiApiKeyBtn = $('#toggleGeminiApiKeyBtn');
     els.toggleKimiApiKeyBtn = $('#toggleKimiApiKeyBtn');
     els.toggleOpenrouterApiKeyBtn = $('#toggleOpenrouterApiKeyBtn');
-    els.toggleOpencodeGoApiKeyBtn = $('#toggleOpencodeGoApiKeyBtn');
-    els.togglePerplexityApiKeyBtn = $('#togglePerplexityApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
@@ -2550,13 +2541,10 @@ window.UI = (() => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
-    els.nvidiaApiKeyInput.value = state.nvidiaApiKey || '';
     els.byteplusApiKeyInput.value = state.byteplusApiKey || '';
     els.geminiApiKeyInput.value = state.geminiApiKey || '';
     els.kimiApiKeyInput.value = state.kimiApiKey || '';
     els.openrouterApiKeyInput.value = state.openrouterApiKey || '';
-    els.opencodeGoApiKeyInput.value = state.opencodeGoApiKey || '';
-    els.perplexityApiKeyInput.value = state.perplexityApiKey || '';
     const promptForInput = state.systemPromptMode === 'custom'
       ? (state.customSystemPrompt || state.systemPrompt || '')
       : (state.systemPrompt || window.I18n.getDefaultSystemPrompt(state.locale));
@@ -2570,8 +2558,6 @@ window.UI = (() => {
     els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.deepseekApiKeyInput.type = 'password';
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
-    els.nvidiaApiKeyInput.type = 'password';
-    els.nvidiaApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.byteplusApiKeyInput.type = 'password';
     els.byteplusApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.geminiApiKeyInput.type = 'password';
@@ -2580,10 +2566,6 @@ window.UI = (() => {
     els.kimiApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.openrouterApiKeyInput.type = 'password';
     els.openrouterApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
-    els.opencodeGoApiKeyInput.type = 'password';
-    els.opencodeGoApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
-    els.perplexityApiKeyInput.type = 'password';
-    els.perplexityApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     updateSettingsTokenUsage(state);
     els.settingsModal.classList.remove('hidden');
     setTimeout(() => els.apiKeyInput.focus(), 50);

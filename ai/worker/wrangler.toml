@@ -8,8 +8,8 @@ ALLOWED_ORIGINS = "https://vutaso.com,https://www.vutaso.com,https://vutaso.gith
 
 [[kv_namespaces]]
 binding = "SHARES"
-id = "860ddb0c8d604689b8b51e02d95baa5c"
-preview_id = "1559e030d6cc40e28cdb48049388e398"
+id = "c463c44f16d641a8a53f97f7e0f5aeff"
+preview_id = "d886250b18d24cdd90f0b28bbdf9fa3e"
 
 # Set secret before deploy (do NOT commit the key):
 #   cd TestChatAI/worker
@@ -20,5 +20,5 @@ preview_id = "1559e030d6cc40e28cdb48049388e398"
 #
 # Then set in js/config.js:
 #   DEEPSEEK_PROXY_ENDPOINT = workers.dev URL (root path)
-#   NVIDIA_PROXY_ENDPOINT   = same URL + '/nvidia'
+#   BYTEPLUS_PROXY_ENDPOINT = same URL + '/byteplus'
 #   SHARE_ENDPOINT          = same URL + '/share'

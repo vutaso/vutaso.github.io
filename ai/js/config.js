@@ -14,11 +14,12 @@ window.APP_CONFIG = {
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
-    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-deepseek-v4-flash', apiModel: 'deepseek-v4-flash-260425', label: 'DeepSeek V4 Flash (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-glm-5-2', apiModel: 'glm-5-2-260617', label: 'GLM-5.2 (Byte Plus)', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-gpt-oss-120b', apiModel: 'gpt-oss-120b-250805', label: 'GPT OSS 120B', provider: 'byteplus', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-deepseek-v4.1-flash', apiModel: 'deepseek/deepseek-v4.1-flash', label: 'DeepSeek V4.1 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-deepseek-v4-flash', apiModel: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
     { id: 'openrouter-deepseek-v4-flash-0731', apiModel: 'deepseek/deepseek-v4-flash-0731', label: 'DeepSeek V4 Flash 0731 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false, maxOutputTokens: 16384 },
     { id: 'openrouter-deepseek-v4-pro', apiModel: 'deepseek/deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
@@ -51,16 +52,6 @@ window.APP_CONFIG = {
     { id: 'byteplus-dola-seed-2-0-pro', apiModel: 'seed-2-0-pro-260328', label: 'Dola Seed 2.0 Pro', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'byteplus-dola-seed-2-0-code', apiModel: 'seed-2-0-code-preview-260328', label: 'Dola Seed 2.0 Code', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'byteplus-dola-seed-2-1-turbo', apiModel: 'dola-seed-2-1-turbo-260628', label: 'Dola Seed 2.1 Turbo', provider: 'byteplus', apiMode: 'responses', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'nvidia-nemotron-3-ultra-550b-a55b', apiModel: 'nvidia/nemotron-3-ultra-550b-a55b', label: 'Nemotron 3 Ultra (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-nemotron-3-super', apiModel: 'nvidia/nemotron-3-super-120b-a12b', label: 'Nemotron 3 Super (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false, nemotronReasoningBudget: 16384 },
-    { id: 'nvidia-nemotron-3-nano-omni', apiModel: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning', label: 'Nemotron 3 Nano Omni (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false, nemotronReasoningBudget: 16384 },
-    { id: 'nvidia-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-glm-5-2', apiModel: 'z-ai/glm-5.2', label: 'GLM 5.2 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-minimax-m3', apiModel: 'minimaxai/minimax-m3', label: 'MiniMax M3 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'nvidia-minimax-m2-7', apiModel: 'minimaxai/minimax-m2.7', label: 'MiniMax M2.7 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-step-3-7-flash', apiModel: 'stepfun-ai/step-3.7-flash', label: 'Step 3.7 Flash (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'nvidia-mistral-small-4', apiModel: 'mistralai/mistral-small-4-119b-2603', label: 'Mistral Small 4 (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'nvidia-mistral-medium-3-5-128b', apiModel: 'mistralai/mistral-medium-3.5-128b', label: 'Mistral Medium 3.5 128B (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', provider: 'google', webSearch: true, imageGen: true, thinking: true },
     { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
@@ -68,25 +59,7 @@ window.APP_CONFIG = {
     { id: 'kimi-k2.5', label: 'Kimi K2.5', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
     { id: 'kimi-k2.6', label: 'Kimi K2.6', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
     { id: 'kimi-k2.7-code', label: 'Kimi K2.7 Code', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
-    { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
-    { id: 'opencode-go-glm-5-2', apiModel: 'glm-5.2', label: 'GLM-5.2 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-glm-5-1', apiModel: 'glm-5.1', label: 'GLM-5.1 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-kimi-k2.7-code', apiModel: 'kimi-k2.7-code', label: 'Kimi K2.7 Code (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-kimi-k2.6', apiModel: 'kimi-k2.6', label: 'Kimi K2.6 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-deepseek-v4-pro', apiModel: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-deepseek-v4-flash', apiModel: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-mimo-v2-5', apiModel: 'mimo-v2.5', label: 'MiMo-V2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-mimo-v2.5-pro', apiModel: 'mimo-v2.5-pro', label: 'MiMo-V2.5-Pro (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-minimax-m3', apiModel: 'minimax-m3', label: 'MiniMax M3 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-minimax-m2.7', apiModel: 'minimax-m2.7', label: 'MiniMax M2.7 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-minimax-m2.5', apiModel: 'minimax-m2.5', label: 'MiniMax M2.5 (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-qwen3.7-max', apiModel: 'qwen3.7-max', label: 'Qwen3.7 Max (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'opencode-go-qwen3.7-plus', apiModel: 'qwen3.7-plus', label: 'Qwen3.7 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'opencode-go-qwen3.6-plus', apiModel: 'qwen3.6-plus', label: 'Qwen3.6 Plus (OpenCode Go)', provider: 'opencode-go', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'sonar', label: 'Sonar', provider: 'perplexity', webSearch: true, imageGen: false, thinking: false, vision: false },
-    { id: 'sonar-pro', label: 'Sonar Pro', provider: 'perplexity', webSearch: true, imageGen: false, thinking: false, vision: false },
-    { id: 'sonar-reasoning-pro', label: 'Sonar Reasoning Pro', provider: 'perplexity', webSearch: true, imageGen: false, thinking: true, vision: false },
-    { id: 'perplexity-search', label: 'Perplexity Search', provider: 'perplexity', apiMode: 'search', webSearch: true, imageGen: false, thinking: false, vision: false }
+    { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true }
   ],
 
   // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-06-29
@@ -110,6 +83,7 @@ window.APP_CONFIG = {
     'byteplus-glm-5-2': { input: 1.40, output: 4.40 },
     'byteplus-gpt-oss-120b': { input: 0.10, output: 0.50 },
     'openrouter-gpt-oss-120b': { input: 0.03, output: 0.15 },
+    'openrouter-deepseek-v4.1-flash': { input: 0.15, output: 0.60 },
     'openrouter-deepseek-v4-flash': { input: 0.09, output: 0.18 },
     'openrouter-deepseek-v4-flash-0731': { input: 0.09, output: 0.18 },
     'openrouter-deepseek-v4-pro': { input: 0.435, output: 0.87 },
@@ -142,16 +116,6 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-0-pro': { input: 0.50, output: 3.00 },
     'byteplus-dola-seed-2-0-code': { input: 0.50, output: 3.00 },
     'byteplus-dola-seed-2-1-turbo': { input: 0.15, output: 0.80 },
-    'nvidia-nemotron-3-ultra-550b-a55b': { input: 0, output: 0 },
-    'nvidia-nemotron-3-super': { input: 0, output: 0 },
-    'nvidia-nemotron-3-nano-omni': { input: 0, output: 0 },
-    'nvidia-gpt-oss-120b': { input: 0, output: 0 },
-    'nvidia-glm-5-2': { input: 0, output: 0 },
-    'nvidia-minimax-m3': { input: 0, output: 0 },
-    'nvidia-minimax-m2-7': { input: 0, output: 0 },
-    'nvidia-step-3-7-flash': { input: 0, output: 0 },
-    'nvidia-mistral-small-4': { input: 0, output: 0 },
-    'nvidia-mistral-medium-3-5-128b': { input: 0, output: 0 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 },
     'gemini-2.5-flash-lite': { input: 0.10, output: 0.40 },
     'gemini-2.5-flash': { input: 0.30, output: 2.50 },
@@ -159,25 +123,7 @@ window.APP_CONFIG = {
     'kimi-k2.5': { input: 0.60, output: 3.00 },
     'kimi-k2.6': { input: 0.95, output: 4.00 },
     'kimi-k2.7-code': { input: 0.95, output: 4.00 },
-    'kimi-k2.7-code-highspeed': { input: 1.90, output: 8.00 },
-    'opencode-go-glm-5-2': { input: 1.40, output: 4.40 },
-    'opencode-go-glm-5-1': { input: 1.40, output: 4.40 },
-    'opencode-go-kimi-k2.7-code': { input: 0.95, output: 4.00 },
-    'opencode-go-kimi-k2.6': { input: 0.95, output: 4.00 },
-    'opencode-go-deepseek-v4-pro': { input: 1.74, output: 3.48 },
-    'opencode-go-deepseek-v4-flash': { input: 0.14, output: 0.28 },
-    'opencode-go-mimo-v2-5': { input: 0.14, output: 0.28 },
-    'opencode-go-mimo-v2.5-pro': { input: 1.74, output: 3.48 },
-    'opencode-go-minimax-m3': { input: 0.30, output: 1.20 },
-    'opencode-go-minimax-m2.7': { input: 0.30, output: 1.20 },
-    'opencode-go-minimax-m2.5': { input: 0.30, output: 1.20 },
-    'opencode-go-qwen3.7-max': { input: 2.50, output: 7.50 },
-    'opencode-go-qwen3.7-plus': { input: 0.40, output: 1.60 },
-    'opencode-go-qwen3.6-plus': { input: 0.50, output: 3.00 },
-    'sonar': { input: 1.00, output: 1.00 },
-    'sonar-pro': { input: 3.00, output: 15.00 },
-    'sonar-reasoning-pro': { input: 2.00, output: 8.00 },
-    'perplexity-search': { input: 0, output: 0 }
+    'kimi-k2.7-code-highspeed': { input: 1.90, output: 8.00 }
   },
 
   TOKEN_COST_WARNING_USD: 1,
@@ -189,21 +135,18 @@ window.APP_CONFIG = {
   COMPARE_MIN_MODELS: 2,
   COMPARE_MAX_MODELS: 3,
 
-  DEFAULT_MODEL: 'nvidia-mistral-small-4',
+  DEFAULT_MODEL: 'deepseek-v4-flash',
   DEFAULT_LOCALE: 'en',
   LOCALES: ['en', 'vi', 'jp', 'zh'],
 
   PROVIDERS: [
-    { id: 'nvidia', label: 'NVIDIA' },
     { id: 'openrouter', label: 'OpenRouter' },
-    { id: 'opencode-go', label: 'OpenCode Go' },
     { id: 'deepseek', label: 'DeepSeek' },
     { id: 'byteplus', label: 'Byte Plus' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'google', label: 'Gemini' },
-    { id: 'kimi', label: 'Kimi' },
-    { id: 'perplexity', label: 'Perplexity' }
+    { id: 'kimi', label: 'Kimi' }
   ],
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
@@ -218,12 +161,9 @@ window.APP_CONFIG = {
     anthropic: ['low', 'medium', 'high', 'xhigh', 'max'],
     google:    ['low', 'medium', 'high'],
     deepseek:  ['default', 'high', 'max'],
-    nvidia:    ['default', 'high', 'max'],
     byteplus:  ['default', 'high', 'max'],
     openrouter: ['low', 'medium', 'high'],
-    'opencode-go': ['low', 'medium', 'high'],
-    kimi:      [], // binary thinking only: enabled/disabled via Thinking toggle
-    perplexity: ['low', 'medium', 'high']
+    kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
   },
 
   MODEL_EFFORT_LEVELS: {
@@ -237,16 +177,6 @@ window.APP_CONFIG = {
     'gemini-2.5-flash-lite': ['low', 'medium', 'high'],
     'gemini-2.5-flash': ['low', 'medium', 'high'],
     'gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
-    'nvidia-nemotron-3-ultra-550b-a55b': ['default', 'medium', 'high'],
-    'nvidia-nemotron-3-super': ['default', 'medium', 'high'],
-    'nvidia-nemotron-3-nano-omni': ['default', 'medium', 'high'],
-    'nvidia-gpt-oss-120b': ['low', 'medium', 'high'],
-    'nvidia-glm-5-2': ['default', 'high', 'max'],
-    'nvidia-minimax-m3': ['low', 'medium', 'high'],
-    'nvidia-minimax-m2-7': ['low', 'medium', 'high'],
-    'nvidia-step-3-7-flash': [],
-    'nvidia-mistral-small-4': ['low', 'medium', 'high'],
-    'nvidia-mistral-medium-3-5-128b': ['low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-lite': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-mini': ['minimal', 'low', 'medium', 'high'],
     'byteplus-dola-seed-2-0-pro': ['minimal', 'low', 'medium', 'high'],
@@ -254,6 +184,7 @@ window.APP_CONFIG = {
     'byteplus-dola-seed-2-1-turbo': ['minimal', 'low', 'medium', 'high'],
     'byteplus-gpt-oss-120b': ['low', 'medium', 'high'],
     'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
+    'openrouter-deepseek-v4.1-flash': ['high', 'xhigh'],
     'openrouter-deepseek-v4-flash': ['high', 'xhigh'],
     'openrouter-deepseek-v4-flash-0731': ['high', 'xhigh'],
     'openrouter-deepseek-v4-pro': ['high', 'xhigh'],
@@ -278,21 +209,7 @@ window.APP_CONFIG = {
     'openrouter-muse-spark-1.1': ['low', 'medium', 'high'],
     'openrouter-gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'opencode-go-glm-5-2': ['high', 'xhigh'],
-    'opencode-go-glm-5-1': ['high', 'xhigh'],
-    'opencode-go-deepseek-v4-pro': ['high', 'xhigh'],
-    'opencode-go-deepseek-v4-flash': ['high', 'xhigh'],
-    'opencode-go-mimo-v2-5': ['low', 'medium', 'high'],
-    'opencode-go-mimo-v2.5-pro': ['low', 'medium', 'high'],
-    'opencode-go-kimi-k2.7-code': ['low', 'medium', 'high'],
-    'opencode-go-kimi-k2.6': ['low', 'medium', 'high'],
-    'opencode-go-minimax-m3': ['low', 'medium', 'high'],
-    'opencode-go-minimax-m2.7': ['low', 'medium', 'high'],
-    'opencode-go-minimax-m2.5': ['low', 'medium', 'high'],
-    'opencode-go-qwen3.7-max': ['low', 'medium', 'high'],
-    'opencode-go-qwen3.7-plus': ['low', 'medium', 'high'],
-    'opencode-go-qwen3.6-plus': ['low', 'medium', 'high']
+    'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -324,11 +241,8 @@ window.APP_CONFIG = {
     if (this.modelUsesByteplusOpenAIReasoning(modelId)) return false;
     if (this.modelUsesGptOssReasoning(modelId)) return false;
     if (this.modelUsesOpenRouterReasoning(modelId)) return false;
-    if (this.modelUsesOpencodeGoReasoning(modelId)) return false;
-    if (this.modelUsesNvidiaEnableThinkingTemplate(modelId)) return false;
-    if (this.modelUsesNvidiaStepModel(modelId)) return false;
     const provider = this.getModelProvider(modelId);
-    return provider === 'deepseek' || provider === 'nvidia' || provider === 'byteplus';
+    return provider === 'deepseek' || provider === 'byteplus';
   },
 
   modelUsesBinaryThinking(modelId) {
@@ -351,59 +265,6 @@ window.APP_CONFIG = {
     return 'high';
   },
 
-  normalizeNemotronEffort(effort) {
-    if (effort === 'default') return 'default';
-    if (effort === 'medium') return 'medium';
-    if (effort === 'high' || effort === 'max' || effort === 'xhigh') return 'high';
-    return 'high';
-  },
-
-  modelUsesNvidiaDeepSeekChatTemplate(modelId) {
-    if (this.getModelProvider(modelId) !== 'nvidia') return false;
-    return /^deepseek-ai\//.test(this.getApiModel(modelId));
-  },
-
-  modelUsesNvidiaEnableThinkingTemplate(modelId) {
-    if (this.getModelProvider(modelId) !== 'nvidia') return false;
-    return /^google\/(gemma|diffusiongemma)/i.test(this.getApiModel(modelId));
-  },
-
-  modelUsesNvidiaStepModel(modelId) {
-    if (this.getModelProvider(modelId) !== 'nvidia') return false;
-    return /^stepfun-ai\/step-3\.[57]-flash$/i.test(this.getApiModel(modelId));
-  },
-
-  modelUsesNvidiaLmReasoningEffort(modelId) {
-    if (this.getModelProvider(modelId) !== 'nvidia') return false;
-    return /^mistralai\/mistral-(small|medium)/i.test(this.getApiModel(modelId));
-  },
-
-  normalizeNvidiaLmReasoningEffort(effort, modelId) {
-    const levels = ['low', 'medium', 'high'];
-    const normalized = this.normalizeEffortForModel(
-      effort || this.getDefaultEffortForModel(modelId),
-      modelId
-    );
-    if (levels.includes(normalized)) return normalized;
-    if (normalized === 'default' || normalized === 'minimal') return 'medium';
-    return 'high';
-  },
-
-  modelUsesNemotronReasoning(modelId) {
-    const model = this.getModel(modelId);
-    const apiModel = model.apiModel || model.id;
-    return /nemotron/i.test(apiModel);
-  },
-
-  modelUsesNemotronBudgetReasoning(modelId) {
-    return !!this.getModel(modelId).nemotronReasoningBudget;
-  },
-
-  getNemotronReasoningBudget(modelId) {
-    const model = this.getModel(modelId);
-    return model.nemotronReasoningBudget || 16384;
-  },
-
   getDeepSeekThinkingConfig(reasoningEffort, thinkingEnabled) {
     const effort = this.normalizeDeepSeekEffort(reasoningEffort);
     if (effort === 'default' || !thinkingEnabled) {
@@ -417,10 +278,6 @@ window.APP_CONFIG = {
     if (!levels.length) return effort;
 
     if (this.modelUsesEffortLinkedThinking(modelId)) {
-      if (this.modelUsesNemotronReasoning(modelId)) {
-        const normalized = this.normalizeNemotronEffort(effort);
-        return levels.includes(normalized) ? normalized : 'high';
-      }
       const normalized = this.normalizeDeepSeekEffort(effort);
       return levels.includes(normalized) ? normalized : 'high';
     }
@@ -453,27 +310,16 @@ window.APP_CONFIG = {
   getDefaultEffortForModel(modelId) {
     if (modelId === 'gemini-3.5-flash' || modelId === 'openrouter-gemini-3.5-flash') return 'medium';
     if (modelId === 'byteplus-dola-seed-2-0-lite' || modelId === 'byteplus-dola-seed-2-0-mini' || modelId === 'byteplus-dola-seed-2-0-pro' || modelId === 'byteplus-dola-seed-2-0-code' || modelId === 'byteplus-dola-seed-2-1-turbo') return 'medium';
-    if (modelId === 'byteplus-gpt-oss-120b' || modelId === 'nvidia-gpt-oss-120b') return 'medium';
-    if (modelId === 'nvidia-glm-5-2') return 'high';
-    if (modelId === 'nvidia-minimax-m3') return 'medium';
-    if (modelId === 'nvidia-minimax-m2-7') return 'medium';
-    if (modelId === 'nvidia-step-3-7-flash') return 'medium';
-    if (modelId === 'nvidia-mistral-small-4') return 'medium';
-    if (modelId === 'nvidia-mistral-medium-3-5-128b') return 'high';
+    if (modelId === 'byteplus-gpt-oss-120b') return 'medium';
     if (modelId === 'openrouter-gpt-oss-120b') return 'medium';
-    if (modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-flash-0731' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
+    if (modelId === 'openrouter-deepseek-v4.1-flash' || modelId === 'openrouter-deepseek-v4-flash' || modelId === 'openrouter-deepseek-v4-flash-0731' || modelId === 'openrouter-deepseek-v4-pro' || modelId === 'openrouter-glm-5-2') return 'high';
     if (modelId === 'openrouter-mimo-v2-5' || modelId === 'openrouter-mimo-v2.5-pro') return 'medium';
-    if (modelId === 'nvidia-nemotron-3-super') return 'high';
-    if (modelId === 'nvidia-nemotron-3-nano-omni') return 'high';
     if (modelId === 'openrouter-minimax-m3' || modelId === 'openrouter-minimax-m2.7-nitro' || modelId === 'openrouter-north-mini-code' || modelId === 'openrouter-mistral-small-4') return 'medium';
     if (modelId === 'gpt-5.6-luna' || modelId === 'openrouter-gpt-5.6-luna') return 'low';
     if (modelId === 'gpt-5.6-terra' || modelId === 'openrouter-gpt-5.6-terra') return 'medium';
     if (modelId === 'openrouter-kimi-k3') return 'max';
     if (modelId === 'openrouter-muse-spark-1.1') return 'medium';
     if (modelId === 'gpt-5.6-sol' || modelId === 'openrouter-claude-haiku-4-5' || modelId === 'openrouter-claude-sonnet-5' || modelId === 'openrouter-claude-opus-4-8' || modelId === 'openrouter-claude-opus-5' || modelId === 'openrouter-gemini-2.5-flash-lite' || modelId === 'openrouter-gemini-2.5-flash' || modelId === 'openrouter-kimi-k2.7-code' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-grok-4.5' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
-    if (modelId === 'opencode-go-glm-5-2' || modelId === 'opencode-go-glm-5-1' || modelId === 'opencode-go-deepseek-v4-pro' || modelId === 'opencode-go-deepseek-v4-flash') return 'high';
-    if (modelId === 'opencode-go-mimo-v2-5' || modelId === 'opencode-go-mimo-v2.5-pro' || modelId === 'opencode-go-minimax-m3' || modelId === 'opencode-go-minimax-m2.7' || modelId === 'opencode-go-minimax-m2.5' || modelId === 'opencode-go-qwen3.7-plus' || modelId === 'opencode-go-qwen3.6-plus') return 'medium';
-    if (modelId === 'opencode-go-kimi-k2.7-code' || modelId === 'opencode-go-kimi-k2.6' || modelId === 'opencode-go-qwen3.7-max') return 'high';
     return this.DEFAULT_EFFORT;
   },
 
@@ -538,7 +384,7 @@ window.APP_CONFIG = {
   getModelDisplayLabel(model) {
     if (!model) return '';
     if (model.shortLabel) return model.shortLabel;
-    return model.label.replace(/\s*\((OpenRouter|NVIDIA|Byte Plus|OpenCode Go)\)\s*$/, '');
+    return model.label.replace(/\s*\((OpenRouter|Byte Plus)\)\s*$/, '');
   },
 
   getModel(modelId) {
@@ -593,9 +439,6 @@ window.APP_CONFIG = {
       // OpenRouter từ chối request nếu max_tokens vượt số credit còn lại — để null = không gửi max_tokens.
       return this.OPENROUTER_MAX_OUTPUT_TOKENS || null;
     }
-    if (this.getModelProvider(modelId) === 'nvidia') {
-      return this.NVIDIA_MAX_OUTPUT_TOKENS || configured;
-    }
     const cap = this.getModel(modelId).maxOutputTokens;
     return cap ? Math.min(configured, cap) : configured;
   },
@@ -608,13 +451,10 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
-    if (provider === 'nvidia') return state.nvidiaApiKey || '';
     if (provider === 'byteplus') return state.byteplusApiKey || '';
     if (provider === 'openrouter') return state.openrouterApiKey || '';
-    if (provider === 'opencode-go') return state.opencodeGoApiKey || '';
     if (provider === 'google') return state.geminiApiKey || '';
     if (provider === 'kimi') return state.kimiApiKey || '';
-    if (provider === 'perplexity') return state.perplexityApiKey || '';
     return state.apiKey || '';
   },
 
@@ -623,13 +463,10 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
-    if (provider === 'nvidia') return 'Enter your NVIDIA API key in Settings first';
     if (provider === 'byteplus') return 'Enter your Byte Plus API key in Settings first';
     if (provider === 'openrouter') return 'Enter your OpenRouter API key in Settings first';
-    if (provider === 'opencode-go') return 'Enter your OpenCode Go API key in Settings first';
     if (provider === 'google') return 'Enter your Gemini API key in Settings first';
     if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
-    if (provider === 'perplexity') return 'Enter your Perplexity API key in Settings first';
     return 'Enter your API key in Settings first';
   },
 
@@ -638,19 +475,11 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
-    if (provider === 'nvidia') return 'No NVIDIA API key. Open Settings to enter one.';
     if (provider === 'byteplus') return 'No Byte Plus API key. Open Settings to enter one.';
     if (provider === 'openrouter') return 'No OpenRouter API key. Open Settings to enter one.';
-    if (provider === 'opencode-go') return 'No OpenCode Go API key. Open Settings to enter one.';
     if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
     if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
-    if (provider === 'perplexity') return 'No Perplexity API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
-  },
-
-  getNvidiaProxyRequiredError() {
-    if (window.I18n) return window.I18n.t('nvidiaProxyRequired');
-    return 'NVIDIA API requires a CORS proxy. Deploy worker/ and set NVIDIA_PROXY_ENDPOINT in config.js.';
   },
 
   getByteplusProxyRequiredError() {
@@ -658,51 +487,16 @@ window.APP_CONFIG = {
     return 'Byte Plus API requires a CORS proxy. Deploy worker/ and set BYTEPLUS_PROXY_ENDPOINT in config.js.';
   },
 
-  getOpencodeGoProxyRequiredError() {
-    if (window.I18n) return window.I18n.t('opencodeGoProxyRequired');
-    return 'OpenCode Go API requires a CORS proxy. Deploy worker/ and set OPENCODE_GO proxy endpoints in config.js.';
-  },
-
-  getPerplexityProxyRequiredError() {
-    if (window.I18n) return window.I18n.t('perplexityProxyRequired');
-    return 'Perplexity API requires a CORS proxy. Deploy worker/ and set PERPLEXITY_PROXY_ENDPOINT in config.js.';
-  },
-
   formatApiError(err, modelId) {
     const msg = err?.message || String(err || '');
     const isNetwork = /load failed|failed to fetch|networkerror|network error/i.test(msg);
     const provider = this.getModelProvider(modelId);
-    if (isNetwork && provider === 'nvidia') {
-      if (!this.NVIDIA_PROXY_ENDPOINT) {
-        return this.getNvidiaProxyRequiredError();
-      }
-      if (window.I18n) return window.I18n.t('nvidiaProxyNetworkError');
-      return 'Could not reach NVIDIA proxy. Check API key, use a local server (not file://), and redeploy worker/.';
-    }
     if (isNetwork && provider === 'byteplus') {
       if (!this.getByteplusProxyEndpoint(modelId)) {
         return this.getByteplusProxyRequiredError();
       }
       if (window.I18n) return window.I18n.t('byteplusProxyNetworkError');
       return 'Could not reach Byte Plus proxy. Check API key, use a local server (not file://), and redeploy worker/.';
-    }
-    if (isNetwork && provider === 'opencode-go') {
-      if (!this.getOpencodeGoProxyEndpoint(modelId)) {
-        return this.getOpencodeGoProxyRequiredError();
-      }
-      if (window.I18n) return window.I18n.t('opencodeGoProxyNetworkError');
-      return 'Could not reach OpenCode Go proxy. Check API key, use a local server (not file://), and redeploy worker/.';
-    }
-    if (isNetwork && provider === 'perplexity') {
-      if (!this.getPerplexityProxyEndpoint(modelId)) {
-        return this.getPerplexityProxyRequiredError();
-      }
-      if (window.I18n) return window.I18n.t('perplexityProxyNetworkError');
-      return 'Could not reach Perplexity proxy. Check API key, use a local server (not file://), and redeploy worker/.';
-    }
-    if (/DEGRADED function cannot be invoked/i.test(msg) && provider === 'nvidia') {
-      if (window.I18n) return window.I18n.t('nvidiaDegradedError');
-      return 'Endpoint NVIDIA đang degraded (quá tải hoặc bảo trì). Thử lại sau hoặc dùng DeepSeek V4 Flash qua OpenRouter/Byte Plus.';
     }
     return msg;
   },
@@ -840,17 +634,13 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
-  NVIDIA_ENDPOINT: 'https://integrate.api.nvidia.com/v1/chat/completions',
-  // Cloudflare Worker proxy — bắt buộc cho NVIDIA (API không hỗ trợ CORS từ trình duyệt).
-  // Deploy: cd worker && npx wrangler deploy → dán URL + '/nvidia' vào đây.
-  NVIDIA_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/nvidia',
   BYTEPLUS_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/chat/completions',
   BYTEPLUS_RESPONSES_ENDPOINT: 'https://ark.ap-southeast.bytepluses.com/api/v3/responses',
   // Deploy: cd worker && npx wrangler deploy → dán URL + '/byteplus' vào đây.
-  BYTEPLUS_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus',
-  BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/byteplus-responses',
+  BYTEPLUS_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/byteplus',
+  BYTEPLUS_RESPONSES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/byteplus-responses',
   // Share snapshots: POST create / GET /share/:id (Cloudflare KV)
-  SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/share',
+  SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/share',
 
   BYTEPLUS_MCP_TOOLS: {
     'byteplus-dola-seed-2-0-lite': [
@@ -896,41 +686,13 @@ window.APP_CONFIG = {
   },
   OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
   OPENROUTER_IMAGES_ENDPOINT: 'https://openrouter.ai/api/v1/images',
-  OPENCODE_GO_CHAT_ENDPOINT: 'https://opencode.ai/zen/go/v1/chat/completions',
-  OPENCODE_GO_MESSAGES_ENDPOINT: 'https://opencode.ai/zen/go/v1/messages',
-  // Deploy: cd worker && npx wrangler deploy → dán URL + '/opencode-go-chat' hoặc '/opencode-go-messages'.
-  OPENCODE_GO_CHAT_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/opencode-go-chat',
-  OPENCODE_GO_MESSAGES_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/opencode-go-messages',
-  // OpenCode Go: MiniMax + Qwen dùng /v1/messages (Anthropic); còn lại dùng /v1/chat/completions.
-  OPENCODE_GO_MESSAGES_MODELS: new Set([
-    'opencode-go-minimax-m3',
-    'opencode-go-minimax-m2.7',
-    'opencode-go-minimax-m2.5',
-    'opencode-go-qwen3.7-max',
-    'opencode-go-qwen3.7-plus',
-    'opencode-go-qwen3.6-plus'
-  ]),
   // Để null: không gửi max_tokens (OpenRouter tự giới hạn theo credit). Đặt số (vd. 8192) nếu tài khoản có đủ credit.
   OPENROUTER_MAX_OUTPUT_TOKENS: 32768,
-  NVIDIA_MAX_OUTPUT_TOKENS: 65536,
   KIMI_ENDPOINT: 'https://api.moonshot.ai/v1/chat/completions',
-  PERPLEXITY_ENDPOINT: 'https://api.perplexity.ai/v1/sonar',
-  PERPLEXITY_SEARCH_ENDPOINT: 'https://api.perplexity.ai/search',
-  // Deploy: cd worker && npx wrangler deploy → dán URL + '/perplexity' hoặc '/perplexity-search'.
-  PERPLEXITY_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/perplexity',
-  PERPLEXITY_SEARCH_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.testchatai-deepseek.workers.dev/perplexity-search',
   GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models',
 
   geminiStreamUrl(modelId) {
     return this.GEMINI_API_BASE + '/' + modelId + ':streamGenerateContent?alt=sse';
-  },
-
-  getNvidiaEndpoint() {
-    return this.NVIDIA_PROXY_ENDPOINT || this.NVIDIA_ENDPOINT;
-  },
-
-  nvidiaRequiresProxy() {
-    return true;
   },
 
   getByteplusEndpoint(modelId) {
@@ -961,68 +723,6 @@ window.APP_CONFIG = {
 
   modelUsesOpenRouterReasoning(modelId) {
     return this.getModelProvider(modelId) === 'openrouter';
-  },
-
-  modelUsesOpencodeGoReasoning(modelId) {
-    return this.getModelProvider(modelId) === 'opencode-go';
-  },
-
-  getOpencodeGoThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {
-    const required = this.modelThinkingRequired(modelId);
-    if (!thinkingEnabled && !required) return null;
-    const effort = this.normalizeEffortForModel(
-      reasoningEffort || this.getDefaultEffortForModel(modelId),
-      modelId
-    );
-    return { enabled: true, effort };
-  },
-
-  modelUsesOpencodeGoMessages(modelId) {
-    return this.OPENCODE_GO_MESSAGES_MODELS.has(modelId);
-  },
-
-  getOpencodeGoEndpoint(modelId) {
-    if (this.modelUsesOpencodeGoMessages(modelId)) {
-      return this.OPENCODE_GO_MESSAGES_PROXY_ENDPOINT || this.OPENCODE_GO_MESSAGES_ENDPOINT;
-    }
-    return this.OPENCODE_GO_CHAT_PROXY_ENDPOINT || this.OPENCODE_GO_CHAT_ENDPOINT;
-  },
-
-  getOpencodeGoProxyEndpoint(modelId) {
-    if (this.modelUsesOpencodeGoMessages(modelId)) {
-      return this.OPENCODE_GO_MESSAGES_PROXY_ENDPOINT;
-    }
-    return this.OPENCODE_GO_CHAT_PROXY_ENDPOINT;
-  },
-
-  opencodeGoRequiresProxy() {
-    return true;
-  },
-
-  modelUsesPerplexitySearch(modelId) {
-    return this.getModel(modelId).apiMode === 'search';
-  },
-
-  getPerplexityEndpoint(modelId) {
-    if (this.modelUsesPerplexitySearch(modelId)) {
-      return this.PERPLEXITY_SEARCH_PROXY_ENDPOINT || this.PERPLEXITY_SEARCH_ENDPOINT;
-    }
-    return this.PERPLEXITY_PROXY_ENDPOINT || this.PERPLEXITY_ENDPOINT;
-  },
-
-  getPerplexityProxyEndpoint(modelId) {
-    if (this.modelUsesPerplexitySearch(modelId)) {
-      return this.PERPLEXITY_SEARCH_PROXY_ENDPOINT;
-    }
-    return this.PERPLEXITY_PROXY_ENDPOINT;
-  },
-
-  perplexityRequiresProxy() {
-    return true;
-  },
-
-  getPerplexitySearchContextSize() {
-    return this.SEARCH_CONTEXT_SIZE || 'high';
   },
 
   getOpenRouterThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {
