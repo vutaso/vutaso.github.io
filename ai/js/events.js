@@ -1267,9 +1267,8 @@ window.Events = (() => {
     convoMod.addMessage(convo, userMsg);
     const userMsgIdx = convo.messages.length - 1;
 
-    ui.els.composerInput.value = '';
-    window.Speech?.stopListening?.();
     window.Speech?.stopSpeaking?.();
+    clearComposerInput();
     clearPendingAttachments();
     pendingReferenceImage = null;
     resetImageGenPicked();
@@ -1316,6 +1315,28 @@ window.Events = (() => {
     updateSendEnabled();
   };
 
+  let composerClearedAt = 0;
+
+  const clearComposerInput = () => {
+    const el = ui.els.composerInput;
+    if (!el) return;
+    window.Speech?.stopListening?.({ restoreInput: false });
+    el.classList.remove('is-voice-interim');
+    el.value = '';
+    autoResize(el);
+    composerClearedAt = Date.now();
+    const keepEmpty = () => {
+      if (!el.isConnected) return;
+      if (Date.now() - composerClearedAt > 500) return;
+      if (el.value !== '') {
+        el.value = '';
+        autoResize(el);
+      }
+    };
+    queueMicrotask(keepEmpty);
+    requestAnimationFrame(keepEmpty);
+  };
+
   const isComposerEnterSend = (e) => {
     if (e.isComposing || e.keyCode === 229) return false;
     if (e.key === 'Enter' || e.key === 'NumpadEnter') return !e.shiftKey;
@@ -1331,6 +1352,11 @@ window.Events = (() => {
     // Mobile Safari/IME often skip or delay `input`; also sync on keyup and composition.
     ['input', 'keyup', 'change', 'compositionend', 'cut'].forEach((type) => {
       ui.els.composerInput.addEventListener(type, syncComposerInputState);
+    });
+    ui.els.composerInput.addEventListener('compositionend', () => {
+      if (Date.now() - composerClearedAt > 500) return;
+      clearComposerInput();
+      updateSendEnabled();
     });
     // During IME composition, only refresh send state — avoid autoResize fighting the caret.
     ui.els.composerInput.addEventListener('compositionupdate', updateSendEnabled);

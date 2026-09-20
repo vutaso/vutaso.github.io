@@ -132,6 +132,7 @@ window.Speech = (() => {
     rec.interimResults = true;
 
     rec.onresult = (event) => {
+      if (!listening) return;
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
@@ -191,13 +192,18 @@ window.Speech = (() => {
     }
   };
 
-  const stopListening = () => {
+  const stopListening = ({ restoreInput = true } = {}) => {
     listening = false;
     if (recognition) {
       try { recognition.stop(); } catch { /* ignore */ }
       recognition = null;
     }
-    finalizeListenSession();
+    if (restoreInput) {
+      finalizeListenSession();
+    } else {
+      if (inputEl) inputEl.classList.remove('is-voice-interim');
+      resetListenSession();
+    }
     syncMicUI();
     if (typeof onListeningChange === 'function') onListeningChange(false);
   };

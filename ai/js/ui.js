@@ -2858,7 +2858,7 @@ window.UI = (() => {
   const setStreaming = (on) => {
     if (on) {
       _stickToBottom = true;
-      window.Speech?.stopListening?.();
+      window.Speech?.stopListening?.({ restoreInput: false });
       window.Speech?.stopSpeaking?.();
     }
     syncCompressContextBar();
