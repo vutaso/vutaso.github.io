@@ -128,10 +128,12 @@ const truncateText = (value, max) => {
   return text.slice(0, max) + '\n\n…';
 };
 
+const SHARE_SAFE_IMAGE_RE = /^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+/]+=*$/i;
+
 const sanitizeShareImage = (img) => {
   if (!img || typeof img !== 'object') return null;
-  const dataUrl = typeof img.dataUrl === 'string' ? img.dataUrl : '';
-  if (!dataUrl.startsWith('data:image/') || dataUrl.length > SHARE_MAX_IMAGE_CHARS) return null;
+  const dataUrl = typeof img.dataUrl === 'string' ? img.dataUrl.replace(/\s+/g, '') : '';
+  if (!SHARE_SAFE_IMAGE_RE.test(dataUrl) || dataUrl.length > SHARE_MAX_IMAGE_CHARS) return null;
   return {
     dataUrl,
     name: truncateText(String(img.name || 'image'), 120),
@@ -337,6 +339,10 @@ export default {
 
     if (request.method !== 'POST') {
       return jsonError('Method not allowed', 405, origin, env);
+    }
+
+    if (!resolveOrigin(origin, env)) {
+      return jsonError('Origin not allowed', 403, origin, env);
     }
 
     return handleDeepseek(request, env, origin);

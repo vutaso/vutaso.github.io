@@ -6,6 +6,67 @@ window.Utils = (() => {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+  const SAFE_IMAGE_DATA_RE = /^data:image\/(?:png|jpe?g|gif|webp);base64,[a-z0-9+/]+=*$/i;
+
+  const safeHref = (href) => {
+    const raw = String(href || '').trim();
+    if (!raw || /[\s<>]/.test(raw) || /^(javascript|vbscript|data):/i.test(raw)) return '';
+    try {
+      const url = new URL(raw, window.location.origin);
+      if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
+        return raw;
+      }
+    } catch {}
+    return '';
+  };
+
+  const isSafeImageDataUrl = (dataUrl) => {
+    if (typeof dataUrl !== 'string') return false;
+    if (dataUrl.length > 8_000_000) return false;
+    return SAFE_IMAGE_DATA_RE.test(dataUrl.replace(/\s+/g, ''));
+  };
+
+  const safeImageSrc = (src) => {
+    const raw = String(src || '').trim();
+    if (!raw) return '';
+    if (isSafeImageDataUrl(raw)) return raw;
+    const href = safeHref(raw);
+    return /^https?:/i.test(href) ? href : '';
+  };
+
+  let purifyHooked = false;
+  const ensurePurifyHooks = () => {
+    if (purifyHooked || !window.DOMPurify) return;
+    purifyHooked = true;
+    window.DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+      if (node.tagName === 'A') {
+        const safe = safeHref(node.getAttribute('href'));
+        if (!safe) node.removeAttribute('href');
+        else {
+          node.setAttribute('href', safe);
+          node.setAttribute('target', '_blank');
+          node.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+      if (node.tagName === 'IMG') {
+        const safe = safeImageSrc(node.getAttribute('src'));
+        if (!safe) node.removeAttribute('src');
+        else node.setAttribute('src', safe);
+      }
+    });
+  };
+
+  const sanitizeHtml = (html) => {
+    if (!html) return '';
+    if (!window.DOMPurify) return String(html);
+    ensurePurifyHooks();
+    return window.DOMPurify.sanitize(html, {
+      USE_PROFILES: { html: true, svg: true, svgFilters: true },
+      ADD_ATTR: ['target', 'rel'],
+      ADD_TAGS: ['foreignObject']
+    });
+  };
+
   const formatTime = (ts) => {
     const d = new Date(ts);
     const now = new Date();
@@ -818,7 +879,8 @@ window.Utils = (() => {
   };
 
   return {
-    escapeHTML, formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
+    escapeHTML, safeHref, safeImageSrc, isSafeImageDataUrl, sanitizeHtml,
+    formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
     getCodeBlockSource,
     buildSearchFold, includesSearchFold, findSearchRangeInFold, buildSearchSnippet,
     includesSearch, findSearchRange, highlightSearchText,

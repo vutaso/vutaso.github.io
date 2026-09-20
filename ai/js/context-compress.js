@@ -56,8 +56,13 @@ window.ContextCompress = (() => {
         }
         if (chunks.length) parts.push('USER:\n' + chunks.join('\n'));
       } else if (m.role === 'assistant') {
+        const chunks = [];
         const text = window.Conversations.getAssistantContent(m);
-        if (text?.trim()) parts.push('ASSISTANT:\n' + text.trim());
+        if (text?.trim()) chunks.push(text.trim());
+        if (m.generatedImages?.length) {
+          chunks.push('[' + m.generatedImages.length + ' ' + t('compressImagesAttached') + ']');
+        }
+        if (chunks.length) parts.push('ASSISTANT:\n' + chunks.join('\n'));
       }
     }
     return parts.join('\n\n---\n\n');
@@ -85,6 +90,7 @@ window.ContextCompress = (() => {
       }]
     };
     const systemPrompt = window.I18n.getSystemPromptForMode('contentSummarizer', locale);
+    const thinking = !!window.APP_CONFIG.modelThinkingRequired(modelId);
 
     let buffer = '';
     await new Promise((resolve, reject) => {
@@ -95,16 +101,20 @@ window.ContextCompress = (() => {
         convo: tempConvo,
         webSearch: false,
         imageGen: false,
-        thinking: false,
-        reasoningEffort: 'default',
+        thinking,
+        reasoningEffort: thinking ? (window.APP_CONFIG.DEFAULT_EFFORT || 'high') : 'default',
         onToken: (chunk) => {
           buffer += chunk;
           if (typeof onProgress === 'function') onProgress(buffer);
         },
-        onUsage: (usage) => {
-          if (usage && convo) window.Conversations.addTokenUsage(convo, modelId, usage);
+        onDone: (info) => {
+          if (info?.aborted) {
+            reject(new Error(window.I18n.t('compressAborted')));
+            return;
+          }
+          if (info?.usage && convo) window.Conversations.addTokenUsage(convo, modelId, info.usage);
+          resolve();
         },
-        onDone: () => resolve(),
         onError: reject
       });
     });
@@ -122,14 +132,18 @@ window.ContextCompress = (() => {
     }
 
     const toCompress = messages.slice(0, messages.length - keep);
+    const recent = messages.slice(-keep);
     const transcript = capTranscript(formatMessagesForSummary(toCompress));
     if (!transcript.trim()) {
       throw new Error(window.I18n.t('compressNothingToSummarize'));
     }
 
     const summary = await requestSummary({ transcript, modelId, apiKey, locale, convo, onProgress });
-    const applied = window.Conversations.compressWithSummary(convo, summary, keep);
-    if (!applied) throw new Error(window.I18n.t('compressFailed'));
+    const applied = window.Conversations.compressWithSummary(convo, summary, {
+      keepRecent: keep,
+      recent
+    });
+    if (!applied) throw new Error(window.I18n.t('compressApplyFailed'));
 
     return {
       summary,

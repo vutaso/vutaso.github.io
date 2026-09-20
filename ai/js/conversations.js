@@ -220,6 +220,28 @@ window.Conversations = (() => {
     return message.responseModel || '';
   };
 
+  const emptyVariantExtra = () => ({
+    generatedImages: [],
+    reasoningContent: '',
+    groundingMetadata: null
+  });
+
+  const snapshotVariantExtra = (message) => ({
+    generatedImages: Array.isArray(message.generatedImages) ? message.generatedImages.slice() : [],
+    reasoningContent: message.reasoningContent || '',
+    groundingMetadata: message.groundingMetadata || null
+  });
+
+  const applyVariantExtra = (message, extra) => {
+    const e = extra || emptyVariantExtra();
+    if (e.generatedImages?.length) message.generatedImages = e.generatedImages.slice();
+    else delete message.generatedImages;
+    if (e.reasoningContent) message.reasoningContent = e.reasoningContent;
+    else delete message.reasoningContent;
+    if (e.groundingMetadata) message.groundingMetadata = e.groundingMetadata;
+    else delete message.groundingMetadata;
+  };
+
   const initAssistantVariants = (message) => {
     if (!message || message.role !== 'assistant') return;
     if (!message.variants) {
@@ -232,6 +254,15 @@ window.Conversations = (() => {
     }
     while (message.variantModels.length < message.variants.length) {
       message.variantModels.push(message.responseModel || '');
+    }
+    if (!message.variantExtras) {
+      const current = message.variantIndex ?? 0;
+      message.variantExtras = message.variants.map((_, i) => (
+        i === current ? snapshotVariantExtra(message) : emptyVariantExtra()
+      ));
+    }
+    while (message.variantExtras.length < message.variants.length) {
+      message.variantExtras.push(emptyVariantExtra());
     }
   };
 
@@ -247,11 +278,13 @@ window.Conversations = (() => {
     if (!msg || msg.role !== 'assistant') return null;
     convo.messages = convo.messages.slice(0, messageIndex + 1);
     initAssistantVariants(msg);
+    msg.variantExtras[msg.variantIndex] = snapshotVariantExtra(msg);
     msg.variants.push('');
     msg.variantModels.push('');
+    msg.variantExtras.push(emptyVariantExtra());
     msg.variantIndex = msg.variants.length - 1;
     msg.content = '';
-    msg.generatedImages = [];
+    applyVariantExtra(msg, emptyVariantExtra());
     saveConvo(convo);
     return msg;
   };
@@ -260,12 +293,14 @@ window.Conversations = (() => {
     const msg = convo.messages[messageIndex];
     if (!msg || msg.role !== 'assistant') return;
     initAssistantVariants(msg);
+    msg.variantExtras[msg.variantIndex] = snapshotVariantExtra(msg);
     const next = Math.max(0, Math.min(variantIndex, msg.variants.length - 1));
     msg.variantIndex = next;
     msg.content = msg.variants[next] || '';
     if (msg.variantModels?.length) {
       msg.responseModel = msg.variantModels[next] || msg.responseModel || '';
     }
+    applyVariantExtra(msg, msg.variantExtras[next]);
     saveConvo(convo);
   };
 
@@ -275,11 +310,13 @@ window.Conversations = (() => {
     if (msg.variants[msg.variantIndex] === '') {
       msg.variants.pop();
       if (msg.variantModels?.length) msg.variantModels.pop();
+      if (msg.variantExtras?.length) msg.variantExtras.pop();
       msg.variantIndex = msg.variants.length - 1;
       msg.content = msg.variants[msg.variantIndex] || '';
       if (msg.variantModels?.length) {
         msg.responseModel = msg.variantModels[msg.variantIndex] || msg.responseModel || '';
       }
+      applyVariantExtra(msg, msg.variantExtras?.[msg.variantIndex]);
       saveConvo(convo);
     }
   };
@@ -293,6 +330,8 @@ window.Conversations = (() => {
     msg.ts = Date.now();
     if (extra.generatedImages !== undefined) {
       msg.generatedImages = extra.generatedImages;
+    } else {
+      delete msg.generatedImages;
     }
     if (extra.reasoningContent) {
       msg.reasoningContent = extra.reasoningContent;
@@ -309,6 +348,7 @@ window.Conversations = (() => {
       msg.variantModels[msg.variantIndex] = extra.responseModel;
       msg.responseModel = extra.responseModel;
     }
+    msg.variantExtras[msg.variantIndex] = snapshotVariantExtra(msg);
     saveConvo(convo);
   };
 
@@ -332,10 +372,17 @@ window.Conversations = (() => {
     const clone = JSON.parse(JSON.stringify(message));
     if (clone.role === 'assistant') {
       const content = getAssistantContent(message);
+      const idx = message.variantIndex ?? 0;
       clone.content = content;
       if (clone.variants?.length) {
         clone.variants = [content];
         clone.variantIndex = 0;
+      }
+      if (clone.variantModels?.length) {
+        clone.variantModels = [clone.variantModels[idx] || clone.responseModel || ''];
+      }
+      if (clone.variantExtras?.length) {
+        clone.variantExtras = [clone.variantExtras[idx] || snapshotVariantExtra(clone)];
       }
     }
     return clone;
@@ -390,23 +437,39 @@ window.Conversations = (() => {
 
   const isBranch = (convo) => !!(convo && convo.parentId);
 
-  const compressWithSummary = (convo, summary, keepRecent = window.APP_CONFIG.COMPRESS_KEEP_RECENT_MESSAGES) => {
+  const compressWithSummary = (convo, summary, keepRecentOrOpts = window.APP_CONFIG.COMPRESS_KEEP_RECENT_MESSAGES) => {
     if (!convo || !summary?.trim()) return false;
-    const messages = convo.messages || [];
-    const keep = Math.max(0, keepRecent || 0);
-    if (messages.length <= keep) return false;
+    if (!isPersisted(convo.id)) return false;
 
-    const toCompress = messages.slice(0, messages.length - keep);
-    const recent = messages.slice(-keep);
+    const opts = keepRecentOrOpts && typeof keepRecentOrOpts === 'object'
+      ? keepRecentOrOpts
+      : { keepRecent: keepRecentOrOpts };
+    const messages = convo.messages || [];
+    const keep = Math.max(0, opts.keepRecent ?? window.APP_CONFIG.COMPRESS_KEEP_RECENT_MESSAGES ?? 0);
+    const recentSnapshot = Array.isArray(opts.recent) && opts.recent.length
+      ? opts.recent
+      : (keep ? messages.slice(-keep) : []);
+
+    const firstRecent = recentSnapshot[0];
+    let tailStart = firstRecent ? messages.indexOf(firstRecent) : -1;
+    if (tailStart < 0 && keep && messages.length > keep) {
+      return false;
+    }
+    if (tailStart < 0) tailStart = Math.max(0, messages.length - keep);
+    if (tailStart <= 0 && !recentSnapshot.length) return false;
+
+    const tail = messages.slice(tailStart);
+    const removedCount = Math.max(0, tailStart);
+    const summaryRole = tail[0]?.role === 'user' ? 'assistant' : 'user';
     const summaryMsg = {
-      role: 'user',
+      role: summaryRole,
       content: summary.trim(),
       contextSummary: true,
       compressedAt: Date.now(),
-      compressedMessageCount: toCompress.length,
+      compressedMessageCount: removedCount,
       ts: Date.now()
     };
-    convo.messages = [summaryMsg, ...recent];
+    convo.messages = [summaryMsg, ...tail];
     saveConvo(convo);
     return true;
   };

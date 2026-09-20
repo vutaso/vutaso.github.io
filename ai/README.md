@@ -198,6 +198,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | **System Prompt** | Chỉnh prompt hệ thống hoặc chọn preset |
 | **Ngôn ngữ** | Chọn ngôn ngữ giao diện |
 | **Theme** | Chọn theme trong modal hoặc nút toggle sidebar |
+| **Sao lưu / khôi phục JSON** | Xuất hội thoại, prompt và cài đặt ra file; khôi phục bằng Thay thế hoặc Gộp. API key không xuất trừ khi chọn |
 | **Xóa tất cả hội thoại** | Nút trong Cài đặt (có xác nhận) |
 | **Tự mở Cài đặt** | Hiện modal khi chưa có API key cho model đang chọn |
 
@@ -224,7 +225,7 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
   - Google: Gemini `streamGenerateContent` (web search, image gen, thinking)
   - Kimi: Chat Completions (binary thinking)
   - OpenRouter: Chat Completions (reasoning, vision)
-- **Lưu trữ:** IndexedDB + `localStorage` (key: `testchatai`)
+- **Lưu trữ:** IndexedDB + `localStorage` (key: `testchatai`); sao lưu/khôi phục JSON từ Cài đặt
 - **Thư viện CDN:** Marked, KaTeX, Highlight.js, Mermaid, PDF.js, Mammoth, SheetJS, docx, html2canvas-pro, jsPDF
 - **Tuỳ chỉnh API** (`config.js`): `API_MAX_OUTPUT_TOKENS` (65536), `REASONING_EFFORT` (`high`), `SEARCH_CONTEXT_SIZE` (`high`)
 

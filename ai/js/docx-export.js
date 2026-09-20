@@ -440,7 +440,7 @@ window.DocxExport = (() => {
         window.mermaid.initialize({
           startOnLoad: false,
           theme: 'default',
-          securityLevel: 'loose',
+          securityLevel: 'strict',
           fontFamily: 'Inter, system-ui, sans-serif',
           logLevel: 'error',
           suppressErrorRendering: true,

@@ -114,6 +114,10 @@ a.btn {
   z-index: 110;
 }
 
+#backupRestoreModal {
+  z-index: 120;
+}
+
 .modal-header-actions {
   display: flex;
   align-items: center;
@@ -458,6 +462,69 @@ a.btn {
 .settings-token-usage-sep {
   color: var(--text-dim);
   user-select: none;
+}
+
+.settings-backup-hint,
+.backup-restore-help {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.settings-backup-keys {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.settings-backup-keys input {
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+.settings-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settings-backup-btn {
+  flex: 1;
+  min-width: 132px;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.backup-restore-summary {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.backup-restore-date {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.backup-restore-help {
+  margin-top: 12px;
+}
+
+#backupRestoreKeysWrap {
+  margin-top: 12px;
 }
 
 .modal-cost-warning {

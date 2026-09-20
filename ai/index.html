@@ -491,6 +491,7 @@
           <p id="pdfExportLoadingTitle" class="pdf-export-overlay-title">Đang mở hộp thoại in...</p>
           <p id="pdfExportLoadingText" class="pdf-export-overlay-hint">Tắt Headers and footers, rồi chọn Lưu PDF</p>
           <button type="button" id="pdfExportDownloadBtn" class="btn btn-primary pdf-export-download-btn hidden">Tải xuống</button>
+          <button type="button" id="pdfExportCancelBtn" class="btn btn-ghost pdf-export-cancel-btn hidden">Huỷ</button>
         </div>
       </div>
     </main>
@@ -610,6 +611,26 @@
           </p>
         </section>
 
+        <section class="settings-section settings-backup-section" aria-labelledby="settingsBackupLabel">
+          <p id="settingsBackupLabel" class="settings-section-label">Sao lưu &amp; khôi phục</p>
+          <p id="settingsBackupHint" class="settings-backup-hint">Xuất hội thoại, thư viện prompt và cài đặt ra file JSON. Khôi phục khi đổi trình duyệt hoặc xóa dữ liệu máy.</p>
+          <label class="settings-backup-keys" for="backupIncludeKeys">
+            <input type="checkbox" id="backupIncludeKeys" />
+            <span id="backupIncludeKeysLabel">Bao gồm API key (giữ file này ở nơi riêng tư)</span>
+          </label>
+          <div class="settings-backup-actions">
+            <button type="button" id="backupExportBtn" class="btn btn-ghost settings-backup-btn">
+              <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+              <span id="backupExportBtnLabel">Xuất JSON</span>
+            </button>
+            <button type="button" id="backupRestoreBtn" class="btn btn-ghost settings-backup-btn">
+              <i class="fa-solid fa-file-import" aria-hidden="true"></i>
+              <span id="backupRestoreBtnLabel">Khôi phục…</span>
+            </button>
+          </div>
+          <input type="file" id="backupFileInput" accept="application/json,.json" hidden />
+        </section>
+
         <footer class="settings-footer">
           <div class="settings-footer-prefs">
             <div class="field field-row settings-pref">
@@ -633,6 +654,32 @@
           <p class="settings-credit">Developed by VUTASO.com. All rights reserved</p>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="backupRestoreModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="backupRestoreTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-content modal-content-sm">
+      <header class="modal-header modal-header-stack">
+        <div class="modal-badge-inline" aria-hidden="true">
+          <div class="brand-avatar brand-avatar-sm">V</div>
+        </div>
+        <h2 id="backupRestoreTitle">Khôi phục bản sao lưu</h2>
+        <p id="backupRestoreSubtitle" class="modal-subtitle">Chọn cách áp dụng file này</p>
+      </header>
+      <div class="modal-body modal-body-compact">
+        <p id="backupRestoreSummary" class="backup-restore-summary"></p>
+        <p id="backupRestoreDate" class="backup-restore-date"></p>
+        <p id="backupRestoreHelp" class="backup-restore-help">Thay thế sẽ ghi đè hội thoại và prompt trên máy này. Gộp sẽ giữ dữ liệu hiện có và thêm từ file. API key trên máy được giữ lại trừ khi bạn chọn khôi phục key.</p>
+        <label id="backupRestoreKeysWrap" class="settings-backup-keys hidden" for="backupRestoreKeys">
+          <input type="checkbox" id="backupRestoreKeys" />
+          <span id="backupRestoreKeysLabel">Khôi phục cả API key từ file này</span>
+        </label>
+        <footer class="modal-footer modal-footer-split">
+          <button type="button" id="backupRestoreMergeBtn" class="btn btn-ghost">Gộp</button>
+          <button type="button" id="backupRestoreReplaceBtn" class="btn btn-primary">Thay thế</button>
+        </footer>
+      </div>
     </div>
   </div>
 
@@ -903,6 +950,7 @@
     <p id="imagePreviewCaption" class="image-preview-caption hidden"></p>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.4/purify.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>

@@ -160,6 +160,11 @@
     justify-content: center;
   }
 
+  .settings-backup-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
   .messages-empty h2 { font-size: 20px; }
 
   .app-drop-overlay-content {

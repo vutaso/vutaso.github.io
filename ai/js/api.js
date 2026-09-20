@@ -688,11 +688,11 @@ window.API = (() => {
   };
 
   const buildOpenRouterBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
-    const body = {
+    const body = withStreamUsage({
       model: window.APP_CONFIG.getApiModel(model),
       messages: buildMessages(convo, systemPrompt),
       stream: true
-    };
+    });
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
       body.max_tokens = maxOutputTokens;

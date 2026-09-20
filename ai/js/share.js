@@ -40,7 +40,7 @@ window.Share = (() => {
         if (m.groundingMetadata) out.groundingMetadata = m.groundingMetadata;
         if (m.generatedImages?.length) {
           out.generatedImages = m.generatedImages
-            .filter((img) => img?.dataUrl)
+            .filter((img) => window.Utils.isSafeImageDataUrl(img?.dataUrl))
             .map((img) => ({
               dataUrl: img.dataUrl,
               name: img.name || 'image',
@@ -50,7 +50,7 @@ window.Share = (() => {
       } else if (m.role === 'user') {
         if (m.images?.length) {
           out.images = m.images
-            .filter((img) => img?.dataUrl)
+            .filter((img) => window.Utils.isSafeImageDataUrl(img?.dataUrl))
             .map((img) => ({
               dataUrl: img.dataUrl,
               name: img.name || 'image',

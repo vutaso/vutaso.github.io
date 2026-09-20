@@ -49,6 +49,7 @@ window.Storage = (() => {
   let usingIdbBackend = false;
   let heavySavePending = false;
   let idbPromise = null;
+  let idbWriteChain = Promise.resolve();
 
   const isQuotaError = (err) => {
     if (!err) return false;
@@ -188,95 +189,112 @@ window.Storage = (() => {
   const applyLoadedState = (parsed) => {
     state = { ...defaultState(), ...parsed };
     delete state[BACKEND_FIELD];
+    let migrated = false;
+    const setField = (key, value) => {
+      if (state[key] !== value) {
+        state[key] = value;
+        migrated = true;
+      }
+    };
 
     const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
     if (!validIds.includes(state.currentModel)) {
+      let next = window.APP_CONFIG.DEFAULT_MODEL;
       if (/^gemini-/.test(state.currentModel) && validIds.includes('gemini-3.8-flash')) {
-        state.currentModel = 'gemini-3.8-flash';
+        next = 'gemini-3.8-flash';
       } else if (/^openrouter-gemini-/.test(state.currentModel) && validIds.includes('openrouter-gemini-3.8-flash')) {
-        state.currentModel = 'openrouter-gemini-3.8-flash';
+        next = 'openrouter-gemini-3.8-flash';
       } else if (state.currentModel === 'openrouter-mistral-small-4' && validIds.includes('openrouter-deepseek-v4.1-flash')) {
-        state.currentModel = 'openrouter-deepseek-v4.1-flash';
+        next = 'openrouter-deepseek-v4.1-flash';
       } else if (state.currentModel === 'gpt-5.4-mini' && validIds.includes('gpt-5.6-luna')) {
-        state.currentModel = 'gpt-5.6-luna';
+        next = 'gpt-5.6-luna';
       } else if (state.currentModel === 'gpt-5.4' && validIds.includes('gpt-5.6-terra')) {
-        state.currentModel = 'gpt-5.6-terra';
+        next = 'gpt-5.6-terra';
       } else if (state.currentModel === 'gpt-5.5' && validIds.includes('gpt-5.6-sol')) {
-        state.currentModel = 'gpt-5.6-sol';
+        next = 'gpt-5.6-sol';
       } else if (state.currentModel === 'claude-sonnet-4-6' && validIds.includes('claude-sonnet-5')) {
-        state.currentModel = 'claude-sonnet-5';
+        next = 'claude-sonnet-5';
       } else if (state.currentModel === 'openrouter-claude-haiku-4-5' && validIds.includes('openrouter-claude-haiku-latest')) {
-        state.currentModel = 'openrouter-claude-haiku-latest';
+        next = 'openrouter-claude-haiku-latest';
       } else if (state.currentModel === 'openrouter-claude-sonnet-5' && validIds.includes('openrouter-claude-sonnet-latest')) {
-        state.currentModel = 'openrouter-claude-sonnet-latest';
+        next = 'openrouter-claude-sonnet-latest';
       } else if (state.currentModel === 'openrouter-claude-opus-5' && validIds.includes('openrouter-claude-opus-latest')) {
-        state.currentModel = 'openrouter-claude-opus-latest';
-      } else {
-        state.currentModel = window.APP_CONFIG.DEFAULT_MODEL;
+        next = 'openrouter-claude-opus-latest';
       }
+      setField('currentModel', next);
     }
     const validLangs = window.APP_CONFIG.TRANSLATE_LANGUAGES.map((l) => l.code);
     if (!validLangs.includes(state.translateTargetLang)) {
-      state.translateTargetLang = window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
+      setField('translateTargetLang', window.APP_CONFIG.DEFAULT_TRANSLATE_LANG);
     }
     const validRatios = window.APP_CONFIG.IMAGE_GEN_RATIOS.map((r) => r.id);
     if (!validRatios.includes(state.imageGenRatio)) {
-      state.imageGenRatio = window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO;
+      setField('imageGenRatio', window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO);
     }
     const validStyles = window.APP_CONFIG.IMAGE_GEN_STYLES.map((s) => s.id);
     if (!validStyles.includes(state.imageGenStyle)) {
-      state.imageGenStyle = window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE;
+      setField('imageGenStyle', window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE);
     }
     const validTemplates = window.APP_CONFIG.IMAGE_GEN_TEMPLATES.map((t) => t.id);
     if (!validTemplates.includes(state.imageGenTemplate)) {
-      state.imageGenTemplate = window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE;
+      setField('imageGenTemplate', window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE);
     }
     const allEfforts = ['minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'default'];
     if (!allEfforts.includes(state.reasoningEffort)) {
-      state.reasoningEffort = window.APP_CONFIG.DEFAULT_EFFORT;
+      setField('reasoningEffort', window.APP_CONFIG.DEFAULT_EFFORT);
     }
-    state.reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(state.reasoningEffort, state.currentModel);
+    setField('reasoningEffort', window.APP_CONFIG.normalizeEffortForModel(state.reasoningEffort, state.currentModel));
     if (window.APP_CONFIG.modelUsesEffortLinkedThinking(state.currentModel)) {
-      state.thinkingEnabled = state.reasoningEffort !== 'default';
+      setField('thinkingEnabled', state.reasoningEffort !== 'default');
     }
     if (window.APP_CONFIG.modelThinkingRequired(state.currentModel)) {
-      state.thinkingEnabled = true;
+      setField('thinkingEnabled', true);
     }
     if (!window.APP_CONFIG.LOCALES.includes(state.locale)) {
-      state.locale = window.APP_CONFIG.DEFAULT_LOCALE;
+      setField('locale', window.APP_CONFIG.DEFAULT_LOCALE);
     }
     if (parsed && !('locale' in parsed) && parsed.conversations?.length) {
-      state.locale = 'vi';
+      setField('locale', 'vi');
     }
     if (!state.systemPromptMode) {
-      state.systemPromptMode = state.tokenSaveEnabled ? 'tokenSave' : 'default';
+      setField('systemPromptMode', state.tokenSaveEnabled ? 'tokenSave' : 'default');
     }
     if (!window.I18n.SYSTEM_PROMPT_MODE_IDS.includes(state.systemPromptMode)) {
-      state.systemPromptMode = 'custom';
+      setField('systemPromptMode', 'custom');
     }
     if (!state.customSystemPrompt?.trim()) {
       if (state.systemPromptMode === 'custom' && state.systemPrompt?.trim()) {
-        state.customSystemPrompt = state.systemPrompt;
+        setField('customSystemPrompt', state.systemPrompt);
       } else if (state.systemPrompt?.trim() && !window.I18n.isPresetSystemPrompt(state.systemPrompt)) {
-        state.customSystemPrompt = state.systemPrompt;
+        setField('customSystemPrompt', state.systemPrompt);
       }
     }
     if (state.systemPromptMode !== 'custom') {
       if (window.I18n.isPresetSystemPrompt(state.systemPrompt) || !state.systemPrompt?.trim()) {
-        state.systemPrompt = window.I18n.getSystemPromptForMode(state.systemPromptMode, state.locale);
+        setField('systemPrompt', window.I18n.getSystemPromptForMode(state.systemPromptMode, state.locale));
       } else {
-        state.systemPromptMode = window.I18n.detectSystemPromptMode(state.systemPrompt, state.locale);
+        setField('systemPromptMode', window.I18n.detectSystemPromptMode(state.systemPrompt, state.locale));
       }
     }
+    if ('tokenSaveEnabled' in (parsed || {})) migrated = true;
     delete state.tokenSaveEnabled;
-    return false;
+    return migrated;
   };
 
-  const saveToIndexedDb = async () => {
-    await idbSet(state);
-    writeLocalPointer();
-    usingIdbBackend = true;
+  const queueIdbSave = ({ silent = false } = {}) => {
+    const run = idbWriteChain.then(async () => {
+      await idbSet(state);
+      writeLocalPointer();
+      usingIdbBackend = true;
+    });
+    idbWriteChain = run.catch((err) => {
+      console.error('IndexedDB save failed', err);
+      if (!silent) notify(window.I18n.t('storageFail'), 'error');
+    });
+    return run;
   };
+
+  const saveToIndexedDb = () => queueIdbSave();
 
   const scheduleHeavySave = () => {
     if (heavySavePending) return;
@@ -321,10 +339,7 @@ window.Storage = (() => {
 
   const save = () => {
     if (usingIdbBackend) {
-      idbSet(state).catch((err) => {
-        console.error('IndexedDB save failed', err);
-        notify(window.I18n.t('storageFail'), 'error');
-      });
+      queueIdbSave().catch(() => {});
       return true;
     }
 
@@ -405,7 +420,267 @@ window.Storage = (() => {
     save();
   };
 
+  const persistNow = async () => {
+    if (usingIdbBackend) {
+      await queueIdbSave({ silent: true });
+      return;
+    }
+    try {
+      tryWriteLocalStorage(state);
+    } catch (err) {
+      if (!isQuotaError(err)) throw err;
+      await queueIdbSave({ silent: true });
+    }
+  };
+
   const getBackend = () => (usingIdbBackend ? 'indexeddb' : 'localStorage');
 
-  return { load, save, get, set, resetAll, getBackend };
+  const BACKUP_APP = 'vutaso-ai';
+  const BACKUP_KIND = 'backup';
+  const BACKUP_VERSION = 1;
+  const BACKUP_WARN_BYTES = 20 * 1024 * 1024;
+  const BACKUP_MAX_BYTES = 120 * 1024 * 1024;
+  const API_KEY_FIELDS = [
+    'apiKey',
+    'anthropicApiKey',
+    'deepseekApiKey',
+    'openrouterApiKey',
+    'geminiApiKey',
+    'kimiApiKey'
+  ];
+
+  const cloneJson = (value) => JSON.parse(JSON.stringify(value));
+
+  const hasAnyApiKey = (obj) => API_KEY_FIELDS.some((field) => {
+    const val = obj?.[field];
+    return typeof val === 'string' && val.trim();
+  });
+
+  const stripApiKeys = (obj) => {
+    const next = { ...obj };
+    API_KEY_FIELDS.forEach((field) => { next[field] = ''; });
+    delete next[BACKEND_FIELD];
+    return next;
+  };
+
+  const copyApiKeys = (from, to) => {
+    const next = { ...to };
+    API_KEY_FIELDS.forEach((field) => { next[field] = from?.[field] || ''; });
+    return next;
+  };
+
+  const countMessages = (conversations) => (conversations || []).reduce(
+    (n, convo) => n + (Array.isArray(convo?.messages) ? convo.messages.length : 0),
+    0
+  );
+
+  const sanitizeConversations = (list) => {
+    if (!Array.isArray(list)) return [];
+    const uuid = window.Utils?.uuid;
+    return list
+      .filter((convo) => convo && typeof convo === 'object')
+      .map((convo) => {
+        const id = typeof convo.id === 'string' && convo.id.trim()
+          ? convo.id
+          : (uuid ? uuid() : ('convo_' + Date.now().toString(36)));
+        const messages = Array.isArray(convo.messages)
+          ? convo.messages.filter((m) => m && typeof m === 'object')
+          : [];
+        return {
+          ...convo,
+          id,
+          title: typeof convo.title === 'string' ? convo.title : '',
+          createdAt: Number(convo.createdAt) || Date.now(),
+          updatedAt: Number(convo.updatedAt) || Date.now(),
+          messages
+        };
+      });
+  };
+
+  const sanitizeSnippets = (list) => {
+    if (!Array.isArray(list)) return [];
+    return list
+      .filter((s) => s && typeof s === 'object')
+      .map((s, i) => ({
+        ...s,
+        id: typeof s.id === 'string' && s.id.trim()
+          ? s.id
+          : ('snip_import_' + Date.now().toString(36) + '_' + i),
+        title: typeof s.title === 'string' ? s.title : '',
+        content: typeof s.content === 'string' ? s.content : '',
+        preset: !!s.preset,
+        createdAt: Number(s.createdAt) || Date.now(),
+        updatedAt: Number(s.updatedAt) || Date.now()
+      }))
+      .filter((s) => s.title.trim() && s.content.trim());
+  };
+
+  const backupFilename = (includesApiKeys) => {
+    const day = new Date().toISOString().slice(0, 10);
+    return includesApiKeys
+      ? 'vutaso-ai-backup-' + day + '-keys.json'
+      : 'vutaso-ai-backup-' + day + '.json';
+  };
+
+  const buildBackup = ({ includeApiKeys = false } = {}) => {
+    let snapshot = cloneJson(state);
+    delete snapshot[BACKEND_FIELD];
+    if (!includeApiKeys) snapshot = stripApiKeys(snapshot);
+    const includesApiKeys = !!(includeApiKeys && hasAnyApiKey(snapshot));
+    const conversations = sanitizeConversations(snapshot.conversations);
+    const promptSnippets = sanitizeSnippets(snapshot.promptSnippets);
+    snapshot.conversations = conversations;
+    snapshot.promptSnippets = promptSnippets;
+    return {
+      app: BACKUP_APP,
+      kind: BACKUP_KIND,
+      version: BACKUP_VERSION,
+      exportedAt: new Date().toISOString(),
+      includesApiKeys,
+      stats: {
+        conversations: conversations.length,
+        messages: countMessages(conversations),
+        snippets: promptSnippets.length
+      },
+      state: snapshot,
+      filename: backupFilename(includesApiKeys)
+    };
+  };
+
+  const parseBackup = (text) => {
+    let data;
+    try {
+      data = JSON.parse(String(text || '').replace(/^\uFEFF/, ''));
+    } catch {
+      const err = new Error('invalid-json');
+      err.code = 'invalid-json';
+      throw err;
+    }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      const err = new Error('invalid-format');
+      err.code = 'invalid-format';
+      throw err;
+    }
+
+    const asWrapped = (stateObj, extra = {}) => {
+      if (!stateObj || typeof stateObj !== 'object' || Array.isArray(stateObj)) {
+        const err = new Error('invalid-format');
+        err.code = 'invalid-format';
+        throw err;
+      }
+      const snapshot = cloneJson(stateObj);
+      delete snapshot[BACKEND_FIELD];
+      snapshot.conversations = sanitizeConversations(snapshot.conversations);
+      snapshot.promptSnippets = sanitizeSnippets(snapshot.promptSnippets);
+      return {
+        app: BACKUP_APP,
+        kind: BACKUP_KIND,
+        version: Number(extra.version) || BACKUP_VERSION,
+        exportedAt: extra.exportedAt || null,
+        includesApiKeys: extra.includesApiKeys === true || hasAnyApiKey(snapshot),
+        stats: {
+          conversations: snapshot.conversations.length,
+          messages: countMessages(snapshot.conversations),
+          snippets: snapshot.promptSnippets.length
+        },
+        state: snapshot
+      };
+    };
+
+    if (data.app === BACKUP_APP || data.kind === BACKUP_KIND) {
+      return asWrapped(data.state, data);
+    }
+    if (Array.isArray(data.conversations) || Array.isArray(data.promptSnippets)) {
+      return asWrapped(data);
+    }
+    const err = new Error('invalid-format');
+    err.code = 'invalid-format';
+    throw err;
+  };
+
+  const resolveCurrentConversationId = (preferredId) => {
+    const list = state.conversations || [];
+    if (preferredId && list.some((c) => c.id === preferredId)) {
+      state.currentConversationId = preferredId;
+      return;
+    }
+    if (state.currentConversationId && list.some((c) => c.id === state.currentConversationId)) return;
+    state.currentConversationId = list[0]?.id || null;
+  };
+
+  const persistBackupOrRollback = async (previous, previousIdb) => {
+    try {
+      await persistNow();
+    } catch (err) {
+      applyLoadedState(previous);
+      usingIdbBackend = previousIdb;
+      try { await persistNow(); } catch {}
+      const fail = new Error('save-failed');
+      fail.code = 'save-failed';
+      fail.cause = err;
+      throw fail;
+    }
+  };
+
+  const applyBackup = async (backup, { mode = 'replace', restoreApiKeys = false } = {}) => {
+    if (!backup?.state || typeof backup.state !== 'object') {
+      const err = new Error('invalid-format');
+      err.code = 'invalid-format';
+      throw err;
+    }
+
+    const previous = cloneJson(state);
+    const previousIdb = usingIdbBackend;
+    const incoming = cloneJson(backup.state);
+    incoming.conversations = sanitizeConversations(incoming.conversations);
+    incoming.promptSnippets = sanitizeSnippets(incoming.promptSnippets);
+    const currentKeys = {};
+    API_KEY_FIELDS.forEach((field) => { currentKeys[field] = state[field] || ''; });
+    const incomingHasKeys = hasAnyApiKey(incoming);
+    const useIncomingKeys = restoreApiKeys && incomingHasKeys;
+
+    if (mode === 'merge') {
+      const existingConvoIds = new Set((state.conversations || []).map((c) => c.id));
+      const addedConversations = incoming.conversations.filter((c) => !existingConvoIds.has(c.id));
+      const existingSnippetIds = new Set((state.promptSnippets || []).map((s) => s.id));
+      const addedSnippets = incoming.promptSnippets.filter((s) => !existingSnippetIds.has(s.id));
+      const keepCurrentId = state.currentConversationId;
+      const merged = {
+        ...state,
+        conversations: [...addedConversations, ...(state.conversations || [])],
+        promptSnippets: [...(state.promptSnippets || []), ...addedSnippets],
+        promptSnippetsSeeded: true
+      };
+      applyLoadedState(copyApiKeys(useIncomingKeys ? incoming : currentKeys, merged));
+      resolveCurrentConversationId(keepCurrentId || addedConversations[0]?.id || null);
+      await persistBackupOrRollback(previous, previousIdb);
+      return {
+        mode: 'merge',
+        conversations: addedConversations.length,
+        snippets: addedSnippets.length,
+        restoredApiKeys: useIncomingKeys
+      };
+    }
+
+    const next = copyApiKeys(useIncomingKeys ? incoming : currentKeys, incoming);
+    if (!next.currentConversationId || !next.conversations.some((c) => c.id === next.currentConversationId)) {
+      next.currentConversationId = next.conversations[0]?.id || null;
+    }
+    if (!('promptSnippetsSeeded' in next)) next.promptSnippetsSeeded = next.promptSnippets.length > 0;
+    applyLoadedState(next);
+    resolveCurrentConversationId(next.currentConversationId);
+    await persistBackupOrRollback(previous, previousIdb);
+    return {
+      mode: 'replace',
+      conversations: (state.conversations || []).length,
+      snippets: (state.promptSnippets || []).length,
+      restoredApiKeys: useIncomingKeys
+    };
+  };
+
+  return {
+    load, save, get, set, resetAll, getBackend,
+    buildBackup, parseBackup, applyBackup,
+    BACKUP_WARN_BYTES, BACKUP_MAX_BYTES
+  };
 })();

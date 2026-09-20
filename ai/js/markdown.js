@@ -1,5 +1,5 @@
 window.Markdown = (() => {
-  const { escapeHTML } = window.Utils;
+  const { escapeHTML, safeHref, safeImageSrc, sanitizeHtml } = window.Utils;
 
   const COPY_BTN = '<button type="button" class="copy-code-btn" data-copy-code title="Sao chép" aria-label="Sao chép"><i class="fa-solid fa-copy"></i></button>';
   const previewBtnTitle = (key, fallback) => {
@@ -258,11 +258,6 @@ window.Markdown = (() => {
     }
   };
 
-  const mathPlaceholder = (id, display) =>
-    display
-      ? '<div class="math-ph" data-mid="' + id + '"></div>'
-      : '<span class="math-ph" data-mid="' + id + '"></span>';
-
   const protectContent = (text) => {
     const held = [];
     const mathParts = [];
@@ -270,13 +265,13 @@ window.Markdown = (() => {
     const holdHtml = (html) => {
       const id = held.length;
       held.push(html);
-      return '<!--CODEPH' + id + '-->';
+      return 'CODEPHX' + id + 'XCODEPH';
     };
 
     const holdMath = (tex, display) => {
       const id = mathParts.length;
       mathParts.push({ tex: tex.trim(), display });
-      return mathPlaceholder(id, display);
+      return 'MATHPHX' + id + 'XMATHPH';
     };
 
     let src = text || '';
@@ -300,17 +295,19 @@ window.Markdown = (() => {
   };
 
   const restoreContent = (html, held, mathParts) => {
-    let out = html.replace(/<!--CODEPH(\d+)-->/g, (_, id) => held[Number(id)] || '');
-
-    out = out.replace(/<(span|div) class="math-ph" data-mid="(\d+)"><\/\1>/g, (_, tag, id) => {
+    const restoreMath = (id) => {
       const item = mathParts[Number(id)];
       if (!item) return '';
       const rendered = renderKatex(item.tex, item.display);
       return item.display
         ? '<div class="math-block">' + rendered + '</div>'
         : '<span class="math-inline">' + rendered + '</span>';
-    });
+    };
 
+    let out = html.replace(/<p>\s*CODEPHX(\d+)XCODEPH\s*<\/p>/g, (_, id) => held[Number(id)] || '');
+    out = out.replace(/CODEPHX(\d+)XCODEPH/g, (_, id) => held[Number(id)] || '');
+    out = out.replace(/<p>\s*MATHPHX(\d+)XMATHPH\s*<\/p>/g, (_, id) => restoreMath(id));
+    out = out.replace(/MATHPHX(\d+)XMATHPH/g, (_, id) => restoreMath(id));
     return out;
   };
 
@@ -324,10 +321,29 @@ window.Markdown = (() => {
       const text = typeof token === 'object' && token.tokens
         ? this.parser.parseInline(token.tokens)
         : (typeof token === 'object' ? token.text : arguments[2]) || '';
-      let out = '<a href="' + escapeHTML(href) + '" target="_blank" rel="noopener noreferrer"';
+      const safe = safeHref(href);
+      if (!safe) return text || '';
+      let out = '<a href="' + escapeHTML(safe) + '" target="_blank" rel="noopener noreferrer"';
       if (title) out += ' title="' + escapeHTML(title) + '"';
       out += '>' + text + '</a>';
       return out;
+    };
+
+    renderer.image = function (token) {
+      const href = typeof token === 'object' ? token.href : token;
+      const title = typeof token === 'object' ? token.title : arguments[1];
+      const alt = typeof token === 'object' ? token.text : arguments[2];
+      const safe = safeImageSrc(href);
+      if (!safe) return escapeHTML(alt || '');
+      let out = '<img src="' + escapeHTML(safe) + '" alt="' + escapeHTML(alt || '') + '"';
+      if (title) out += ' title="' + escapeHTML(title) + '"';
+      out += '>';
+      return out;
+    };
+
+    renderer.html = function (token) {
+      const html = typeof token === 'object' ? (token.text || token.raw || '') : (token || '');
+      return escapeHTML(html);
     };
 
     renderer.code = (arg, infostring) => {
@@ -341,6 +357,12 @@ window.Markdown = (() => {
   const enhanceLinks = (root) => {
     if (!root) return;
     root.querySelectorAll('a[href]').forEach((a) => {
+      const safe = safeHref(a.getAttribute('href'));
+      if (!safe) {
+        a.removeAttribute('href');
+        return;
+      }
+      a.setAttribute('href', safe);
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
     });
@@ -359,7 +381,7 @@ window.Markdown = (() => {
       window.mermaid.initialize({
         startOnLoad: false,
         theme: getMermaidTheme(),
-        securityLevel: 'loose',
+        securityLevel: 'strict',
         fontFamily: 'Inter, system-ui, sans-serif',
         logLevel: 'error',
         suppressErrorRendering: true
@@ -376,7 +398,7 @@ window.Markdown = (() => {
       window.mermaid.initialize({
         startOnLoad: false,
         theme: getMermaidTheme(),
-        securityLevel: 'loose',
+        securityLevel: 'strict',
         fontFamily: 'Inter, system-ui, sans-serif',
         logLevel: 'error',
         suppressErrorRendering: true
@@ -414,13 +436,13 @@ window.Markdown = (() => {
       try {
         const { svg, bindFunctions } = await window.mermaid.render(id, text);
         const probe = document.createElement('div');
-        probe.innerHTML = svg;
+        probe.innerHTML = sanitizeHtml(svg);
         if (isMermaidErrorOutput(probe)) {
           probe.remove();
           throw new Error('Syntax error in text');
         }
         probe.remove();
-        view.innerHTML = svg;
+        view.innerHTML = sanitizeHtml(svg);
         if (typeof bindFunctions === 'function') bindFunctions(view);
         return { ok: true, source: text };
       } catch (err) {
@@ -663,7 +685,8 @@ window.Markdown = (() => {
     if (!window.marked) return '';
     try {
       const { src, held, mathParts } = protectContent(text);
-      return restoreContent(window.marked.parse(src), held, mathParts);
+      const parsed = sanitizeHtml(window.marked.parse(src));
+      return restoreContent(parsed, held, mathParts);
     } catch {
       return '<p>' + escapeHTML(text || '') + '</p>';
     }

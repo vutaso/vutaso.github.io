@@ -901,11 +901,7 @@ window.Events = (() => {
         dataUrl: payload.dataUrl,
         name: payload.partial ? 'Xem trước ' + ((payload.index ?? 0) + 1) : 'Hình ảnh AI'
       };
-      if (payload.partial) {
-        generatedImages[payload.index ?? 0] = img;
-      } else {
-        generatedImages = [img];
-      }
+      generatedImages[payload.index ?? 0] = img;
       generatedImages = generatedImages.filter(Boolean);
       if (streamingContext) streamingContext.generatedImages = generatedImages;
       refreshStreamingContent();
@@ -1776,6 +1772,11 @@ window.Events = (() => {
       if (await copyToClipboard(url)) ui.showToast(t('shareCopied'));
     });
 
+    ui.els.pdfExportCancelBtn?.addEventListener('click', () => {
+      if (!ui.isPdfExportCancellable()) return;
+      stopStreaming();
+    });
+
     ui.els.pdfExportDownloadBtn?.addEventListener('click', () => {
       const pending = ui.consumeExportDownload();
       if (!pending) return;
@@ -1813,9 +1814,11 @@ window.Events = (() => {
 
       compressing = true;
       ui.els.compressContextBtn.disabled = true;
+      ui.setStreaming(true);
       ui.setPdfExportLoading(true, {
         title: t('compressContextTitle'),
         hint: t('compressContextProgress'),
+        cancellable: true,
       });
 
       try {
@@ -1824,13 +1827,15 @@ window.Events = (() => {
           apiKey: window.APP_CONFIG.getApiKey(s, modelId),
           locale: s.locale || window.I18n.getLocale(),
         });
-        ui.setPdfExportLoading(false);
         ui.renderMessages(convoMod.getCurrent());
         ui.showToast(t('compressSuccess', { n: result.removedCount }));
       } catch (err) {
-        ui.setPdfExportLoading(false);
-        ui.showToast(t('compressFailed', { err: err.message || err }));
+        const msg = err?.message || String(err);
+        if (msg === t('compressAborted') || msg === t('compressApplyFailed')) ui.showToast(msg);
+        else ui.showToast(t('compressFailed', { err: msg }));
       } finally {
+        ui.setPdfExportLoading(false);
+        ui.setStreaming(false);
         compressing = false;
         ui.syncCompressContextBar();
       }
@@ -2366,6 +2371,153 @@ window.Events = (() => {
     ui.els.clearAllBtn.addEventListener('click', handleClearAll);
     ui.els.clearAllSidebarBtn.addEventListener('click', handleClearAll);
 
+    let pendingBackup = null;
+    let backupBusy = false;
+
+    const backupErrorMessage = (err) => {
+      const code = err?.code || err?.message;
+      if (code === 'invalid-json') return t('backupInvalidJson');
+      if (code === 'invalid-format') return t('backupInvalidFormat');
+      if (code === 'too-large') return t('backupFileTooLarge', { size: err.sizeLabel || '' });
+      if (code === 'save-failed') return t('storageFail');
+      return err?.message || String(err || '');
+    };
+
+    const setBackupBusy = (on) => {
+      backupBusy = on;
+      [
+        ui.els.backupExportBtn,
+        ui.els.backupRestoreBtn,
+        ui.els.backupRestoreMergeBtn,
+        ui.els.backupRestoreReplaceBtn,
+      ].forEach((btn) => {
+        if (btn) btn.disabled = on;
+      });
+    };
+
+    const refreshAfterBackup = () => {
+      const s = state.get();
+      window.Speech?.stopListening?.();
+      window.Speech?.stopSpeaking?.();
+      closeCompareOverlay();
+      clearPendingAttachments();
+      pendingReferenceImage = null;
+      resetImageGenPicked();
+      ui.setExportSelectMode(false);
+      if (ui.els.composerInput) {
+        ui.els.composerInput.value = '';
+        autoResize(ui.els.composerInput);
+      }
+      ui.closeMarkdownPreview();
+      ui.clearConversationSearch();
+      ui.setTheme(s.theme || window.APP_CONFIG.DEFAULT_THEME);
+      ui.initModelSelect(s.currentModel);
+      ui.syncEffortSelect(s.currentModel, s.reasoningEffort, s.thinkingEnabled);
+      ui.syncSystemPromptModeUI(s);
+      ui.syncCompareBar(s);
+      ui.applyLocale(s);
+      window.Speech?.syncLabels?.();
+      window.Snippets.ensureSeeded();
+      ui.refreshSnippetsViews();
+      updateSendEnabled();
+      if (ui.els.settingsModal && !ui.els.settingsModal.classList.contains('hidden')) {
+        ui.openSettings(s);
+      }
+    };
+
+    const exportBackup = () => {
+      if (backupBusy) return;
+      applySettingsFromForm();
+      try {
+        const includeApiKeys = !!ui.els.backupIncludeKeys?.checked;
+        const backup = state.buildBackup({ includeApiKeys });
+        const payload = { ...backup };
+        delete payload.filename;
+        const json = JSON.stringify(payload);
+        const blob = new Blob([json], { type: 'application/json' });
+        const warnBytes = state.BACKUP_WARN_BYTES || (20 * 1024 * 1024);
+        if (blob.size >= warnBytes) {
+          const size = window.Files.formatSize(blob.size);
+          if (!confirm(t('backupConfirmExportLarge', { size }))) return;
+          window.Utils.downloadBlob(blob, backup.filename);
+          ui.showToast(t('toastBackupExportLarge', { size }));
+          return;
+        }
+        window.Utils.downloadBlob(blob, backup.filename);
+        ui.showToast(t('toastBackupExportOk'));
+      } catch (err) {
+        ui.showToast(t('toastBackupExportFail', { err: backupErrorMessage(err) }));
+      }
+    };
+
+    const openBackupFilePicker = () => {
+      if (backupBusy) return;
+      applySettingsFromForm();
+      if (ui.els.backupFileInput) {
+        ui.els.backupFileInput.value = '';
+        ui.els.backupFileInput.click();
+      }
+    };
+
+    const handleBackupFile = async (file) => {
+      if (!file || backupBusy) return;
+      const maxBytes = state.BACKUP_MAX_BYTES || (120 * 1024 * 1024);
+      const warnBytes = state.BACKUP_WARN_BYTES || (20 * 1024 * 1024);
+      if (file.size > maxBytes) {
+        const size = window.Files.formatSize(file.size);
+        ui.showToast(t('backupFileTooLarge', { size }));
+        return;
+      }
+      if (file.size >= warnBytes) {
+        const size = window.Files.formatSize(file.size);
+        if (!confirm(t('backupConfirmImportLarge', { size }))) return;
+      }
+      try {
+        const text = await file.text();
+        pendingBackup = state.parseBackup(text);
+        ui.openBackupRestoreModal(pendingBackup);
+      } catch (err) {
+        pendingBackup = null;
+        ui.showToast(t('toastBackupRestoreFail', { err: backupErrorMessage(err) }));
+      }
+    };
+
+    const applyPendingBackup = async (mode) => {
+      if (backupBusy || !pendingBackup) return;
+      if (mode === 'replace' && !confirm(t('backupConfirmReplace'))) return;
+      const restoreApiKeys = !!ui.els.backupRestoreKeys?.checked;
+      setBackupBusy(true);
+      try {
+        await settleActiveStream({ discard: true });
+        const result = await state.applyBackup(pendingBackup, { mode, restoreApiKeys });
+        pendingBackup = null;
+        ui.closeBackupRestoreModal();
+        refreshAfterBackup();
+        if (mode === 'merge' && result.conversations === 0 && result.snippets === 0) {
+          ui.showToast(t('toastBackupRestoreNothing'));
+          return;
+        }
+        ui.showToast(t(mode === 'merge' ? 'toastBackupRestoreMerge' : 'toastBackupRestoreReplace', {
+          conversations: result.conversations,
+          snippets: result.snippets
+        }));
+      } catch (err) {
+        ui.showToast(t('toastBackupRestoreFail', { err: backupErrorMessage(err) }));
+      } finally {
+        setBackupBusy(false);
+      }
+    };
+
+    ui.els.backupExportBtn?.addEventListener('click', exportBackup);
+    ui.els.backupRestoreBtn?.addEventListener('click', openBackupFilePicker);
+    ui.els.backupFileInput?.addEventListener('change', () => {
+      const file = ui.els.backupFileInput.files?.[0];
+      handleBackupFile(file);
+      ui.els.backupFileInput.value = '';
+    });
+    ui.els.backupRestoreMergeBtn?.addEventListener('click', () => applyPendingBackup('merge'));
+    ui.els.backupRestoreReplaceBtn?.addEventListener('click', () => applyPendingBackup('replace'));
+
     let systemPromptSaveTimer = null;
     const scheduleApplySettingsFromForm = () => {
       clearTimeout(systemPromptSaveTimer);
@@ -2541,6 +2693,11 @@ window.Events = (() => {
           ui.closeTokenCostWarning();
           return;
         }
+        if (el.closest('#backupRestoreModal')) {
+          pendingBackup = null;
+          ui.closeBackupRestoreModal();
+          return;
+        }
         if (el.closest('#settingsModal')) {
           closeSettingsModal();
         }
@@ -2553,6 +2710,11 @@ window.Events = (() => {
         if (editing) {
           e.preventDefault();
           ui.exitEditMode(editing);
+          return;
+        }
+        if (ui.isPdfExportCancellable()) {
+          e.preventDefault();
+          stopStreaming();
           return;
         }
         hideSelectionReplyTooltip();
@@ -2601,6 +2763,11 @@ window.Events = (() => {
         }
         if (ui.isTokenCostWarningOpen()) {
           ui.closeTokenCostWarning();
+          return;
+        }
+        if (ui.isBackupRestoreOpen()) {
+          pendingBackup = null;
+          ui.closeBackupRestoreModal();
           return;
         }
         if (ui.isGuideModalOpen()) {

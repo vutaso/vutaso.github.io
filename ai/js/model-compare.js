@@ -125,10 +125,8 @@ window.ModelCompare = (() => {
         groundingMetadata = meta;
         refresh();
       },
-      onUsage: (usage) => {
-        if (usage) window.Conversations.addTokenUsage(convo, modelId, usage);
-      },
       onDone: (info) => {
+        if (info?.usage) window.Conversations.addTokenUsage(convo, modelId, info.usage);
         if (info?.aborted) {
           setStatus(buffer ? 'compareStatusStopped' : 'compareStatusAborted', { state: 'warning' });
           window.UI.finalizeCompareColumn(columnEl, buffer, {

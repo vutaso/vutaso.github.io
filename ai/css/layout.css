@@ -233,7 +233,8 @@
   margin: 0;
 }
 
-.pdf-export-download-btn {
+.pdf-export-download-btn,
+.pdf-export-cancel-btn {
   width: 100%;
   margin-top: 4px;
 }

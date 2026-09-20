@@ -1,7 +1,11 @@
 window.UI = (() => {
-  const { escapeHTML, formatTime, truncate, copyToClipboard, autoResize, highlightSearchText } = window.Utils;
+  const { escapeHTML, safeHref, safeImageSrc, formatTime, truncate, copyToClipboard, autoResize, highlightSearchText } = window.Utils;
   const { DEFAULT_SYSTEM_PROMPT } = window.APP_CONFIG;
   const t = (key, params) => window.I18n.t(key, params);
+  const imageSrcAttr = (src) => {
+    const safe = safeImageSrc(src);
+    return safe ? escapeHTML(safe) : '';
+  };
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
@@ -68,6 +72,7 @@ window.UI = (() => {
     els.pdfExportLoadingText = $('#pdfExportLoadingText');
     els.pdfExportSpinner = $('#pdfExportSpinner');
     els.pdfExportDownloadBtn = $('#pdfExportDownloadBtn');
+    els.pdfExportCancelBtn = $('#pdfExportCancelBtn');
     els.toggleExportSelectBtn = $('#toggleExportSelectBtn');
     els.exportSelectBar = $('#exportSelectBar');
     els.compressContextBar = $('#compressContextBar');
@@ -124,6 +129,17 @@ window.UI = (() => {
     els.tokenCostWarningModal = $('#tokenCostWarningModal');
     els.tokenCostWarningMessage = $('#tokenCostWarningMessage');
     els.tokenCostWarningSettingsBtn = $('#tokenCostWarningSettingsBtn');
+    els.backupIncludeKeys = $('#backupIncludeKeys');
+    els.backupExportBtn = $('#backupExportBtn');
+    els.backupRestoreBtn = $('#backupRestoreBtn');
+    els.backupFileInput = $('#backupFileInput');
+    els.backupRestoreModal = $('#backupRestoreModal');
+    els.backupRestoreSummary = $('#backupRestoreSummary');
+    els.backupRestoreDate = $('#backupRestoreDate');
+    els.backupRestoreKeysWrap = $('#backupRestoreKeysWrap');
+    els.backupRestoreKeys = $('#backupRestoreKeys');
+    els.backupRestoreMergeBtn = $('#backupRestoreMergeBtn');
+    els.backupRestoreReplaceBtn = $('#backupRestoreReplaceBtn');
     els.composerTranslateBar = $('#composerTranslateBar');
     els.translateChipClose = $('#translateChipClose');
     els.translateLangBtn = $('#translateLangBtn');
@@ -618,9 +634,11 @@ window.UI = (() => {
   const generatedImagesHTML = (images) => {
     if (!images || !images.length) return '';
     return '<div class="message-images message-generated-images">' + images.map((img, i) => {
+      const src = imageSrcAttr(img.dataUrl);
+      if (!src) return '';
       const alt = escapeHTML(img.name || t('aiImage', { n: i + 1 }));
       return '<div class="message-image-wrap message-generated-image-wrap">'
-        + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + alt + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
+        + '<img class="message-preview-image" src="' + src + '" alt="' + alt + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
         + '<div class="generated-image-actions" aria-label="' + escapeHTML(t('copy')) + '">'
         + '<button type="button" class="generated-image-btn" data-copy-generated-image title="' + escapeHTML(t('copyImage')) + '" aria-label="' + escapeHTML(t('copyImage')) + '">'
         + '<i class="fa-solid fa-copy" aria-hidden="true"></i></button>'
@@ -651,7 +669,8 @@ window.UI = (() => {
     if (chunks.length) {
       html += '<ul class="message-grounding-sources">';
       chunks.forEach((chunk) => {
-        const uri = chunk.web.uri;
+        const uri = safeHref(chunk.web.uri);
+        if (!uri) return;
         const title = chunk.web.title || uri;
         html += '<li><a href="' + escapeHTML(uri) + '" target="_blank" rel="noopener noreferrer">'
           + escapeHTML(title) + '</a></li>';
@@ -766,7 +785,14 @@ window.UI = (() => {
     toolbar.insertAdjacentHTML('beforebegin', html);
   };
 
+  const contextSummaryBodyHTML = (m) => {
+    return '<div class="context-summary-badge"><i class="fa-solid fa-compress" aria-hidden="true"></i> '
+      + escapeHTML(t('compressSummaryBadge')) + '</div>'
+      + '<div class="context-summary-body">' + window.Markdown.render(m.content || '') + '</div>';
+  };
+
   const assistantContentHTML = (m) => {
+    if (m.contextSummary) return contextSummaryBodyHTML(m);
     const text = window.Conversations.getAssistantContent(m);
     return reasoningHTML(m.reasoningContent)
       + groundingHTML(m.groundingMetadata)
@@ -872,11 +898,13 @@ window.UI = (() => {
 
   const userImagesHTML = (images) => {
     if (!images || !images.length) return '';
-    return '<div class="message-images">' + images.map((img, i) =>
-      '<div class="message-image-wrap">'
-      + '<img class="message-preview-image" src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || t('image', { n: i + 1 })) + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
-      + '</div>'
-    ).join('') + '</div>';
+    return '<div class="message-images">' + images.map((img, i) => {
+      const src = imageSrcAttr(img.dataUrl);
+      if (!src) return '';
+      return '<div class="message-image-wrap">'
+      + '<img class="message-preview-image" src="' + src + '" alt="' + escapeHTML(img.name || t('image', { n: i + 1 })) + '" loading="lazy" title="' + escapeHTML(t('viewImage')) + '" />'
+      + '</div>';
+    }).join('') + '</div>';
   };
 
   const userContentHTML = (m) => {
@@ -908,9 +936,7 @@ window.UI = (() => {
           + '<p class="message-document-label"><i class="fa-solid fa-file-word" aria-hidden="true"></i> '
           + escapeHTML(t('documentModeLabel')) + '</p>';
       } else if (m.contextSummary) {
-        text = '<div class="context-summary-badge"><i class="fa-solid fa-compress" aria-hidden="true"></i> '
-          + escapeHTML(t('compressSummaryBadge')) + '</div>'
-          + '<div class="context-summary-body">' + window.Markdown.render(m.content || '') + '</div>';
+        text = contextSummaryBodyHTML(m);
       } else {
         text = '<p>' + escaped + '</p>';
       }
@@ -1526,32 +1552,37 @@ window.UI = (() => {
 
   const messageHTML = (m, idx) => {
     const isUser = m.role === 'user';
+    const isSummary = !!m.contextSummary;
     const avatar = isUser
       ? '<div class="avatar user-av"><i class="fa-solid fa-user"></i></div>'
       : '<div class="avatar assistant-av">V</div>';
-    const body = isUser
-      ? '<div class="content">' + userContentHTML(m) + '</div>'
-      : '<div class="content">' + assistantContentHTML(m) + '</div>';
+    const body = isSummary
+      ? '<div class="content">' + contextSummaryBodyHTML(m) + '</div>'
+      : isUser
+        ? '<div class="content">' + userContentHTML(m) + '</div>'
+        : '<div class="content">' + assistantContentHTML(m) + '</div>';
     const idxAttr = idx !== undefined ? ' data-idx="' + idx + '"' : '';
-    const summaryClass = isUser && m.contextSummary ? ' context-summary' : '';
-    const editBtn = isUser
+    const summaryClass = isSummary ? ' context-summary' : '';
+    const editBtn = isUser && !isSummary
       ? '<button type="button" class="tb-btn" data-action="edit" title="' + escapeHTML(t('edit')) + '"><i class="fa-solid fa-pen-to-square"></i></button>'
       : '';
     const delBtn = isUser
       ? '<button type="button" class="tb-btn" data-action="delete-msg" title="' + escapeHTML(t('delete')) + '"><i class="fa-solid fa-trash"></i></button>'
       : '';
-    const toolbar = isUser
-      ? editBtn
-        + branchToolbarBtnHTML()
-        + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
-        + delBtn
-      : assistantToolbarHTML(m);
+    const toolbar = isSummary
+      ? '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
+      : isUser
+        ? editBtn
+          + branchToolbarBtnHTML()
+          + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
+          + delBtn
+        : assistantToolbarHTML(m);
     return '<article class="message ' + m.role + summaryClass + '" data-role="' + m.role + '"' + idxAttr + '>'
       + avatar
       + '<div class="body">'
       + messageEdgeScrollBtnsHTML()
       + body
-      + (isUser ? '' : messageModelLabelHTML(m))
+      + (isUser || isSummary ? '' : messageModelLabelHTML(m))
       + '<div class="toolbar">' + toolbar + '</div>'
       + '</div></article>';
   };
@@ -1823,7 +1854,7 @@ window.UI = (() => {
         window.mermaid.initialize({
           startOnLoad: false,
           theme: 'default',
-          securityLevel: 'loose',
+          securityLevel: 'strict',
           fontFamily: 'Inter, system-ui, sans-serif',
           logLevel: 'error',
           suppressErrorRendering: true
@@ -2384,13 +2415,15 @@ window.UI = (() => {
       return;
     }
     els.composerAttachments.classList.remove('hidden');
-    const imageHtml = imgList.map((img, i) =>
-      '<div class="composer-attachment composer-attachment-image" data-type="image" data-idx="' + i + '">'
-      + '<img src="' + img.dataUrl + '" alt="' + escapeHTML(img.name || 'Ảnh ' + (i + 1)) + '" />'
+    const imageHtml = imgList.map((img, i) => {
+      const src = imageSrcAttr(img.dataUrl);
+      if (!src) return '';
+      return '<div class="composer-attachment composer-attachment-image" data-type="image" data-idx="' + i + '">'
+      + '<img src="' + src + '" alt="' + escapeHTML(img.name || 'Ảnh ' + (i + 1)) + '" />'
       + '<button type="button" class="composer-attachment-remove" data-remove-type="image" data-remove-idx="' + i + '" title="' + escapeHTML(t('removeImage')) + '" aria-label="' + escapeHTML(t('removeImage')) + '">'
       + '<i class="fa-solid fa-xmark"></i></button>'
-      + '</div>'
-    ).join('');
+      + '</div>';
+    }).join('');
     const fileHtml = fileList.map((f, i) =>
       '<div class="composer-attachment composer-attachment-file" data-type="file" data-idx="' + i + '">'
       + '<i class="fa-solid ' + window.Files.getIconClass(f.name) + '"></i>'
@@ -2516,6 +2549,50 @@ window.UI = (() => {
 
   const isTokenCostWarningOpen = () => {
     return !!(els.tokenCostWarningModal && !els.tokenCostWarningModal.classList.contains('hidden'));
+  };
+
+  const formatBackupDate = (iso) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    const locale = window.I18n.getLocale?.() || window.APP_CONFIG.DEFAULT_LOCALE;
+    const localeTag = locale === 'vi' ? 'vi-VN' : locale === 'jp' ? 'ja-JP' : locale === 'zh' ? 'zh-CN' : 'en-US';
+    try {
+      return date.toLocaleString(localeTag, { dateStyle: 'medium', timeStyle: 'short' });
+    } catch {
+      return date.toISOString();
+    }
+  };
+
+  const openBackupRestoreModal = (backup) => {
+    if (!els.backupRestoreModal || !backup) return;
+    const stats = backup.stats || {};
+    if (els.backupRestoreSummary) {
+      els.backupRestoreSummary.textContent = t('backupRestoreSummary', {
+        conversations: stats.conversations || 0,
+        messages: stats.messages || 0,
+        snippets: stats.snippets || 0
+      });
+    }
+    if (els.backupRestoreDate) {
+      const formatted = formatBackupDate(backup.exportedAt);
+      els.backupRestoreDate.textContent = formatted
+        ? t('backupRestoreDate', { date: formatted })
+        : t('backupRestoreDateUnknown');
+    }
+    const showKeys = !!backup.includesApiKeys;
+    els.backupRestoreKeysWrap?.classList.toggle('hidden', !showKeys);
+    if (els.backupRestoreKeys) els.backupRestoreKeys.checked = false;
+    els.backupRestoreModal.classList.remove('hidden');
+  };
+
+  const closeBackupRestoreModal = () => {
+    if (els.backupRestoreModal) els.backupRestoreModal.classList.add('hidden');
+    if (els.backupRestoreKeys) els.backupRestoreKeys.checked = false;
+  };
+
+  const isBackupRestoreOpen = () => {
+    return !!(els.backupRestoreModal && !els.backupRestoreModal.classList.contains('hidden'));
   };
 
   const syncSystemPromptModeUI = (appState) => {
@@ -3210,7 +3287,7 @@ window.UI = (() => {
     els.markdownPreviewContent.classList.add('is-html-preview', 'is-artifact-preview');
     const iframe = document.createElement('iframe');
     iframe.className = 'html-preview-frame artifact-preview-frame';
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-modals');
+    iframe.setAttribute('sandbox', 'allow-scripts allow-popups allow-modals');
     iframe.setAttribute('title', t(PREVIEW_TITLE_KEYS[currentPreviewMode] || 'previewHtml'));
     iframe.srcdoc = srcdoc;
     els.markdownPreviewContent.appendChild(iframe);
@@ -3324,8 +3401,9 @@ window.UI = (() => {
   };
 
   const openImagePreview = (src, alt = '') => {
-    if (!src || !els.imagePreviewOverlay || !els.imagePreviewImg) return;
-    els.imagePreviewImg.src = src;
+    const safe = safeImageSrc(src);
+    if (!safe || !els.imagePreviewOverlay || !els.imagePreviewImg) return;
+    els.imagePreviewImg.src = safe;
     els.imagePreviewImg.alt = alt || 'Ảnh';
     if (els.imagePreviewCaption) {
       const caption = (alt || '').trim();
@@ -3410,15 +3488,18 @@ window.UI = (() => {
 
   let pendingExportDownload = null;
   let pendingExportKind = null;
+  let overlayCancellable = false;
 
-  const setPdfExportLoading = (visible, { title, hint, ready = false, downloadLabel } = {}) => {
+  const setPdfExportLoading = (visible, { title, hint, ready = false, downloadLabel, cancellable } = {}) => {
     if (!els.pdfExportOverlay) return;
     if (visible) {
+      if (typeof cancellable === 'boolean') overlayCancellable = cancellable;
       if (title && els.pdfExportLoadingTitle) els.pdfExportLoadingTitle.textContent = title;
       if (hint && els.pdfExportLoadingText) els.pdfExportLoadingText.textContent = hint;
       if (downloadLabel && els.pdfExportDownloadBtn) els.pdfExportDownloadBtn.textContent = downloadLabel;
       els.pdfExportSpinner?.classList.toggle('hidden', ready);
       els.pdfExportDownloadBtn?.classList.toggle('hidden', !ready);
+      els.pdfExportCancelBtn?.classList.toggle('hidden', !(overlayCancellable && !ready));
       els.pdfExportOverlay.classList.remove('hidden');
       els.pdfExportOverlay.setAttribute('aria-hidden', 'false');
       els.pdfExportOverlay.setAttribute('aria-busy', ready ? 'false' : 'true');
@@ -3426,14 +3507,24 @@ window.UI = (() => {
     } else {
       pendingExportDownload = null;
       pendingExportKind = null;
+      overlayCancellable = false;
       els.pdfExportSpinner?.classList.remove('hidden');
       els.pdfExportDownloadBtn?.classList.add('hidden');
+      els.pdfExportCancelBtn?.classList.add('hidden');
       els.pdfExportOverlay.classList.add('hidden');
       els.pdfExportOverlay.setAttribute('aria-hidden', 'true');
       els.pdfExportOverlay.setAttribute('aria-busy', 'false');
       document.body.classList.remove('pdf-export-loading');
     }
   };
+
+  const isPdfExportCancellable = () => !!(
+    overlayCancellable
+    && els.pdfExportOverlay
+    && !els.pdfExportOverlay.classList.contains('hidden')
+    && els.pdfExportCancelBtn
+    && !els.pdfExportCancelBtn.classList.contains('hidden')
+  );
 
   const showExportDownloadPrompt = (blob, filename, { title, hint, downloadLabel, kind = 'pdf' }) => {
     pendingExportDownload = { blob, filename };
@@ -3479,6 +3570,7 @@ window.UI = (() => {
     renderComposerAttachments, setDragOverlay,
     openSettings, closeSettings, updateSettingsTokenUsage, syncSystemPromptModeUI, checkTokenCostWarning,
     openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
+    openBackupRestoreModal, closeBackupRestoreModal, isBackupRestoreOpen,
     applyLocale, openGuide, closeGuide, isGuideModalOpen,
     openShareModal, closeShareModal, isShareModalOpen,
     setShareModalLoading, setShareModalResult, setShareModalError,
@@ -3492,7 +3584,7 @@ window.UI = (() => {
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
     closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
-    setPdfExportLoading,
+    setPdfExportLoading, isPdfExportCancellable,
     showExportDownloadPrompt, consumeExportDownload, finishExportDownload,
     isExportSelectMode, toggleExportSelectMode, setExportSelectMode,
     syncCompressContextBar,

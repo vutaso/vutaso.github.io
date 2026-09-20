@@ -1005,8 +1005,21 @@ window.ArtifactPreview = (() => {
   const renderSqlPreview = (container, source) =>
     window.SqlPreview?.renderSqlPreview?.(container, source) ?? Promise.resolve();
 
+  const IFRAME_SANDBOX = 'allow-scripts allow-popups allow-modals';
+
   const openInNewTab = (srcdoc) => {
-    const blob = new Blob([srcdoc], { type: 'text/html;charset=utf-8' });
+    const escaped = String(srcdoc || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;');
+    const wrapper = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+      + '<meta name="viewport" content="width=device-width, initial-scale=1">'
+      + '<title>Preview</title>'
+      + '<style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%}</style>'
+      + '</head><body>'
+      + '<iframe sandbox="' + IFRAME_SANDBOX + '" srcdoc="' + escaped + '"></iframe>'
+      + '</body></html>';
+    const blob = new Blob([wrapper], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const tab = window.open(url, '_blank', 'noopener,noreferrer');
     if (tab) {

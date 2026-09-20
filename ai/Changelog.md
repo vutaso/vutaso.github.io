@@ -10,6 +10,17 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Sao lưu / khôi phục JSON (`js/storage.js`)
+**Ý nghĩa:** Dữ liệu hội thoại chỉ nằm trên trình duyệt. Xuất file JSON để đổi máy, đổi trình duyệt, hoặc khôi phục sau khi xóa cache — không mất chat và prompt.
+
+**Cách dùng:**
+- Mở **Cài đặt** → **Sao lưu & khôi phục** → **Xuất JSON**. File gồm hội thoại, thư viện prompt và tuỳ chọn (theme, ngôn ngữ, system prompt, model…).
+- API key **không** được đưa vào file trừ khi tick *Bao gồm API key*. File có key nên giữ riêng tư; tên file sẽ có hậu tố `-keys`.
+- **Khôi phục…** chọn file → **Thay thế** (ghi đè chat/prompt trên máy) hoặc **Gộp** (giữ dữ liệu hiện có, thêm mục mới theo id). API key trên máy được giữ lại trừ khi file có key và bạn chọn khôi phục key.
+- File JSON compact; file ≥ 20MB sẽ hỏi xác nhận, > 120MB bị từ chối. Gộp trên máy trống tự mở hội thoại đầu tiên. Restore lỗi lưu sẽ rollback, không báo thành công giả.
+
+---
+
 #### Giọng nói — STT & TTS (`js/speech.js`)
 **Ý nghĩa:** Nhập tin nhắn bằng giọng nói (Speech-to-Text) và nghe phản hồi AI (Text-to-Speech), giúp chat hands-free hoặc khi khó gõ.
 
