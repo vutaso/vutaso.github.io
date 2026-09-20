@@ -1580,9 +1580,17 @@ window.Events = (() => {
         if (!c) return;
         ui.refreshConversationList(id);
         ui.renderMessages(c);
+        const sidebarQ = ui.getConversationSearchQuery();
+        if (sidebarQ && sidebarQ.trim()) {
+          ui.openChatFind(sidebarQ, {
+            jump: true,
+            instant: true,
+            focus: !window.Utils.prefersCoarsePointer()
+          });
+        }
         ui.updateSettingsTokenUsage(state.get());
         ui.closeMobileSidebar();
-        if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput.focus();
+        if (!(sidebarQ && sidebarQ.trim()) && !window.Utils.prefersCoarsePointer()) ui.els.composerInput.focus();
       }
     });
 
@@ -2793,6 +2801,11 @@ window.Events = (() => {
           ui.closeMarkdownPreview();
           return;
         }
+        if (ui.isChatFindOpen()) {
+          e.preventDefault();
+          ui.closeChatFind({ restoreFocus: true });
+          return;
+        }
         if (ui.isConversationSearchOpen()) {
           if (ui.getConversationSearchQuery()) {
             ui.clearConversationSearch();
@@ -2817,6 +2830,39 @@ window.Events = (() => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         ui.els.composerInput.focus();
+        return;
+      }
+
+      const findBlocked = () => !!(
+        ui.isPdfExportCancellable()
+        || (ui.els.settingsModal && !ui.els.settingsModal.classList.contains('hidden'))
+        || ui.isGuideModalOpen()
+        || ui.isSnippetsModalOpen()
+        || ui.isRenameModalOpen()
+        || ui.isShareModalOpen()
+        || ui.isBackupRestoreOpen()
+        || ui.isTokenCostWarningOpen()
+        || ui.isImagePreviewOpen()
+        || ui.isModelCompareOpen()
+      );
+
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && key === 'f') {
+        if (findBlocked()) return;
+        e.preventDefault();
+        ui.focusChatFind();
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && key === 'g') {
+        if (findBlocked()) return;
+        e.preventDefault();
+        ui.stepChatFind(e.shiftKey ? -1 : 1, { instant: true });
+        return;
+      }
+      if (e.key === 'F3') {
+        if (findBlocked()) return;
+        e.preventDefault();
+        ui.stepChatFind(e.shiftKey ? -1 : 1, { instant: true });
       }
     });
 

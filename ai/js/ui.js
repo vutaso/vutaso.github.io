@@ -1,5 +1,8 @@
 window.UI = (() => {
-  const { escapeHTML, safeHref, safeImageSrc, formatTime, truncate, copyToClipboard, autoResize, highlightSearchText } = window.Utils;
+  const {
+    escapeHTML, safeHref, safeImageSrc, formatTime, truncate, copyToClipboard, autoResize,
+    highlightSearchText, normalizeSearchQuery, buildSearchFold, findAllSearchRangesInFold
+  } = window.Utils;
   const { DEFAULT_SYSTEM_PROMPT } = window.APP_CONFIG;
   const t = (key, params) => window.I18n.t(key, params);
   const imageSrcAttr = (src) => {
@@ -226,8 +229,16 @@ window.UI = (() => {
     els.messageScrollRailTooltip = $('#messageScrollRailTooltip');
     els.messageScrollRailPrev = $('#messageScrollRailPrev');
     els.messageScrollRailNext = $('#messageScrollRailNext');
+    els.chatFindBtn = $('#chatFindBtn');
+    els.chatFindBar = $('#chatFindBar');
+    els.chatFindInput = $('#chatFindInput');
+    els.chatFindCount = $('#chatFindCount');
+    els.chatFindPrev = $('#chatFindPrev');
+    els.chatFindNext = $('#chatFindNext');
+    els.chatFindClose = $('#chatFindClose');
     bindMessagesScroll();
     bindMessageScrollRail();
+    bindChatFind();
   };
 
   const syncComposerToolsUI = (modelId, toolState) => {
@@ -1420,6 +1431,7 @@ window.UI = (() => {
     syncCompressContextBar(null);
     els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(t('hello')) + '</h2><p class="messages-empty-sub">' + escapeHTML(t('emptySub')) + '</p></div>';
     updateMessageScrollRail();
+    refreshChatFind({ keepIndex: false, scroll: false });
     if (!animate) return;
     const empty = els.messages.querySelector('.messages-empty');
     if (empty) requestAnimationFrame(() => empty.classList.add('is-entering'));
@@ -1488,6 +1500,7 @@ window.UI = (() => {
     syncCompressContextBar(convo);
     scrollToBottom();
     updateMessageScrollRail();
+    refreshChatFind({ keepIndex: true, scroll: chatFindOpen });
   };
 
   const messageEdgeScrollBtnsHTML = () => (
@@ -1596,6 +1609,7 @@ window.UI = (() => {
     els.messages.appendChild(article);
     scrollToBottom();
     updateMessageScrollRail();
+    refreshChatFind({ keepIndex: true, scroll: false });
     return article;
   };
 
@@ -1634,6 +1648,7 @@ window.UI = (() => {
     }
     syncMessageModelLabel(article, m);
     setAssistantToolbar(article, m);
+    refreshChatFind({ keepIndex: true, scroll: false });
   };
 
   const beginRetryStreaming = (idx) => {
@@ -1650,6 +1665,7 @@ window.UI = (() => {
     const content = article.querySelector('.content');
     if (content) content.innerHTML = '';
     updateMessageScrollRail();
+    refreshChatFind({ keepIndex: true, scroll: false });
     return { article, content };
   };
 
@@ -1693,6 +1709,7 @@ window.UI = (() => {
           }
         );
         polishContent(_latestCE, { streaming: true });
+        pruneDisconnectedChatFindMarks();
 
         if (preserveScroll) {
           // Keep reading position stable while tokens append below.
@@ -1740,6 +1757,7 @@ window.UI = (() => {
     if (message) setAssistantToolbar(article, message);
     scrollToBottomIfNear();
     updateMessageScrollRail();
+    refreshChatFind({ keepIndex: true, scroll: false });
   };
 
   const rerenderMermaid = () => {
@@ -1758,6 +1776,8 @@ window.UI = (() => {
     if (article.classList.contains('editing')) return;
     const contentEl = article.querySelector('.content');
     const toolbarEl = article.querySelector('.toolbar');
+    unwrapFindMarksIn(contentEl);
+    pruneDisconnectedChatFindMarks();
     article._editOriginal = {
       content: contentEl.innerHTML,
       toolbar: toolbarEl.innerHTML
@@ -1773,17 +1793,21 @@ window.UI = (() => {
     autoResize(textarea);
     textarea.focus();
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    if (chatFindOpen) refreshChatFind({ keepIndex: true, scroll: false });
   };
 
   const exitEditMode = (article) => {
     if (!article.classList.contains('editing')) return;
     const saved = article._editOriginal;
     if (saved) {
-      article.querySelector('.content').innerHTML = saved.content;
+      const contentEl = article.querySelector('.content');
+      contentEl.innerHTML = saved.content;
+      unwrapFindMarksIn(contentEl);
       article.querySelector('.toolbar').innerHTML = saved.toolbar;
     }
     article.classList.remove('editing');
     delete article._editOriginal;
+    if (chatFindOpen) refreshChatFind({ keepIndex: true, scroll: false });
   };
 
   const rehighlight = (root) => {
@@ -2221,6 +2245,7 @@ window.UI = (() => {
     }).join('');
 
     scheduleMessageScrollRailIndicator();
+    syncMessageScrollRailFindMarks();
   };
 
   const bindMessageScrollRail = () => {
@@ -2272,7 +2297,9 @@ window.UI = (() => {
       if (!tick) return;
       const idx = parseInt(tick.dataset.idx, 10);
       const users = getUserMessageArticles();
-      if (!isNaN(idx) && users[idx]) scrollToUserMessage(users[idx]);
+      if (isNaN(idx) || !users[idx]) return;
+      if (jumpChatFindToMessageBlock(users[idx])) return;
+      scrollToUserMessage(users[idx]);
     });
 
     els.messageScrollRailPrev?.addEventListener('click', () => scrollToAdjacentUserMessage(-1));
@@ -2281,6 +2308,390 @@ window.UI = (() => {
     els.messageScrollRail?.addEventListener('mouseleave', (e) => {
       if (e.relatedTarget && els.messageScrollRail.contains(e.relatedTarget)) return;
       hideMessageScrollRailTooltip();
+    });
+  };
+
+  const CHAT_FIND_MAX = 400;
+  const CHAT_FIND_SKIP = [
+    'script', 'style', 'textarea', 'input', 'button', 'select', 'option', 'svg', 'canvas', 'summary',
+    '.toolbar', '.msg-edge-scroll', '.katex', '.mermaid', '.code-copy',
+    '.export-select-check', '.message-translate-toggle', '.chat-find-bar', '.messages-empty',
+    '.line-numbers', '.pre-header', '.table-header-actions', '.table-label',
+    '.message-model-label', '.message.streaming'
+  ].join(',');
+
+  let chatFindOpen = false;
+  let chatFindQuery = '';
+  let chatFindIndex = 0;
+  let chatFindMarks = [];
+  let chatFindCapped = false;
+  let chatFindInputTimer = null;
+  let chatFindComposing = false;
+  let chatFindBound = false;
+
+  const isChatFindOpen = () => chatFindOpen;
+
+  const getChatFindWrap = () => els.messages?.closest('.chat-scroll-wrap') || els.chatFindBar?.parentElement;
+
+  const setChatFindNavDisabled = (disabled) => {
+    if (els.chatFindPrev) els.chatFindPrev.disabled = disabled;
+    if (els.chatFindNext) els.chatFindNext.disabled = disabled;
+  };
+
+  const syncChatFindI18n = () => {
+    if (els.chatFindBar) els.chatFindBar.setAttribute('aria-label', t('chatFind'));
+    if (els.chatFindBtn) {
+      els.chatFindBtn.title = t('chatFind');
+      els.chatFindBtn.setAttribute('aria-label', t('chatFind'));
+    }
+    if (els.chatFindInput) {
+      els.chatFindInput.placeholder = t('chatFindPlaceholder');
+      els.chatFindInput.setAttribute('aria-label', t('chatFindPlaceholder'));
+    }
+    if (els.chatFindPrev) {
+      els.chatFindPrev.title = t('chatFindPrev');
+      els.chatFindPrev.setAttribute('aria-label', t('chatFindPrev'));
+    }
+    if (els.chatFindNext) {
+      els.chatFindNext.title = t('chatFindNext');
+      els.chatFindNext.setAttribute('aria-label', t('chatFindNext'));
+    }
+    if (els.chatFindClose) {
+      els.chatFindClose.title = t('chatFindClose');
+      els.chatFindClose.setAttribute('aria-label', t('chatFindClose'));
+    }
+    syncChatFindCount();
+  };
+
+  const syncChatFindChrome = () => {
+    getChatFindWrap()?.classList.toggle('is-find-open', chatFindOpen);
+    els.chatFindBtn?.classList.toggle('is-active', chatFindOpen);
+    els.chatFindBtn?.setAttribute('aria-pressed', chatFindOpen ? 'true' : 'false');
+  };
+
+  const syncChatFindCount = () => {
+    if (!els.chatFindCount) return;
+    const q = (chatFindQuery || '').trim();
+    if (!chatFindOpen || !q) {
+      els.chatFindCount.textContent = '';
+      setChatFindNavDisabled(true);
+      return;
+    }
+    const total = chatFindMarks.length;
+    if (!total) {
+      els.chatFindCount.textContent = t('chatFindNone');
+      setChatFindNavDisabled(true);
+      return;
+    }
+    const key = chatFindCapped ? 'chatFindCountCapped' : 'chatFindCount';
+    els.chatFindCount.textContent = t(key, { current: chatFindIndex + 1, total });
+    setChatFindNavDisabled(false);
+  };
+
+  const unwrapFindMarksIn = (root) => {
+    if (!root) return;
+    const parents = new Set();
+    root.querySelectorAll('mark.chat-find-hl').forEach((mark) => {
+      const parent = mark.parentNode;
+      if (!parent) return;
+      while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+      parents.add(parent);
+    });
+    parents.forEach((parent) => parent.normalize());
+  };
+
+  const clearChatFindHighlights = (root = els.messages) => {
+    chatFindMarks = [];
+    chatFindCapped = false;
+    unwrapFindMarksIn(root);
+  };
+
+  const pruneDisconnectedChatFindMarks = () => {
+    if (!chatFindOpen) return;
+    const prev = chatFindMarks[chatFindIndex] || null;
+    chatFindMarks = chatFindMarks.filter((mark) => mark.isConnected);
+    if (!chatFindMarks.length) {
+      chatFindIndex = 0;
+      syncChatFindCount();
+      syncMessageScrollRailFindMarks();
+      return;
+    }
+    let next = prev ? chatFindMarks.indexOf(prev) : -1;
+    if (next < 0) next = Math.min(chatFindIndex, chatFindMarks.length - 1);
+    setChatFindIndex(next, { scroll: false });
+    syncMessageScrollRailFindMarks();
+  };
+
+  const wrapRangesInTextNode = (node, ranges) => {
+    const marks = [];
+    if (!node || !ranges.length) return marks;
+    const text = node.nodeValue;
+    const parent = node.parentNode;
+    if (!text || !parent) return marks;
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    ranges.forEach(({ start, end }) => {
+      const s = Math.max(last, start);
+      const e = Math.min(text.length, end);
+      if (e <= s) return;
+      if (s > last) frag.appendChild(document.createTextNode(text.slice(last, s)));
+      const mark = document.createElement('mark');
+      mark.className = 'chat-find-hl';
+      mark.textContent = text.slice(s, e);
+      frag.appendChild(mark);
+      marks.push(mark);
+      last = e;
+    });
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    parent.replaceChild(frag, node);
+    return marks;
+  };
+
+  const collectFindTextNodes = (root) => {
+    const nodes = [];
+    if (!root) return nodes;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        const el = node.parentElement;
+        if (!el || el.closest(CHAT_FIND_SKIP)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    let current;
+    while ((current = walker.nextNode())) nodes.push(current);
+    return nodes;
+  };
+
+  const applyChatFindHighlights = (query) => {
+    clearChatFindHighlights();
+    const normQuery = normalizeSearchQuery(query);
+    if (!normQuery || !els.messages) return;
+    const nodes = collectFindTextNodes(els.messages);
+    for (const node of nodes) {
+      if (chatFindMarks.length >= CHAT_FIND_MAX) {
+        chatFindCapped = true;
+        break;
+      }
+      const remaining = CHAT_FIND_MAX - chatFindMarks.length;
+      const ranges = findAllSearchRangesInFold(buildSearchFold(node.nodeValue), normQuery, remaining + 1);
+      if (!ranges.length) continue;
+      if (ranges.length > remaining) {
+        chatFindCapped = true;
+        chatFindMarks.push(...wrapRangesInTextNode(node, ranges.slice(0, remaining)));
+        break;
+      }
+      chatFindMarks.push(...wrapRangesInTextNode(node, ranges));
+    }
+  };
+
+  const revealFindMatchAncestors = (mark) => {
+    let el = mark.parentElement;
+    while (el && el !== els.messages) {
+      if (el.tagName === 'DETAILS' && !el.open) el.open = true;
+      el = el.parentElement;
+    }
+  };
+
+  const scrollMessagesToMark = (mark, { instant = false } = {}) => {
+    const messagesEl = els.messages;
+    if (!mark?.isConnected || !messagesEl) return;
+    _stickToBottom = false;
+    _ignoreScrollEvent = true;
+    const markRect = mark.getBoundingClientRect();
+    const boxRect = messagesEl.getBoundingClientRect();
+    const offset = markRect.top - boxRect.top - (messagesEl.clientHeight / 2) + (markRect.height / 2);
+    const maxTop = Math.max(0, messagesEl.scrollHeight - messagesEl.clientHeight);
+    const top = Math.min(maxTop, Math.max(0, messagesEl.scrollTop + offset));
+    const behavior = instant || prefersReducedMotion() ? 'auto' : 'smooth';
+    messagesEl.scrollTo({ top, behavior });
+    window.setTimeout(() => {
+      _ignoreScrollEvent = false;
+      updateMessageScrollRailIndicator();
+    }, behavior === 'smooth' ? 450 : 60);
+  };
+
+  const scrollToFindMatch = (mark, { instant = false } = {}) => {
+    if (!mark || !els.messages) return;
+    revealFindMatchAncestors(mark);
+    requestAnimationFrame(() => scrollMessagesToMark(mark, { instant }));
+  };
+
+  const setChatFindIndex = (idx, { scroll = true, instant = false } = {}) => {
+    if (!chatFindMarks.length) {
+      chatFindIndex = 0;
+      syncChatFindCount();
+      return;
+    }
+    const n = chatFindMarks.length;
+    chatFindIndex = ((idx % n) + n) % n;
+    chatFindMarks.forEach((mark, i) => {
+      const current = i === chatFindIndex;
+      mark.classList.toggle('is-current', current);
+      if (current) mark.setAttribute('aria-current', 'true');
+      else mark.removeAttribute('aria-current');
+    });
+    syncChatFindCount();
+    if (scroll) scrollToFindMatch(chatFindMarks[chatFindIndex], { instant });
+  };
+
+  const getUserMessageBlock = (userArticle) => {
+    const articles = [...(els.messages?.querySelectorAll('.message') || [])];
+    const start = articles.indexOf(userArticle);
+    if (start < 0) return userArticle ? [userArticle] : [];
+    const block = [userArticle];
+    for (let i = start + 1; i < articles.length; i++) {
+      if (articles[i].classList.contains('user')) break;
+      block.push(articles[i]);
+    }
+    return block;
+  };
+
+  const messageBlockHasFindMatch = (userArticle) => {
+    if (!chatFindMarks.length) return false;
+    const block = getUserMessageBlock(userArticle);
+    return chatFindMarks.some((mark) => block.some((article) => article.contains(mark)));
+  };
+
+  const syncMessageScrollRailFindMarks = () => {
+    const ticks = els.messageScrollRailTicks?.querySelectorAll('.message-scroll-rail-tick');
+    if (!ticks?.length) return;
+    const users = getUserMessageArticles();
+    ticks.forEach((tick) => {
+      const idx = parseInt(tick.dataset.idx, 10);
+      const article = users[idx];
+      tick.classList.toggle('is-find-match', !!(chatFindOpen && article && messageBlockHasFindMatch(article)));
+    });
+  };
+
+  const jumpChatFindToMessageBlock = (userArticle) => {
+    if (!chatFindOpen || !chatFindMarks.length || !userArticle) return false;
+    const block = getUserMessageBlock(userArticle);
+    const idx = chatFindMarks.findIndex((mark) => block.some((article) => article.contains(mark)));
+    if (idx < 0) return false;
+    setChatFindIndex(idx, { scroll: true });
+    return true;
+  };
+
+  const refreshChatFind = ({ keepIndex = true, scroll = false, instant = false } = {}) => {
+    if (!chatFindOpen) return;
+    const prev = chatFindIndex;
+    chatFindQuery = els.chatFindInput ? els.chatFindInput.value : chatFindQuery;
+    applyChatFindHighlights(chatFindQuery);
+    const nextIndex = keepIndex && chatFindMarks.length
+      ? Math.min(prev, chatFindMarks.length - 1)
+      : 0;
+    setChatFindIndex(nextIndex, { scroll: scroll && chatFindMarks.length > 0, instant });
+    syncMessageScrollRailFindMarks();
+  };
+
+  const openChatFind = (query, { jump = true, instant = false, focus = true, select = true } = {}) => {
+    chatFindOpen = true;
+    if (typeof query === 'string') {
+      chatFindQuery = query;
+      if (els.chatFindInput && els.chatFindInput.value !== query) els.chatFindInput.value = query;
+    } else {
+      chatFindQuery = els.chatFindInput?.value || chatFindQuery || '';
+    }
+    els.chatFindBar?.classList.remove('hidden');
+    syncChatFindI18n();
+    syncChatFindChrome();
+    refreshChatFind({ keepIndex: false, scroll: false, instant });
+    if (jump && chatFindMarks.length) {
+      const mark = chatFindMarks[chatFindIndex];
+      requestAnimationFrame(() => {
+        const current = chatFindMarks[chatFindIndex] || mark;
+        if (current && document.body.contains(current)) {
+          scrollToFindMatch(current, { instant });
+        }
+      });
+    }
+    if (focus && els.chatFindInput) {
+      els.chatFindInput.focus();
+      if (select) els.chatFindInput.select();
+    }
+  };
+
+  const closeChatFind = ({ restoreFocus = false } = {}) => {
+    const focusFind = restoreFocus && document.activeElement === els.chatFindInput;
+    chatFindOpen = false;
+    chatFindCapped = false;
+    clearTimeout(chatFindInputTimer);
+    chatFindInputTimer = null;
+    els.chatFindBar?.classList.add('hidden');
+    clearChatFindHighlights();
+    syncChatFindChrome();
+    syncMessageScrollRailFindMarks();
+    syncChatFindCount();
+    if (focusFind && !isShareViewMode()) els.composerInput?.focus();
+  };
+
+  const toggleChatFind = () => {
+    if (chatFindOpen) closeChatFind({ restoreFocus: true });
+    else openChatFind(els.chatFindInput?.value || chatFindQuery || '');
+  };
+
+  const focusChatFind = () => {
+    if (chatFindOpen) {
+      els.chatFindInput?.focus();
+      els.chatFindInput?.select();
+      return;
+    }
+    openChatFind(els.chatFindInput?.value || chatFindQuery || '');
+  };
+
+  const stepChatFind = (dir, opts = {}) => {
+    if (!chatFindOpen) {
+      openChatFind(els.chatFindInput?.value || chatFindQuery || '');
+      return;
+    }
+    if (!chatFindMarks.length) return;
+    setChatFindIndex(chatFindIndex + dir, opts);
+  };
+
+  const bindChatFind = () => {
+    if (chatFindBound) return;
+    chatFindBound = true;
+    syncChatFindI18n();
+    syncChatFindChrome();
+    setChatFindNavDisabled(true);
+
+    els.chatFindBtn?.addEventListener('click', () => toggleChatFind());
+    els.chatFindClose?.addEventListener('click', () => closeChatFind({ restoreFocus: true }));
+    els.chatFindPrev?.addEventListener('click', () => stepChatFind(-1));
+    els.chatFindNext?.addEventListener('click', () => stepChatFind(1));
+
+    els.chatFindInput?.addEventListener('compositionstart', () => {
+      chatFindComposing = true;
+    });
+    els.chatFindInput?.addEventListener('compositionend', () => {
+      chatFindComposing = false;
+      refreshChatFind({ keepIndex: false, scroll: true });
+    });
+    els.chatFindInput?.addEventListener('input', () => {
+      if (chatFindComposing) return;
+      clearTimeout(chatFindInputTimer);
+      chatFindInputTimer = setTimeout(() => {
+        refreshChatFind({ keepIndex: false, scroll: true });
+      }, 80);
+    });
+    els.chatFindInput?.addEventListener('change', () => {
+      if (chatFindComposing) return;
+      refreshChatFind({ keepIndex: false, scroll: true });
+    });
+    els.chatFindInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        e.stopPropagation();
+        stepChatFind(e.shiftKey ? -1 : 1, { instant: true });
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeChatFind({ restoreFocus: true });
+      }
     });
   };
 
@@ -2674,6 +3085,7 @@ window.UI = (() => {
     else renderEmpty();
     updateExportSelectCount();
     syncMessageScrollRailI18n();
+    syncChatFindI18n();
     syncCompressContextBar(convo);
     if (currentPreviewMode) setPreviewPanelTitle(currentPreviewMode);
   };
@@ -3561,7 +3973,8 @@ window.UI = (() => {
     syncComposerToolsUI, syncTranslateUI, syncSlidesUI, syncExcelUI, syncDocumentUI, syncPdfUI, syncCreateFileUI, closeCreateFileMenu, toggleCreateFileMenu, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,
-    setConversationSearchQuery, toggleConversationSearch, clearConversationSearch,
+    setConversationSearchQuery, toggleConversationSearch, clearConversationSearch, isConversationSearchOpen,
+    isChatFindOpen, openChatFind, closeChatFind, toggleChatFind, focusChatFind, stepChatFind,
     renderMessages, renderEmpty, animateClearAll,
     appendMessage, appendStreamingMessage, updateStreamingContent, finalizeStreaming,
     enterEditMode, exitEditMode, downloadConversation, downloadConversationTxt,

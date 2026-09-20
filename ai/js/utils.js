@@ -143,6 +143,25 @@ window.Utils = (() => {
     return { start, end: endStart + endChar.length };
   };
 
+  const findAllSearchRangesInFold = (fold, normQuery, max = 0) => {
+    if (!normQuery || !fold?.norm) return [];
+    const ranges = [];
+    const nq = normQuery.length;
+    let from = 0;
+    while (from <= fold.norm.length - nq) {
+      const normIdx = fold.norm.indexOf(normQuery, from);
+      if (normIdx < 0) break;
+      const start = fold.starts[normIdx];
+      const lastNormIdx = normIdx + nq - 1;
+      const endStart = fold.starts[lastNormIdx];
+      const endChar = String.fromCodePoint(fold.source.codePointAt(endStart));
+      ranges.push({ start, end: endStart + endChar.length });
+      if (max > 0 && ranges.length >= max) break;
+      from = lastNormIdx + 1;
+    }
+    return ranges;
+  };
+
   const findSearchRange = (text, query) => {
     const normQuery = normalizeSearchQuery(query);
     if (!normQuery) return null;
@@ -882,8 +901,8 @@ window.Utils = (() => {
     escapeHTML, safeHref, safeImageSrc, isSafeImageDataUrl, sanitizeHtml,
     formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
     getCodeBlockSource,
-    buildSearchFold, includesSearchFold, findSearchRangeInFold, buildSearchSnippet,
-    includesSearch, findSearchRange, highlightSearchText,
+    buildSearchFold, includesSearchFold, findSearchRangeInFold, findAllSearchRangesInFold,
+    buildSearchSnippet, includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
     formatConversation, formatConversationPlainText,
     downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice, prefersCoarsePointer,

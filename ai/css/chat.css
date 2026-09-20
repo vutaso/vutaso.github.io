@@ -1571,6 +1571,164 @@ body.image-preview-open {
   min-width: 0;
 }
 
+.chat-scroll-wrap.is-find-open > .messages {
+  scroll-padding-top: 58px;
+}
+
+.chat-find-bar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: min(420px, calc(100% - 72px));
+  max-width: calc(100% - 72px);
+  padding: 6px 6px 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.chat-find-bar.hidden {
+  display: none;
+}
+
+.chat-find-icon {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.chat-find-bar input {
+  flex: 1 1 auto;
+  min-width: 80px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.chat-find-count {
+  flex-shrink: 0;
+  min-width: 3.2em;
+  padding: 0 6px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chat-find-nav,
+.chat-find-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chat-find-nav:hover:not(:disabled),
+.chat-find-close:hover {
+  background: color-mix(in srgb, var(--bg-hover) 80%, transparent);
+  color: var(--text);
+}
+
+.chat-find-nav:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.main-header #chatFindBtn.is-active {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+mark.chat-find-hl {
+  background: #ffe44d;
+  color: #1a1508;
+  border-radius: 2px;
+  padding: 0 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  text-shadow: none;
+}
+
+mark.chat-find-hl.is-current {
+  background: #ffd000;
+  color: #1a1508;
+  box-shadow: 0 0 0 1px rgba(90, 70, 0, 0.28);
+}
+
+:root[data-theme="dark"] mark.chat-find-hl,
+:root[data-theme="vs-dark"] mark.chat-find-hl,
+:root[data-theme="apple-dark"] mark.chat-find-hl,
+:root[data-theme="cyberpunk"] mark.chat-find-hl,
+:root[data-theme="nvidia"] mark.chat-find-hl,
+:root[data-theme="liquid-glass"] mark.chat-find-hl {
+  background: #f2cc22;
+  color: #161200;
+}
+
+:root[data-theme="dark"] mark.chat-find-hl.is-current,
+:root[data-theme="vs-dark"] mark.chat-find-hl.is-current,
+:root[data-theme="apple-dark"] mark.chat-find-hl.is-current,
+:root[data-theme="cyberpunk"] mark.chat-find-hl.is-current,
+:root[data-theme="nvidia"] mark.chat-find-hl.is-current,
+:root[data-theme="liquid-glass"] mark.chat-find-hl.is-current {
+  background: #ffe347;
+  color: #161200;
+  box-shadow: 0 0 0 1px rgba(255, 230, 80, 0.35);
+}
+
+.message-scroll-rail-tick.is-find-match::after {
+  background: #f2cc22;
+  opacity: 1;
+}
+
+.message-scroll-rail-tick.is-find-match.is-active::after,
+.message-scroll-rail-tick.is-find-match:hover::after {
+  background: #ffe347;
+}
+
+@media (max-width: 768px) {
+  .chat-find-bar {
+    left: 10px;
+    right: 36px;
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+  }
+
+  .chat-find-bar input {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-find-bar {
+    left: 8px;
+    right: 8px;
+  }
+}
+
 .message-scroll-rail {
   position: absolute;
   top: 0;

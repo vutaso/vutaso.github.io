@@ -112,7 +112,8 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 |-----------|--------|
 | **Cuộc trò chuyện mới** | Tạo hội thoại mới từ sidebar |
 | **Lịch sử hội thoại** | Danh sách cuộc trò chuyện, sắp xếp theo thời gian cập nhật |
-| **Tìm kiếm lịch sử** | Lọc hội thoại theo tiêu đề và nội dung tin nhắn |
+| **Tìm kiếm lịch sử** | Lọc hội thoại theo tiêu đề và nội dung tin nhắn; mở chat dài sẽ nhảy tới đoạn khớp |
+| **Tìm trong cuộc chat** | `Ctrl/Cmd + F` highlight, prev/next, đếm số lần xuất hiện; tick trên thanh cuộn câu hỏi đánh dấu khối có khớp |
 | **Chuyển hội thoại** | Click vào mục trong sidebar để mở |
 | **Đặt tên tự động** | Tiêu đề hội thoại lấy từ tin nhắn user đầu tiên |
 | **Đổi tên** | Đổi tên hiển thị qua modal |
@@ -211,7 +212,9 @@ English, Tiếng Việt, 中文, 日本語, 한국어, العربية, Deutsch, 
 | `Enter` | Gửi tin nhắn (hoặc lưu khi đang sửa tin nhắn) |
 | `Shift + Enter` | Xuống dòng trong composer |
 | `Ctrl/Cmd + K` | Focus vào ô nhập tin nhắn |
-| `Escape` | Thoát sửa tin / đóng tooltip Reply / đóng modal / đóng preview MD / đóng sidebar (mobile) |
+| `Ctrl/Cmd + F` | Tìm trong cuộc chat đang mở (highlight, prev/next, đếm số lần) |
+| `F3` / `Ctrl/Cmd + G` | Kết quả tìm tiếp theo (`Shift` để lùi) |
+| `Escape` | Thoát sửa tin / đóng tìm trong chat / đóng tooltip Reply / đóng modal / đóng preview MD / đóng sidebar (mobile) |
 
 ---
 

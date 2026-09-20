@@ -119,6 +119,9 @@
           </span>
         </div>
         <div class="header-actions">
+          <button type="button" id="chatFindBtn" class="btn btn-icon" title="Tìm trong cuộc chat" aria-pressed="false" aria-label="Tìm trong cuộc chat">
+            <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+          </button>
           <button type="button" id="toggleExportSelectBtn" class="btn btn-icon" title="Chọn tin để xuất" aria-pressed="false" aria-label="Chọn tin để xuất">
             <span class="icon"><i class="fa-solid fa-check-double"></i></span>
           </button>
@@ -202,6 +205,20 @@
       </div>
 
       <div class="chat-scroll-wrap">
+        <div id="chatFindBar" class="chat-find-bar hidden" role="search">
+          <i class="fa-solid fa-magnifying-glass chat-find-icon" aria-hidden="true"></i>
+          <input id="chatFindInput" type="text" enterkeyhint="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Tìm trong cuộc chat này">
+          <span id="chatFindCount" class="chat-find-count" aria-live="polite"></span>
+          <button type="button" id="chatFindPrev" class="chat-find-nav" title="Kết quả trước" aria-label="Kết quả trước">
+            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+          </button>
+          <button type="button" id="chatFindNext" class="chat-find-nav" title="Kết quả sau" aria-label="Kết quả sau">
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <button type="button" id="chatFindClose" class="chat-find-close" title="Đóng" aria-label="Đóng">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
         <section id="messages" class="messages" aria-live="polite"></section>
         <nav id="messageScrollRail" class="message-scroll-rail hidden" aria-label="Nhảy đến câu hỏi">
           <button type="button" id="messageScrollRailPrev" class="message-scroll-rail-arrow" title="Câu hỏi trước" aria-label="Câu hỏi trước">
@@ -842,6 +859,7 @@
               <li><kbd>Enter</kbd> — gửi tin nhắn</li>
               <li><kbd>Shift</kbd> + <kbd>Enter</kbd> — xuống dòng</li>
               <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>K</kbd> — focus ô nhập</li>
+              <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>F</kbd> — tìm trong cuộc chat đang mở</li>
             </ul>
           </div>
         </section>
@@ -890,7 +908,7 @@
             <h3>Xuất &amp; phím tắt khác</h3>
             <p>Trên header: tải Markdown, sao chép Markdown, xuất Word (.docx), in / lưu PDF (hộp thoại in của trình duyệt). Phản hồi AI hỗ trợ Markdown, code highlight, công thức toán, sơ đồ Mermaid. Khối code có nút preview — HTML, React, Vue, Python, Chart, OpenAPI, CSV, Graphviz, <strong>SQL</strong> (format + explain + mock result), Mermaid…</p>
             <ul>
-              <li><kbd>Escape</kbd> — đóng modal, menu, preview; thoát sửa tin</li>
+              <li><kbd>Escape</kbd> — đóng tìm trong chat, modal, menu, preview; thoát sửa tin</li>
             </ul>
           </div>
         </section>

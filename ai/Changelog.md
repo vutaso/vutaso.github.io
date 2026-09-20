@@ -10,6 +10,17 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Added
 
+#### Tìm trong cuộc chat đang mở (`js/ui.js`, `js/events.js`)
+**Ý nghĩa:** Sidebar đã lọc theo tiêu đề/nội dung, nhưng chat dài không nhảy tới đoạn khớp. Find trong app (`Ctrl/Cmd + F`) highlight, prev/next, đếm số lần xuất hiện, và đánh dấu tick trên thanh cuộn câu hỏi.
+
+**Cách dùng:**
+- `Ctrl/Cmd + F` (hoặc nút kính lúp trên header) mở thanh tìm trong cuộc chat hiện tại. Enter / F3 / `Ctrl/Cmd + G` tới kết quả sau; Shift để lùi. Escape đóng.
+- Mở một cuộc chat từ kết quả tìm sidebar sẽ tự mở find với cùng từ khóa và cuộn tới lần khớp đầu.
+- Tick vàng trên thanh cuộn câu hỏi là khối hỏi–đáp có khớp; bấm tick để nhảy tới match trong khối đó.
+- Hủy sửa tin không để lại highlight. Match trong code/bảng chỉ cuộn khung chat; thinking/sources đóng thì được mở. Đang stream thì không nháy lại toàn bộ highlight. Đếm hiện `400+` khi cắt trần. Không tô số dòng, header code, nhãn bảng, summary.
+
+---
+
 #### Sao lưu / khôi phục JSON (`js/storage.js`)
 **Ý nghĩa:** Dữ liệu hội thoại chỉ nằm trên trình duyệt. Xuất file JSON để đổi máy, đổi trình duyệt, hoặc khôi phục sau khi xóa cache — không mất chat và prompt.
 
