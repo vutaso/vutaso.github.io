@@ -1454,7 +1454,13 @@ window.Events = (() => {
         }
       }
       if (e.key === 'Enter' && e.shiftKey && !e.isComposing && e.keyCode !== 229) {
-        requestAnimationFrame(syncComposerInputState);
+        e.preventDefault();
+        const el = ui.els.composerInput;
+        const start = el.selectionStart ?? el.value.length;
+        const end = el.selectionEnd ?? start;
+        el.value = el.value.slice(0, start) + '\n' + el.value.slice(end);
+        el.selectionStart = el.selectionEnd = start + 1;
+        syncComposerInputState();
         return;
       }
       if (isComposerEnterSend(e)) {
