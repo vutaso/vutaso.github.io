@@ -87,23 +87,23 @@
     padding: 5px 8px;
   }
 
-  .header-title .provider-select,
-  .header-title .header-provider-btn,
-  .header-title .model-select,
-  .header-title .header-effort-select,
-  .header-title .header-prompt-mode-select {
+  .header-selects .provider-select,
+  .header-selects .header-provider-btn,
+  .header-selects .model-select,
+  .header-selects .header-effort-select,
+  .header-selects .header-prompt-mode-select {
     max-width: min(110px, 32vw);
     font-size: 11px;
     padding: 3px 22px 3px 8px;
     flex-shrink: 0;
   }
 
-  .header-title .header-provider-btn {
+  .header-selects .header-provider-btn {
     padding: 3px 8px;
     background-image: none;
   }
 
-  .header-title .header-effort-select {
+  .header-selects .header-effort-select {
     max-width: min(88px, 26vw);
   }
 

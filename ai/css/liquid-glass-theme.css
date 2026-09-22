@@ -40,9 +40,11 @@
 }
 
 :root[data-theme="liquid-glass"] .main-header {
-  background: var(--glass-fill);
-  border-bottom: 0.5px solid var(--border-strong);
-  box-shadow: inset 0 1px 0 var(--glass-shine);
+  background: transparent;
+  border-bottom: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 :root[data-theme="liquid-glass"] .sidebar-brand .brand-avatar,
@@ -224,7 +226,7 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 
-:root[data-theme="liquid-glass"] .header-title .header-select {
+:root[data-theme="liquid-glass"] .header-selects .header-select {
   border-radius: var(--radius-full);
   background: var(--glass-fill);
   border: 0.5px solid var(--border);

@@ -145,14 +145,14 @@
   z-index: 4;
   width: 28px;
   height: 28px;
-  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  border: 1px solid transparent;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   font-size: 11px;
   opacity: 0;
@@ -167,9 +167,10 @@
 }
 
 .message .msg-edge-scroll:hover {
-  background: var(--bg-hover);
+  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
   color: var(--text);
-  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-color: color-mix(in srgb, var(--border) 90%, transparent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
 }
 
 .message .msg-edge-scroll-bottom {
@@ -187,13 +188,14 @@
 .message.user .msg-edge-scroll {
   right: 8px;
   color: color-mix(in srgb, var(--text) 72%, var(--text-muted));
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 22%, transparent);
+  background: transparent;
+  border-color: transparent;
   box-shadow: none;
 }
 
 .message.user .msg-edge-scroll:hover {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 22%, transparent);
   color: var(--text);
 }
 
@@ -1294,6 +1296,37 @@
   color: var(--accent);
   font-size: 12px;
   font-weight: 500;
+}
+
+.streaming-tool-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    var(--text-dim) 0%,
+    var(--text-dim) 38%,
+    var(--text) 50%,
+    var(--text-dim) 62%,
+    var(--text-dim) 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: streaming-text-shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes streaming-text-shimmer {
+  0% { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-tool-shimmer {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--text);
+  }
 }
 
 .message-reasoning {

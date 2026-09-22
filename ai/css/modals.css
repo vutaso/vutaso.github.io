@@ -907,7 +907,7 @@ a.btn {
   height: 28px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-on, #fff);
   font-size: 13px;
   font-weight: 600;
   display: flex;
@@ -959,7 +959,7 @@ a.btn {
 
 .toast {
   position: fixed;
-  bottom: 28px;
+  top: max(16px, env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-elev);
@@ -974,7 +974,7 @@ a.btn {
   animation: toast-in 220ms ease;
 }
 @keyframes toast-in {
-  from { opacity: 0; transform: translate(-50%, 8px); }
+  from { opacity: 0; transform: translate(-50%, -8px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
 

@@ -81,11 +81,19 @@ window.Events = (() => {
     }
     state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
     ui.syncProviderSelect(window.APP_CONFIG.getModelProvider(modelId));
+    const model = window.APP_CONFIG.getModel(modelId);
+    const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : (ui.els.modelSelect?.selectedOptions[0]?.textContent || modelId);
+    if (ui.els.modelSelectBtnLabel) ui.els.modelSelectBtnLabel.textContent = label;
+    ui.els.modelSelectMenu?.querySelectorAll('.header-model-option').forEach((opt) => {
+      const selected = opt.dataset.model === modelId;
+      opt.classList.toggle('is-selected', selected);
+      opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
+    ui.closeModelMenu();
     syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
     updateSendEnabled();
     ui.updateSettingsTokenUsage(state.get());
     if (showToast) {
-      const label = ui.els.modelSelect?.selectedOptions[0]?.textContent || modelId;
       ui.showToast(t('toastModel', { label }));
     }
   };
@@ -437,10 +445,30 @@ window.Events = (() => {
     }
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
-    if (compareMode || s.imageGenEnabled) {
-      ui.els.sendBtn.disabled = !hasKey || !hasText;
+    const canSend = (compareMode || s.imageGenEnabled) ? hasText : (hasText || hasAttachments);
+    const voiceMode = !canSend && !window.API.isStreaming() && !!window.Speech?.isSTTSupported?.();
+    ui.els.sendBtn.classList.toggle('is-voice', voiceMode);
+    if (voiceMode) {
+      const listening = !!window.Speech?.isListening?.();
+      ui.els.sendBtn.classList.toggle('is-listening', listening);
+      const voiceIcon = ui.els.sendBtn.querySelector('.voice-icon');
+      if (voiceIcon) {
+        voiceIcon.className = 'fa-solid voice-icon ' + (listening ? 'fa-microphone-lines' : 'fa-microphone');
+      }
+      ui.els.sendBtn.disabled = false;
+      const voiceLabel = window.I18n?.t?.(listening ? 'voiceInputListening' : 'voiceInput') || '';
+      if (voiceLabel) {
+        ui.els.sendBtn.title = voiceLabel;
+        ui.els.sendBtn.setAttribute('aria-label', voiceLabel);
+      }
     } else {
-      ui.els.sendBtn.disabled = !hasKey || (!hasText && !hasAttachments);
+      ui.els.sendBtn.classList.remove('is-listening');
+      ui.els.sendBtn.disabled = !hasKey || !canSend;
+      const sendLabel = window.I18n?.t?.('send') || '';
+      if (sendLabel) {
+        ui.els.sendBtn.title = sendLabel;
+        ui.els.sendBtn.setAttribute('aria-label', sendLabel);
+      }
     }
     if (!window.API.isStreaming()) {
       ui.els.composerInput.disabled = false;
@@ -1351,6 +1379,10 @@ window.Events = (() => {
   const bind = () => {
     ui.els.composer.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (ui.els.sendBtn.classList.contains('is-voice')) {
+        window.Speech?.toggleListening?.();
+        return;
+      }
       sendCurrent();
     });
 
@@ -1411,7 +1443,7 @@ window.Events = (() => {
         if (isComposerEnterSend(e)) {
           enterSendHandled = true;
           e.preventDefault();
-          if (ui.confirmSlashCommand({ requireQuery: true })) {
+          if (ui.confirmSlashCommand()) {
             ui.showToast(t('snippetsInserted'));
             updateSendEnabled();
           } else {
@@ -1447,7 +1479,7 @@ window.Events = (() => {
       if (e.inputType !== 'insertLineBreak' && e.inputType !== 'insertParagraph') return;
       if (ui.isSlashCommandMenuOpen()) {
         e.preventDefault();
-        if (ui.confirmSlashCommand({ requireQuery: true })) {
+        if (ui.confirmSlashCommand()) {
           ui.showToast(t('snippetsInserted'));
           updateSendEnabled();
         } else {
@@ -1494,6 +1526,7 @@ window.Events = (() => {
         updateSendEnabled();
         ui.syncSlashCommandMenu();
       },
+      onListeningChange: () => updateSendEnabled(),
       onError: (msg) => ui.showToast(msg),
     });
 
@@ -1814,6 +1847,36 @@ window.Events = (() => {
       ui.toggleProviderMenu();
     });
 
+    ui.els.modelSelectBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleModelMenu();
+    });
+
+    ui.els.systemPromptModeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.togglePromptModeMenu();
+    });
+
+    ui.els.systemPromptModeMenu?.addEventListener('click', (e) => {
+      const option = e.target.closest('[data-mode]');
+      if (!option) return;
+      const mode = option.dataset.mode;
+      ui.closePromptModeMenu();
+      if (!mode || !ui.els.systemPromptModeSelect || ui.els.systemPromptModeSelect.value === mode) return;
+      ui.els.systemPromptModeSelect.value = mode;
+      ui.els.systemPromptModeSelect.dispatchEvent(new Event('change'));
+    });
+
+    ui.els.modelSelectMenu?.addEventListener('click', (e) => {
+      const option = e.target.closest('.header-model-option');
+      if (!option) return;
+      const modelId = option.dataset.model;
+      ui.closeModelMenu();
+      if (!modelId || !ui.els.modelSelect || ui.els.modelSelect.value === modelId) return;
+      ui.els.modelSelect.value = modelId;
+      ui.els.modelSelect.dispatchEvent(new Event('change'));
+    });
+
     ui.els.providerSelectMenu?.addEventListener('click', (e) => {
       const option = e.target.closest('.header-provider-option');
       if (!option) return;
@@ -2085,6 +2148,21 @@ window.Events = (() => {
       applyModelChange(ui.els.modelSelect.value);
     });
 
+    ui.els.effortSelectBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ui.toggleEffortMenu();
+    });
+
+    ui.els.effortSelectMenu?.addEventListener('click', (e) => {
+      const option = e.target.closest('[data-effort]');
+      if (!option) return;
+      const effort = option.dataset.effort;
+      ui.closeEffortMenu();
+      if (!effort || !ui.els.effortSelect || ui.els.effortSelect.value === effort) return;
+      ui.els.effortSelect.value = effort;
+      ui.els.effortSelect.dispatchEvent(new Event('change'));
+    });
+
     ui.els.effortSelect?.addEventListener('change', () => {
       const effort = ui.els.effortSelect.value;
       const modelId = state.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
@@ -2095,6 +2173,12 @@ window.Events = (() => {
       state.set(patch);
       syncComposerTools(modelId, patch);
       const label = ui.els.effortSelect.selectedOptions[0]?.textContent || effort;
+      if (ui.els.effortSelectBtnLabel) ui.els.effortSelectBtnLabel.textContent = label;
+      ui.els.effortSelectMenu?.querySelectorAll('[data-effort]').forEach((opt) => {
+        const selected = opt.dataset.effort === effort;
+        opt.classList.toggle('is-selected', selected);
+        opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
       ui.showToast(t('toastEffort', { label }));
     });
 
@@ -2400,6 +2484,15 @@ window.Events = (() => {
       }
       if (!e.target.closest('.header-provider-wrap')) {
         ui.closeProviderMenu();
+      }
+      if (!e.target.closest('.header-model-wrap')) {
+        ui.closeModelMenu();
+      }
+      if (!e.target.closest('.header-prompt-mode-wrap')) {
+        ui.closePromptModeMenu();
+      }
+      if (!e.target.closest('.header-effort-wrap')) {
+        ui.closeEffortMenu();
       }
     });
 

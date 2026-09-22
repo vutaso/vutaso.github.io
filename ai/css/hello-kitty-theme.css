@@ -29,8 +29,10 @@
 }
 
 :root[data-theme="hello-kitty"] .main-header {
-  background: color-mix(in srgb, var(--bg-elev) 90%, #ffe8f2 10%);
-  border-bottom-color: var(--border);
+  background: transparent;
+  border-bottom: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 :root[data-theme="hello-kitty"] .sidebar-brand .brand-avatar,
@@ -140,7 +142,7 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
-:root[data-theme="hello-kitty"] .header-title .header-select {
+:root[data-theme="hello-kitty"] .header-selects .header-select {
   border-radius: var(--radius-full);
   background-color: color-mix(in srgb, var(--accent) 8%, var(--bg-hover));
   font-weight: 600;

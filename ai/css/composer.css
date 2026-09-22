@@ -6,7 +6,8 @@
 
 .composer-inner {
   display: flex;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   max-width: var(--content-max-width);
   margin: 0 auto;
@@ -22,7 +23,8 @@
 
 .composer-field {
   position: relative;
-  flex: 1;
+  order: -1;
+  flex: 1 0 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -274,8 +276,8 @@
 }
 
 .composer-attach {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   color: var(--text-dim);
   border-radius: 50%;
@@ -287,11 +289,44 @@
 }
 
 .composer-mic {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  color: var(--text-dim);
-  border-radius: 50%;
+  display: none !important;
+}
+
+.composer .btn-send,
+.composer .btn-stop {
+  width: 30px;
+  height: 30px;
+}
+
+.btn-send .voice-icon {
+  display: none;
+  font-size: 13px;
+}
+
+.btn-send.is-voice .send-icon {
+  display: none;
+}
+
+.btn-send.is-voice .voice-icon {
+  display: block;
+}
+
+.btn-send.is-voice,
+.btn-send.is-voice:hover,
+.btn-send.is-voice:disabled {
+  background: var(--bg-active) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+  opacity: 1;
+  cursor: pointer;
+  transform: none;
+}
+
+.btn-send.is-voice.is-listening,
+.btn-send.is-voice.is-listening:hover {
+  color: #e74c3c !important;
+  background: color-mix(in srgb, #e74c3c 16%, var(--bg-active)) !important;
+  animation: composer-mic-pulse 1.2s ease-in-out infinite;
 }
 
 .composer-mic:hover:not(:disabled) {
@@ -503,9 +538,65 @@
 
 .composer-input::placeholder { color: var(--text-dim); }
 
+.composer .header-selects {
+  position: relative;
+  flex: 0 1 auto;
+  align-self: center;
+  min-width: 0;
+  max-width: calc(100% - 148px);
+  margin-left: auto;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.composer .header-selects .header-select,
+.composer .header-selects .header-provider-btn,
+.composer .header-selects .header-model-btn,
+.composer .header-selects .header-effort-select,
+.composer .header-selects .header-prompt-mode-select {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.composer .header-selects .header-model-btn {
+  line-height: 1;
+}
+
+.composer .header-selects .header-provider-btn,
+.composer .header-selects .header-model-btn {
+  gap: 4px;
+  padding-right: 7px;
+}
+
+.composer .header-provider-btn .provider-logo-wrap,
+.composer .header-provider-btn .provider-logo {
+  width: 12px;
+  height: 12px;
+}
+
+.composer .header-provider-caret {
+  font-size: 7px;
+}
+
+.composer .header-selects.is-provider-open,
+.composer .header-selects.is-model-open,
+.composer .header-selects.is-prompt-open,
+.composer .header-selects.is-effort-open {
+  overflow: visible;
+  z-index: 6;
+}
+
+.composer .header-selects::-webkit-scrollbar {
+  display: none;
+}
+
 .composer-actions {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   display: grid;
   place-items: center;

@@ -97,22 +97,6 @@
         <button id="openSidebarBtn" class="btn btn-icon header-menu" title="Đóng sidebar">
           <span class="icon"><i class="fa-solid fa-bars"></i></span>
         </button>
-        <div class="header-title">
-          <div class="header-selects">
-            <div class="header-provider-wrap">
-              <select id="providerSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
-              <button type="button" id="providerSelectBtn" class="select header-select provider-select header-provider-btn" title="Chọn nhà cung cấp" aria-label="Chọn nhà cung cấp" aria-haspopup="listbox" aria-expanded="false" aria-controls="providerSelectMenu">
-                <span id="providerSelectBtnIcon" class="provider-logo-wrap" aria-hidden="true"></span>
-                <span id="providerSelectBtnLabel" class="header-provider-label"></span>
-                <i class="fa-solid fa-chevron-down header-provider-caret" aria-hidden="true"></i>
-              </button>
-              <div id="providerSelectMenu" class="header-provider-menu hidden" role="listbox" aria-labelledby="providerSelectBtn"></div>
-            </div>
-            <select id="modelSelect" class="select model-select header-select" title="Chọn model" aria-label="Chọn model"></select>
-            <select id="effortSelect" class="select header-effort-select header-select" title="Effort" aria-label="Effort"></select>
-            <select id="systemPromptModeSelect" class="select header-prompt-mode-select header-select" aria-label="Chế độ"></select>
-          </div>
-        </div>
         <div id="shareViewHeader" class="share-view-header hidden" aria-hidden="true">
           <div class="share-view-header-start">
             <div class="brand-avatar brand-avatar-sm" aria-hidden="true">V</div>
@@ -401,9 +385,45 @@
               </div>
             </div>
           </div>
+          <div class="header-selects">
+            <div class="header-provider-wrap">
+              <select id="providerSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <button type="button" id="providerSelectBtn" class="select header-select provider-select header-provider-btn" title="Chọn nhà cung cấp" aria-label="Chọn nhà cung cấp" aria-haspopup="listbox" aria-expanded="false" aria-controls="providerSelectMenu">
+                <span id="providerSelectBtnIcon" class="provider-logo-wrap" aria-hidden="true"></span>
+                <span id="providerSelectBtnLabel" class="header-provider-label"></span>
+                <i class="fa-solid fa-chevron-up header-provider-caret" aria-hidden="true"></i>
+              </button>
+              <div id="providerSelectMenu" class="header-provider-menu hidden" role="listbox" aria-labelledby="providerSelectBtn"></div>
+            </div>
+            <div class="header-model-wrap">
+              <select id="modelSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <button type="button" id="modelSelectBtn" class="select header-select model-select header-model-btn" title="Chọn model" aria-label="Chọn model" aria-haspopup="listbox" aria-expanded="false" aria-controls="modelSelectMenu">
+                <span id="modelSelectBtnLabel" class="header-model-label"></span>
+                <i class="fa-solid fa-chevron-up header-provider-caret" aria-hidden="true"></i>
+              </button>
+              <div id="modelSelectMenu" class="header-model-menu hidden" role="listbox" aria-labelledby="modelSelectBtn"></div>
+            </div>
+            <div class="header-model-wrap header-effort-wrap">
+              <select id="effortSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <button type="button" id="effortSelectBtn" class="select header-select header-effort-select header-model-btn" title="Effort" aria-label="Effort" aria-haspopup="listbox" aria-expanded="false" aria-controls="effortSelectMenu">
+                <span id="effortSelectBtnLabel" class="header-model-label"></span>
+                <i class="fa-solid fa-chevron-up header-provider-caret" aria-hidden="true"></i>
+              </button>
+              <div id="effortSelectMenu" class="header-model-menu hidden" role="listbox" aria-labelledby="effortSelectBtn"></div>
+            </div>
+            <div class="header-model-wrap header-prompt-mode-wrap">
+              <select id="systemPromptModeSelect" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <button type="button" id="systemPromptModeBtn" class="select header-select header-prompt-mode-select header-model-btn" title="Chế độ" aria-label="Chế độ" aria-haspopup="listbox" aria-expanded="false" aria-controls="systemPromptModeMenu">
+                <span id="systemPromptModeBtnLabel" class="header-model-label"></span>
+                <i class="fa-solid fa-chevron-up header-provider-caret" aria-hidden="true"></i>
+              </button>
+              <div id="systemPromptModeMenu" class="header-model-menu hidden" role="listbox" aria-labelledby="systemPromptModeBtn"></div>
+            </div>
+          </div>
           <div class="composer-actions">
             <button id="sendBtn" type="submit" class="btn btn-send" title="Gửi" aria-label="Gửi">
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3l4 4M8 3L4 7M8 3v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg class="send-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3l4 4M8 3L4 7M8 3v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <i class="fa-solid fa-microphone voice-icon" aria-hidden="true"></i>
             </button>
             <button id="stopBtn" type="button" class="btn btn-stop hidden" title="Dừng" aria-label="Dừng">
               <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg>
@@ -815,7 +835,7 @@
           <div class="guide-step-num" aria-hidden="true">2</div>
           <div class="guide-step-body">
             <h3>Chọn model</h3>
-            <p>Dùng dropdown trên header để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.</p>
+            <p>Dùng các nút bên phải ô nhập, cạnh nút gửi, để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.</p>
           </div>
         </section>
         <section class="guide-step">

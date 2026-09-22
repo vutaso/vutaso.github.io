@@ -567,7 +567,7 @@ window.I18n = (() => {
       guideStep1Title: 'Configure API Key',
       guideStep1Body: 'On first visit, this guide appears before Settings. Click <strong>Settings</strong> (gear icon) or close this guide to enter an API key for your provider: OpenAI, Anthropic, DeepSeek, or Gemini. Keys are stored locally and sent only to the matching provider.',
       guideStep2Title: 'Choose a model',
-      guideStep2Body: 'Use the dropdown in the header to select a model. Each model supports different tools — e.g. web search, image generation, thinking. The composer toolbar shows/hides based on the selected model.',
+      guideStep2Body: 'Use the controls to the right of the input, next to Send, to select a model. Each model supports different tools — e.g. web search, image generation, thinking. The composer toolbar shows/hides based on the selected model.',
       guideStep3Title: 'Start chatting',
       guideStep3Body: 'Type a message in the input below. AI responds in real time (streaming). Click <strong>Stop</strong> to cancel — received content is kept.',
       guideStep3Li1: '<kbd>Enter</kbd> — send message',
@@ -1141,7 +1141,7 @@ window.I18n = (() => {
       guideStep1Title: 'Cấu hình API Key',
       guideStep1Body: 'Lần đầu vào app, hướng dẫn này hiện trước Cài đặt. Bấm <strong>Cài đặt</strong> (icon bánh răng) hoặc đóng hướng dẫn để nhập API key cho nhà cung cấp bạn dùng: OpenAI, Anthropic, DeepSeek hoặc Gemini. Key chỉ lưu trên máy bạn và chỉ gửi tới provider tương ứng.',
       guideStep2Title: 'Chọn model',
-      guideStep2Body: 'Dùng dropdown trên header để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.',
+      guideStep2Body: 'Dùng các nút bên phải ô nhập, cạnh nút gửi, để chọn model. Mỗi model hỗ trợ công cụ khác nhau — ví dụ web search, tạo ảnh, thinking. Thanh công cụ composer tự ẩn/hiện theo model đang chọn.',
       guideStep3Title: 'Bắt đầu chat',
       guideStep3Body: 'Gõ tin nhắn vào ô nhập phía dưới. AI trả lời theo thời gian thực (streaming). Bấm <strong>Dừng</strong> để hủy — nội dung đã nhận vẫn được giữ.',
       guideStep3Li1: '<kbd>Enter</kbd> — gửi tin nhắn',
@@ -1715,7 +1715,7 @@ window.I18n = (() => {
       guideStep1Title: 'APIキーの設定',
       guideStep1Body: '初回アクセス時は、このガイドが設定より先に表示されます。<strong>設定</strong>（歯車アイコン）を開くか、このガイドを閉じてから API キーを入力してください: OpenAI, Anthropic, DeepSeek, Gemini。キーはローカルに保存され、該当プロバイダーにのみ送信されます。',
       guideStep2Title: 'モデルを選択',
-      guideStep2Body: 'ヘッダーのドロップダウンでモデルを選択。各モデルは異なるツール（Web検索、画像生成、Thinkingなど）に対応。Composerツールバーは選択モデルに応じて表示/非表示が切り替わります。',
+      guideStep2Body: '入力欄の右、送信ボタンの横でモデルを選択。各モデルは異なるツール（Web検索、画像生成、Thinkingなど）に対応。Composerツールバーは選択モデルに応じて表示/非表示が切り替わります。',
       guideStep3Title: 'チャットを開始',
       guideStep3Body: '下の入力欄にメッセージを入力。AIはリアルタイム（ストリーミング）で応答。<strong>停止</strong>でキャンセル — 受信済みの内容は保持されます。',
       guideStep3Li1: '<kbd>Enter</kbd> — 送信',
@@ -2289,7 +2289,7 @@ window.I18n = (() => {
       guideStep1Title: '配置 API Key',
       guideStep1Body: '首次访问时，会先显示本指南，再进入设置。点击<strong>设置</strong>（齿轮图标）或关闭本指南后，再输入所用服务商的 API Key：OpenAI、Anthropic、DeepSeek 或 Gemini。Key 仅保存在本地，且仅发送至对应服务商。',
       guideStep2Title: '选择模型',
-      guideStep2Body: '使用顶栏下拉菜单选择模型。各模型支持不同工具——如网络搜索、图片生成、Thinking。Composer 工具栏会根据所选模型显示/隐藏。',
+      guideStep2Body: '在输入框右侧、发送按钮旁选择模型。各模型支持不同工具——如网络搜索、图片生成、Thinking。Composer 工具栏会根据所选模型显示/隐藏。',
       guideStep3Title: '开始聊天',
       guideStep3Body: '在下方输入框输入消息。AI 实时（流式）回复。点击<strong>停止</strong>可取消——已接收的内容会保留。',
       guideStep3Li1: '<kbd>Enter</kbd> — 发送消息',
@@ -2596,10 +2596,16 @@ window.I18n = (() => {
     { sel: '#providerSelectBtn', attr: 'aria-label', key: 'selectProvider' },
     { sel: '#modelSelect', attr: 'title', key: 'selectModel' },
     { sel: '#modelSelect', attr: 'aria-label', key: 'selectModel' },
+    { sel: '#modelSelectBtn', attr: 'title', key: 'selectModel' },
+    { sel: '#modelSelectBtn', attr: 'aria-label', key: 'selectModel' },
     { sel: '#effortSelect', attr: 'title', key: 'effortLabel' },
     { sel: '#effortSelect', attr: 'aria-label', key: 'effortLabel' },
+    { sel: '#effortSelectBtn', attr: 'title', key: 'effortLabel' },
+    { sel: '#effortSelectBtn', attr: 'aria-label', key: 'effortLabel' },
     { sel: '#systemPromptModeSelect', attr: 'title', key: 'systemPromptMode' },
     { sel: '#systemPromptModeSelect', attr: 'aria-label', key: 'systemPromptMode' },
+    { sel: '#systemPromptModeBtn', attr: 'title', key: 'systemPromptMode' },
+    { sel: '#systemPromptModeBtn', attr: 'aria-label', key: 'systemPromptMode' },
     { sel: '#toggleExportSelectBtn', attr: 'title', key: 'selectExport' },
     { sel: '#toggleExportSelectBtn', attr: 'aria-label', key: 'selectExport' },
     { sel: '#chatFindBtn', attr: 'title', key: 'chatFind' },
@@ -2878,6 +2884,16 @@ window.I18n = (() => {
       `<option value="${id}">${getSystemPromptModeLabel(id)}</option>`
     ).join('');
     selectEl.value = mode;
+    const labelEl = document.getElementById('systemPromptModeBtnLabel');
+    const menu = document.getElementById('systemPromptModeMenu');
+    if (labelEl) labelEl.textContent = getSystemPromptModeLabel(mode);
+    if (menu) {
+      menu.innerHTML = SYSTEM_PROMPT_MODE_IDS.map((id) =>
+        '<button type="button" class="header-model-option' + (id === mode ? ' is-selected' : '') + '" role="option" data-mode="'
+        + id + '" aria-selected="' + (id === mode ? 'true' : 'false') + '"><span>'
+        + getSystemPromptModeLabel(id) + '</span><i class="fa-solid fa-check header-provider-check" aria-hidden="true"></i></button>'
+      ).join('');
+    }
   };
 
   const getTokenSavePrompt = (loc) => TOKEN_SAVE_PROMPTS[normalizeLocale(loc || locale)] || TOKEN_SAVE_PROMPTS.en;

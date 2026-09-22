@@ -24,8 +24,8 @@
 }
 
 :root[data-theme="nvidia"] .main-header {
-  background: var(--bg-elev);
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 15%, var(--border));
+  background: transparent;
+  border-bottom: 0;
 }
 
 :root[data-theme="nvidia"] .sidebar-brand .brand-avatar,
@@ -143,7 +143,7 @@
   box-shadow: 0 0 0 2px rgba(118, 185, 0, 0.25);
 }
 
-:root[data-theme="nvidia"] .header-title .header-select {
+:root[data-theme="nvidia"] .header-selects .header-select {
   border-radius: 4px;
   background-color: var(--bg-hover);
   font-family: "Exo 2", sans-serif;

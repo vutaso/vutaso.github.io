@@ -41,8 +41,10 @@
 
 :root[data-theme="apple"] .main-header,
 :root[data-theme="apple-dark"] .main-header {
-  background: color-mix(in srgb, var(--bg-elev) 88%, transparent);
-  border-bottom-color: var(--border);
+  background: transparent;
+  border-bottom: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 :root[data-theme="apple"] .brand-avatar,
@@ -199,8 +201,15 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
-:root[data-theme="apple"] .header-title .header-select,
-:root[data-theme="apple-dark"] .header-title .header-select {
+:root[data-theme="apple-dark"] .header-model-menu,
+:root[data-theme="apple-dark"] .header-provider-menu {
+  background: var(--popup-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-theme="apple"] .header-selects .header-select,
+:root[data-theme="apple-dark"] .header-selects .header-select {
   border-radius: var(--radius-full);
   background-color: var(--bg-hover);
   font-weight: 600;

@@ -112,6 +112,8 @@ window.UI = (() => {
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
     els.systemPromptModeSelect = $('#systemPromptModeSelect');
+    els.systemPromptModeBtn = $('#systemPromptModeBtn');
+    els.systemPromptModeMenu = $('#systemPromptModeMenu');
     els.systemPromptModeHint = $('#systemPromptModeHint');
     els.settingsTokenUsageModel = $('#settingsTokenUsageModel');
     els.settingsTokenUsageInput = $('#settingsTokenUsageInput');
@@ -219,12 +221,18 @@ window.UI = (() => {
     els.renameForm = $('#renameForm');
     els.renameInput = $('#renameInput');
     els.modelSelect = $('#modelSelect');
+    els.modelSelectBtn = $('#modelSelectBtn');
+    els.modelSelectBtnLabel = $('#modelSelectBtnLabel');
+    els.modelSelectMenu = $('#modelSelectMenu');
     els.providerSelect = $('#providerSelect');
     els.providerSelectBtn = $('#providerSelectBtn');
     els.providerSelectBtnIcon = $('#providerSelectBtnIcon');
     els.providerSelectBtnLabel = $('#providerSelectBtnLabel');
     els.providerSelectMenu = $('#providerSelectMenu');
     els.effortSelect = $('#effortSelect');
+    els.effortSelectBtn = $('#effortSelectBtn');
+    els.effortSelectBtnLabel = $('#effortSelectBtnLabel');
+    els.effortSelectMenu = $('#effortSelectMenu');
     els.toggleSidebarSearchBtn = $('#toggleSidebarSearchBtn');
     els.sidebarSearchWrap = $('#sidebarSearchWrap');
     els.sidebarSearchInput = $('#sidebarSearchInput');
@@ -530,7 +538,7 @@ window.UI = (() => {
     setStreamingToolBadge(
       article,
       'streaming-search-badge',
-      '<i class="fa-solid fa-globe" aria-hidden="true"></i> ' + t('searchingWeb'),
+      '<i class="fa-solid fa-globe" aria-hidden="true"></i> <span class="streaming-tool-shimmer">' + t('searchingWeb') + '</span>',
       status === 'searching'
     );
   };
@@ -820,7 +828,83 @@ window.UI = (() => {
       + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m)) + '</option>'
     ).join('');
     els.modelSelect.value = selected;
+    const selectedModel = models.find((m) => m.id === selected) || models[0];
+    if (els.modelSelectBtnLabel) {
+      els.modelSelectBtnLabel.textContent = selectedModel
+        ? window.APP_CONFIG.getModelDisplayLabel(selectedModel)
+        : '';
+    }
+    if (els.modelSelectMenu) {
+      els.modelSelectMenu.innerHTML = models.map((m) =>
+        '<button type="button" class="header-model-option' + (m.id === selected ? ' is-selected' : '') + '" role="option" data-model="'
+        + escapeHTML(m.id) + '" aria-selected="' + (m.id === selected ? 'true' : 'false') + '">'
+        + '<span>' + escapeHTML(window.APP_CONFIG.getModelDisplayLabel(m)) + '</span>'
+        + '<i class="fa-solid fa-check header-provider-check" aria-hidden="true"></i>'
+        + '</button>'
+      ).join('');
+    }
     return selected;
+  };
+
+  const closeEffortMenu = () => {
+    if (!els.effortSelectMenu) return;
+    els.effortSelectMenu.classList.add('hidden');
+    if (els.effortSelectBtn) els.effortSelectBtn.setAttribute('aria-expanded', 'false');
+    els.effortSelectBtn?.closest('.header-selects')?.classList.remove('is-effort-open');
+  };
+
+  const toggleEffortMenu = () => {
+    if (!els.effortSelectMenu || !els.effortSelectBtn || els.effortSelectBtn.disabled) return;
+    closeProviderMenu();
+    closeModelMenu();
+    closePromptModeMenu();
+    const open = els.effortSelectMenu.classList.contains('hidden');
+    els.effortSelectMenu.classList.toggle('hidden', !open);
+    els.effortSelectBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    els.effortSelectBtn.closest('.header-selects')?.classList.toggle('is-effort-open', open);
+  };
+
+  const closePromptModeMenu = () => {
+    if (!els.systemPromptModeMenu) return;
+    els.systemPromptModeMenu.classList.add('hidden');
+    if (els.systemPromptModeBtn) els.systemPromptModeBtn.setAttribute('aria-expanded', 'false');
+    els.systemPromptModeBtn?.closest('.header-selects')?.classList.remove('is-prompt-open');
+  };
+
+  const togglePromptModeMenu = () => {
+    if (!els.systemPromptModeMenu || !els.systemPromptModeBtn) return;
+    closeProviderMenu();
+    closeModelMenu();
+    closeEffortMenu();
+    const open = els.systemPromptModeMenu.classList.contains('hidden');
+    els.systemPromptModeMenu.classList.toggle('hidden', !open);
+    els.systemPromptModeBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    els.systemPromptModeBtn.closest('.header-selects')?.classList.toggle('is-prompt-open', open);
+    if (open) {
+      els.systemPromptModeMenu.querySelector('.header-model-option.is-selected')?.scrollIntoView({ block: 'nearest' });
+    }
+  };
+
+  const closeModelMenu = () => {
+    if (!els.modelSelectMenu) return;
+    els.modelSelectMenu.classList.add('hidden');
+    if (els.modelSelectBtn) els.modelSelectBtn.setAttribute('aria-expanded', 'false');
+    els.modelSelectBtn?.closest('.header-selects')?.classList.remove('is-model-open');
+  };
+
+  const toggleModelMenu = () => {
+    if (!els.modelSelectMenu || !els.modelSelectBtn) return;
+    closeProviderMenu();
+    closePromptModeMenu();
+    closeEffortMenu();
+    const open = els.modelSelectMenu.classList.contains('hidden');
+    els.modelSelectMenu.classList.toggle('hidden', !open);
+    els.modelSelectBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    els.modelSelectBtn.closest('.header-selects')?.classList.toggle('is-model-open', open);
+    if (open) {
+      const active = els.modelSelectMenu.querySelector('.header-model-option.is-selected');
+      active?.scrollIntoView({ block: 'nearest' });
+    }
   };
 
   const providerLogoHTML = (providerId) => window.APP_CONFIG.getProviderLogoHTML(providerId);
@@ -850,6 +934,9 @@ window.UI = (() => {
   const toggleProviderMenu = () => {
     if (!els.providerSelectMenu || !els.providerSelectBtn) return;
     closeHeaderDownloadMenu();
+    closeModelMenu();
+    closePromptModeMenu();
+    closeEffortMenu();
     const open = els.providerSelectMenu.classList.contains('hidden');
     els.providerSelectMenu.classList.toggle('hidden', !open);
     els.providerSelectBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -913,26 +1000,42 @@ window.UI = (() => {
   const initEffortSelect = (modelId, currentEffort, thinkingActive) => {
     if (!els.effortSelect) return;
     const levels = window.APP_CONFIG.getEffortLevels(modelId);
+    const wrap = els.effortSelectBtn?.closest('.header-effort-wrap');
     if (!levels.length) {
       els.effortSelect.classList.add('hidden');
       els.effortSelect.disabled = false;
+      wrap?.classList.add('hidden');
       return;
     }
     els.effortSelect.classList.remove('hidden');
+    wrap?.classList.remove('hidden');
     const t = window.I18n.t;
     const fallback = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId)
       ? 'high'
       : window.APP_CONFIG.getDefaultEffortForModel(modelId);
     const normalized = window.APP_CONFIG.normalizeEffortForModel(currentEffort, modelId);
     const selected = levels.includes(normalized) ? normalized : fallback;
+    const labelFor = (lv) => t(EFFORT_LABEL_KEYS[lv] || lv);
     els.effortSelect.innerHTML = levels.map((lv) =>
       '<option value="' + lv + '"' + (lv === selected ? ' selected' : '') + '>'
-      + escapeHTML(t(EFFORT_LABEL_KEYS[lv] || lv)) + '</option>'
+      + escapeHTML(labelFor(lv)) + '</option>'
     ).join('');
+    if (els.effortSelectBtnLabel) els.effortSelectBtnLabel.textContent = labelFor(selected);
+    if (els.effortSelectMenu) {
+      els.effortSelectMenu.innerHTML = levels.map((lv) =>
+        '<button type="button" class="header-model-option' + (lv === selected ? ' is-selected' : '') + '" role="option" data-effort="'
+        + lv + '" aria-selected="' + (lv === selected ? 'true' : 'false') + '"><span>'
+        + escapeHTML(labelFor(lv)) + '</span><i class="fa-solid fa-check header-provider-check" aria-hidden="true"></i></button>'
+      ).join('');
+    }
     const alwaysEnabled = window.APP_CONFIG.modelEffortDropdownAlwaysEnabled(modelId);
     const active = alwaysEnabled || thinkingActive !== false;
     els.effortSelect.disabled = !active;
     els.effortSelect.classList.toggle('is-disabled', !active);
+    if (els.effortSelectBtn) {
+      els.effortSelectBtn.disabled = !active;
+      els.effortSelectBtn.classList.toggle('is-disabled', !active);
+    }
   };
 
   const syncEffortSelect = (modelId, currentEffort, thinkingActive) => {
@@ -4410,6 +4513,9 @@ window.UI = (() => {
   const toggleHeaderDownloadMenu = () => {
     if (!els.headerDownloadMenu || !els.headerDownloadBtn) return;
     closeProviderMenu();
+    closeModelMenu();
+    closePromptModeMenu();
+    closeEffortMenu();
     const open = els.headerDownloadMenu.classList.contains('hidden');
     els.headerDownloadMenu.classList.toggle('hidden', !open);
     els.headerDownloadBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -4557,6 +4663,9 @@ window.UI = (() => {
     closeAllMsgExportMenus,
     closeHeaderDownloadMenu, toggleHeaderDownloadMenu, setHeaderDownloadOptionDisabled,
     closeProviderMenu, toggleProviderMenu, isProviderMenuOpen,
+    closeModelMenu, toggleModelMenu,
+    closePromptModeMenu, togglePromptModeMenu,
+    closeEffortMenu, toggleEffortMenu,
     els
   };
 })();

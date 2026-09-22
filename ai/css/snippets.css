@@ -4,8 +4,8 @@
 }
 
 .composer-snippets {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   color: var(--text-dim);
   border-radius: 50%;
