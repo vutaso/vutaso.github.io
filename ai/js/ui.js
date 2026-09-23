@@ -46,6 +46,8 @@ window.UI = (() => {
     els.settingsLocaleSelect = $('#settingsLocaleSelect');
     els.settingsThemeSelect = $('#settingsThemeSelect');
     els.settingsForm = $('#settingsForm');
+    els.settingsNavSearch = $('#settingsNavSearch');
+    els.settingsNavList = $('#settingsNavList');
     els.toast = $('#toast');
     els.selectionReplyTooltip = $('#selectionReplyTooltip');
     els.openSettingsBtn = $('#openSettingsBtn');
@@ -776,8 +778,16 @@ window.UI = (() => {
     const model = window.APP_CONFIG.getModel(modelId);
     const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : modelId;
     const providerId = model?.provider || window.APP_CONFIG.getModelProvider(modelId) || '';
-    return '<div class="message-model-label" data-provider="' + escapeHTML(providerId) + '" title="' + escapeHTML(modelId) + '">'
-      + escapeHTML(t('responseModelLabel', { model: label }))
+    const parts = t('responseModelLabel', { model: '\u0001' }).split('\u0001');
+    const before = (parts[0] || '').trim();
+    const after = (parts[1] || '').trim();
+    const kicker = (text) => text
+      ? '<span class="message-model-kicker">' + escapeHTML(text) + '</span>'
+      : '';
+    return '<div class="message-model-label" data-provider="' + escapeHTML(providerId) + '" title="' + escapeHTML(t('responseModelLabel', { model: label })) + '">'
+      + kicker(before)
+      + '<span class="message-model-name">' + escapeHTML(label) + '</span>'
+      + kicker(after)
       + '</div>';
   };
 
@@ -1102,29 +1112,18 @@ window.UI = (() => {
   };
 
   const THEME_META_COLORS = {
-    apple: '#f5f5f7',
-    'apple-dark': '#1c1c1e',
-    'hello-kitty': '#fff5f9',
-    cyberpunk: '#0a0a12',
-    nvidia: '#0d0d0d',
-    'liquid-glass': '#0d0d0f'
+    claude: '#faf9f5',
+    'claude-dark': '#262624'
   };
   const THEME_ICONS = {
-    apple: '<i class="fa-brands fa-apple"></i>',
-    'apple-dark': '<i class="fa-solid fa-moon"></i>',
-    'hello-kitty': '<i class="fa-solid fa-heart"></i>',
-    cyberpunk: '<i class="fa-solid fa-bolt"></i>',
-    nvidia: '<i class="fa-solid fa-microchip"></i>',
-    'liquid-glass': '<i class="fa-solid fa-droplet"></i>'
+    claude: '<i class="fa-solid fa-asterisk"></i>',
+    'claude-dark': '<i class="fa-solid fa-moon"></i>'
   };
   const HIGHLIGHT_THEMES = {
-    apple: 'atom-one-light',
-    'apple-dark': 'atom-one-dark',
-    'hello-kitty': 'atom-one-light',
-    cyberpunk: 'atom-one-dark',
-    nvidia: 'atom-one-dark',
-    'liquid-glass': 'atom-one-dark'
+    claude: 'github',
+    'claude-dark': 'github-dark'
   };
+  const LEGACY_DARK_THEMES = new Set(['dark', 'vs-dark', 'apple-dark', 'cyberpunk', 'nvidia', 'liquid-glass']);
 
   const updateHighlightTheme = (theme) => {
     const hl = HIGHLIGHT_THEMES[theme] || 'atom-one-dark';
@@ -1136,8 +1135,19 @@ window.UI = (() => {
 
   const normalizeTheme = (theme) => {
     const fallback = window.APP_CONFIG.DEFAULT_THEME;
-    if (theme === 'dark' || theme === 'vs-dark') return fallback;
+    if (LEGACY_DARK_THEMES.has(theme)) return 'claude-dark';
+    if (theme === 'apple' || theme === 'hello-kitty' || theme === 'light') return 'claude';
     return THEME_META_COLORS[theme] ? theme : fallback;
+  };
+
+  const syncSettingsThemeToggle = (theme) => {
+    const resolved = normalizeTheme(theme);
+    if (els.settingsThemeSelect) els.settingsThemeSelect.value = resolved;
+    document.querySelectorAll('.settings-theme-btn').forEach((btn) => {
+      const on = btn.dataset.themeValue === resolved;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
   };
 
   const setTheme = (theme) => {
@@ -1145,8 +1155,9 @@ window.UI = (() => {
     document.documentElement.setAttribute('data-theme', resolved);
     const mc = document.querySelector('meta[name="theme-color"]');
     if (mc) mc.setAttribute('content', THEME_META_COLORS[resolved]);
-    if (els.themeIcon) els.themeIcon.innerHTML = THEME_ICONS[resolved] || THEME_ICONS['apple-dark'];
+    if (els.themeIcon) els.themeIcon.innerHTML = THEME_ICONS[resolved] || THEME_ICONS.claude;
     updateHighlightTheme(resolved);
+    syncSettingsThemeToggle(resolved);
   };
 
   const renderConversationList = (conversations, currentId, searchQuery = '', snippetMap = null) => {
@@ -3343,7 +3354,49 @@ window.UI = (() => {
     }
   };
 
-  const openSettings = (state) => {
+  const showSettingsTab = (tab) => {
+    const root = els.settingsModal;
+    if (!root) return;
+    const buttons = [...root.querySelectorAll('[data-settings-tab]')];
+    let next = tab;
+    const requested = buttons.find((btn) => btn.dataset.settingsTab === next && !btn.hidden);
+    if (!requested) {
+      const fallback = buttons.find((btn) => !btn.hidden)?.dataset.settingsTab;
+      if (!fallback) return;
+      next = fallback;
+    }
+    buttons.forEach((btn) => {
+      const on = btn.dataset.settingsTab === next;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    root.querySelectorAll('[data-settings-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.settingsPanel !== next;
+    });
+    const main = root.querySelector('.settings-main');
+    if (main) main.scrollTop = 0;
+  };
+
+  const filterSettingsNav = (query) => {
+    const root = els.settingsModal;
+    if (!root) return;
+    const q = window.Utils.normalizeSearchQuery(query);
+    const buttons = [...root.querySelectorAll('[data-settings-tab]')];
+    buttons.forEach((btn) => {
+      const panel = root.querySelector(`[data-settings-panel="${btn.dataset.settingsTab}"]`);
+      const hay = `${btn.textContent || ''} ${panel?.textContent || ''}`;
+      btn.hidden = Boolean(q) && !window.Utils.includesSearch(hay, q);
+    });
+    const any = buttons.some((btn) => !btn.hidden);
+    const empty = root.querySelector('#settingsNavEmpty');
+    const group = root.querySelector('#settingsNavGroupLabel');
+    if (empty) empty.hidden = any;
+    if (group) group.hidden = !any;
+    const active = buttons.find((btn) => btn.classList.contains('is-active') && !btn.hidden);
+    if (!active) showSettingsTab(buttons.find((btn) => !btn.hidden)?.dataset.settingsTab || 'general');
+  };
+
+  const openSettings = (state, opts = {}) => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
@@ -3370,8 +3423,21 @@ window.UI = (() => {
     els.openrouterApiKeyInput.type = 'password';
     els.openrouterApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     updateSettingsTokenUsage(state);
+    const keepTab = !opts.tab && els.settingsModal && !els.settingsModal.classList.contains('hidden');
+    const currentTab = els.settingsModal?.querySelector('[data-settings-tab].is-active')?.dataset.settingsTab;
+    if (!keepTab && els.settingsNavSearch) {
+      els.settingsNavSearch.value = '';
+      filterSettingsNav('');
+    }
+    const tab = opts.tab || (keepTab && currentTab) || 'general';
+    showSettingsTab(tab);
     els.settingsModal.classList.remove('hidden');
-    setTimeout(() => els.apiKeyInput.focus(), 50);
+    if (!keepTab) {
+      setTimeout(() => {
+        if (tab === 'api') els.apiKeyInput?.focus();
+        else els.settingsNavSearch?.focus();
+      }, 50);
+    }
   };
 
   const closeSettings = () => els.settingsModal.classList.add('hidden');
@@ -4631,7 +4697,7 @@ window.UI = (() => {
     scrollToBottom, scrollToBottomIfNear, scrollMessageToTop, scrollMessageToBottom,
     showError, removeError, setStreaming,
     renderComposerAttachments, setDragOverlay,
-    openSettings, closeSettings, updateSettingsTokenUsage, setUsageDashRange, syncSystemPromptModeUI, checkTokenCostWarning,
+    openSettings, closeSettings, showSettingsTab, filterSettingsNav, updateSettingsTokenUsage, setUsageDashRange, syncSystemPromptModeUI, checkTokenCostWarning,
     openTokenCostWarning, closeTokenCostWarning, isTokenCostWarningOpen,
     openBackupRestoreModal, closeBackupRestoreModal, isBackupRestoreOpen,
     applyLocale, openGuide, closeGuide, isGuideModalOpen,

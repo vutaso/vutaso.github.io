@@ -1,0 +1,379 @@
+/* Claude — claude.ai light + dark
+   Tokens: color-background-tertiary canvas, secondary sidebar, primary cards.
+   Coral is reserved for the mark and links. Controls stay neutral. */
+
+:root[data-theme="claude"],
+:root[data-theme="claude-dark"] {
+  --sidebar-width: 260px;
+  --claude-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 1.2 13.05 8.1 18.7 4.2 15.4 9.7 22.6 12 15.4 14.3 18.7 19.8 13.05 15.9 12 22.8 10.95 15.9 5.3 19.8 8.6 14.3 1.4 12 8.6 9.7 5.3 4.2 10.95 8.1Z'/%3E%3C/svg%3E");
+  font-family: "Anthropic Sans", "AnthropicSans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+
+:root[data-theme="claude-dark"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="claude"] body,
+:root[data-theme="claude-dark"] body {
+  font-family: inherit;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text);
+  background: var(--bg);
+}
+
+:root[data-theme="claude"] .main,
+:root[data-theme="claude-dark"] .main {
+  background: var(--bg);
+}
+
+:root[data-theme="claude"] .sidebar,
+:root[data-theme="claude-dark"] .sidebar {
+  background: var(--bg-elev);
+  border-right: 0.5px solid var(--border);
+}
+
+:root[data-theme="claude"] .main-header,
+:root[data-theme="claude-dark"] .main-header {
+  background: transparent;
+  border-bottom: 0;
+}
+
+:root[data-theme="claude"] .sidebar-footer,
+:root[data-theme="claude-dark"] .sidebar-footer {
+  border-top: 0.5px solid var(--border);
+}
+
+/* Spark mark — sidebar only. The empty state stays text, like claude.ai. */
+:root[data-theme="claude"] .sidebar-brand .brand-avatar,
+:root[data-theme="claude-dark"] .sidebar-brand .brand-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+}
+
+:root[data-theme="claude"] .sidebar-brand .brand-avatar::before,
+:root[data-theme="claude-dark"] .sidebar-brand .brand-avatar::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: var(--claude-coral);
+  -webkit-mask: var(--claude-mark) center / contain no-repeat;
+  mask: var(--claude-mark) center / contain no-repeat;
+}
+
+:root[data-theme="claude"] .messages-empty .brand-avatar-lg,
+:root[data-theme="claude-dark"] .messages-empty .brand-avatar-lg,
+:root[data-theme="claude"] .message .avatar,
+:root[data-theme="claude-dark"] .message .avatar {
+  display: none;
+}
+
+:root[data-theme="claude"] .messages-empty h2,
+:root[data-theme="claude-dark"] .messages-empty h2 {
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+:root[data-theme="claude"] .messages-empty-sub,
+:root[data-theme="claude-dark"] .messages-empty-sub {
+  color: var(--text-dim);
+  font-size: 16px;
+}
+
+/* New chat is a quiet row, not a filled button. */
+:root[data-theme="claude"] .sidebar-header .btn-primary,
+:root[data-theme="claude-dark"] .sidebar-header .btn-primary {
+  justify-content: flex-start;
+  height: 36px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+:root[data-theme="claude"] .sidebar-header .btn-primary:hover,
+:root[data-theme="claude-dark"] .sidebar-header .btn-primary:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  box-shadow: none;
+}
+
+:root[data-theme="claude"] .btn-primary,
+:root[data-theme="claude-dark"] .btn-primary {
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: none;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+:root[data-theme="claude"] .btn-primary:hover,
+:root[data-theme="claude-dark"] .btn-primary:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+  box-shadow: none;
+}
+
+:root[data-theme="claude"] .btn-icon,
+:root[data-theme="claude-dark"] .btn-icon,
+:root[data-theme="claude"] .composer-tool-btn,
+:root[data-theme="claude-dark"] .composer-tool-btn {
+  color: var(--text-muted);
+  border-radius: 8px;
+}
+
+:root[data-theme="claude"] .btn-send,
+:root[data-theme="claude-dark"] .btn-send,
+:root[data-theme="claude"] .composer .btn-send,
+:root[data-theme="claude-dark"] .composer .btn-send {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: none;
+}
+
+:root[data-theme="claude"] .btn-send:hover,
+:root[data-theme="claude-dark"] .btn-send:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+  transform: none;
+  box-shadow: none;
+}
+
+:root[data-theme="claude"] .btn-send:disabled,
+:root[data-theme="claude-dark"] .btn-send:disabled {
+  background: var(--bg-active);
+  color: var(--text-dim);
+  box-shadow: none;
+}
+
+:root[data-theme="claude"] .sidebar-section-label,
+:root[data-theme="claude-dark"] .sidebar-section-label {
+  padding: 10px 10px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-dim);
+}
+
+:root[data-theme="claude"] .conversation-item,
+:root[data-theme="claude-dark"] .conversation-item {
+  gap: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border-color: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+:root[data-theme="claude"] .conversation-item .icon,
+:root[data-theme="claude-dark"] .conversation-item .icon {
+  display: none;
+}
+
+:root[data-theme="claude"] .conversation-item .title,
+:root[data-theme="claude-dark"] .conversation-item .title {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+:root[data-theme="claude"] .conversation-item:hover:not(.active),
+:root[data-theme="claude-dark"] .conversation-item:hover:not(.active) {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+:root[data-theme="claude"] .conversation-item.active,
+:root[data-theme="claude-dark"] .conversation-item.active {
+  background: var(--bg-active);
+  color: var(--text);
+  border-color: transparent;
+}
+
+:root[data-theme="claude"] .composer,
+:root[data-theme="claude-dark"] .composer {
+  background: linear-gradient(to top, var(--bg) 78%, transparent);
+}
+
+:root[data-theme="claude"] .composer-inner,
+:root[data-theme="claude-dark"] .composer-inner {
+  background: var(--bg-input);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 20px;
+  box-shadow: var(--composer-shadow);
+  padding: 10px 10px 8px 16px;
+}
+
+:root[data-theme="claude"] .composer-inner:focus-within,
+:root[data-theme="claude-dark"] .composer-inner:focus-within {
+  border-color: var(--border-strong);
+  box-shadow: var(--composer-shadow);
+}
+
+:root[data-theme="claude"] .composer-input,
+:root[data-theme="claude-dark"] .composer-input {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+:root[data-theme="claude"] .composer-input::placeholder,
+:root[data-theme="claude-dark"] .composer-input::placeholder {
+  color: var(--text-dim);
+}
+
+:root[data-theme="claude"] .message,
+:root[data-theme="claude-dark"] .message {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+:root[data-theme="claude"] .message .content,
+:root[data-theme="claude-dark"] .message .content {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+:root[data-theme="claude"] .message.user .body,
+:root[data-theme="claude-dark"] .message.user .body {
+  background: var(--user-bubble);
+  border: 0;
+  border-radius: 16px;
+  padding: 12px 16px;
+  padding-right: 40px;
+}
+
+:root[data-theme="claude"] .message.assistant .body,
+:root[data-theme="claude-dark"] .message.assistant .body {
+  background: transparent;
+}
+
+:root[data-theme="claude"] .message .content a,
+:root[data-theme="claude-dark"] .message .content a {
+  color: var(--claude-coral);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+:root[data-theme="claude"] .message .content blockquote,
+:root[data-theme="claude-dark"] .message .content blockquote {
+  border-left: 2px solid var(--border-strong);
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+:root[data-theme="claude"] .message .content :not(pre) > code,
+:root[data-theme="claude-dark"] .message .content :not(pre) > code {
+  background: var(--code-bg);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+:root[data-theme="claude"] .message .content .code-block,
+:root[data-theme="claude-dark"] .message .content .code-block,
+:root[data-theme="claude"] .message .content pre:not(.code-block-body pre),
+:root[data-theme="claude-dark"] .message .content pre:not(.code-block-body pre) {
+  background: var(--code-bg);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+}
+
+:root[data-theme="claude"] .header-selects .header-select,
+:root[data-theme="claude-dark"] .header-selects .header-select,
+:root[data-theme="claude"] .header-selects .header-model-btn,
+:root[data-theme="claude-dark"] .header-selects .header-model-btn,
+:root[data-theme="claude"] .header-selects .header-provider-btn,
+:root[data-theme="claude-dark"] .header-selects .header-provider-btn {
+  background-color: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+:root[data-theme="claude"] .header-selects .header-select:hover,
+:root[data-theme="claude-dark"] .header-selects .header-select:hover,
+:root[data-theme="claude"] .header-selects .header-model-btn:hover,
+:root[data-theme="claude-dark"] .header-selects .header-model-btn:hover,
+:root[data-theme="claude"] .header-selects .header-provider-btn:hover,
+:root[data-theme="claude-dark"] .header-selects .header-provider-btn:hover {
+  background-color: var(--bg-hover);
+}
+
+:root[data-theme="claude"] .modal-content,
+:root[data-theme="claude-dark"] .modal-content,
+:root[data-theme="claude"] .toast,
+:root[data-theme="claude-dark"] .toast,
+:root[data-theme="claude"] .header-model-menu,
+:root[data-theme="claude-dark"] .header-model-menu,
+:root[data-theme="claude"] .header-provider-menu,
+:root[data-theme="claude-dark"] .header-provider-menu,
+:root[data-theme="claude"] .header-download-menu,
+:root[data-theme="claude-dark"] .header-download-menu,
+:root[data-theme="claude"] .composer-dropdown-menu,
+:root[data-theme="claude-dark"] .composer-dropdown-menu,
+:root[data-theme="claude"] .translate-lang-menu,
+:root[data-theme="claude-dark"] .translate-lang-menu {
+  background: var(--popup-bg);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+:root[data-theme="claude"] .modal-backdrop,
+:root[data-theme="claude-dark"] .modal-backdrop {
+  background: rgba(20, 20, 19, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+:root[data-theme="claude"] .select,
+:root[data-theme="claude-dark"] .select,
+:root[data-theme="claude"] .input,
+:root[data-theme="claude-dark"] .input {
+  background: var(--bg-input);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--text);
+}
+
+:root[data-theme="claude"] .select:focus,
+:root[data-theme="claude-dark"] .select:focus,
+:root[data-theme="claude"] .input:focus,
+:root[data-theme="claude-dark"] .input:focus {
+  border-color: var(--text-dim);
+  box-shadow: 0 0 0 3px rgba(20, 20, 19, 0.12);
+  outline: none;
+}
+
+:root[data-theme="claude-dark"] .select:focus,
+:root[data-theme="claude-dark"] .input:focus {
+  box-shadow: 0 0 0 3px rgba(250, 249, 245, 0.16);
+}
+
+:root[data-theme="claude"] .header-model-option:hover,
+:root[data-theme="claude-dark"] .header-model-option:hover,
+:root[data-theme="claude"] .header-model-option.is-selected,
+:root[data-theme="claude-dark"] .header-model-option.is-selected {
+  background: var(--bg-hover);
+}
+
+:root[data-theme="claude"] .export-select-bar,
+:root[data-theme="claude-dark"] .export-select-bar {
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--border);
+}

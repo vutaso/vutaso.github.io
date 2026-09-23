@@ -4,21 +4,11 @@
       const raw = localStorage.getItem('testchatai');
       if (!raw) return;
       const data = JSON.parse(raw);
-      const themeColors = {
-        dark: '#0c0c0e',
-        'vs-dark': '#1e1e1e',
-        apple: '#f5f5f7',
-        'apple-dark': '#1c1c1e',
-        'hello-kitty': '#fff5f9',
-        cyberpunk: '#0a0a12',
-        nvidia: '#0d0d0d',
-        'liquid-glass': '#0d0d0f'
-      };
-      if (themeColors[data.theme]) {
-        document.documentElement.setAttribute('data-theme', data.theme);
-        const mc = document.querySelector('meta[name="theme-color"]');
-        if (mc) mc.setAttribute('content', themeColors[data.theme]);
-      }
+      const dark = new Set(['dark', 'vs-dark', 'apple-dark', 'cyberpunk', 'nvidia', 'liquid-glass', 'claude-dark']);
+      const theme = dark.has(data.theme) ? 'claude-dark' : 'claude';
+      document.documentElement.setAttribute('data-theme', theme);
+      const mc = document.querySelector('meta[name="theme-color"]');
+      if (mc) mc.setAttribute('content', theme === 'claude-dark' ? '#262624' : '#faf9f5');
     } catch {}
   };
 

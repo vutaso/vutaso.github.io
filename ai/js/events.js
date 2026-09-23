@@ -662,7 +662,7 @@ window.Events = (() => {
 
     for (const id of modelIds) {
       if (!window.APP_CONFIG.hasApiKey(s, id)) {
-        ui.openSettings(s);
+        ui.openSettings(s, { tab: 'api' });
         ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(id));
         return;
       }
@@ -1177,7 +1177,7 @@ window.Events = (() => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
-      ui.openSettings(s);
+      ui.openSettings(s, { tab: 'api' });
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
@@ -1199,7 +1199,7 @@ window.Events = (() => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
     if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
-      ui.openSettings(s);
+      ui.openSettings(s, { tab: 'api' });
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
@@ -1226,13 +1226,13 @@ window.Events = (() => {
       const modelIds = getCompareModels();
       for (const id of modelIds) {
         if (!window.APP_CONFIG.hasApiKey(s, id)) {
-          ui.openSettings(s);
+          ui.openSettings(s, { tab: 'api' });
           ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(id));
           return;
         }
       }
     } else if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
-      ui.openSettings(s);
+      ui.openSettings(s, { tab: 'api' });
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
@@ -2082,7 +2082,7 @@ window.Events = (() => {
       const s = state.get();
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       if (!window.APP_CONFIG.hasApiKey(s, modelId)) {
-        ui.openSettings(s);
+        ui.openSettings(s, { tab: 'api' });
         return;
       }
 
@@ -2126,6 +2126,14 @@ window.Events = (() => {
     };
 
     ui.els.openSettingsBtn.addEventListener('click', () => ui.openSettings(state.get()));
+    ui.els.settingsNavList?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-settings-tab]');
+      if (!btn || btn.hidden) return;
+      ui.showSettingsTab(btn.dataset.settingsTab);
+    });
+    ui.els.settingsNavSearch?.addEventListener('input', () => {
+      ui.filterSettingsNav(ui.els.settingsNavSearch.value);
+    });
     ui.els.guideOpenSettingsBtn?.addEventListener('click', () => {
       ui.closeGuide({ skipOnClose: true });
       if (!state.get().guideSeen) state.set({ guideSeen: true });
@@ -2133,7 +2141,7 @@ window.Events = (() => {
     });
     ui.els.tokenCostWarningSettingsBtn?.addEventListener('click', () => {
       ui.closeTokenCostWarning();
-      ui.openSettings(state.get());
+      ui.openSettings(state.get(), { tab: 'usage' });
     });
     ui.els.providerSelect?.addEventListener('change', () => {
       const providerId = ui.els.providerSelect.value;
@@ -2502,17 +2510,23 @@ window.Events = (() => {
       }
     });
 
-    const THEME_CYCLE = ['apple', 'apple-dark', 'hello-kitty', 'cyberpunk', 'nvidia', 'liquid-glass'];
+    const THEME_CYCLE = ['claude', 'claude-dark'];
 
     ui.els.themeToggleBtn.addEventListener('click', () => {
       const raw = state.get().theme || window.APP_CONFIG.DEFAULT_THEME;
-      const current = raw === 'dark' || raw === 'vs-dark' ? window.APP_CONFIG.DEFAULT_THEME : raw;
-      const idx = THEME_CYCLE.indexOf(current);
+      const idx = THEME_CYCLE.indexOf(raw);
       const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
       state.set({ theme: next });
       ui.setTheme(next);
       ui.rerenderMermaid();
       if (ui.els.settingsThemeSelect) ui.els.settingsThemeSelect.value = next;
+    });
+
+    ui.els.settingsModal?.querySelector('.settings-theme-toggle')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-theme-value]');
+      if (!btn) return;
+      if (ui.els.settingsThemeSelect) ui.els.settingsThemeSelect.value = btn.dataset.themeValue;
+      applySettingsFromForm();
     });
 
     ui.els.toggleApiKeyBtn.addEventListener('click', () => {

@@ -370,7 +370,7 @@ window.Markdown = (() => {
 
   const getMermaidTheme = () => {
     const theme = document.documentElement.getAttribute('data-theme');
-    return theme === 'apple-dark' || theme === 'cyberpunk' || theme === 'nvidia' || theme === 'liquid-glass' ? 'dark' : 'default';
+    return theme === 'claude-dark' || theme === 'dark' || theme === 'vs-dark' ? 'dark' : 'default';
   };
 
   let mermaidReady = false;

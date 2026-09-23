@@ -48,212 +48,64 @@
   --composer-shadow: 0 0 0 1px var(--border), 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
-:root[data-theme="apple"] {
-  --bg: #f5f5f7;
-  --bg-elev: rgba(255, 255, 255, 0.78);
+:root[data-theme="claude"] {
+  --bg: #faf9f5;
+  --bg-elev: #f5f4ed;
   --popup-bg: #ffffff;
-  --bg-input: rgba(255, 255, 255, 0.92);
-  --bg-hover: rgba(0, 0, 0, 0.045);
-  --bg-active: rgba(0, 0, 0, 0.08);
-  --text: #1d1d1f;
-  --text-muted: #6e6e73;
-  --text-dim: #86868b;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.14);
-  --user-bubble: rgba(29, 29, 31, 0.08);
+  --bg-input: #ffffff;
+  --bg-hover: rgba(31, 30, 29, 0.06);
+  --bg-active: rgba(31, 30, 29, 0.1);
+  --text: #141413;
+  --text-muted: #3d3d3a;
+  --text-dim: #73726c;
+  --border: rgba(31, 30, 29, 0.15);
+  --border-strong: rgba(31, 30, 29, 0.3);
+  --user-bubble: #f0eee6;
   --assistant-bubble: transparent;
-  --accent: #1d1d1f;
+  --accent: #141413;
   --accent-hover: #000000;
-  --accent-glow: rgba(0, 0, 0, 0.16);
-  --accent-on: #ffffff;
-  --danger: #ff3b30;
-  --danger-hover: #d70015;
-  --code-bg: #ebebed;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --composer-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --glass-blur: saturate(180%) blur(20px);
+  --accent-glow: transparent;
+  --accent-on: #faf9f5;
+  --claude-coral: #c6613f;
+  --danger: #a73d39;
+  --danger-hover: #7f2c28;
+  --code-bg: #f0eee6;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --composer-shadow: 0 0 0 0.5px rgba(31, 30, 29, 0.15), 0 4px 16px rgba(31, 30, 29, 0.06);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
-:root[data-theme="vs-dark"] {
-  --bg: #1e1e1e;
-  --bg-elev: #252526;
-  --popup-bg: #252526;
-  --bg-input: #3c3c3c;
-  --bg-hover: #2a2d2e;
-  --bg-active: #37373d;
-  --text: #d4d4d4;
-  --text-muted: #b5b5b5;
-  --text-dim: #858585;
-  --border: #3f3f46;
-  --border-strong: #454545;
-  --user-bubble: #264f78;
+:root[data-theme="claude-dark"] {
+  --bg: #262624;
+  --bg-elev: #1f1e1d;
+  --popup-bg: #30302e;
+  --bg-input: #30302e;
+  --bg-hover: rgba(250, 249, 245, 0.08);
+  --bg-active: rgba(250, 249, 245, 0.12);
+  --text: #faf9f5;
+  --text-muted: #c2c0b6;
+  --text-dim: #9c9a92;
+  --border: rgba(222, 220, 209, 0.15);
+  --border-strong: rgba(222, 220, 209, 0.3);
+  --user-bubble: #30302e;
   --assistant-bubble: transparent;
-  --accent: #007acc;
-  --accent-hover: #1c97ea;
-  --accent-glow: rgba(0, 122, 204, 0.28);
-  --danger: #f44747;
-  --danger-hover: #d16969;
-  --code-bg: #1e1e1e;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --composer-shadow: 0 0 0 1px var(--border), 0 4px 24px rgba(0, 0, 0, 0.35);
-}
-
-:root[data-theme="apple-dark"] {
-  --bg: #1c1c1e;
-  --bg-elev: rgba(44, 44, 46, 0.82);
-  --popup-bg: #2c2c2e;
-  --bg-input: rgba(58, 58, 60, 0.92);
-  --bg-hover: rgba(255, 255, 255, 0.06);
-  --bg-active: rgba(255, 255, 255, 0.1);
-  --text: #f5f5f7;
-  --text-muted: #aeaeb2;
-  --text-dim: #8e8e93;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --user-bubble: rgba(255, 255, 255, 0.1);
-  --assistant-bubble: transparent;
-  --accent: #f5f5f7;
+  --accent: #faf9f5;
   --accent-hover: #ffffff;
-  --accent-glow: rgba(255, 255, 255, 0.12);
-  --accent-on: #1d1d1f;
-  --danger: #ff453a;
-  --danger-hover: #ff6961;
-  --code-bg: #2c2c2e;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --composer-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.35);
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --glass-blur: saturate(180%) blur(20px);
-}
-
-:root[data-theme="hello-kitty"] {
-  --bg: #fff5f9;
-  --bg-elev: rgba(255, 255, 255, 0.92);
-  --popup-bg: #ffffff;
-  --bg-input: rgba(255, 252, 254, 0.98);
-  --bg-hover: #ffe8f2;
-  --bg-active: #ffd6e8;
-  --text: #5c3d52;
-  --text-muted: #8b6b7f;
-  --text-dim: #b08a9f;
-  --border: #ffd6e8;
-  --border-strong: #ffb8d4;
-  --user-bubble: #ffe4f2;
-  --assistant-bubble: transparent;
-  --accent: #ff4d8d;
-  --accent-hover: #ff2d7a;
-  --accent-glow: rgba(255, 77, 141, 0.28);
-  --accent-on: #ffffff;
-  --danger: #e40046;
-  --danger-hover: #c7003c;
-  --code-bg: #fff0f6;
-  --shadow: 0 8px 32px rgba(255, 105, 180, 0.12);
-  --shadow-sm: 0 2px 12px rgba(255, 105, 180, 0.08);
-  --composer-shadow: 0 0 0 1px var(--border), 0 4px 24px rgba(255, 105, 180, 0.1);
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --glass-blur: saturate(160%) blur(18px);
-}
-
-:root[data-theme="cyberpunk"] {
-  --bg: #0a0a12;
-  --bg-elev: #12121f;
-  --popup-bg: #12121f;
-  --bg-input: #16162a;
-  --bg-hover: #1c1c34;
-  --bg-active: #252545;
-  --text: #eceaf8;
-  --text-muted: #9d9ab8;
-  --text-dim: #6b6888;
-  --border: #2a2848;
-  --border-strong: #3d3a6b;
-  --user-bubble: rgba(255, 45, 149, 0.14);
-  --assistant-bubble: transparent;
-  --accent: #ff2d95;
-  --accent-hover: #ff5aad;
-  --accent-glow: rgba(255, 45, 149, 0.5);
-  --accent-on: #0a0a12;
-  --danger: #ff3366;
-  --danger-hover: #ff5577;
-  --code-bg: #0d0d18;
-  --shadow: 0 8px 32px rgba(255, 45, 149, 0.18);
-  --shadow-sm: 0 2px 12px rgba(0, 240, 255, 0.12);
-  --composer-shadow: 0 0 0 1px var(--border), 0 0 20px rgba(255, 45, 149, 0.15);
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --neon-cyan: #00f0ff;
-  --neon-purple: #b026ff;
-}
-
-:root[data-theme="liquid-glass"] {
-  --bg: #0d0d0f;
-  --bg-elev: rgba(255, 255, 255, 0.08);
-  --popup-bg: #161618;
-  --bg-input: rgba(255, 255, 255, 0.1);
-  --bg-hover: rgba(255, 255, 255, 0.06);
-  --bg-active: rgba(255, 255, 255, 0.14);
-  --text: #f5f5f7;
-  --text-muted: rgba(255, 255, 255, 0.65);
-  --text-dim: rgba(255, 255, 255, 0.42);
-  --border: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.22);
-  --user-bubble: rgba(255, 255, 255, 0.12);
-  --assistant-bubble: transparent;
-  --accent: #f5f5f7;
-  --accent-hover: #ffffff;
-  --accent-glow: rgba(255, 255, 255, 0.1);
-  --accent-on: #1d1d1f;
-  --danger: #ff453a;
-  --danger-hover: #ff6961;
-  --code-bg: rgba(0, 0, 0, 0.55);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.35);
-  --composer-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 8px 32px rgba(0, 0, 0, 0.35);
-  --radius-sm: 14px;
-  --radius-md: 22px;
-  --radius-lg: 30px;
-  --glass-blur: saturate(180%) blur(28px);
-  --glass-shine: rgba(255, 255, 255, 0.18);
-  --glass-tint: rgba(255, 255, 255, 0.04);
-  --glass-fill: rgba(255, 255, 255, 0.08);
-  --glass-fill-strong: rgba(255, 255, 255, 0.14);
-}
-
-:root[data-theme="nvidia"] {
-  --bg: #0d0d0d;
-  --bg-elev: #1a1a1a;
-  --popup-bg: #1a1a1a;
-  --bg-input: #1f1f1f;
-  --bg-hover: #252525;
-  --bg-active: #2e2e2e;
-  --text: #e8e8e8;
-  --text-muted: #a8a8a8;
-  --text-dim: #6e6e6e;
-  --border: #2a2a2a;
-  --border-strong: #3a3a3a;
-  --user-bubble: rgba(118, 185, 0, 0.14);
-  --assistant-bubble: transparent;
-  --accent: #76b900;
-  --accent-hover: #8fd400;
-  --accent-glow: rgba(118, 185, 0, 0.4);
-  --accent-on: #0d0d0d;
-  --danger: #ff4444;
-  --danger-hover: #ff6666;
-  --code-bg: #141414;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-sm: 0 2px 12px rgba(118, 185, 0, 0.1);
-  --composer-shadow: 0 0 0 1px var(--border), 0 0 18px rgba(118, 185, 0, 0.12);
-  --nvidia-green-bright: #9acd32;
-  --nvidia-green-dim: #5a8f00;
+  --accent-glow: transparent;
+  --accent-on: #141413;
+  --claude-coral: #d97757;
+  --danger: #cd5c58;
+  --danger-hover: #ee8884;
+  --code-bg: #141413;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.35);
+  --composer-shadow: 0 0 0 0.5px rgba(222, 220, 209, 0.15), 0 4px 16px rgba(0, 0, 0, 0.28);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
 :root {

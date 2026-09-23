@@ -9,12 +9,8 @@ window.I18n = (() => {
   };
 
   const THEMES = [
-    { value: 'apple', label: 'Apple Light' },
-    { value: 'apple-dark', label: 'Apple Dark' },
-    { value: 'hello-kitty', label: 'Hello Kitty Pink' },
-    { value: 'cyberpunk', label: 'Cyberpunk Neon' },
-    { value: 'nvidia', label: 'NVIDIA' },
-    { value: 'liquid-glass', label: 'Liquid Glass Dark' },
+    { value: 'claude', label: 'Claude' },
+    { value: 'claude-dark', label: 'Claude Dark' },
   ];
 
   let locale = 'en';
@@ -238,6 +234,14 @@ window.I18n = (() => {
       dropAttach: 'Drop to attach',
       dropAttachHint: 'Images or documents (PDF, Word, Excel...)',
       settingsTitle: 'Settings',
+      settingsSearch: 'Search',
+      settingsNavEmpty: 'No matching settings',
+      settingsTabGeneral: 'General',
+      settingsTabPrompt: 'Prompt',
+      settingsTabUsage: 'Usage',
+      settingsTabData: 'Data',
+      settingsAppearance: 'Appearance',
+      settingsOpenGuide: 'Open guide',
       settingsGuide: 'Getting started guide',
       apiKeyOpenAI: 'API Key (OpenAI)',
       apiKeyAnthropic: 'API Key (Anthropic)',
@@ -261,6 +265,8 @@ window.I18n = (() => {
       systemPrompt: 'System Prompt',
       systemPromptPlaceholder: 'You are a helpful AI assistant. Answer in detail with clear structure...',
       theme: 'Theme',
+      themeLight: 'Light',
+      themeDark: 'Dark',
       language: 'Language',
       clearAllConversations: 'Clear all conversations',
       settingsBackup: 'Backup & restore',
@@ -812,6 +818,14 @@ window.I18n = (() => {
       dropAttach: 'Thả để đính kèm',
       dropAttachHint: 'Ảnh hoặc tài liệu (PDF, Word, Excel...)',
       settingsTitle: 'Cài đặt',
+      settingsSearch: 'Tìm kiếm',
+      settingsNavEmpty: 'Không có mục phù hợp',
+      settingsTabGeneral: 'Chung',
+      settingsTabPrompt: 'Prompt',
+      settingsTabUsage: 'Sử dụng',
+      settingsTabData: 'Dữ liệu',
+      settingsAppearance: 'Giao diện',
+      settingsOpenGuide: 'Mở hướng dẫn',
       settingsGuide: 'Hướng dẫn sử dụng cho người mới',
       apiKeyOpenAI: 'API Key (OpenAI)',
       apiKeyAnthropic: 'API Key (Anthropic)',
@@ -835,6 +849,8 @@ window.I18n = (() => {
       systemPrompt: 'System Prompt',
       systemPromptPlaceholder: 'Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt...',
       theme: 'Theme',
+      themeLight: 'Sáng',
+      themeDark: 'Tối',
       language: 'Ngôn ngữ',
       clearAllConversations: 'Xoá tất cả hội thoại',
       settingsBackup: 'Sao lưu & khôi phục',
@@ -1386,6 +1402,14 @@ window.I18n = (() => {
       dropAttach: 'ドロップして添付',
       dropAttachHint: '画像またはドキュメント (PDF, Word, Excel...)',
       settingsTitle: '設定',
+      settingsSearch: '検索',
+      settingsNavEmpty: '該当する設定がありません',
+      settingsTabGeneral: '一般',
+      settingsTabPrompt: 'プロンプト',
+      settingsTabUsage: '使用量',
+      settingsTabData: 'データ',
+      settingsAppearance: '外観',
+      settingsOpenGuide: 'ガイドを開く',
       settingsGuide: 'はじめての方へ',
       apiKeyOpenAI: 'API Key (OpenAI)',
       apiKeyAnthropic: 'API Key (Anthropic)',
@@ -1409,6 +1433,8 @@ window.I18n = (() => {
       systemPrompt: 'システムプロンプト',
       systemPromptPlaceholder: 'あなたは親切で正確なAIアシスタントです。詳細かつ構造化された回答を...',
       theme: 'テーマ',
+      themeLight: 'ライト',
+      themeDark: 'ダーク',
       language: '言語',
       clearAllConversations: 'すべての会話を削除',
       settingsBackup: 'バックアップと復元',
@@ -1960,6 +1986,14 @@ window.I18n = (() => {
       dropAttach: '拖放以附加',
       dropAttachHint: '图片或文档（PDF、Word、Excel...）',
       settingsTitle: '设置',
+      settingsSearch: '搜索',
+      settingsNavEmpty: '没有匹配的设置',
+      settingsTabGeneral: '通用',
+      settingsTabPrompt: '提示词',
+      settingsTabUsage: '用量',
+      settingsTabData: '数据',
+      settingsAppearance: '外观',
+      settingsOpenGuide: '打开指南',
       settingsGuide: '新手指南',
       apiKeyOpenAI: 'API Key (OpenAI)',
       apiKeyAnthropic: 'API Key (Anthropic)',
@@ -1983,6 +2017,8 @@ window.I18n = (() => {
       systemPrompt: '系统提示词',
       systemPromptPlaceholder: '你是一位智能、尽职且准确的 AI 助手。请详细、结构化地回答...',
       theme: '主题',
+      themeLight: '浅色',
+      themeDark: '深色',
       language: '语言',
       clearAllConversations: '清除所有对话',
       settingsBackup: '备份与恢复',
@@ -2767,11 +2803,29 @@ window.I18n = (() => {
     { sel: '#mdPreviewResizeHandle', attr: 'title', key: 'resizePreview' },
     { sel: '#mdPreviewResizeHandle', attr: 'aria-label', key: 'resizePreview' },
     { sel: '#settingsTitle', key: 'settingsTitle' },
+    { sel: '#settingsNav', attr: 'aria-label', key: 'settingsTitle' },
+    { sel: '#settingsNavSearch', attr: 'placeholder', key: 'settingsSearch' },
+    { sel: '#settingsNavSearch', attr: 'aria-label', key: 'settingsSearch' },
+    { sel: '#settingsNavGroupLabel', key: 'settingsTitle' },
+    { sel: '#settingsNavEmpty', key: 'settingsNavEmpty' },
+    { sel: '#settingsTabGeneralLabel', key: 'settingsTabGeneral' },
+    { sel: '#settingsTabApiLabel', key: 'settingsApiKeys' },
+    { sel: '#settingsTabPromptLabel', key: 'settingsTabPrompt' },
+    { sel: '#settingsTabUsageLabel', key: 'settingsTabUsage' },
+    { sel: '#settingsTabDataLabel', key: 'settingsTabData' },
+    { sel: '#settingsAppearanceTitle', key: 'settingsAppearance' },
+    { sel: '#settingsUsageTitle', key: 'settingsTabUsage' },
+    { sel: '#settingsDataTitle', key: 'settingsTabData' },
+    { sel: '#settingsApiHint', key: 'apiKeyHintAll' },
+    { sel: '#settingsGuideRowLabel', key: 'settingsGuide' },
+    { sel: '#settingsGuideBtnLabel', key: 'settingsOpenGuide' },
+    { sel: '#settingsPricingBtnLabel', key: 'modelPricing' },
     { sel: '#settingsPricingBtn', attr: 'title', key: 'modelPricing' },
     { sel: '#settingsPricingBtn', attr: 'aria-label', key: 'modelPricing' },
     { sel: '#settingsGuideBtn', attr: 'title', key: 'settingsGuide' },
     { sel: '#settingsGuideBtn', attr: 'aria-label', key: 'settingsGuide' },
-    { sel: '#settingsModal .modal-header-actions [data-modal-close]', attr: 'title', key: 'close' },
+    { sel: '#settingsModal .settings-close', attr: 'title', key: 'close' },
+    { sel: '#settingsModal .settings-close', attr: 'aria-label', key: 'close' },
     { sel: '#settingsApiKeysLabel', key: 'settingsApiKeys' },
     { sel: '.settings-api-section', attr: 'title', key: 'apiKeyHintAll' },
     { sel: 'label[for="apiKeyInput"] .settings-api-label-text', key: 'apiKeyLabelOpenAI' },
@@ -2797,7 +2851,10 @@ window.I18n = (() => {
     { sel: '#settingsLanguageLabel', key: 'language' },
     { sel: '#settingsLocaleSelect', attr: 'aria-label', key: 'language' },
     { sel: '#settingsThemeLabel', key: 'theme' },
-    { sel: '#settingsThemeSelect', attr: 'aria-label', key: 'theme' },
+    { sel: '.settings-theme-btn[data-theme-value="claude"]', attr: 'title', key: 'themeLight' },
+    { sel: '.settings-theme-btn[data-theme-value="claude"]', attr: 'aria-label', key: 'themeLight' },
+    { sel: '.settings-theme-btn[data-theme-value="claude-dark"]', attr: 'title', key: 'themeDark' },
+    { sel: '.settings-theme-btn[data-theme-value="claude-dark"]', attr: 'aria-label', key: 'themeDark' },
     { sel: '#clearAllBtn', key: 'clearAllConversations' },
     { sel: '#renameTitle', key: 'renameTitle' },
     { sel: '#renameModal .modal-subtitle', key: 'renameSubtitle' },
@@ -2958,15 +3015,23 @@ window.I18n = (() => {
   const getLocaleLabel = (code) => LOCALE_LABELS[normalizeLocale(code)] || code;
 
   const populateThemeSelect = (selectEl, selected) => {
-    if (!selectEl) return;
     const fallback = document.documentElement.getAttribute('data-theme') || window.APP_CONFIG.DEFAULT_THEME;
-    const resolved = selected || selectEl.value || fallback;
-    const legacy = resolved === 'dark' || resolved === 'vs-dark' ? window.APP_CONFIG.DEFAULT_THEME : resolved;
-    const current = THEMES.some((t) => t.value === legacy) ? legacy : window.APP_CONFIG.DEFAULT_THEME;
-    selectEl.innerHTML = THEMES.map((t) =>
-      `<option value="${t.value}">${t.label}</option>`
-    ).join('');
-    selectEl.value = current;
+    const resolved = selected || selectEl?.value || fallback;
+    const legacyDark = resolved === 'dark' || resolved === 'vs-dark' || resolved === 'apple-dark' || resolved === 'cyberpunk' || resolved === 'nvidia' || resolved === 'liquid-glass';
+    const legacyLight = resolved === 'apple' || resolved === 'hello-kitty' || resolved === 'light';
+    const mapped = legacyDark ? 'claude-dark' : legacyLight ? 'claude' : resolved;
+    const current = THEMES.some((t) => t.value === mapped) ? mapped : window.APP_CONFIG.DEFAULT_THEME;
+    if (selectEl?.tagName === 'SELECT') {
+      selectEl.innerHTML = THEMES.map((t) =>
+        `<option value="${t.value}">${t.label}</option>`
+      ).join('');
+    }
+    if (selectEl) selectEl.value = current;
+    document.querySelectorAll('.settings-theme-btn').forEach((btn) => {
+      const on = btn.dataset.themeValue === current;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
   };
 
   const populateLocaleSelect = (selectEl, selected) => {

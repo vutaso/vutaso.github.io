@@ -238,21 +238,52 @@
 .message .content p { margin: 4px 0; }
 
 .message-model-label {
+  --model-accent: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
   margin-top: 8px;
+  padding: 2px 8px 2px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--model-accent) 16%, transparent);
   font-size: 11px;
-  font-weight: 500;
-  color: var(--text-muted);
+  line-height: 1.35;
   user-select: none;
-  line-height: 1.4;
 }
 
-.message-model-label[data-provider="openai"] { color: color-mix(in srgb, #10a37f 72%, var(--text-muted)); }
-.message-model-label[data-provider="anthropic"] { color: color-mix(in srgb, #d97757 72%, var(--text-muted)); }
-.message-model-label[data-provider="google"] { color: color-mix(in srgb, #4285f4 72%, var(--text-muted)); }
-.message-model-label[data-provider="deepseek"] { color: color-mix(in srgb, #4d6bfe 72%, var(--text-muted)); }
-.message-model-label[data-provider="kimi"] { color: color-mix(in srgb, #6366f1 72%, var(--text-muted)); }
-.message-model-label[data-provider="byteplus"] { color: color-mix(in srgb, #8b5cf6 72%, var(--text-muted)); }
-.message-model-label[data-provider="openrouter"] { color: color-mix(in srgb, #a78bfa 72%, var(--text-muted)); }
+.message-model-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--model-accent);
+  flex-shrink: 0;
+}
+
+.message-model-kicker {
+  color: var(--text-dim);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.message-model-name {
+  color: var(--model-accent);
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message-model-label[data-provider="openai"] { --model-accent: #10a37f; }
+.message-model-label[data-provider="anthropic"] { --model-accent: #d97757; }
+.message-model-label[data-provider="google"] { --model-accent: #4285f4; }
+.message-model-label[data-provider="deepseek"] { --model-accent: #4d6bfe; }
+.message-model-label[data-provider="kimi"] { --model-accent: #6366f1; }
+.message-model-label[data-provider="byteplus"] { --model-accent: #8b5cf6; }
+.message-model-label[data-provider="openrouter"] { --model-accent: #a78bfa; }
 
 .message.streaming .message-model-label {
   opacity: 0.85;
@@ -1847,20 +1878,14 @@ mark.chat-find-hl.is-current {
 
 :root[data-theme="dark"] mark.chat-find-hl,
 :root[data-theme="vs-dark"] mark.chat-find-hl,
-:root[data-theme="apple-dark"] mark.chat-find-hl,
-:root[data-theme="cyberpunk"] mark.chat-find-hl,
-:root[data-theme="nvidia"] mark.chat-find-hl,
-:root[data-theme="liquid-glass"] mark.chat-find-hl {
+:root[data-theme="claude-dark"] mark.chat-find-hl {
   background: #f2cc22;
   color: #161200;
 }
 
 :root[data-theme="dark"] mark.chat-find-hl.is-current,
 :root[data-theme="vs-dark"] mark.chat-find-hl.is-current,
-:root[data-theme="apple-dark"] mark.chat-find-hl.is-current,
-:root[data-theme="cyberpunk"] mark.chat-find-hl.is-current,
-:root[data-theme="nvidia"] mark.chat-find-hl.is-current,
-:root[data-theme="liquid-glass"] mark.chat-find-hl.is-current {
+:root[data-theme="claude-dark"] mark.chat-find-hl.is-current {
   background: #ffe347;
   color: #161200;
   box-shadow: 0 0 0 1px rgba(255, 230, 80, 0.35);

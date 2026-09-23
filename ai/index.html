@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="apple-dark">
+<html lang="en" data-theme="claude-dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0c0c0e" />
+  <meta name="theme-color" content="#262624" />
   <title>Vutaso AI</title>
   <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Orbitron:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
@@ -25,11 +25,7 @@
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/pdf-export.css" />
   <link rel="stylesheet" href="css/artifact-preview.css" />
-  <link rel="stylesheet" href="css/apple-theme.css" />
-  <link rel="stylesheet" href="css/hello-kitty-theme.css" />
-  <link rel="stylesheet" href="css/cyberpunk-theme.css" />
-  <link rel="stylesheet" href="css/nvidia-theme.css" />
-  <link rel="stylesheet" href="css/liquid-glass-theme.css" />
+  <link rel="stylesheet" href="css/claude-theme.css" />
 </head>
 <body>
   <div id="app" class="app" data-sidebar="open">
@@ -482,23 +478,71 @@
   <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="modal-backdrop" data-modal-close></div>
     <div class="modal-content modal-content-settings">
-      <header class="modal-header">
-        <h2 id="settingsTitle">Cài đặt</h2>
-        <div class="modal-header-actions">
-          <a href="pricing.html" id="settingsPricingBtn" class="btn btn-icon" title="Bảng giá model" aria-label="Bảng giá model" target="_blank" rel="noopener noreferrer">
-            <span class="icon"><i class="fa-solid fa-tags"></i></span>
-          </a>
-          <button type="button" id="settingsGuideBtn" class="btn btn-icon" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn sử dụng">
-            <span class="icon"><i class="fa-solid fa-circle-question"></i></span>
-          </button>
-          <button type="button" class="btn btn-icon" data-modal-close title="Đóng">
-            <span class="icon"><i class="fa-solid fa-xmark"></i></span>
-          </button>
-        </div>
-      </header>
-      <form id="settingsForm" class="modal-body settings-form">
-        <section class="settings-section settings-api-section" aria-labelledby="settingsApiKeysLabel" title="">
-          <p id="settingsApiKeysLabel" class="settings-section-label">API Keys</p>
+      <h2 id="settingsTitle" class="visually-hidden">Cài đặt</h2>
+      <button type="button" class="btn btn-icon settings-close" data-modal-close title="Đóng" aria-label="Đóng">
+        <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+      </button>
+      <div class="settings-shell">
+        <aside id="settingsNav" class="settings-nav" aria-label="Cài đặt">
+          <label class="settings-search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="settingsNavSearch" type="search" placeholder="Tìm kiếm" autocomplete="off" aria-label="Tìm kiếm" />
+          </label>
+          <p id="settingsNavGroupLabel" class="settings-nav-group">Cài đặt</p>
+          <div id="settingsNavList" class="settings-nav-list" role="tablist" aria-orientation="vertical">
+            <button type="button" id="settingsTabGeneral" class="settings-nav-item is-active" role="tab" data-settings-tab="general" aria-selected="true" aria-controls="settingsPanelGeneral">
+              <i class="fa-solid fa-gear" aria-hidden="true"></i>
+              <span id="settingsTabGeneralLabel">Chung</span>
+            </button>
+            <button type="button" id="settingsTabApi" class="settings-nav-item" role="tab" data-settings-tab="api" aria-selected="false" aria-controls="settingsPanelApi">
+              <i class="fa-solid fa-key" aria-hidden="true"></i>
+              <span id="settingsTabApiLabel">API Keys</span>
+            </button>
+            <button type="button" id="settingsTabPrompt" class="settings-nav-item" role="tab" data-settings-tab="prompt" aria-selected="false" aria-controls="settingsPanelPrompt">
+              <i class="fa-solid fa-message" aria-hidden="true"></i>
+              <span id="settingsTabPromptLabel">Prompt</span>
+            </button>
+            <button type="button" id="settingsTabUsage" class="settings-nav-item" role="tab" data-settings-tab="usage" aria-selected="false" aria-controls="settingsPanelUsage">
+              <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+              <span id="settingsTabUsageLabel">Sử dụng</span>
+            </button>
+            <button type="button" id="settingsTabData" class="settings-nav-item" role="tab" data-settings-tab="data" aria-selected="false" aria-controls="settingsPanelData">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              <span id="settingsTabDataLabel">Dữ liệu</span>
+            </button>
+          </div>
+          <p id="settingsNavEmpty" class="settings-nav-empty" hidden>Không có mục phù hợp</p>
+        </aside>
+        <form id="settingsForm" class="settings-main">
+        <section id="settingsPanelGeneral" class="settings-panel" data-settings-panel="general" role="tabpanel" aria-labelledby="settingsTabGeneral">
+          <h3 id="settingsAppearanceTitle" class="settings-panel-title">Giao diện</h3>
+          <div class="settings-row">
+            <span id="settingsThemeLabel">Theme</span>
+            <div class="settings-theme-toggle" role="group" aria-labelledby="settingsThemeLabel">
+              <button type="button" class="settings-theme-btn" data-theme-value="claude" aria-pressed="false" title="Sáng" aria-label="Sáng">
+                <i class="fa-solid fa-sun" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="settings-theme-btn is-active" data-theme-value="claude-dark" aria-pressed="true" title="Tối" aria-label="Tối">
+                <i class="fa-solid fa-moon" aria-hidden="true"></i>
+              </button>
+              <input type="hidden" id="settingsThemeSelect" name="theme" value="claude-dark" />
+            </div>
+          </div>
+          <div class="settings-row">
+            <label id="settingsLanguageLabel" for="settingsLocaleSelect">Language</label>
+            <select id="settingsLocaleSelect" name="locale" class="select settings-locale-select" aria-label="Language"></select>
+          </div>
+          <div class="settings-row">
+            <p id="settingsGuideRowLabel" class="settings-row-label">Hướng dẫn sử dụng cho người mới</p>
+            <button type="button" id="settingsGuideBtn" class="btn btn-ghost settings-inline-btn" title="Hướng dẫn sử dụng cho người mới" aria-label="Hướng dẫn sử dụng">
+              <span id="settingsGuideBtnLabel">Mở hướng dẫn</span>
+            </button>
+          </div>
+        </section>
+
+        <section id="settingsPanelApi" class="settings-panel settings-api-section" data-settings-panel="api" role="tabpanel" aria-labelledby="settingsTabApi" hidden>
+          <h3 id="settingsApiKeysLabel" class="settings-panel-title">API Keys</h3>
+          <p id="settingsApiHint" class="settings-panel-hint">Lưu cục bộ, chỉ gửi tới provider tương ứng.</p>
           <div class="settings-api-grid">
             <div class="settings-api-row">
               <label for="apiKeyInput"><span class="settings-provider-logo" data-provider-logo="openai"></span><span class="settings-api-label-text">OpenAI</span></label>
@@ -557,14 +601,14 @@
           </div>
         </section>
 
-        <section class="settings-section">
-          <div class="field settings-prompt-field">
-            <label for="systemPromptInput">System Prompt</label>
-            <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="3" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
-            <p class="field-hint settings-prompt-mode-hint" id="systemPromptModeHint">Trả lời chi tiết, có cấu trúc, kèm ví dụ khi cần.</p>
-          </div>
+        <section id="settingsPanelPrompt" class="settings-panel" data-settings-panel="prompt" role="tabpanel" aria-labelledby="settingsTabPrompt" hidden>
+          <h3 class="settings-panel-title"><label for="systemPromptInput">System Prompt</label></h3>
+          <textarea id="systemPromptInput" class="input textarea settings-prompt" rows="8" placeholder="Bạn là trợ lý AI thông minh, tận tâm và chính xác. Trả lời chi tiết, có cấu trúc bằng tiếng Việt..."></textarea>
+          <p class="field-hint settings-prompt-mode-hint" id="systemPromptModeHint">Trả lời chi tiết, có cấu trúc, kèm ví dụ khi cần.</p>
         </section>
 
+        <section id="settingsPanelUsage" class="settings-panel" data-settings-panel="usage" role="tabpanel" aria-labelledby="settingsTabUsage" hidden>
+          <h3 id="settingsUsageTitle" class="settings-panel-title">Sử dụng</h3>
         <section class="settings-section settings-token-usage-section" aria-labelledby="settingsTokenUsageLabel" title="">
           <div class="settings-token-usage-head">
             <p id="settingsTokenUsageLabel" class="settings-section-label settings-token-usage-label">Token đã tiêu thụ</p>
@@ -615,7 +659,14 @@
           <p class="settings-usage-models-label" id="settingsUsageDashModelsLabel" hidden>Theo model</p>
           <ul class="settings-usage-models" id="usageDashModels"></ul>
         </section>
+          <a href="pricing.html" id="settingsPricingBtn" class="settings-row settings-row-link" title="Bảng giá model" aria-label="Bảng giá model" target="_blank" rel="noopener noreferrer">
+            <span id="settingsPricingBtnLabel">Bảng giá model</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          </a>
+        </section>
 
+        <section id="settingsPanelData" class="settings-panel" data-settings-panel="data" role="tabpanel" aria-labelledby="settingsTabData" hidden>
+          <h3 id="settingsDataTitle" class="settings-panel-title">Dữ liệu</h3>
         <section class="settings-section settings-backup-section" aria-labelledby="settingsBackupLabel">
           <p id="settingsBackupLabel" class="settings-section-label">Sao lưu &amp; khôi phục</p>
           <p id="settingsBackupHint" class="settings-backup-hint">Xuất hội thoại, thư viện prompt và cài đặt ra file JSON. Khôi phục khi đổi trình duyệt hoặc xóa dữ liệu máy.</p>
@@ -635,30 +686,18 @@
           </div>
           <input type="file" id="backupFileInput" accept="application/json,.json" hidden />
         </section>
-
-        <footer class="settings-footer">
-          <div class="settings-footer-prefs">
-            <div class="field field-row settings-pref">
-              <label id="settingsLanguageLabel" for="settingsLocaleSelect">Language</label>
-              <select id="settingsLocaleSelect" name="locale" class="select settings-locale-select" aria-label="Language"></select>
-            </div>
-            <div class="field field-row settings-pref">
-              <label id="settingsThemeLabel" for="settingsThemeSelect">Theme</label>
-              <select id="settingsThemeSelect" name="theme" class="select settings-theme-select" aria-label="Theme"></select>
-            </div>
-          </div>
           <button type="button" id="clearAllBtn" class="btn btn-danger settings-clear-btn">Xoá tất cả hội thoại</button>
-        </footer>
-
-        <div class="settings-legal-footer">
-          <nav class="settings-legal-links" aria-label="Legal">
-            <a href="privacy.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-            <span class="settings-legal-sep" aria-hidden="true">·</span>
-            <a href="terms.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-          </nav>
-          <p class="settings-credit">Developed by VUTASO.com. All rights reserved</p>
-        </div>
-      </form>
+          <div class="settings-legal-footer">
+            <nav class="settings-legal-links" aria-label="Legal">
+              <a href="privacy.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+              <span class="settings-legal-sep" aria-hidden="true">·</span>
+              <a href="terms.html" class="settings-legal-link" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+            </nav>
+            <p class="settings-credit">Developed by VUTASO.com. All rights reserved</p>
+          </div>
+        </section>
+        </form>
+      </div>
     </div>
   </div>
 

@@ -25,11 +25,9 @@
   ui.bindSidebarResize();
   ui.bindComposerViewport();
   let theme = state.theme || window.APP_CONFIG.DEFAULT_THEME;
-  if (theme === 'dark' || theme === 'vs-dark') {
-    theme = window.APP_CONFIG.DEFAULT_THEME;
-    window.Storage.set({ theme });
-  }
   ui.setTheme(theme);
+  theme = document.documentElement.getAttribute('data-theme');
+  if (state.theme !== theme) window.Storage.set({ theme });
   ui.initModelSelect(state.currentModel);
   ui.syncSystemPromptModeUI(state);
   ui.initTranslateLangMenu();
@@ -82,13 +80,13 @@
             window.Storage.set({ guideSeen: true });
             const latest = window.Storage.get();
             if (!window.APP_CONFIG.hasApiKey(latest, latest.currentModel)) {
-              ui.openSettings(latest);
+              ui.openSettings(latest, { tab: 'api' });
             }
           }
         });
         return;
       }
-      ui.openSettings(state);
+      ui.openSettings(state, { tab: 'api' });
     }, 200);
   } else if (!window.Utils.prefersCoarsePointer()) {
     ui.els.composerInput.focus();

@@ -527,7 +527,7 @@ window.APP_CONFIG = {
     return base ? base + '\n\n' + hints.join(' ') : hints.join(' ');
   },
   DEFAULT_SYSTEM_PROMPT: 'Bạn là một trợ lý AI thông minh, tận tâm và chính xác. Hãy tuân thủ các nguyên tắc sau:\n\n1. Suy nghĩ từng bước trước khi trả lời các câu hỏi phức tạp.\n2. Trả lời chi tiết, đầy đủ và có cấu trúc rõ ràng. Sử dụng markdown để định dạng khi cần (tiêu đề, danh sách, bảng, code block).\n3. Nếu không chắc chắn, hãy nói rõ giới hạn kiến thức của bạn thay vì bịa đặt.\n4. Khi được hỏi về code hoặc kỹ thuật, hãy giải thích nguyên lý đằng sau, không chỉ đưa ra code.\n5. Luôn trả lời bằng tiếng Việt, trừ khi người dùng yêu cầu ngôn ngữ khác.\n6. Đưa ra ví dụ cụ thể khi có thể để minh họa cho câu trả lời.',
-  DEFAULT_THEME: 'apple-dark',
+  DEFAULT_THEME: 'claude-dark',
 
   OPENAI_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
   RESPONSES_ENDPOINT: 'https://api.openai.com/v1/responses',
