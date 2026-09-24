@@ -47,14 +47,12 @@ Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github
 
 | Nhà cung cấp | Model | Web search | Tạo ảnh | Thinking |
 |--------------|-------|:----------:|:-------:|:--------:|
-| **OpenAI** | GPT-5.6 Luna, GPT-5.6 Terra, GPT-5.6 Sol | ✓ | ✓ | ✓ |
+| **OpenAI** | GPT-6 Luna, GPT-6 Sol | ✓ | ✓ | ✓ |
 | **Anthropic** | Claude Haiku 4.5, Sonnet 5, Opus 4.8, Opus 5 | ✓ | — | ✓ |
 | **DeepSeek** | DeepSeek V4 Flash, V4 Pro | — | — | ✓ |
-| **Google** | Gemini 3.8 Flash | ✓ | ✓ | ✓ |
-| **Kimi** | K2.5, K2.6, K2.7 Code, K2.7 Code HighSpeed | — | — | ✓ |
-| **OpenRouter** | GLM Flash Latest, DeepSeek Flash Latest, GPT OSS 120B, DeepSeek V4.1 Flash, GPT-5.6 Luna/Terra/Sol, Gemini 3.8 Flash, Kimi K2.6, Kimi K3, Claude Haiku/Sonnet/Opus Latest | — | — | ✓ |
+| **OpenRouter** | GLM Flash/Latest, DeepSeek Flash Latest, GPT Luna/Sol Latest, Gemini Flash Latest, Kimi Latest, Grok Latest, Claude Haiku/Sonnet/Opus Latest | — | — | ✓ |
 
-> Model **OpenRouter** hỗ trợ reasoning và vision; web search / tạo ảnh trong app chỉ có trên provider gốc (OpenAI, Anthropic, Google).
+> Model **OpenRouter** hỗ trợ reasoning và vision; web search / tạo ảnh trong app chỉ có trên provider gốc (OpenAI, Anthropic).
 
 ---
 

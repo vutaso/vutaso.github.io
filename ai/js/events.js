@@ -2547,18 +2547,6 @@ window.Events = (() => {
       ui.els.deepseekApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
     });
 
-    ui.els.toggleGeminiApiKeyBtn.addEventListener('click', () => {
-      const isPwd = ui.els.geminiApiKeyInput.type === 'password';
-      ui.els.geminiApiKeyInput.type = isPwd ? 'text' : 'password';
-      ui.els.geminiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
-    });
-
-    ui.els.toggleKimiApiKeyBtn.addEventListener('click', () => {
-      const isPwd = ui.els.kimiApiKeyInput.type === 'password';
-      ui.els.kimiApiKeyInput.type = isPwd ? 'text' : 'password';
-      ui.els.kimiApiKeyIcon.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
-    });
-
     ui.els.toggleOpenrouterApiKeyBtn.addEventListener('click', () => {
       const isPwd = ui.els.openrouterApiKeyInput.type === 'password';
       ui.els.openrouterApiKeyInput.type = isPwd ? 'text' : 'password';
@@ -2772,12 +2760,10 @@ window.Events = (() => {
         const apiKey = ui.els.apiKeyInput.value.trim();
         const anthropicApiKey = ui.els.anthropicApiKeyInput.value.trim();
         const deepseekApiKey = ui.els.deepseekApiKeyInput.value.trim();
-        const geminiApiKey = ui.els.geminiApiKeyInput.value.trim();
-        const kimiApiKey = ui.els.kimiApiKeyInput.value.trim();
         const openrouterApiKey = ui.els.openrouterApiKeyInput.value.trim();
         const theme = ui.els.settingsThemeSelect?.value || window.APP_CONFIG.DEFAULT_THEME;
         nextState = {
-          apiKey, anthropicApiKey, deepseekApiKey, geminiApiKey, kimiApiKey, openrouterApiKey,
+          apiKey, anthropicApiKey, deepseekApiKey, openrouterApiKey,
           ...promptPatch, theme, locale
         };
       }
@@ -2875,8 +2861,6 @@ window.Events = (() => {
       ui.els.apiKeyInput,
       ui.els.anthropicApiKeyInput,
       ui.els.deepseekApiKeyInput,
-      ui.els.geminiApiKeyInput,
-      ui.els.kimiApiKeyInput,
       ui.els.openrouterApiKeyInput,
       ui.els.systemPromptInput,
     ].forEach((input) => {

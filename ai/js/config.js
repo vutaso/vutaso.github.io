@@ -2,66 +2,50 @@ window.APP_CONFIG = {
   STORAGE_KEY: 'testchatai',
 
   MODELS: [
-    { id: 'gpt-5.6-luna', label: 'GPT-5.6 Luna', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
-    { id: 'gpt-5.6-sol', label: 'GPT-5.6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true },
+    { id: 'gpt-6-luna', label: 'GPT-6 Luna', provider: 'openai', webSearch: true, imageGen: true, thinking: true, maxOutputTokens: 128000 },
+    { id: 'gpt-6-sol', label: 'GPT-6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true, maxOutputTokens: 128000 },
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-gpt-oss-120b', apiModel: 'openai/gpt-oss-120b', label: 'GPT OSS 120B (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'openrouter-deepseek-v4.1-flash', apiModel: 'deepseek/deepseek-v4.1-flash', label: 'DeepSeek V4.1 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-gpt-5.6-luna', apiModel: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-5.6-terra', apiModel: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-5.6-sol', apiModel: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gemini-3.8-flash', apiModel: 'google/gemini-3.8-flash', label: 'Gemini 3.8 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-kimi-k2.6', apiModel: 'moonshotai/kimi-k2.6', label: 'Kimi K2.6 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-kimi-k3', apiModel: 'moonshotai/kimi-k3', label: 'Kimi K3 (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-luna-latest', apiModel: '~openai/gpt-luna-latest', label: 'GPT Luna Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-sol-latest', apiModel: '~openai/gpt-sol-latest', label: 'GPT Sol Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gemini-flash-latest', apiModel: '~google/gemini-flash-latest', label: 'Gemini Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
+    { id: 'openrouter-kimi-latest', apiModel: '~moonshotai/kimi-latest', label: 'Kimi Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-grok-latest', apiModel: '~x-ai/grok-latest', label: 'Grok Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-claude-haiku-latest', apiModel: '~anthropic/claude-haiku-latest', label: 'Claude Haiku Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
     { id: 'openrouter-claude-sonnet-latest', apiModel: '~anthropic/claude-sonnet-latest', label: 'Claude Sonnet Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-claude-opus-latest', apiModel: '~anthropic/claude-opus-latest', label: 'Claude Opus Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false },
-    { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', provider: 'google', webSearch: true, imageGen: true, thinking: true },
-    { id: 'kimi-k2.5', label: 'Kimi K2.5', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
-    { id: 'kimi-k2.6', label: 'Kimi K2.6', provider: 'kimi', webSearch: false, imageGen: false, thinking: true },
-    { id: 'kimi-k2.7-code', label: 'Kimi K2.7 Code', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true },
-    { id: 'kimi-k2.7-code-highspeed', label: 'Kimi K2.7 Code HighSpeed', provider: 'kimi', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true }
+    { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false }
   ],
 
-  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-09-20
+  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-09-24
   // Nguồn: openai.com/developers, platform.claude.com, api-docs.deepseek.com,
   //        ai.google.dev/gemini-api/docs/pricing, platform.kimi.ai, openrouter.ai/api/v1/models
   MODEL_PRICING: {
-    'gpt-5.6-sol': { input: 5.00, output: 30.00 },
-    'gpt-5.6-terra': { input: 2.00, output: 12.00 },
-    'gpt-5.6-luna': { input: 0.20, output: 1.20 },
+    'gpt-6-sol': { input: 2.00, output: 10.00 },
+    'gpt-6-luna': { input: 0.10, output: 0.50 },
     'claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'claude-opus-5': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'openrouter-glm-flash-latest': { input: 0.075, output: 0.25 },
+    'openrouter-glm-latest': { input: 0.56, output: 2.50 },
     'openrouter-deepseek-flash-latest': { input: 0.13, output: 0.52 },
-    'openrouter-gpt-oss-120b': { input: 0.15, output: 0.60 },
-    'openrouter-deepseek-v4.1-flash': { input: 0.15, output: 0.60 },
-    'openrouter-gpt-5.6-luna': { input: 0.20, output: 1.20 },
-    'openrouter-gemini-3.8-flash': { input: 0.75, output: 3.75 },
-    'openrouter-kimi-k2.6': { input: 0.95, output: 4.00 },
+    'openrouter-gpt-luna-latest': { input: 0.10, output: 0.50 },
+    'openrouter-kimi-latest': { input: 1.40, output: 10.75 },
+    'openrouter-grok-latest': { input: 1.60, output: 4.80 },
     'openrouter-claude-haiku-latest': { input: 1.00, output: 5.00 },
-    'openrouter-kimi-k3': { input: 1.70, output: 8.50 },
-    'openrouter-gpt-5.6-sol': { input: 2.00, output: 10.00 },
+    'openrouter-gpt-sol-latest': { input: 2.00, output: 10.00 },
+    'openrouter-gemini-flash-latest': { input: 0.75, output: 3.75 },
     'openrouter-claude-sonnet-latest': { input: 2.00, output: 10.00 },
-    'openrouter-gpt-5.6-terra': { input: 2.00, output: 12.00 },
     'openrouter-claude-opus-latest': { input: 5.00, output: 25.00 },
-    'deepseek-v4-pro': { input: 0.435, output: 0.87 },
-    'gemini-3.8-flash': { input: 0.75, output: 3.75 },
-    'kimi-k2.5': { input: 0.60, output: 3.00 },
-    'kimi-k2.6': { input: 0.95, output: 4.00 },
-    'kimi-k2.7-code': { input: 0.95, output: 4.00 },
-    'kimi-k2.7-code-highspeed': { input: 1.90, output: 8.00 }
+    'deepseek-v4-pro': { input: 0.435, output: 0.87 }
   },
 
   TOKEN_COST_WARNING_USD: 1,
@@ -81,8 +65,6 @@ window.APP_CONFIG = {
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'deepseek', label: 'DeepSeek' },
-    { id: 'kimi', label: 'Kimi' },
-    { id: 'google', label: 'Gemini' },
     { id: 'openrouter', label: 'OpenRouter' }
   ],
 
@@ -113,26 +95,22 @@ window.APP_CONFIG = {
   },
 
   MODEL_EFFORT_LEVELS: {
-    'gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
-    'gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'gpt-6-sol': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'gpt-6-luna': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
     'claude-opus-4-8': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
-    'gemini-3.8-flash': ['minimal', 'low', 'medium', 'high'],
-    'openrouter-gpt-oss-120b': ['low', 'medium', 'high'],
-    'openrouter-deepseek-v4.1-flash': ['high', 'xhigh'],
     'openrouter-deepseek-flash-latest': ['low', 'high', 'max'],
     'openrouter-glm-flash-latest': ['low', 'high', 'max'],
+    'openrouter-glm-latest': ['low', 'high', 'max'],
     'openrouter-claude-haiku-latest': ['low', 'medium', 'high'],
     'openrouter-claude-sonnet-latest': ['low', 'medium', 'high', 'max'],
     'openrouter-claude-opus-latest': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gemini-3.8-flash': ['minimal', 'low', 'medium', 'high'],
-    'openrouter-kimi-k2.6': ['low', 'medium', 'high'],
-    'openrouter-kimi-k3': ['max'],
-    'openrouter-gpt-5.6-sol': ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max']
+    'openrouter-kimi-latest': ['low', 'medium', 'high'],
+    'openrouter-grok-latest': ['low', 'medium', 'high'],
+    'openrouter-gpt-sol-latest': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-gpt-luna-latest': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'openrouter-gemini-flash-latest': ['minimal', 'low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -228,13 +206,12 @@ window.APP_CONFIG = {
   },
 
   getDefaultEffortForModel(modelId) {
-    if (modelId === 'gemini-3.8-flash' || modelId === 'openrouter-gemini-3.8-flash') return 'medium';
-    if (modelId === 'openrouter-gpt-oss-120b') return 'medium';
-    if (modelId === 'openrouter-deepseek-v4.1-flash' || modelId === 'openrouter-deepseek-flash-latest') return 'high';
-    if (modelId === 'gpt-5.6-luna' || modelId === 'openrouter-gpt-5.6-luna') return 'low';
-    if (modelId === 'gpt-5.6-terra' || modelId === 'openrouter-gpt-5.6-terra') return 'medium';
-    if (modelId === 'openrouter-kimi-k3' || modelId === 'openrouter-glm-flash-latest') return 'max';
-    if (modelId === 'gpt-5.6-sol' || modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-k2.6' || modelId === 'openrouter-gpt-5.6-sol') return 'high';
+    if (modelId === 'openrouter-gemini-flash-latest') return 'medium';
+    if (modelId === 'openrouter-deepseek-flash-latest') return 'high';
+    if (modelId === 'gpt-6-luna' || modelId === 'gpt-6-sol' || modelId === 'openrouter-gpt-luna-latest' || modelId === 'openrouter-gpt-sol-latest') return 'medium';
+    if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest') return 'max';
+    if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
+    if (modelId === 'openrouter-grok-latest') return 'medium';
     return this.DEFAULT_EFFORT;
   },
 
@@ -370,8 +347,6 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
     if (provider === 'openrouter') return state.openrouterApiKey || '';
-    if (provider === 'google') return state.geminiApiKey || '';
-    if (provider === 'kimi') return state.kimiApiKey || '';
     return state.apiKey || '';
   },
 
@@ -381,8 +356,6 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
     if (provider === 'openrouter') return 'Enter your OpenRouter API key in Settings first';
-    if (provider === 'google') return 'Enter your Gemini API key in Settings first';
-    if (provider === 'kimi') return 'Enter your Kimi API key in Settings first';
     return 'Enter your API key in Settings first';
   },
 
@@ -392,8 +365,6 @@ window.APP_CONFIG = {
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
     if (provider === 'openrouter') return 'No OpenRouter API key. Open Settings to enter one.';
-    if (provider === 'google') return 'No Gemini API key. Open Settings to enter one.';
-    if (provider === 'kimi') return 'No Kimi API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 

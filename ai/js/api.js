@@ -1122,10 +1122,15 @@ window.API = (() => {
     }
 
     const body = {
-      model,
+      model: window.APP_CONFIG.getApiModel(model),
       input,
       tools,
-      stream: true
+      stream: true,
+      store: true,
+      text: {
+        format: { type: 'text' },
+        verbosity: 'medium'
+      }
     };
     const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
     if (maxOutputTokens) {
@@ -1134,15 +1139,24 @@ window.API = (() => {
     if (systemPrompt && systemPrompt.trim()) {
       body.instructions = systemPrompt;
     }
+    const include = [];
     if (thinking) {
       const effort = window.APP_CONFIG.normalizeEffortForModel(
         reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
         model
       );
-      body.reasoning = { effort };
+      body.reasoning = {
+        effort,
+        mode: 'standard',
+        summary: 'auto'
+      };
+      include.push('reasoning.encrypted_content');
     }
     if (tools.some((tool) => tool?.type === 'web_search' || tool?.type === 'web_search_preview')) {
-      body.include = ['web_search_call.action.sources'];
+      include.push('web_search_call.action.sources');
+    }
+    if (include.length) {
+      body.include = include;
     }
 
     const res = await fetch(RESPONSES_ENDPOINT, {

@@ -405,18 +405,50 @@ window.Storage = (() => {
     const validIds = window.APP_CONFIG.MODELS.map((m) => m.id);
     if (!validIds.includes(state.currentModel)) {
       let next = window.APP_CONFIG.DEFAULT_MODEL;
-      if (/^gemini-/.test(state.currentModel) && validIds.includes('gemini-3.8-flash')) {
-        next = 'gemini-3.8-flash';
-      } else if (/^openrouter-gemini-/.test(state.currentModel) && validIds.includes('openrouter-gemini-3.8-flash')) {
-        next = 'openrouter-gemini-3.8-flash';
-      } else if (state.currentModel === 'openrouter-mistral-small-4' && validIds.includes('openrouter-deepseek-v4.1-flash')) {
-        next = 'openrouter-deepseek-v4.1-flash';
-      } else if (state.currentModel === 'gpt-5.4-mini' && validIds.includes('gpt-5.6-luna')) {
-        next = 'gpt-5.6-luna';
-      } else if (state.currentModel === 'gpt-5.4' && validIds.includes('gpt-5.6-terra')) {
-        next = 'gpt-5.6-terra';
-      } else if (state.currentModel === 'gpt-5.5' && validIds.includes('gpt-5.6-sol')) {
-        next = 'gpt-5.6-sol';
+      if (/^gemini-/.test(state.currentModel) && validIds.includes('openrouter-gemini-flash-latest')) {
+        next = 'openrouter-gemini-flash-latest';
+      } else if (/^kimi-/.test(state.currentModel) && validIds.includes('openrouter-kimi-latest')) {
+        next = 'openrouter-kimi-latest';
+      } else if (/^openrouter-gemini-/.test(state.currentModel) && validIds.includes('openrouter-gemini-flash-latest')) {
+        next = 'openrouter-gemini-flash-latest';
+      } else if (state.currentModel === 'openrouter-gemini-3.8-flash' && validIds.includes('openrouter-gemini-flash-latest')) {
+        next = 'openrouter-gemini-flash-latest';
+      } else if (state.currentModel === 'openrouter-mistral-small-4' && validIds.includes('openrouter-deepseek-flash-latest')) {
+        next = 'openrouter-deepseek-flash-latest';
+      } else if (state.currentModel === 'openrouter-deepseek-v4.1-flash' && validIds.includes('openrouter-deepseek-flash-latest')) {
+        next = 'openrouter-deepseek-flash-latest';
+      } else if (state.currentModel === 'openrouter-gpt-oss-120b' && validIds.includes('openrouter-gpt-luna-latest')) {
+        next = 'openrouter-gpt-luna-latest';
+      } else if (state.currentModel === 'openrouter-kimi-k2.6' && validIds.includes('openrouter-kimi-latest')) {
+        next = 'openrouter-kimi-latest';
+      } else if (state.currentModel === 'openrouter-kimi-k3' && validIds.includes('openrouter-kimi-latest')) {
+        next = 'openrouter-kimi-latest';
+      } else if (state.currentModel === 'gpt-5.4-mini' && validIds.includes('gpt-6-luna')) {
+        next = 'gpt-6-luna';
+      } else if (state.currentModel === 'gpt-5.4' && validIds.includes('gpt-6-luna')) {
+        next = 'gpt-6-luna';
+      } else if (state.currentModel === 'gpt-5.5' && validIds.includes('gpt-6-sol')) {
+        next = 'gpt-6-sol';
+      } else if (state.currentModel === 'gpt-5.6-luna' && validIds.includes('gpt-6-luna')) {
+        next = 'gpt-6-luna';
+      } else if (state.currentModel === 'gpt-5.6-terra' && validIds.includes('gpt-6-luna')) {
+        next = 'gpt-6-luna';
+      } else if (state.currentModel === 'gpt-6-terra' && validIds.includes('gpt-6-luna')) {
+        next = 'gpt-6-luna';
+      } else if (state.currentModel === 'gpt-5.6-sol' && validIds.includes('gpt-6-sol')) {
+        next = 'gpt-6-sol';
+      } else if (state.currentModel === 'openrouter-gpt-5.6-luna' && validIds.includes('openrouter-gpt-luna-latest')) {
+        next = 'openrouter-gpt-luna-latest';
+      } else if (state.currentModel === 'openrouter-gpt-5.6-terra' && validIds.includes('openrouter-gpt-luna-latest')) {
+        next = 'openrouter-gpt-luna-latest';
+      } else if (state.currentModel === 'openrouter-gpt-6-terra' && validIds.includes('openrouter-gpt-luna-latest')) {
+        next = 'openrouter-gpt-luna-latest';
+      } else if (state.currentModel === 'openrouter-gpt-6-luna' && validIds.includes('openrouter-gpt-luna-latest')) {
+        next = 'openrouter-gpt-luna-latest';
+      } else if (state.currentModel === 'openrouter-gpt-5.6-sol' && validIds.includes('openrouter-gpt-sol-latest')) {
+        next = 'openrouter-gpt-sol-latest';
+      } else if (state.currentModel === 'openrouter-gpt-6-sol' && validIds.includes('openrouter-gpt-sol-latest')) {
+        next = 'openrouter-gpt-sol-latest';
       } else if (state.currentModel === 'claude-sonnet-4-6' && validIds.includes('claude-sonnet-5')) {
         next = 'claude-sonnet-5';
       } else if (state.currentModel === 'openrouter-claude-haiku-4-5' && validIds.includes('openrouter-claude-haiku-latest')) {
