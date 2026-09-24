@@ -12,6 +12,8 @@ window.APP_CONFIG = {
     { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-mimo-v2-6-flash', apiModel: 'xiaomi/mimo-v2.6-flash', label: 'MiMo V2.6 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-mimo-v2-6-pro', apiModel: 'xiaomi/mimo-v2.6-pro', label: 'MiMo V2.6 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-gpt-luna-latest', apiModel: '~openai/gpt-luna-latest', label: 'GPT Luna Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gpt-sol-latest', apiModel: '~openai/gpt-sol-latest', label: 'GPT Sol Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gemini-flash-latest', apiModel: '~google/gemini-flash-latest', label: 'Gemini Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
@@ -42,6 +44,8 @@ window.APP_CONFIG = {
     'openrouter-glm-flash-latest': { input: 0.075, output: 0.25 },
     'openrouter-glm-latest': { input: 0.56, output: 2.50 },
     'openrouter-deepseek-flash-latest': { input: 0.13, output: 0.52 },
+    'openrouter-mimo-v2-6-flash': { input: 0.14, output: 0.28 },
+    'openrouter-mimo-v2-6-pro': { input: 0.435, output: 0.87 },
     'openrouter-gpt-luna-latest': { input: 0.10, output: 0.50 },
     'openrouter-kimi-latest': { input: 1.40, output: 10.75 },
     'openrouter-grok-latest': { input: 1.60, output: 4.80 },
@@ -114,6 +118,8 @@ window.APP_CONFIG = {
     'claude-opus-5': ['low', 'medium', 'high', 'xhigh', 'max'],
     'claude-sonnet-5': ['low', 'medium', 'high', 'max'],
     'openrouter-deepseek-flash-latest': ['low', 'high', 'max'],
+    'openrouter-mimo-v2-6-flash': ['low', 'high', 'max'],
+    'openrouter-mimo-v2-6-pro': ['low', 'high', 'max'],
     'openrouter-glm-flash-latest': ['low', 'high', 'max'],
     'openrouter-glm-latest': ['low', 'high', 'max'],
     'openrouter-claude-haiku-latest': ['low', 'medium', 'high'],
@@ -225,7 +231,7 @@ window.APP_CONFIG = {
 
   getDefaultEffortForModel(modelId) {
     if (modelId === 'openrouter-gemini-flash-latest') return 'medium';
-    if (modelId === 'openrouter-deepseek-flash-latest') return 'high';
+    if (modelId === 'openrouter-deepseek-flash-latest' || modelId === 'openrouter-mimo-v2-6-flash' || modelId === 'openrouter-mimo-v2-6-pro') return 'high';
     if (modelId === 'gpt-6-luna' || modelId === 'gpt-6-sol' || modelId === 'openrouter-gpt-luna-latest' || modelId === 'openrouter-gpt-sol-latest') return 'medium';
     if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest') return 'max';
     if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
