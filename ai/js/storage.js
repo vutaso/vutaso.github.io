@@ -457,6 +457,13 @@ window.Storage = (() => {
         next = 'openrouter-claude-sonnet-latest';
       } else if (state.currentModel === 'openrouter-claude-opus-5' && validIds.includes('openrouter-claude-opus-latest')) {
         next = 'openrouter-claude-opus-latest';
+      } else if (
+        (state.currentModel === 'openrouter-free-qwen3-8-27b'
+          || state.currentModel === 'openrouter-free-glm-5-2'
+          || state.currentModel === 'openrouter-free-gemma-4-31b-it')
+        && validIds.includes('openrouter-free-router')
+      ) {
+        next = 'openrouter-free-router';
       }
       setField('currentModel', next);
     }

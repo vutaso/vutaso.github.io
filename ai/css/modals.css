@@ -603,6 +603,7 @@ a.btn {
 .settings-provider-logo[data-provider-logo="deepseek"] { color: #4d6bfe; }
 .settings-provider-logo[data-provider-logo="kimi"] { color: #6366f1; }
 .settings-provider-logo[data-provider-logo="openrouter"] { color: #a78bfa; }
+.settings-provider-logo[data-provider-logo="openrouter-free"] { color: #4ade80; }
 
 .settings-api-row .input {
   padding: 6px 8px;

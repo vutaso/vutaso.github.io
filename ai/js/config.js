@@ -20,6 +20,11 @@ window.APP_CONFIG = {
     { id: 'openrouter-claude-haiku-latest', apiModel: '~anthropic/claude-haiku-latest', label: 'Claude Haiku Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
     { id: 'openrouter-claude-sonnet-latest', apiModel: '~anthropic/claude-sonnet-latest', label: 'Claude Sonnet Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-claude-opus-latest', apiModel: '~anthropic/claude-opus-latest', label: 'Claude Opus Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-free-router', apiModel: 'openrouter/free', label: 'Free Models Router (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-free-ling-3-flash-sante', apiModel: 'inclusionai/ling-3.0-flash-sante:free', label: 'Ling 3.0 Flash Sante (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-free-ling-3-flash-fin', apiModel: 'inclusionai/ling-3.0-flash-fin:free', label: 'Ling 3.0 Flash Fin (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-free-ling-3-flash-vl', apiModel: 'inclusionai/ling-3.0-flash-vl', label: 'Ling 3.0 Flash VL (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-free-north-mini-code', apiModel: 'cohere/north-mini-code:free', label: 'North Mini Code (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false }
   ],
 
@@ -45,6 +50,11 @@ window.APP_CONFIG = {
     'openrouter-gemini-flash-latest': { input: 0.75, output: 3.75 },
     'openrouter-claude-sonnet-latest': { input: 2.00, output: 10.00 },
     'openrouter-claude-opus-latest': { input: 5.00, output: 25.00 },
+    'openrouter-free-router': { input: 0, output: 0 },
+    'openrouter-free-ling-3-flash-sante': { input: 0, output: 0 },
+    'openrouter-free-ling-3-flash-fin': { input: 0, output: 0 },
+    'openrouter-free-ling-3-flash-vl': { input: 0, output: 0 },
+    'openrouter-free-north-mini-code': { input: 0, output: 0 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 }
   },
 
@@ -65,7 +75,8 @@ window.APP_CONFIG = {
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'deepseek', label: 'DeepSeek' },
-    { id: 'openrouter', label: 'OpenRouter' }
+    { id: 'openrouter', label: 'OpenRouter' },
+    { id: 'openrouter-free', label: 'OpenRouter Free' }
   ],
 
   PROVIDER_LOGOS: {
@@ -74,7 +85,8 @@ window.APP_CONFIG = {
     deepseek: 'M23.748 4.651c-.254-.124-.364.113-.512.233-.051.04-.094.09-.137.137-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.155-.708-.311-.955-.65-.172-.24-.219-.509-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.094.172.187.129.323-.082.28-.18.553-.266.833-.055.179-.137.218-.328.14a5.5 5.5 0 0 1-1.737-1.179c-.857-.828-1.631-1.743-2.597-2.46a12 12 0 0 0-.689-.47c-.985-.957.13-1.743.387-1.836.27-.098.094-.433-.778-.428-.872.003-1.67.295-2.687.685a3 3 0 0 1-.465.136 9.6 9.6 0 0 0-2.883-.101c-1.885.21-3.39 1.1-4.497 2.622C.082 8.776-.231 10.854.152 13.02c.403 2.284 1.568 4.175 3.36 5.653 1.857 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.132-.284 4.994-1.86.47.234.962.328 1.78.398.629.058 1.235-.031 1.705-.129.735-.155.684-.836.418-.961-2.155-1.004-1.682-.595-2.112-.926 1.095-1.295 2.768-3.598 3.284-6.733.05-.346.115-.834.108-1.114-.004-.171.035-.238.23-.257a4.2 4.2 0 0 0 1.545-.475c1.397-.763 1.96-2.016 2.093-3.517.02-.23-.004-.467-.247-.588M11.58 18.168c-2.088-1.642-3.101-2.183-3.52-2.16-.39.024-.32.472-.234.763.09.288.207.487.371.74.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.168-1.361-.801-2.5-1.86-3.301-3.306-.775-1.393-1.225-2.888-1.299-4.482-.02-.385.094-.522.477-.592a4.7 4.7 0 0 1 1.53-.038c2.131.311 3.946 1.264 5.467 2.774.868.86 1.525 1.887 2.202 2.89.72 1.066 1.494 2.082 2.48 2.915.348.291.626.513.892.677-.802.09-2.14.109-3.055-.615zm1.001-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .113.074.3.3 0 0 1 .086.214c0 .17-.136.307-.308.307a.303.303 0 0 1-.306-.307m3.11 1.596c-.2.081-.4.151-.591.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.551-.758a1.7 1.7 0 0 1 .015-.588c.07-.327-.007-.537-.238-.727-.188-.156-.426-.199-.689-.199a.6.6 0 0 1-.254-.078.253.253 0 0 1-.114-.358 1 1 0 0 1 .192-.21c.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.392.451.462.576.685.915.176.264.336.536.446.848.066.194-.02.353-.25.45',
     kimi: 'M21.765.351C22.998.351 24 1.353 24 2.586S22.998 4.82 21.765 4.82h-1.974c-.15 0-.26-.12-.26-.26V2.586A2.237 2.237 0 0 1 21.765.35M9.41 13.388l8.447-8.377c.16-.16.07-.471-.14-.471h-4.55s-.1.02-.14.06l-9.099 9.029c-.14.14-.35.02-.35-.21V4.81c0-.15-.1-.27-.221-.27H.22c-.12 0-.22.12-.22.27v18.57c0 .15.1.27.22.27h3.137c.12 0 .22-.12.22-.27v-3.79c0-.08.03-.16.08-.21l2.826-2.796c.07-.07.16-.08.241-.03l7.546 5.551a8.9 8.9 0 0 0 4.018 1.493c.12.01.23-.11.23-.27V19.76c0-.14-.08-.25-.19-.26a5.8 5.8 0 0 1-2.355-.942l-6.533-4.73c-.14-.09-.15-.32-.03-.441',
     google: 'M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81',
-    openrouter: 'M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z'
+    openrouter: 'M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z',
+    'openrouter-free': 'M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z'
   },
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
@@ -91,6 +103,7 @@ window.APP_CONFIG = {
     google:    ['low', 'medium', 'high'],
     deepseek:  ['default', 'high', 'max'],
     openrouter: ['low', 'medium', 'high'],
+    'openrouter-free': ['low', 'medium', 'high'],
     kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
   },
 
@@ -110,7 +123,12 @@ window.APP_CONFIG = {
     'openrouter-grok-latest': ['low', 'medium', 'high'],
     'openrouter-gpt-sol-latest': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
     'openrouter-gpt-luna-latest': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
-    'openrouter-gemini-flash-latest': ['minimal', 'low', 'medium', 'high']
+    'openrouter-gemini-flash-latest': ['minimal', 'low', 'medium', 'high'],
+    'openrouter-free-router': ['low', 'medium', 'high'],
+    'openrouter-free-ling-3-flash-sante': ['low', 'medium', 'high'],
+    'openrouter-free-ling-3-flash-fin': ['low', 'medium', 'high'],
+    'openrouter-free-ling-3-flash-vl': ['low', 'medium', 'high'],
+    'openrouter-free-north-mini-code': ['low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -212,7 +230,12 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest') return 'max';
     if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
     if (modelId === 'openrouter-grok-latest') return 'medium';
+    if (/^openrouter-free-/.test(modelId || '')) return 'medium';
     return this.DEFAULT_EFFORT;
+  },
+
+  isOpenRouterProvider(providerId) {
+    return providerId === 'openrouter' || providerId === 'openrouter-free';
   },
 
   normalizeGeminiEffort(effort, modelId) {
@@ -330,7 +353,7 @@ window.APP_CONFIG = {
   getMaxOutputTokens(modelId) {
     const configured = this.API_MAX_OUTPUT_TOKENS;
     if (!configured) return null;
-    if (this.getModelProvider(modelId) === 'openrouter') {
+    if (this.isOpenRouterProvider(this.getModelProvider(modelId))) {
       // OpenRouter từ chối request nếu max_tokens vượt số credit còn lại — để null = không gửi max_tokens.
       return this.OPENROUTER_MAX_OUTPUT_TOKENS || null;
     }
@@ -346,7 +369,7 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
-    if (provider === 'openrouter') return state.openrouterApiKey || '';
+    if (this.isOpenRouterProvider(provider)) return state.openrouterApiKey || '';
     return state.apiKey || '';
   },
 
@@ -355,7 +378,7 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
-    if (provider === 'openrouter') return 'Enter your OpenRouter API key in Settings first';
+    if (this.isOpenRouterProvider(provider)) return 'Enter your OpenRouter API key in Settings first';
     return 'Enter your API key in Settings first';
   },
 
@@ -364,7 +387,7 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
-    if (provider === 'openrouter') return 'No OpenRouter API key. Open Settings to enter one.';
+    if (this.isOpenRouterProvider(provider)) return 'No OpenRouter API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 
@@ -523,7 +546,7 @@ window.APP_CONFIG = {
   },
 
   modelUsesOpenRouterReasoning(modelId) {
-    return this.getModelProvider(modelId) === 'openrouter';
+    return this.isOpenRouterProvider(this.getModelProvider(modelId));
   },
 
   getOpenRouterThinkingConfig(modelId, thinkingEnabled, reasoningEffort) {

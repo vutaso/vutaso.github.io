@@ -3002,7 +3002,7 @@ window.I18n = (() => {
     if (provider === 'deepseek') return t('missingApiKeyDeepSeek');
     if (provider === 'google') return t('missingApiKeyGemini');
     if (provider === 'kimi') return t('missingApiKeyKimi');
-    if (provider === 'openrouter') return t('missingApiKeyOpenRouter');
+    if (provider === 'openrouter' || provider === 'openrouter-free') return t('missingApiKeyOpenRouter');
     return t('missingApiKeyOpenAI');
   };
 
@@ -3012,7 +3012,7 @@ window.I18n = (() => {
     if (provider === 'deepseek') return t('missingApiKeyErrorDeepSeek');
     if (provider === 'google') return t('missingApiKeyErrorGemini');
     if (provider === 'kimi') return t('missingApiKeyErrorKimi');
-    if (provider === 'openrouter') return t('missingApiKeyErrorOpenRouter');
+    if (provider === 'openrouter' || provider === 'openrouter-free') return t('missingApiKeyErrorOpenRouter');
     return t('missingApiKeyErrorOpenAI');
   };
 

@@ -963,6 +963,8 @@ body.model-compare-open .md-preview-panel.is-open.is-sources-preview-panel {
 .header-provider-option[data-provider="kimi"] .provider-logo { color: #6366f1; }
 .header-provider-btn[data-provider="openrouter"] .provider-logo,
 .header-provider-option[data-provider="openrouter"] .provider-logo { color: #a78bfa; }
+.header-provider-btn[data-provider="openrouter-free"] .provider-logo,
+.header-provider-option[data-provider="openrouter-free"] .provider-logo { color: #4ade80; }
 
 .header-provider-menu {
   position: absolute;

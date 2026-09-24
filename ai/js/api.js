@@ -1252,7 +1252,7 @@ window.API = (() => {
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: KIMI_ENDPOINT, provider: 'kimi', thinking
         });
-      } else if (provider === 'openrouter') {
+      } else if (window.APP_CONFIG.isOpenRouterProvider(provider)) {
         if (window.APP_CONFIG.modelUsesOpenRouterImages(model)) {
           await sendOpenRouterImages({
             apiKey, model, convo, controller, handlers, imageGenOptions
