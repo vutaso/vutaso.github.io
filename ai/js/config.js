@@ -456,6 +456,35 @@ window.APP_CONFIG = {
     };
   },
 
+  getOpenRouterShellTool() {
+    return { type: 'openrouter:shell' };
+  },
+
+  modelSupportsShell(modelId) {
+    const provider = this.getModelProvider(modelId);
+    if (provider !== 'openrouter') return false;
+    if (this.modelUsesOpenRouterImages(modelId)) return false;
+    return true;
+  },
+
+  getOpenRouterWebServerTools(modelId) {
+    const maxResults = 5;
+    const maxUses = Math.max(1, Number(this.WEB_SEARCH_MAX_USES) || 5);
+    const searchContextSize = this.getOpenRouterWebSearchContextSize();
+    const webFetchTool = this.getOpenRouterWebFetchTool(maxUses);
+    return [
+      {
+        type: 'openrouter:web_search',
+        parameters: {
+          max_results: maxResults,
+          max_uses: maxUses,
+          search_context_size: searchContextSize
+        }
+      },
+      webFetchTool
+    ];
+  },
+
   getOpenRouterServerToolFields(modelId, webSearch) {
     if (!this.isOpenRouterProvider(this.getModelProvider(modelId))) return null;
     const tools = [this.getOpenRouterDatetimeTool()];
@@ -471,12 +500,23 @@ window.APP_CONFIG = {
     };
   },
 
+  getOpenRouterResponsesTools(modelId, { webSearch, shell }) {
+    if (!this.isOpenRouterProvider(this.getModelProvider(modelId))) return [];
+    const tools = [this.getOpenRouterDatetimeTool()];
+    if (shell && this.modelSupportsShell(modelId)) {
+      tools.unshift(this.getOpenRouterShellTool());
+    }
+    if (webSearch && this.modelSupportsWebSearch(modelId)) {
+      tools.push(...this.getOpenRouterWebServerTools(modelId));
+    }
+    return tools;
+  },
+
   getOpenRouterWebSearchFields(modelId) {
     if (!this.modelSupportsWebSearch(modelId)) return null;
     if (!this.isOpenRouterProvider(this.getModelProvider(modelId))) return null;
     const maxResults = 5;
     const maxUses = Math.max(1, Number(this.WEB_SEARCH_MAX_USES) || 5);
-    const searchContextSize = this.getOpenRouterWebSearchContextSize();
     const webFetchTool = this.getOpenRouterWebFetchTool(maxUses);
     if (this.modelUsesOpenRouterWebSearchPlugin(modelId)) {
       return {
@@ -484,19 +524,11 @@ window.APP_CONFIG = {
         tools: [webFetchTool]
       };
     }
-    return {
-      tools: [
-        {
-          type: 'openrouter:web_search',
-          parameters: {
-            max_results: maxResults,
-            max_uses: maxUses,
-            search_context_size: searchContextSize
-          }
-        },
-        webFetchTool
-      ]
-    };
+    return { tools: this.getOpenRouterWebServerTools(modelId) };
+  },
+
+  getOpenRouterResponsesEndpoint() {
+    return this.OPENROUTER_RESPONSES_ENDPOINT;
   },
 
   modelSupportsImageGen(modelId) {
@@ -626,6 +658,7 @@ window.APP_CONFIG = {
   // Share snapshots: POST create / GET /share/:id (Cloudflare KV)
   SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/share',
   OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
+  OPENROUTER_RESPONSES_ENDPOINT: 'https://openrouter.ai/api/v1/responses',
   OPENROUTER_IMAGES_ENDPOINT: 'https://openrouter.ai/api/v1/images',
   // Để null: không gửi max_tokens (OpenRouter tự giới hạn theo credit). Đặt số (vd. 8192) nếu tài khoản có đủ credit.
   OPENROUTER_MAX_OUTPUT_TOKENS: 32768,

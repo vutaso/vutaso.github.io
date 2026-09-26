@@ -100,6 +100,7 @@ window.ContextCompress = (() => {
         systemPrompt,
         convo: tempConvo,
         webSearch: false,
+        shell: false,
         imageGen: false,
         thinking,
         reasoningEffort: thinking ? (window.APP_CONFIG.DEFAULT_EFFORT || 'high') : 'default',

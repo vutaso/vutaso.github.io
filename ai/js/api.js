@@ -613,6 +613,31 @@ window.API = (() => {
     if (first) handlers.finishReason = String(first);
   };
 
+  const isShellActivityEventType = (type) => {
+    if (!type || typeof type !== 'string') return false;
+    if (/shell_call_command\.(added|delta)/i.test(type)) return true;
+    if (/shell_call_output_content\.delta/i.test(type)) return true;
+    if (/code_interpreter_call\.(in_progress|interpreting|code\.delta)/i.test(type)) return true;
+    if (type === 'response.output_item.added') return false;
+    if (/shell_call/i.test(type) && /in_progress|searching|executing|interpreting|added/i.test(type)) return true;
+    return false;
+  };
+
+  const emitShellStatusFromStream = (json, handlers) => {
+    if (!handlers?.onShellStatus || !json || typeof json !== 'object') return;
+    const type = json.type || '';
+    if (isShellActivityEventType(type)) {
+      handlers.onShellStatus('running');
+      return;
+    }
+    if (type === 'response.output_item.added' || type === 'response.output_item.done') {
+      const itemType = json.item?.type || '';
+      if (itemType === 'shell_call' || itemType === 'shell_call_output') {
+        handlers.onShellStatus(itemType === 'shell_call' ? 'running' : 'running');
+      }
+    }
+  };
+
   const handleStreamData = (data, handlers) => {
     if (!data || data === '[DONE]') {
       return data === '[DONE]' ? 'done' : null;
@@ -652,6 +677,7 @@ window.API = (() => {
         if (handlers.onSearchStatus) handlers.onSearchStatus('searching');
         return null;
       }
+      emitShellStatusFromStream(json, handlers);
       if (json.type === 'response.image_generation_call.in_progress'
         || json.type === 'response.image_generation_call.generating') {
         if (handlers.onImageStatus) handlers.onImageStatus('generating');
@@ -739,11 +765,12 @@ window.API = (() => {
         if (delta.content) {
           if (handlers.onToken) handlers.onToken(delta.content);
         }
-        if (Array.isArray(delta.tool_calls) && handlers.onSearchStatus) {
+        if (Array.isArray(delta.tool_calls)) {
           for (const tc of delta.tool_calls) {
             const name = String(tc.function?.name || tc.type || '');
-            if (/web_fetch/i.test(name)) handlers.onSearchStatus('fetching');
-            else if (/web_search/i.test(name)) handlers.onSearchStatus('searching');
+            if (/web_fetch/i.test(name) && handlers.onSearchStatus) handlers.onSearchStatus('fetching');
+            else if (/web_search/i.test(name) && handlers.onSearchStatus) handlers.onSearchStatus('searching');
+            else if (/shell/i.test(name) && handlers.onShellStatus) handlers.onShellStatus('running');
           }
         }
       }
@@ -753,6 +780,8 @@ window.API = (() => {
           handlers.onSearchStatus('fetching');
         } else if (/web_search/i.test(name) && handlers.onSearchStatus) {
           handlers.onSearchStatus('searching');
+        } else if (/shell/i.test(name) && handlers.onShellStatus) {
+          handlers.onShellStatus('running');
         }
       }
     } catch (e) {
@@ -1202,6 +1231,82 @@ window.API = (() => {
     await readSseStream(res.body.getReader(), handlers);
   };
 
+  const sendOpenRouterResponses = async ({
+    apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort, controller, handlers
+  }) => {
+    const input = buildConversationMessages(convo, 'responses');
+    if (!input.length) {
+      throw new Error('Không có tin nhắn để gửi');
+    }
+
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      input,
+      tools,
+      stream: true,
+      store: false,
+      text: {
+        format: { type: 'text' },
+        verbosity: 'medium'
+      }
+    };
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_output_tokens = maxOutputTokens;
+    }
+    if (systemPrompt && systemPrompt.trim()) {
+      body.instructions = systemPrompt;
+    }
+    const include = [];
+    if (thinking) {
+      const effort = window.APP_CONFIG.normalizeEffortForModel(
+        reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+        model
+      );
+      body.reasoning = {
+        effort,
+        mode: 'standard',
+        summary: 'auto'
+      };
+      include.push('reasoning.encrypted_content');
+    }
+    const usesWebTool = tools.some((tool) => (
+      tool?.type === 'openrouter:web_search'
+      || tool?.type === 'web_search'
+      || tool?.type === 'web_search_preview'
+    ));
+    if (usesWebTool) {
+      include.push('web_search_call.action.sources');
+    }
+    if (include.length) {
+      body.include = include;
+    }
+
+    const res = await fetch(window.APP_CONFIG.getOpenRouterResponsesEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + apiKey,
+        'HTTP-Referer': window.location.origin || 'https://vutaso.github.io',
+        'X-Title': 'Vutaso AI'
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw await parseApiError(res, 'openrouter');
+    if (!res.body || !res.body.getReader) {
+      throw new Error('Trình duyệt không hỗ trợ streaming response');
+    }
+
+    const usesShell = tools.some((tool) => tool?.type === 'openrouter:shell');
+    if (usesShell && handlers.onShellStatus) {
+      handlers.onShellStatus('active');
+    }
+
+    await readSseStream(res.body.getReader(), handlers);
+  };
+
   const getImageGenOptionsFromConvo = (convo) => {
     const users = (convo.messages || []).filter((m) => m.role === 'user');
     const last = users[users.length - 1];
@@ -1217,10 +1322,10 @@ window.API = (() => {
 
   const send = async ({
     apiKey, model, systemPrompt, convo,
-    webSearch, imageGen, thinking, reasoningEffort,
+    webSearch, shell, imageGen, thinking, reasoningEffort,
     seedGroundingMetadata,
     allowConcurrent = false,
-    onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
+    onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onShellStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
     if (!allowConcurrent && activeControllers.size > 0) {
       throw new Error('Đang có yêu cầu khác đang chạy');
@@ -1243,6 +1348,7 @@ window.API = (() => {
       onToken,
       onReasoningToken,
       onSearchStatus,
+      onShellStatus,
       onImageStatus,
       onImagePartial,
       onImageComplete,
@@ -1281,6 +1387,15 @@ window.API = (() => {
         if (window.APP_CONFIG.modelUsesOpenRouterImages(model)) {
           await sendOpenRouterImages({
             apiKey, model, convo, controller, handlers, imageGenOptions
+          });
+        } else if (shell && window.APP_CONFIG.modelSupportsShell(model)) {
+          const orTools = window.APP_CONFIG.getOpenRouterResponsesTools(model, { webSearch, shell: true });
+          if (!orTools.length) {
+            throw new Error('Không có server tool để gửi');
+          }
+          await sendOpenRouterResponses({
+            apiKey, model, systemPrompt, convo, tools: orTools,
+            thinking, reasoningEffort: effort, controller, handlers
           });
         } else {
           await sendChatCompletions({

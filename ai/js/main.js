@@ -36,8 +36,17 @@
     window.Storage.set({ webSearchEnabled: false });
     state.webSearchEnabled = false;
   }
+  if (state.shellEnabled && state.imageGenEnabled) {
+    window.Storage.set({ shellEnabled: false });
+    state.shellEnabled = false;
+  }
+  if (state.shellEnabled && !window.APP_CONFIG.modelSupportsShell(state.currentModel)) {
+    window.Storage.set({ shellEnabled: false });
+    state.shellEnabled = false;
+  }
   ui.syncComposerToolsUI(state.currentModel, {
     webSearchEnabled: state.webSearchEnabled,
+    shellEnabled: state.shellEnabled,
     imageGenEnabled: state.imageGenEnabled,
     thinkingEnabled: state.thinkingEnabled,
     translateEnabled: state.translateEnabled,

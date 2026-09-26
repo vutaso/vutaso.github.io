@@ -104,6 +104,7 @@ window.UI = (() => {
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
     els.webSearchBtn = $('#webSearchBtn');
+    els.shellBtn = $('#shellBtn');
     els.imageGenBtn = $('#imageGenBtn');
     els.thinkingBtn = $('#thinkingBtn');
     els.translateBtn = $('#translateBtn');
@@ -253,13 +254,14 @@ window.UI = (() => {
 
   const syncComposerToolsUI = (modelId, toolState) => {
     const {
-      webSearchEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
+      webSearchEnabled, shellEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
       imageGenRatio, imageGenStyle, imageGenTemplate
     } = toolState;
     const showWebSearch = window.APP_CONFIG.modelSupportsWebSearch(modelId);
+    const showShell = window.APP_CONFIG.modelSupportsShell(modelId);
     const showImageGen = window.APP_CONFIG.modelSupportsImageGen(modelId);
     const showThinking = window.APP_CONFIG.modelSupportsThinking(modelId);
-    const hasTools = showWebSearch || showImageGen || showThinking || true;
+    const hasTools = showWebSearch || showShell || showImageGen || showThinking || true;
 
     if (els.composerTools) {
       els.composerTools.classList.toggle('hidden', !hasTools);
@@ -269,6 +271,12 @@ window.UI = (() => {
       const active = showWebSearch && !!webSearchEnabled;
       els.webSearchBtn.classList.toggle('is-active', active);
       els.webSearchBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (els.shellBtn) {
+      els.shellBtn.classList.toggle('hidden', !showShell);
+      const active = showShell && !!shellEnabled;
+      els.shellBtn.classList.toggle('is-active', active);
+      els.shellBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
     if (els.imageGenBtn) {
       els.imageGenBtn.classList.toggle('hidden', !showImageGen);
@@ -540,6 +548,27 @@ window.UI = (() => {
       '<i class="fa-solid ' + icon + '" aria-hidden="true"></i> <span class="streaming-tool-shimmer">' + label + '</span>',
       active
     );
+  };
+
+  const setStreamingShellStatus = (article, status) => {
+    if (!article) return;
+    const active = status === 'running' || status === 'active';
+    const className = 'streaming-shell-badge';
+    const label = status === 'running' ? t('runningShell') : t('shellPending');
+    const html = '<i class="fa-solid fa-terminal" aria-hidden="true"></i> <span class="streaming-tool-shimmer">' + label + '</span>';
+    let badge = article.querySelector('.' + className);
+    if (!active) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'streaming-tool-badge ' + className;
+      const content = article.querySelector('.content');
+      if (content) content.before(badge);
+      else article.querySelector('.body')?.prepend(badge);
+    }
+    badge.innerHTML = html;
   };
 
   const setStreamingImageStatus = (article, status) => {
@@ -2984,6 +3013,7 @@ window.UI = (() => {
     if (els.micBtn) els.micBtn.disabled = on;
     if (els.snippetsBtn) els.snippetsBtn.disabled = on;
     if (els.webSearchBtn) els.webSearchBtn.disabled = on;
+    if (els.shellBtn) els.shellBtn.disabled = on;
     if (els.imageGenBtn) els.imageGenBtn.disabled = on;
     if (els.translateBtn) els.translateBtn.disabled = on;
     if (els.translateChipClose) els.translateChipClose.disabled = on;
@@ -3442,6 +3472,7 @@ window.UI = (() => {
     initImageGenMenus();
     syncComposerToolsUI(appState.currentModel, {
       webSearchEnabled: appState.webSearchEnabled,
+      shellEnabled: appState.shellEnabled,
       imageGenEnabled: appState.imageGenEnabled,
       thinkingEnabled: appState.thinkingEnabled,
       translateEnabled: appState.translateEnabled,
@@ -4679,7 +4710,7 @@ window.UI = (() => {
     cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect,
     initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
-    setStreamingSearchStatus, setStreamingImageStatus, updateStreamingAssistantContent,
+    setStreamingSearchStatus, setStreamingShellStatus, setStreamingImageStatus, updateStreamingAssistantContent,
     renderConversationList, refreshConversationList, getConversationSearchQuery,
     setConversationSearchQuery, toggleConversationSearch, clearConversationSearch, isConversationSearchOpen,
     isChatFindOpen, openChatFind, closeChatFind, toggleChatFind, focusChatFind, stepChatFind,

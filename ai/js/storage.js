@@ -16,6 +16,7 @@ window.Storage = (() => {
     kimiApiKey: '',
     currentModel: window.APP_CONFIG.DEFAULT_MODEL,
     webSearchEnabled: false,
+    shellEnabled: false,
     imageGenEnabled: false,
     thinkingEnabled: window.APP_CONFIG.DEFAULT_EFFORT !== 'default'
       && window.APP_CONFIG.modelUsesEffortLinkedThinking(window.APP_CONFIG.DEFAULT_MODEL),

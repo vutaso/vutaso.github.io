@@ -29,6 +29,7 @@ window.Events = (() => {
     const s = { ...state.get(), ...patch };
     return {
       webSearchEnabled: s.webSearchEnabled,
+      shellEnabled: s.shellEnabled,
       imageGenEnabled: s.imageGenEnabled,
       thinkingEnabled: s.thinkingEnabled,
       translateEnabled: s.translateEnabled,
@@ -56,13 +57,16 @@ window.Events = (() => {
   const applyModelChange = (modelId, { showToast = true } = {}) => {
     const s = state.get();
     let webSearchEnabled = s.webSearchEnabled;
+    let shellEnabled = s.shellEnabled;
     let imageGenEnabled = s.imageGenEnabled;
     let thinkingEnabled = s.thinkingEnabled;
     let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
     if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
+    if (!window.APP_CONFIG.modelSupportsShell(modelId)) shellEnabled = false;
     if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
     if (window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) imageGenEnabled = true;
     if (imageGenEnabled && webSearchEnabled) webSearchEnabled = false;
+    if (imageGenEnabled && shellEnabled) shellEnabled = false;
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
     if (window.APP_CONFIG.modelThinkingRequired(modelId)) {
       thinkingEnabled = true;
@@ -79,7 +83,7 @@ window.Events = (() => {
       pendingImages = [];
       ui.renderComposerAttachments(pendingImages, pendingFiles);
     }
-    state.set({ currentModel: modelId, webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
+    state.set({ currentModel: modelId, webSearchEnabled, shellEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
     ui.syncProviderSelect(window.APP_CONFIG.getModelProvider(modelId));
     const model = window.APP_CONFIG.getModel(modelId);
     const label = model ? window.APP_CONFIG.getModelDisplayLabel(model) : (ui.els.modelSelect?.selectedOptions[0]?.textContent || modelId);
@@ -90,7 +94,7 @@ window.Events = (() => {
       opt.setAttribute('aria-selected', selected ? 'true' : 'false');
     });
     ui.closeModelMenu();
-    syncComposerTools(modelId, { webSearchEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
+    syncComposerTools(modelId, { webSearchEnabled, shellEnabled, imageGenEnabled, thinkingEnabled, reasoningEffort });
     updateSendEnabled();
     ui.updateSettingsTokenUsage(state.get());
     if (showToast) {
@@ -939,6 +943,11 @@ window.Events = (() => {
     );
     const useWebSearch = !isContinue && !useImageGen
       && s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
+    const useShell = !isContinue && !useImageGen
+      && s.shellEnabled && window.APP_CONFIG.modelSupportsShell(modelId);
+    if (useShell) {
+      ui.setStreamingShellStatus(article, 'active');
+    }
     const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
     const useThinking = isEffortThinking
       ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
@@ -995,6 +1004,7 @@ window.Events = (() => {
 
     const finishStreamingResponse = (buffer, { aborted = false, truncated = false } = {}) => {
       ui.setStreamingSearchStatus(article, null);
+      ui.setStreamingShellStatus(article, null);
       ui.setStreamingImageStatus(article, null);
 
       const finalMsg = convo.messages[messageIndex];
@@ -1060,6 +1070,7 @@ window.Events = (() => {
       systemPrompt: s.systemPrompt,
       convo: requestConvo,
       webSearch: useWebSearch,
+      shell: useShell,
       imageGen: useImageGen,
       thinking: useThinking,
       reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
@@ -1067,6 +1078,11 @@ window.Events = (() => {
       onSearchStatus: (status) => {
         if (status === 'searching' || status === 'fetching') {
           ui.setStreamingSearchStatus(article, status);
+        }
+      },
+      onShellStatus: (status) => {
+        if (status === 'running' || status === 'active') {
+          ui.setStreamingShellStatus(article, status);
         }
       },
       onImageStatus: (status) => {
@@ -1244,7 +1260,8 @@ window.Events = (() => {
 
     if (compareMode) {
       if (!text) return;
-      if (pendingImages.length || pendingFiles.length || s.imageGenEnabled || s.translateEnabled || s.webSearchEnabled) {
+      if (pendingImages.length || pendingFiles.length || s.imageGenEnabled || s.translateEnabled
+        || s.webSearchEnabled || s.shellEnabled) {
         ui.showToast(t('compareTextOnly'));
         return;
       }
@@ -2215,6 +2232,23 @@ window.Events = (() => {
       ui.showToast(next ? t('toastWebSearchOn') : t('toastWebSearchOff'));
     });
 
+    ui.els.shellBtn?.addEventListener('click', () => {
+      const s = state.get();
+      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+      if (!window.APP_CONFIG.modelSupportsShell(modelId)) return;
+      const next = !s.shellEnabled;
+      const patch = { shellEnabled: next };
+      if (next) {
+        patch.imageGenEnabled = false;
+        pendingReferenceImage = null;
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      syncComposerTools(modelId, patch);
+      updateSendEnabled();
+      ui.showToast(next ? t('toastShellOn') : t('toastShellOff'));
+    });
+
     ui.els.thinkingBtn.addEventListener('click', () => {
       const s = state.get();
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
@@ -2245,6 +2279,7 @@ window.Events = (() => {
       };
       if (enabled) {
         patch.webSearchEnabled = false;
+        patch.shellEnabled = false;
         patch.imageGenEnabled = false;
         patch.translateEnabled = false;
         clearPendingAttachments();
@@ -2325,6 +2360,7 @@ window.Events = (() => {
       const patch = { imageGenEnabled: enabled };
       if (enabled) {
         patch.webSearchEnabled = false;
+        patch.shellEnabled = false;
         patch.translateEnabled = false;
         clearPendingAttachments();
         resetImageGenPicked();

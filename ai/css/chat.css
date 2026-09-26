@@ -1321,6 +1321,7 @@
 
 .message.streaming .streaming-tool-badge,
 .message.streaming .streaming-search-badge,
+.message.streaming .streaming-shell-badge,
 .message.streaming .streaming-image-badge {
   display: inline-flex;
   align-items: center;
