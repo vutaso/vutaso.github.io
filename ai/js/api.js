@@ -1051,8 +1051,10 @@ window.API = (() => {
     if (imageGenOptions?.aspectRatio && window.APP_CONFIG.openRouterImagesSupportsAspectRatio(model)) {
       body.aspect_ratio = imageGenOptions.aspectRatio;
     }
+    if (imageGenOptions?.quality) body.quality = imageGenOptions.quality;
     if (images.length) {
       body.input_references = images.map((img) => ({
+        type: 'image_url',
         image_url: { url: img.dataUrl }
       }));
     }
@@ -1063,7 +1065,9 @@ window.API = (() => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + apiKey
+        Authorization: 'Bearer ' + apiKey,
+        'HTTP-Referer': window.location.origin || 'https://vutaso.github.io',
+        'X-Title': 'Vutaso AI'
       },
       body: JSON.stringify(body),
       signal: controller.signal

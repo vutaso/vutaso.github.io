@@ -18,6 +18,7 @@ window.APP_CONFIG = {
     { id: 'openrouter-mimo-v2-6-pro', apiModel: 'xiaomi/mimo-v2.6-pro', label: 'MiMo V2.6 Pro (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-gpt-luna-latest', apiModel: '~openai/gpt-luna-latest', label: 'GPT Luna Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-gpt-sol-latest', apiModel: '~openai/gpt-sol-latest', label: 'GPT Sol Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-image-2.5-flare', apiModel: 'openai/gpt-image-2.5-flare', label: 'GPT Image 2.5 Flare (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: true, imageOnly: true, thinking: false, vision: true, apiMode: 'openrouter-images' },
     { id: 'openrouter-gemini-flash-latest', apiModel: '~google/gemini-flash-latest', label: 'Gemini Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
     { id: 'openrouter-kimi-latest', apiModel: '~moonshotai/kimi-latest', label: 'Kimi Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-grok-latest', apiModel: '~x-ai/grok-latest', label: 'Grok Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
@@ -30,6 +31,7 @@ window.APP_CONFIG = {
     { id: 'openrouter-free-ling-3-flash-vl', apiModel: 'inclusionai/ling-3.0-flash-vl', label: 'Ling 3.0 Flash VL (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-free-north-mini-code', apiModel: 'cohere/north-mini-code:free', label: 'North Mini Code (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-free-dots-3-note-preview', apiModel: 'dots-studio/dots-3-note-preview:free', label: 'Dots3 Note Preview (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-free-space-bunny-alpha', apiModel: 'stealth/space-bunny-alpha', label: 'Space Bunny Alpha (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false }
   ],
 
@@ -56,6 +58,7 @@ window.APP_CONFIG = {
     'openrouter-grok-latest': { input: 1.60, output: 4.80 },
     'openrouter-claude-haiku-latest': { input: 1.00, output: 5.00 },
     'openrouter-gpt-sol-latest': { input: 2.00, output: 10.00 },
+    'openrouter-gpt-image-2.5-flare': { input: 5.00, output: 30.00 },
     'openrouter-gemini-flash-latest': { input: 0.75, output: 3.75 },
     'openrouter-claude-sonnet-latest': { input: 2.00, output: 10.00 },
     'openrouter-claude-opus-latest': { input: 5.00, output: 25.00 },
@@ -65,6 +68,7 @@ window.APP_CONFIG = {
     'openrouter-free-ling-3-flash-vl': { input: 0, output: 0 },
     'openrouter-free-north-mini-code': { input: 0, output: 0 },
     'openrouter-free-dots-3-note-preview': { input: 0, output: 0 },
+    'openrouter-free-space-bunny-alpha': { input: 0, output: 0 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 }
   },
 
@@ -148,7 +152,8 @@ window.APP_CONFIG = {
     'openrouter-free-ling-3-flash-fin': ['low', 'medium', 'high'],
     'openrouter-free-ling-3-flash-vl': ['low', 'medium', 'high'],
     'openrouter-free-north-mini-code': ['low', 'medium', 'high'],
-    'openrouter-free-dots-3-note-preview': ['low', 'medium', 'high']
+    'openrouter-free-dots-3-note-preview': ['low', 'medium', 'high'],
+    'openrouter-free-space-bunny-alpha': ['low', 'medium', 'high', 'xhigh', 'max']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -251,6 +256,7 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest') return 'max';
     if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
     if (modelId === 'openrouter-grok-latest') return 'medium';
+    if (modelId === 'openrouter-free-space-bunny-alpha') return 'max';
     if (/^openrouter-free-/.test(modelId || '')) return 'medium';
     return this.DEFAULT_EFFORT;
   },

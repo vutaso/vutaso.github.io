@@ -1066,10 +1066,11 @@ window.UI = (() => {
     if (!els.effortSelect) return;
     const levels = window.APP_CONFIG.getEffortLevels(modelId);
     const wrap = els.effortSelectBtn?.closest('.header-effort-wrap');
-    if (!levels.length) {
+    if (!levels.length || !window.APP_CONFIG.modelSupportsThinking(modelId)) {
       els.effortSelect.classList.add('hidden');
       els.effortSelect.disabled = false;
       wrap?.classList.add('hidden');
+      closeEffortMenu();
       return;
     }
     els.effortSelect.classList.remove('hidden');
