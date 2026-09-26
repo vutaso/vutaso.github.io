@@ -100,6 +100,13 @@ window.APP_CONFIG = {
   REASONING_EFFORT: 'high',
   SEARCH_CONTEXT_SIZE: 'high',
   WEB_SEARCH_MAX_USES: 5,
+  OPENROUTER_WEB_FETCH_MAX_CONTENT_TOKENS: 50000,
+  OPENROUTER_DATETIME_TIMEZONE_BY_LOCALE: {
+    en: 'UTC',
+    vi: 'Asia/Ho_Chi_Minh',
+    jp: 'Asia/Tokyo',
+    zh: 'Asia/Shanghai'
+  },
 
   DEFAULT_EFFORT: 'high',
 
@@ -424,25 +431,71 @@ window.APP_CONFIG = {
     return 'high';
   },
 
+  getOpenRouterWebFetchTool(maxUses) {
+    const maxContentTokens = Number(this.OPENROUTER_WEB_FETCH_MAX_CONTENT_TOKENS);
+    const parameters = { max_uses: maxUses };
+    if (maxContentTokens > 0) {
+      parameters.max_content_tokens = maxContentTokens;
+    }
+    return { type: 'openrouter:web_fetch', parameters };
+  },
+
+  getOpenRouterDatetimeTimezone() {
+    const locale = (window.I18n && window.I18n.getLocale)
+      ? window.I18n.getLocale()
+      : this.DEFAULT_LOCALE;
+    return this.OPENROUTER_DATETIME_TIMEZONE_BY_LOCALE[locale]
+      || this.OPENROUTER_DATETIME_TIMEZONE_BY_LOCALE.vi
+      || 'UTC';
+  },
+
+  getOpenRouterDatetimeTool() {
+    return {
+      type: 'openrouter:datetime',
+      parameters: { timezone: this.getOpenRouterDatetimeTimezone() }
+    };
+  },
+
+  getOpenRouterServerToolFields(modelId, webSearch) {
+    if (!this.isOpenRouterProvider(this.getModelProvider(modelId))) return null;
+    const tools = [this.getOpenRouterDatetimeTool()];
+    if (!webSearch || !this.modelSupportsWebSearch(modelId)) {
+      return { tools };
+    }
+    const webFields = this.getOpenRouterWebSearchFields(modelId);
+    if (!webFields) return { tools };
+    if (webFields.tools?.length) tools.push(...webFields.tools);
+    return {
+      tools,
+      plugins: webFields.plugins
+    };
+  },
+
   getOpenRouterWebSearchFields(modelId) {
     if (!this.modelSupportsWebSearch(modelId)) return null;
+    if (!this.isOpenRouterProvider(this.getModelProvider(modelId))) return null;
     const maxResults = 5;
     const maxUses = Math.max(1, Number(this.WEB_SEARCH_MAX_USES) || 5);
     const searchContextSize = this.getOpenRouterWebSearchContextSize();
+    const webFetchTool = this.getOpenRouterWebFetchTool(maxUses);
     if (this.modelUsesOpenRouterWebSearchPlugin(modelId)) {
       return {
-        plugins: [{ id: 'web', max_results: maxResults }]
+        plugins: [{ id: 'web', max_results: maxResults }],
+        tools: [webFetchTool]
       };
     }
     return {
-      tools: [{
-        type: 'openrouter:web_search',
-        parameters: {
-          max_results: maxResults,
-          max_uses: maxUses,
-          search_context_size: searchContextSize
-        }
-      }]
+      tools: [
+        {
+          type: 'openrouter:web_search',
+          parameters: {
+            max_results: maxResults,
+            max_uses: maxUses,
+            search_context_size: searchContextSize
+          }
+        },
+        webFetchTool
+      ]
     };
   },
 

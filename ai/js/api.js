@@ -387,6 +387,10 @@ window.API = (() => {
 
     collectWebResults(json.search_results, chunks);
     if (Array.isArray(json.citations)) collectWebResults(json.citations, chunks);
+    if (json.url && (json.title || json.content)) {
+      const chunk = chunkFromWeb(json.url, json.title);
+      if (chunk) chunks.push(chunk);
+    }
 
     if (!chunks.length && !queries.length) return;
     const payload = {};
@@ -738,13 +742,16 @@ window.API = (() => {
         if (Array.isArray(delta.tool_calls) && handlers.onSearchStatus) {
           for (const tc of delta.tool_calls) {
             const name = String(tc.function?.name || tc.type || '');
-            if (/web_search/i.test(name)) handlers.onSearchStatus('searching');
+            if (/web_fetch/i.test(name)) handlers.onSearchStatus('fetching');
+            else if (/web_search/i.test(name)) handlers.onSearchStatus('searching');
           }
         }
       }
       if (json.type === 'tool_call' || json.type === 'tool_call.start') {
         const name = String(json.name || json.tool_call?.name || json.tool_call?.type || '');
-        if (/web_search/i.test(name) && handlers.onSearchStatus) {
+        if (/web_fetch/i.test(name) && handlers.onSearchStatus) {
+          handlers.onSearchStatus('fetching');
+        } else if (/web_search/i.test(name) && handlers.onSearchStatus) {
           handlers.onSearchStatus('searching');
         }
       }
@@ -929,11 +936,9 @@ window.API = (() => {
     if (reasoning) {
       body.reasoning = reasoning;
     }
-    if (webSearch) {
-      const webFields = window.APP_CONFIG.getOpenRouterWebSearchFields(model);
-      if (webFields?.tools) body.tools = webFields.tools;
-      if (webFields?.plugins) body.plugins = webFields.plugins;
-    }
+    const serverFields = window.APP_CONFIG.getOpenRouterServerToolFields(model, webSearch);
+    if (serverFields?.tools?.length) body.tools = serverFields.tools;
+    if (serverFields?.plugins) body.plugins = serverFields.plugins;
     return body;
   };
 

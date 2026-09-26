@@ -1065,7 +1065,9 @@ window.Events = (() => {
       reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
       seedGroundingMetadata: isContinue ? groundingMetadata : null,
       onSearchStatus: (status) => {
-        if (status === 'searching') ui.setStreamingSearchStatus(article, 'searching');
+        if (status === 'searching' || status === 'fetching') {
+          ui.setStreamingSearchStatus(article, status);
+        }
       },
       onImageStatus: (status) => {
         if (status === 'generating') ui.setStreamingImageStatus(article, 'generating');

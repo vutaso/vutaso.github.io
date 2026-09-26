@@ -531,11 +531,14 @@ window.UI = (() => {
   };
 
   const setStreamingSearchStatus = (article, status) => {
+    const active = status === 'searching' || status === 'fetching';
+    const label = status === 'fetching' ? t('fetchingWeb') : t('searchingWeb');
+    const icon = status === 'fetching' ? 'fa-link' : 'fa-globe';
     setStreamingToolBadge(
       article,
       'streaming-search-badge',
-      '<i class="fa-solid fa-globe" aria-hidden="true"></i> <span class="streaming-tool-shimmer">' + t('searchingWeb') + '</span>',
-      status === 'searching'
+      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i> <span class="streaming-tool-shimmer">' + label + '</span>',
+      active
     );
   };
 
