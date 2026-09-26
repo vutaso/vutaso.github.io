@@ -8,9 +8,8 @@ window.Events = (() => {
   const ui = window.UI;
   const t = (key, params) => window.I18n.t(key, params);
 
-  let streamingContext = null;
-  let streamEndPromise = null;
-  let streamEndResolve = null;
+  const streams = new Map();
+  let compressConvoId = null;
 
   let docxExporting = false;
   let htmlExporting = false;
@@ -229,13 +228,14 @@ window.Events = (() => {
       return true;
     });
 
-    if (streamingContext && streamingContext.convo.id === convo.id && streamingContext.buffer) {
+    const live = getStream(convo.id);
+    if (live && live.buffer && !convo.messages[live.messageIndex]) {
       const partial = {
         role: 'assistant',
-        content: streamingContext.buffer,
+        content: live.buffer,
         ts: Date.now()
       };
-      if (streamingContext.reasoningBuffer) partial.reasoningContent = streamingContext.reasoningBuffer;
+      if (live.reasoningBuffer) partial.reasoningContent = live.reasoningBuffer;
       messages.push(partial);
     }
 
@@ -255,20 +255,16 @@ window.Events = (() => {
   const getMessageForExport = (convo, idx) => {
     const m = convo.messages[idx];
     if (m && isExportableMessage(m)) return m;
-    if (
-      streamingContext
-      && streamingContext.convo.id === convo.id
-      && streamingContext.messageIndex === idx
-      && streamingContext.buffer
-    ) {
+    const live = getStream(convo.id);
+    if (live && live.messageIndex === idx && live.buffer) {
       const partial = {
         role: 'assistant',
-        content: streamingContext.buffer,
+        content: live.buffer,
         ts: Date.now()
       };
-      if (streamingContext.reasoningBuffer) partial.reasoningContent = streamingContext.reasoningBuffer;
-      if (streamingContext.generatedImages?.length) {
-        partial.generatedImages = streamingContext.generatedImages.slice();
+      if (live.reasoningBuffer) partial.reasoningContent = live.reasoningBuffer;
+      if (live.generatedImages?.length) {
+        partial.generatedImages = live.generatedImages.slice();
       }
       return partial;
     }
@@ -451,7 +447,7 @@ window.Events = (() => {
     const hasText = ui.els.composerInput.value.trim().length > 0;
     const hasAttachments = pendingImages.length > 0 || pendingFiles.length > 0;
     const canSend = (compareMode || s.imageGenEnabled) ? hasText : (hasText || hasAttachments);
-    const voiceMode = !canSend && !window.API.isStreaming() && !!window.Speech?.isSTTSupported?.();
+    const voiceMode = !canSend && !composerLocked() && !!window.Speech?.isSTTSupported?.();
     ui.els.sendBtn.classList.toggle('is-voice', voiceMode);
     if (voiceMode) {
       const listening = !!window.Speech?.isListening?.();
@@ -475,7 +471,7 @@ window.Events = (() => {
         ui.els.sendBtn.setAttribute('aria-label', sendLabel);
       }
     }
-    if (!window.API.isStreaming()) {
+    if (!composerLocked()) {
       ui.els.composerInput.disabled = false;
       const imageGenOn = s.imageGenEnabled;
       const compareOn = !!s.compareEnabled;
@@ -624,20 +620,88 @@ window.Events = (() => {
     updateSendEnabled();
   };
 
-  const getStreamingConvoId = () => streamingContext?.convo?.id ?? null;
+  const chatStreamKey = (convoId) => 'chat:' + convoId;
+  const compressStreamKey = (convoId) => 'compress:' + convoId;
+  const COMPARE_STREAM_KEY = 'compare';
 
-  const settleActiveStream = async ({ discard = false } = {}) => {
-    if (!window.API.isStreaming()) return;
-    if (streamingContext) streamingContext.discardSave = !!discard;
-    const wait = streamEndPromise || Promise.resolve();
-    apiAbort();
+  const getStream = (convoId) => (convoId ? streams.get(convoId) : null) || null;
+
+  const isConvoStreaming = (convoId) => !!(convoId && streams.has(convoId));
+
+  const isCurrentStreaming = () => isConvoStreaming(convoMod.getCurrent()?.id);
+
+  const composerLocked = () => isCurrentStreaming()
+    || compressing
+    || !!window.API.isStreaming(COMPARE_STREAM_KEY);
+
+  const syncRunningIndicators = () => {
+    ui.setRunningConversationIds(streams.keys());
+  };
+
+  const syncComposerStreaming = () => {
+    ui.setStreaming(composerLocked());
+    updateSendEnabled();
+  };
+
+  const streamVisible = (ctx) => !!(
+    ctx
+    && !ctx.detached
+    && ctx.article?.isConnected
+    && convoMod.getCurrent()?.id === ctx.convo.id
+  );
+
+  const detachStream = (convoId) => {
+    const ctx = streams.get(convoId);
+    if (!ctx) return;
+    ctx.detached = true;
+    ctx.article = null;
+    ctx.contentEl = null;
+  };
+
+  const settleConvoStream = async (convoId, { discard = false } = {}) => {
+    const ctx = streams.get(convoId);
+    if (!ctx && !window.API.isStreaming(chatStreamKey(convoId))) return;
+    if (ctx) ctx.discardSave = !!discard;
+    const wait = ctx?.endPromise || Promise.resolve();
+    apiAbort(chatStreamKey(convoId));
     await wait;
   };
 
-  const settleIfStreamingConvo = async (convoId, options = {}) => {
-    if (!window.API.isStreaming()) return;
-    if (getStreamingConvoId() !== convoId) return;
-    await settleActiveStream(options);
+  const settleStreamsForWorkspace = async (imageWorkspace, options = {}) => {
+    const ids = [...streams.keys()].filter((id) => {
+      const kind = streams.get(id)?.convo?.kind;
+      return imageWorkspace ? kind === 'image' : kind !== 'image';
+    });
+    await Promise.all(ids.map((id) => settleConvoStream(id, options)));
+  };
+
+  const reattachStream = (convo) => {
+    const ctx = convo ? streams.get(convo.id) : null;
+    if (!ctx) return;
+    let streaming = null;
+    if (ctx.continueIdx !== undefined) {
+      streaming = ui.beginContinueStreaming(ctx.continueIdx);
+    } else if (ctx.retryIdx !== undefined) {
+      streaming = ui.beginRetryStreaming(ctx.retryIdx);
+    }
+    if (!streaming) {
+      streaming = ui.appendStreamingMessage(ctx.messageIndex, ctx.modelId);
+    }
+    if (!streaming) return;
+    ctx.article = streaming.article;
+    ctx.contentEl = streaming.content;
+    ctx.detached = false;
+    const reasoningOpen = !!ctx.reasoningBuffer && !ctx.buffer;
+    ui.updateStreamingAssistantContent(
+      ctx.contentEl,
+      ctx.buffer,
+      ctx.generatedImages,
+      ctx.reasoningBuffer,
+      { reasoningOpen, groundingMetadata: ctx.groundingMetadata }
+    );
+    if (ctx.searchStatus) ui.setStreamingSearchStatus(ctx.article, ctx.searchStatus);
+    if (ctx.shellActive) ui.setStreamingShellStatus(ctx.article, 'active');
+    if (ctx.imageStatus) ui.setStreamingImageStatus(ctx.article, ctx.imageStatus);
   };
 
   const getCompareModels = () => {
@@ -653,9 +717,17 @@ window.Events = (() => {
     if (!ui.isModelCompareOpen()) return;
     ui.closeModelCompareOverlay();
     compareContext = null;
-    ui.setStreaming(false);
-    updateSendEnabled();
+    syncComposerStreaming();
     if (toastKey) ui.showToast(t(toastKey));
+  };
+
+  const leaveCurrentStreamView = () => {
+    const id = convoMod.getCurrent()?.id;
+    if (id) detachStream(id);
+    if (ui.isModelCompareOpen()) {
+      apiAbort(COMPARE_STREAM_KEY);
+      closeCompareOverlay();
+    }
   };
 
   const pickCompareResult = (modelId) => {
@@ -671,7 +743,7 @@ window.Events = (() => {
     }
 
     compareContext.picked = true;
-    if (window.API.isStreaming()) apiAbort();
+    if (window.API.isStreaming(COMPARE_STREAM_KEY)) apiAbort(COMPARE_STREAM_KEY);
 
     const extra = {};
     if (data.generatedImages?.length) extra.generatedImages = data.generatedImages.slice();
@@ -894,9 +966,46 @@ window.Events = (() => {
     return text.replace(/^\n{3,}/, '\n\n');
   };
 
+  const releaseStreamSlot = (convoId, ctx) => {
+    if (!convoId || !ctx) return;
+    if (ctx.endResolve) {
+      ctx.endResolve();
+      ctx.endResolve = null;
+    }
+    const cur = streams.get(convoId);
+    if (cur === ctx) {
+      streams.delete(convoId);
+      syncRunningIndicators();
+      syncComposerStreaming();
+    }
+  };
+
   const streamResponse = async (convo, { retryIdx, continueIdx } = {}) => {
+    const convoId = convo?.id;
+    if (!convoId || streams.has(convoId)) return;
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const streamSettings = {
+      apiKey: window.APP_CONFIG.getApiKey(s, modelId),
+      systemPrompt: s.systemPrompt,
+      reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+      webSearchEnabled: s.webSearchEnabled,
+      shellEnabled: s.shellEnabled,
+      thinkingEnabled: s.thinkingEnabled,
+      workspace: s.workspace,
+      imageGenEnabled: s.imageGenEnabled
+    };
+    let ctx = {
+      convo,
+      convoId,
+      pending: true,
+      discardSave: false,
+      endResolve: null,
+      endPromise: null
+    };
+    ctx.endPromise = new Promise((resolve) => { ctx.endResolve = resolve; });
+    streams.set(convoId, ctx);
+    syncRunningIndicators();
     const isContinue = continueIdx !== undefined;
     const isRetry = !isContinue && retryIdx !== undefined;
     let article;
@@ -909,7 +1018,10 @@ window.Events = (() => {
       if (!streaming) {
         ui.renderMessages(convo);
         const again = ui.beginContinueStreaming(continueIdx);
-        if (!again) return;
+        if (!again) {
+          releaseStreamSlot(convoId, ctx);
+          return;
+        }
         article = again.article;
         content = again.content;
       } else {
@@ -923,7 +1035,10 @@ window.Events = (() => {
       if (!streaming) {
         ui.renderMessages(convo);
         const retry = ui.beginRetryStreaming(retryIdx);
-        if (!retry) return;
+        if (!retry) {
+          releaseStreamSlot(convoId, ctx);
+          return;
+        }
         article = retry.article;
         content = retry.content;
       } else {
@@ -947,7 +1062,6 @@ window.Events = (() => {
       ? seedMsg.generatedImages.slice()
       : [];
     let groundingMetadata = isContinue ? (seedMsg?.groundingMetadata || null) : null;
-    ui.setStreaming(true);
     ui.removeError();
     if (isContinue) {
       ui.updateStreamingAssistantContent(
@@ -958,10 +1072,25 @@ window.Events = (() => {
       ui.updateStreamingAssistantContent(content, '', [], '', { reasoningOpen: false });
     }
 
-    streamEndResolve = null;
-    streamEndPromise = new Promise((resolve) => { streamEndResolve = resolve; });
-
-    streamingContext = { convo, contentEl: content, article, buffer, reasoningBuffer, generatedImages, groundingMetadata, retryIdx: isRetry ? retryIdx : undefined, continueIdx: isContinue ? continueIdx : undefined, discardSave: false, messageIndex };
+    Object.assign(ctx, {
+      contentEl: content,
+      article,
+      buffer,
+      reasoningBuffer,
+      generatedImages,
+      groundingMetadata,
+      retryIdx: isRetry ? retryIdx : undefined,
+      continueIdx: isContinue ? continueIdx : undefined,
+      messageIndex,
+      modelId,
+      streamSettings,
+      searchStatus: null,
+      shellActive: false,
+      imageStatus: null,
+      detached: false,
+      pending: false
+    });
+    syncComposerStreaming();
 
     const users = convo.messages.filter((m) => m.role === 'user');
     let triggerUser = users[users.length - 1] || null;
@@ -980,16 +1109,17 @@ window.Events = (() => {
       || !!(triggerUser?.imageGen && window.APP_CONFIG.modelSupportsImageGen(modelId))
     );
     const useWebSearch = !isContinue && !useImageGen
-      && s.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
+      && streamSettings.webSearchEnabled && window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const useShell = !isContinue && !useImageGen
-      && s.shellEnabled && window.APP_CONFIG.modelSupportsShell(modelId);
+      && streamSettings.shellEnabled && window.APP_CONFIG.modelSupportsShell(modelId);
     if (useShell) {
+      ctx.shellActive = true;
       ui.setStreamingShellStatus(article, 'active');
     }
     const isEffortThinking = window.APP_CONFIG.modelUsesEffortLinkedThinking(modelId);
     const useThinking = isEffortThinking
-      ? s.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
-      : (s.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
+      ? streamSettings.reasoningEffort !== 'default' && window.APP_CONFIG.modelSupportsThinking(modelId)
+      : (streamSettings.thinkingEnabled || window.APP_CONFIG.modelThinkingRequired(modelId))
         && window.APP_CONFIG.modelSupportsThinking(modelId);
 
     const useSlides = !!(triggerUser?.slides);
@@ -998,9 +1128,14 @@ window.Events = (() => {
     const usePdf = !!(triggerUser?.pdf);
 
     const refreshStreamingContent = () => {
+      ctx.buffer = buffer;
+      ctx.reasoningBuffer = reasoningBuffer;
+      ctx.generatedImages = generatedImages.slice();
+      ctx.groundingMetadata = groundingMetadata;
+      if (!streamVisible(ctx)) return;
       const reasoningOpen = !!reasoningBuffer && !buffer;
       ui.updateStreamingAssistantContent(
-        content, buffer, generatedImages, reasoningBuffer, { reasoningOpen, groundingMetadata }
+        ctx.contentEl, buffer, generatedImages, reasoningBuffer, { reasoningOpen, groundingMetadata }
       );
     };
 
@@ -1010,12 +1145,11 @@ window.Events = (() => {
         dataUrl: payload.dataUrl,
         name: t('aiImage', { n: index + 1 })
       };
-      if (streamingContext) streamingContext.generatedImages = generatedImages.slice();
       refreshStreamingContent();
     };
 
     const saveAssistantResult = (text, { truncated = false } = {}) => {
-      if (streamingContext?.discardSave) return;
+      if (ctx.discardSave) return;
       if (!convoMod.getById(convo.id)) return;
       const extra = { responseModel: modelId, truncated: !!truncated };
       const savedImages = generatedImages.filter((img) => img?.dataUrl);
@@ -1038,34 +1172,36 @@ window.Events = (() => {
         if (!payload.truncated) delete payload.truncated;
         convoMod.addMessage(convo, payload);
       }
+      ui.refreshConversationList(convoMod.getCurrent()?.id ?? null);
     };
 
-    const finishStreamingResponse = (buffer, { aborted = false, truncated = false } = {}) => {
-      ui.setStreamingSearchStatus(article, null);
-      ui.setStreamingShellStatus(article, null);
-      ui.setStreamingImageStatus(article, null);
+    const finishStreamingResponse = (doneBuffer, { aborted = false, truncated = false } = {}) => {
+      if (ctx.article?.isConnected) {
+        ui.setStreamingSearchStatus(ctx.article, null);
+        ui.setStreamingShellStatus(ctx.article, null);
+        ui.setStreamingImageStatus(ctx.article, null);
+      }
 
       const finalMsg = convo.messages[messageIndex];
-      const viewingConvo = convoMod.getCurrent();
-      const shouldFinalizeUi = viewingConvo?.id === convo.id && article?.isConnected;
+      const shouldFinalizeUi = streamVisible(ctx);
 
       if (shouldFinalizeUi) {
-        if (!article.dataset.idx && messageIndex !== undefined) {
-          article.dataset.idx = String(messageIndex);
+        if (!ctx.article.dataset.idx && messageIndex !== undefined) {
+          ctx.article.dataset.idx = String(messageIndex);
         }
-        ui.finalizeStreaming(article, buffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
+        ui.finalizeStreaming(ctx.article, doneBuffer || convoMod.getAssistantContent(finalMsg) || '', finalMsg);
       }
 
-      ui.setStreaming(false);
-      streamingContext = null;
-
-      if (streamEndResolve) {
-        streamEndResolve();
-        streamEndResolve = null;
-        streamEndPromise = null;
+      streams.delete(convoId);
+      if (ctx.endResolve) {
+        ctx.endResolve();
+        ctx.endResolve = null;
       }
+      syncRunningIndicators();
+      syncComposerStreaming();
+      ui.refreshConversationList(convoMod.getCurrent()?.id ?? null);
 
-      if (useImageGen && generatedImages.length && !aborted && state.get().workspace !== 'image') {
+      if (useImageGen && generatedImages.length && !aborted && convoMod.getCurrent()?.id === convo.id && streamSettings.workspace !== 'image') {
         state.set({ imageGenEnabled: false });
         resetImageGenPicked();
         syncComposerTools(modelId, { imageGenEnabled: false });
@@ -1088,7 +1224,6 @@ window.Events = (() => {
         processPdfResponse(convo, messageIndex, buffer);
       }
 
-      updateSendEnabled();
     };
 
     const requestConvo = isContinue
@@ -1102,75 +1237,80 @@ window.Events = (() => {
         }
       : convo;
 
+    try {
     await apiSend({
-      apiKey: window.APP_CONFIG.getApiKey(s, modelId),
+      allowConcurrent: true,
+      streamId: chatStreamKey(convoId),
+      apiKey: streamSettings.apiKey,
       model: modelId,
-      systemPrompt: useImageGen ? (window.I18n.getImageSystemPrompt?.() || '') : s.systemPrompt,
+      systemPrompt: useImageGen ? (window.I18n.getImageSystemPrompt?.() || '') : streamSettings.systemPrompt,
       convo: requestConvo,
       webSearch: useWebSearch,
       shell: useShell,
       imageGen: useImageGen,
       thinking: useImageGen ? false : useThinking,
-      reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
+      reasoningEffort: streamSettings.reasoningEffort,
       seedGroundingMetadata: isContinue ? groundingMetadata : null,
       onSearchStatus: (status) => {
         if (status === 'searching' || status === 'fetching') {
-          ui.setStreamingSearchStatus(article, status);
+          ctx.searchStatus = status;
+          if (streamVisible(ctx)) ui.setStreamingSearchStatus(ctx.article, status);
         }
       },
       onShellStatus: (status) => {
         if (status === 'running' || status === 'active') {
-          ui.setStreamingShellStatus(article, status);
+          ctx.shellActive = true;
+          if (streamVisible(ctx)) ui.setStreamingShellStatus(ctx.article, status);
         }
       },
       onImageStatus: (status) => {
-        if (status === 'generating') ui.setStreamingImageStatus(article, 'generating');
-        else ui.setStreamingImageStatus(article, null);
+        ctx.imageStatus = status === 'generating' ? 'generating' : null;
+        if (streamVisible(ctx)) ui.setStreamingImageStatus(ctx.article, ctx.imageStatus);
       },
       onImagePartial: upsertGeneratedImage,
       onImageComplete: (payload) => {
-        ui.setStreamingImageStatus(article, null);
+        ctx.imageStatus = null;
+        if (streamVisible(ctx)) ui.setStreamingImageStatus(ctx.article, null);
         upsertGeneratedImage(payload);
       },
       onToken: (delta) => {
-        ui.setStreamingSearchStatus(article, null);
+        ctx.searchStatus = null;
+        if (streamVisible(ctx)) ui.setStreamingSearchStatus(ctx.article, null);
         if (isContinue) {
           continuation += delta;
           buffer = seedText + stripContinuationOverlap(seedText, continuation);
         } else {
           buffer += delta;
         }
-        if (streamingContext) streamingContext.buffer = buffer;
         refreshStreamingContent();
       },
       onReasoningToken: (delta) => {
         if (!useThinking) return;
         reasoningBuffer += delta;
-        if (streamingContext) streamingContext.reasoningBuffer = reasoningBuffer;
         refreshStreamingContent();
       },
       onGroundingMetadata: (meta) => {
         groundingMetadata = meta;
-        if (streamingContext) streamingContext.groundingMetadata = meta;
         refreshStreamingContent();
       },
       onDone: (info) => {
-        const discard = !!(streamingContext && streamingContext.discardSave);
+        const discard = !!ctx.discardSave;
         const msg = convo.messages[messageIndex];
         const hasResult = buffer || generatedImages.length;
         const aborted = !!(info && info.aborted);
         const hasText = !!(buffer && String(buffer).trim());
-        if (useImageGen && !aborted && !generatedImages.some((img) => img?.dataUrl)) {
+        const viewing = convoMod.getCurrent()?.id === convo.id;
+        if (useImageGen && !aborted && !generatedImages.some((img) => img?.dataUrl) && viewing) {
           ui.showError(new Error(t('imageGenNoImage')));
         }
         if (aborted) {
           const truncated = isContinue && hasText;
           if (hasResult && !discard) {
             saveAssistantResult(buffer, { truncated });
-            ui.showToast(t('toastStopped'));
+            if (viewing) ui.showToast(t('toastStopped'));
           } else if (isRetry && !discard) {
             convoMod.cancelRetryVariant(convo, messageIndex);
-            if (msg && convoMod.getById(convo.id)) ui.updateAssistantMessage(messageIndex, msg);
+            if (msg && viewing && convoMod.getById(convo.id)) ui.updateAssistantMessage(messageIndex, msg);
           }
           finishStreamingResponse(buffer, { aborted, truncated });
         } else if (hasResult && !discard) {
@@ -1191,7 +1331,7 @@ window.Events = (() => {
         }
       },
       onError: (err) => {
-        const discard = !!(streamingContext && streamingContext.discardSave);
+        const discard = !!ctx.discardSave;
         if (!discard) {
           const truncated = !!(buffer && String(buffer).trim()) && !!err?.truncated;
           const finalText = buffer || t('emptyErrorMessage');
@@ -1201,24 +1341,28 @@ window.Events = (() => {
             ui.updateSettingsTokenUsage(state.get());
             ui.checkTokenCostWarning(state.get());
           }
-          ui.showError(err);
+          if (convoMod.getCurrent()?.id === convo.id) ui.showError(err);
           finishStreamingResponse(buffer || '', { truncated });
         } else {
           finishStreamingResponse(buffer || '');
         }
       }
     });
+    } catch (err) {
+      releaseStreamSlot(convoId, ctx);
+      if (convoMod.getCurrent()?.id === convo.id) ui.showError(err);
+    }
   };
 
   const branchFromMessageAt = async (idx) => {
-    if (window.API.isStreaming() || ui.isShareViewMode?.()) return;
+    if (isCurrentStreaming() || ui.isShareViewMode?.()) return;
     const convo = convoMod.getCurrent();
     if (!convo) return;
     const msg = convo.messages[idx];
     if (!msg) return;
     if (msg.role === 'assistant' && !convoMod.getAssistantContent(msg)) return;
 
-    await settleActiveStream({ discard: false });
+    await settleConvoStream(convo.id, { discard: false });
     ui.setExportSelectMode(false);
 
     const branched = convoMod.branchFromMessage(convo, idx);
@@ -1258,7 +1402,7 @@ window.Events = (() => {
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
-    if (window.API.isStreaming()) return;
+    if (isCurrentStreaming()) return;
 
     const convo = convoMod.getCurrent();
     if (!convo) return;
@@ -1288,7 +1432,7 @@ window.Events = (() => {
       ui.showToast(window.APP_CONFIG.getMissingApiKeyMessage(modelId));
       return;
     }
-    if (window.API.isStreaming()) return;
+    if (isCurrentStreaming()) return;
 
     const convo = convoMod.getCurrent();
     if (!convo) return;
@@ -1323,7 +1467,7 @@ window.Events = (() => {
     }
 
     const text = ui.els.composerInput.value.trim();
-    if (window.API.isStreaming()) return;
+    if (isCurrentStreaming() || window.API.isStreaming(COMPARE_STREAM_KEY)) return;
 
     if (compareMode) {
       if (!text) return;
@@ -1403,11 +1547,18 @@ window.Events = (() => {
   };
 
   const stopStreaming = () => {
-    if (!window.API.isStreaming()) return;
-    apiAbort();
-    if (ui.isModelCompareOpen()) {
-      ui.syncComparePickButtons();
+    if (window.API.isStreaming(COMPARE_STREAM_KEY)) {
+      apiAbort(COMPARE_STREAM_KEY);
+      if (ui.isModelCompareOpen()) ui.syncComparePickButtons();
+      return;
     }
+    if (compressConvoId && window.API.isStreaming(compressStreamKey(compressConvoId))) {
+      apiAbort(compressStreamKey(compressConvoId));
+      return;
+    }
+    const id = convoMod.getCurrent()?.id;
+    if (!id || !window.API.isStreaming(chatStreamKey(id))) return;
+    apiAbort(chatStreamKey(id));
   };
 
   const saveEdit = (msg) => {
@@ -1418,7 +1569,7 @@ window.Events = (() => {
     const newContent = textarea.value.trim();
     if (!newContent) return;
     const convo = convoMod.getCurrent();
-    if (!convo) return;
+    if (!convo || isConvoStreaming(convo.id)) return;
     convoMod.editMessage(convo, idx, newContent);
     applyCurrentImageGen(convo, idx);
     ui.renderMessages(convo);
@@ -1817,14 +1968,15 @@ window.Events = (() => {
       ui.syncCompareBar(state.get());
       ui.refreshConversationList(convo ? convo.id : null);
       ui.renderMessages(convo);
+      reattachStream(convo);
       ui.updateSettingsTokenUsage(state.get());
-      updateSendEnabled();
+      syncComposerStreaming();
       ui.closeMobileSidebar();
       if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput?.focus();
     };
 
     const enterChatWorkspace = async ({ createNew = false } = {}) => {
-      await settleActiveStream({ discard: false });
+      leaveCurrentStreamView();
       ui.setExportSelectMode(false);
       const s = state.get();
       const fromImage = s.workspace === 'image';
@@ -1858,7 +2010,7 @@ window.Events = (() => {
     };
 
     const enterImageWorkspace = async () => {
-      await settleActiveStream({ discard: false });
+      leaveCurrentStreamView();
       ui.setExportSelectMode(false);
       const s = state.get();
       const already = s.workspace === 'image';
@@ -1909,9 +2061,14 @@ window.Events = (() => {
       presentWorkspace(convo);
     };
 
-    const startNewChat = () => enterChatWorkspace({ createNew: true });
+    const startNewChat = (e) => {
+      e?.preventDefault?.();
+      enterChatWorkspace({ createNew: true });
+    };
 
+    ui.els.newChatBtn?.setAttribute('type', 'button');
     ui.els.newChatBtn.addEventListener('click', startNewChat);
+    ui.els.headerNewChatBtn?.setAttribute('type', 'button');
     ui.els.headerNewChatBtn?.addEventListener('click', startNewChat);
     ui.els.imageStudioBtn?.addEventListener('click', () => {
       enterImageWorkspace();
@@ -1956,11 +2113,16 @@ window.Events = (() => {
       if (action === 'delete') {
         e.stopPropagation();
         if (!confirm(t('confirmDeleteConvo'))) return;
-        await settleIfStreamingConvo(id, { discard: true });
+        const wasCurrent = convoMod.getCurrent()?.id === id;
+        await settleConvoStream(id, { discard: true });
         convoMod.remove(id);
         const cur = convoMod.getCurrent();
         ui.refreshConversationList(cur ? cur.id : null);
-        ui.renderMessages(cur);
+        if (wasCurrent) {
+          ui.renderMessages(cur);
+          reattachStream(cur);
+          syncComposerStreaming();
+        }
         ui.closeMobileSidebar();
       } else if (action === 'rename') {
         e.stopPropagation();
@@ -1972,15 +2134,14 @@ window.Events = (() => {
           ui.refreshConversationList(convoMod.getCurrent()?.id || null);
         }
       } else {
-        const streamingId = getStreamingConvoId();
-        if (window.API.isStreaming() && streamingId && id !== streamingId) {
-          await settleActiveStream({ discard: false });
-        }
+        if (id !== convoMod.getCurrent()?.id) leaveCurrentStreamView();
         ui.setExportSelectMode(false);
         const c = convoMod.select(id);
         if (!c) return;
         ui.refreshConversationList(id);
         ui.renderMessages(c);
+        reattachStream(c);
+        syncComposerStreaming();
         const sidebarQ = ui.getConversationSearchQuery();
         if (sidebarQ && sidebarQ.trim()) {
           ui.openChatFind(sidebarQ, {
@@ -2103,7 +2264,7 @@ window.Events = (() => {
 
         docxExporting = true;
         ui.setHeaderDownloadOptionDisabled('docx', true);
-        const streaming = window.API.isStreaming();
+        const streaming = isCurrentStreaming();
         ui.setPdfExportLoading(true, {
           title: t('toastExportingWord'),
           hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
@@ -2135,7 +2296,7 @@ window.Events = (() => {
 
         htmlExporting = true;
         ui.setHeaderDownloadOptionDisabled('html', true);
-        const streaming = window.API.isStreaming();
+        const streaming = isCurrentStreaming();
         ui.setPdfExportLoading(true, {
           title: t('exportHtmlTitle'),
           hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
@@ -2169,7 +2330,7 @@ window.Events = (() => {
 
         pdfExporting = true;
         ui.setHeaderDownloadOptionDisabled('pdf', true);
-        const streaming = window.API.isStreaming();
+        const streaming = isCurrentStreaming();
         ui.setPdfExportLoading(true, {
           title: t('exportPdfTitle'),
           hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
@@ -2252,7 +2413,7 @@ window.Events = (() => {
     });
 
     ui.els.compressContextBtn?.addEventListener('click', async () => {
-      if (compressing || window.API.isStreaming()) return;
+      if (compressing || isCurrentStreaming()) return;
       const convo = convoMod.getCurrent();
       if (!convo || !window.ContextCompress.shouldOfferCompress(convo)) return;
 
@@ -2268,6 +2429,7 @@ window.Events = (() => {
       }
 
       compressing = true;
+      compressConvoId = convo.id;
       ui.els.compressContextBtn.disabled = true;
       ui.setStreaming(true);
       ui.setPdfExportLoading(true, {
@@ -2283,6 +2445,7 @@ window.Events = (() => {
           locale: s.locale || window.I18n.getLocale(),
         });
         ui.renderMessages(convoMod.getCurrent());
+        reattachStream(convoMod.getCurrent());
         ui.showToast(t('compressSuccess', { n: result.removedCount }));
       } catch (err) {
         const msg = err?.message || String(err);
@@ -2290,8 +2453,9 @@ window.Events = (() => {
         else ui.showToast(t('compressFailed', { err: msg }));
       } finally {
         ui.setPdfExportLoading(false);
-        ui.setStreaming(false);
         compressing = false;
+        compressConvoId = null;
+        syncComposerStreaming();
         ui.syncCompressContextBar();
       }
     });
@@ -2514,7 +2678,7 @@ window.Events = (() => {
     });
 
     ui.els.closeModelCompareBtn?.addEventListener('click', () => {
-      if (window.API.isStreaming()) apiAbort();
+      if (window.API.isStreaming(COMPARE_STREAM_KEY)) apiAbort(COMPARE_STREAM_KEY);
       closeCompareOverlay({ toastKey: 'compareClosed' });
     });
 
@@ -2730,7 +2894,7 @@ window.Events = (() => {
 
     const handleClearAll = async () => {
       if (!confirm(t('confirmClearAll'))) return;
-      await settleActiveStream({ discard: true });
+      await settleStreamsForWorkspace(state.get().workspace === 'image', { discard: true });
       await ui.animateClearAll();
       convoMod.clearAll(state.get().workspace === 'image' ? 'image' : 'chat');
       ui.clearConversationSearch();
@@ -2859,7 +3023,8 @@ window.Events = (() => {
       const restoreApiKeys = !!ui.els.backupRestoreKeys?.checked;
       setBackupBusy(true);
       try {
-        await settleActiveStream({ discard: true });
+        await settleStreamsForWorkspace(false, { discard: true });
+        await settleStreamsForWorkspace(true, { discard: true });
         const result = await state.applyBackup(pendingBackup, { mode, restoreApiKeys });
         pendingBackup = null;
         ui.closeBackupRestoreModal();
@@ -3176,7 +3341,7 @@ window.Events = (() => {
         }
         if (ui.isModelCompareOpen()) {
           e.preventDefault();
-          if (window.API.isStreaming()) apiAbort();
+          if (window.API.isStreaming(COMPARE_STREAM_KEY)) apiAbort(COMPARE_STREAM_KEY);
           closeCompareOverlay({ toastKey: 'compareClosed' });
           return;
         }
@@ -3455,7 +3620,7 @@ window.Events = (() => {
       }
       const retryBtn = e.target.closest('[data-action="retry"]');
       if (retryBtn) {
-        if (window.API.isStreaming()) return;
+        if (isCurrentStreaming()) return;
         const msgEl = retryBtn.closest('.message');
         const idx = parseInt(msgEl?.dataset.idx, 10);
         if (!isNaN(idx)) retryAssistantMessage(idx);
@@ -3463,7 +3628,7 @@ window.Events = (() => {
       }
       const continueBtn = e.target.closest('[data-action="continue"]');
       if (continueBtn) {
-        if (window.API.isStreaming()) return;
+        if (isCurrentStreaming()) return;
         const msgEl = continueBtn.closest('.message');
         const idx = parseInt(msgEl?.dataset.idx, 10);
         if (!isNaN(idx)) continueAssistantMessage(idx);
@@ -3471,7 +3636,7 @@ window.Events = (() => {
       }
       const exportToggle = e.target.closest('[data-action="export-toggle"]');
       if (exportToggle) {
-        if (window.API.isStreaming()) return;
+        if (isCurrentStreaming()) return;
         e.stopPropagation();
         const wrap = exportToggle.closest('.msg-export-wrap');
         const menu = wrap?.querySelector('.msg-export-menu');
@@ -3486,7 +3651,7 @@ window.Events = (() => {
       }
       const exportOption = e.target.closest('[data-export-format]');
       if (exportOption) {
-        if (window.API.isStreaming()) return;
+        if (isCurrentStreaming()) return;
         e.stopPropagation();
         ui.closeAllMsgExportMenus();
         const msgEl = exportOption.closest('.message');
@@ -3529,7 +3694,7 @@ window.Events = (() => {
       const editBtn = e.target.closest('[data-action="edit"]');
       if (editBtn) {
         const msg = editBtn.closest('.message');
-        if (msg && !window.API.isStreaming()) {
+        if (msg && !isCurrentStreaming()) {
           ui.enterEditMode(msg);
         }
         return;
@@ -3550,7 +3715,7 @@ window.Events = (() => {
       if (branchBtn) {
         if (ui.isShareViewMode?.()) return;
         const msgEl = branchBtn.closest('.message');
-        if (!msgEl || window.API.isStreaming()) return;
+        if (!msgEl || isCurrentStreaming()) return;
         const idx = parseInt(msgEl.dataset.idx, 10);
         if (!isNaN(idx)) branchFromMessageAt(idx);
         return;
@@ -3558,7 +3723,7 @@ window.Events = (() => {
       const delBtn = e.target.closest('[data-action="delete-msg"]');
       if (delBtn) {
         const msg = delBtn.closest('.message');
-        if (!msg || window.API.isStreaming()) return;
+        if (!msg || isCurrentStreaming()) return;
         const idx = parseInt(msg.dataset.idx, 10);
         if (isNaN(idx)) return;
         if (!confirm(t('confirmDeleteMsg'))) return;

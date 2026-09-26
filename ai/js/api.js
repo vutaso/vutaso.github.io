@@ -1,7 +1,29 @@
 window.API = (() => {
   const { OPENAI_ENDPOINT, RESPONSES_ENDPOINT, ANTHROPIC_ENDPOINT, ANTHROPIC_VERSION, DEEPSEEK_ENDPOINT, KIMI_ENDPOINT } = window.APP_CONFIG;
-  const activeControllers = new Set();
-  const isStreaming = () => activeControllers.size > 0;
+  const streamGroups = new Map();
+
+  const isStreaming = (streamId) => {
+    if (streamId) return (streamGroups.get(streamId)?.size || 0) > 0;
+    for (const set of streamGroups.values()) {
+      if (set.size) return true;
+    }
+    return false;
+  };
+
+  const trackController = (streamId, controller) => {
+    let set = streamGroups.get(streamId);
+    if (!set) {
+      set = new Set();
+      streamGroups.set(streamId, set);
+    }
+    set.add(controller);
+    return () => {
+      const current = streamGroups.get(streamId);
+      if (!current || !current.has(controller)) return;
+      current.delete(controller);
+      if (!current.size) streamGroups.delete(streamId);
+    };
+  };
 
   const appendFilesToText = (text, files) => {
     if (!files || !files.length) return text || '';
@@ -1495,9 +1517,11 @@ window.API = (() => {
     webSearch, shell, imageGen, thinking, reasoningEffort,
     seedGroundingMetadata,
     allowConcurrent = false,
+    streamId = '',
     onToken, onReasoningToken, onUsage, onDone, onError, onSearchStatus, onShellStatus, onImageStatus, onImagePartial, onImageComplete, onGroundingMetadata
   }) => {
-    if (!allowConcurrent && activeControllers.size > 0) {
+    const groupId = streamId || (allowConcurrent ? ('concurrent:' + Date.now() + ':' + Math.random()) : ('req:' + Date.now() + ':' + Math.random()));
+    if (!allowConcurrent && isStreaming(groupId)) {
       throw new Error('Đang có yêu cầu khác đang chạy');
     }
 
@@ -1508,8 +1532,7 @@ window.API = (() => {
     }
 
     const controller = new AbortController();
-    activeControllers.add(controller);
-    const releaseController = () => { activeControllers.delete(controller); };
+    const releaseController = trackController(groupId, controller);
     let groundingMeta = seedGroundingMetadata
       ? mergeGroundingMetadata({ groundingChunks: [], webSearchQueries: [] }, seedGroundingMetadata)
       : null;
@@ -1610,11 +1633,21 @@ window.API = (() => {
     }
   };
 
-  const abort = () => {
-    for (const controller of activeControllers) {
+  const abort = (streamId) => {
+    const drop = (controller) => {
       try { controller.abort(); } catch { /* ignore */ }
+    };
+    if (streamId) {
+      const set = streamGroups.get(streamId);
+      if (!set) return;
+      for (const controller of set) drop(controller);
+      streamGroups.delete(streamId);
+      return;
     }
-    activeControllers.clear();
+    for (const set of streamGroups.values()) {
+      for (const controller of set) drop(controller);
+    }
+    streamGroups.clear();
   };
 
   return { send, abort, isStreaming };

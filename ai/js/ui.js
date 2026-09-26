@@ -1232,14 +1232,22 @@ window.UI = (() => {
             ? '<span class="conversation-branch-meta">' + escapeHTML(t('branchBadge')) + '</span>'
             : '';
           const iconClass = isBranchConvo ? 'fa-code-branch' : (c.kind === 'image' ? 'fa-image' : 'fa-message');
+          const running = runningConversationIds.has(c.id);
+          const runningLabel = escapeHTML(t('conversationGenerating'));
+          const runningHTML = running
+            ? '<span class="conversation-running" title="' + runningLabel + '" aria-label="' + runningLabel + '">'
+              + '<span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>'
+              + '</span>'
+            : '';
           return `
-          <li class="conversation-item ${c.id === currentId ? 'active' : ''}${isBranchConvo ? ' is-branch' : ''}" data-id="${c.id}">
+          <li class="conversation-item ${c.id === currentId ? 'active' : ''}${isBranchConvo ? ' is-branch' : ''}${running ? ' is-running' : ''}" data-id="${c.id}">
             <span class="icon" aria-hidden="true"><i class="fa-solid ${iconClass}"></i></span>
             <span class="conversation-item-body">
               <span class="title" title="${escapeHTML(c.title)}">${highlightSearchText(c.title, q)}</span>
               ${branchMeta}
               ${snippetHTML}
             </span>
+            ${runningHTML}
             <span class="actions">
               <button type="button" class="btn btn-icon" data-action="rename" title="${escapeHTML(t('rename'))}"><i class="fa-solid fa-pen"></i></button>
               <button type="button" class="btn btn-icon" data-action="delete" title="${escapeHTML(t('delete'))}"><i class="fa-solid fa-trash"></i></button>
@@ -1249,6 +1257,26 @@ window.UI = (() => {
       : `<li class="conversation-empty" style="padding:12px 16px;color:var(--text-dim);font-size:13px;">${emptyMsg}</li>`;
     els.conversationList.innerHTML = html;
   };
+
+  let runningConversationIds = new Set();
+
+  const setRunningConversationIds = (ids) => {
+    const next = new Set(ids || []);
+    if (next.size === runningConversationIds.size) {
+      let same = true;
+      for (const id of next) {
+        if (!runningConversationIds.has(id)) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return;
+    }
+    runningConversationIds = next;
+    refreshConversationList();
+  };
+
+  const isConversationRunning = (id) => !!(id && runningConversationIds.has(id));
 
   let conversationSearchQuery = '';
   let conversationSearchOpen = false;
@@ -1301,7 +1329,12 @@ window.UI = (() => {
       els.compressContextHint.textContent = t('compressContextHint', { n: c.messages.length });
     }
     if (els.compressContextBtn) {
-      els.compressContextBtn.disabled = !!window.API?.isStreaming?.();
+      const id = c?.id;
+      const busy = !!(id && (
+        window.API?.isStreaming?.('chat:' + id)
+        || window.API?.isStreaming?.('compress:' + id)
+      ));
+      els.compressContextBtn.disabled = busy;
     }
   };
 
@@ -1359,7 +1392,7 @@ window.UI = (() => {
     }
 
     if (!els.compareModelPickers) return;
-    const streaming = !!window.API?.isStreaming?.();
+    const streaming = !!window.API?.isStreaming?.('compare');
     els.compareModelPickers.innerHTML = models.map((modelId, i) => {
       const canRemove = models.length > window.ModelCompare.COMPARE_MIN_MODELS;
       const providerId = getCompareProviderId(modelId);
@@ -4749,7 +4782,7 @@ window.UI = (() => {
     initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingShellStatus, setStreamingImageStatus, updateStreamingAssistantContent,
-    renderConversationList, refreshConversationList, getConversationSearchQuery,
+    renderConversationList, refreshConversationList, setRunningConversationIds, isConversationRunning, getConversationSearchQuery,
     setConversationSearchQuery, toggleConversationSearch, clearConversationSearch, isConversationSearchOpen,
     isChatFindOpen, openChatFind, closeChatFind, toggleChatFind, focusChatFind, stepChatFind,
     renderMessages, renderEmpty, animateClearAll,

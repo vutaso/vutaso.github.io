@@ -79,7 +79,8 @@ window.ContextCompress = (() => {
   };
 
   const requestSummary = async ({ transcript, modelId, apiKey, locale, convo, onProgress }) => {
-    if (window.API.isStreaming()) {
+    const streamId = convo?.id ? ('compress:' + convo.id) : 'compress';
+    if ((convo?.id && window.API.isStreaming('chat:' + convo.id)) || window.API.isStreaming(streamId)) {
       throw new Error(window.I18n.t('compressBusyStreaming'));
     }
     const tempConvo = {
@@ -95,6 +96,7 @@ window.ContextCompress = (() => {
     let buffer = '';
     await new Promise((resolve, reject) => {
       window.API.send({
+        streamId,
         apiKey,
         model: modelId,
         systemPrompt,

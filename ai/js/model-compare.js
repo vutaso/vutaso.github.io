@@ -107,6 +107,7 @@ window.ModelCompare = (() => {
 
     window.API.send({
       allowConcurrent: true,
+      streamId: 'compare',
       apiKey: window.APP_CONFIG.getApiKey(settings, modelId),
       model: modelId,
       systemPrompt: settings.systemPrompt,
