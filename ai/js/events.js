@@ -3230,6 +3230,16 @@ window.Events = (() => {
         }
         return;
       }
+      const downloadTableCsvBtn = e.target.closest('[data-download-table-csv]');
+      if (downloadTableCsvBtn) {
+        const table = downloadTableCsvBtn.closest('.table-block')?.querySelector('table');
+        const csv = table ? window.Markdown.tableToCsv(table) : '';
+        if (!csv) return;
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+        window.Utils.downloadBlob(blob, 'table.csv');
+        ui.showToast(t('toastDownloadCsv'));
+        return;
+      }
       const speakBtn = e.target.closest('[data-action="speak"]');
       if (speakBtn) {
         const msg = speakBtn.closest('.message');

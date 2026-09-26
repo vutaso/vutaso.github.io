@@ -735,6 +735,18 @@ window.API = (() => {
         if (delta.content) {
           if (handlers.onToken) handlers.onToken(delta.content);
         }
+        if (Array.isArray(delta.tool_calls) && handlers.onSearchStatus) {
+          for (const tc of delta.tool_calls) {
+            const name = String(tc.function?.name || tc.type || '');
+            if (/web_search/i.test(name)) handlers.onSearchStatus('searching');
+          }
+        }
+      }
+      if (json.type === 'tool_call' || json.type === 'tool_call.start') {
+        const name = String(json.name || json.tool_call?.name || json.tool_call?.type || '');
+        if (/web_search/i.test(name) && handlers.onSearchStatus) {
+          handlers.onSearchStatus('searching');
+        }
       }
     } catch (e) {
       if (e instanceof SyntaxError) {
@@ -903,7 +915,7 @@ window.API = (() => {
     return body;
   };
 
-  const buildOpenRouterBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+  const buildOpenRouterBody = (model, systemPrompt, convo, thinking, reasoningEffort, webSearch) => {
     const body = withStreamUsage({
       model: window.APP_CONFIG.getApiModel(model),
       messages: buildMessages(convo, systemPrompt),
@@ -916,6 +928,11 @@ window.API = (() => {
     const reasoning = window.APP_CONFIG.getOpenRouterThinkingConfig(model, thinking, reasoningEffort);
     if (reasoning) {
       body.reasoning = reasoning;
+    }
+    if (webSearch) {
+      const webFields = window.APP_CONFIG.getOpenRouterWebSearchFields(model);
+      if (webFields?.tools) body.tools = webFields.tools;
+      if (webFields?.plugins) body.plugins = webFields.plugins;
     }
     return body;
   };
@@ -971,11 +988,11 @@ window.API = (() => {
     }
   };
 
-  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort }) => {
+  const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort, webSearch }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
       : provider === 'openrouter'
-            ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort)
+            ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort, webSearch)
           : provider === 'kimi'
             ? buildKimiBody(model, systemPrompt, convo, thinking)
             : buildOpenAIChatBody(model, systemPrompt, convo, thinking, reasoningEffort);
@@ -985,6 +1002,9 @@ window.API = (() => {
     if (provider === 'openrouter') {
       headers['HTTP-Referer'] = window.location.origin || 'https://vutaso.github.io';
       headers['X-Title'] = 'Vutaso AI';
+      if (webSearch && body.plugins && handlers.onSearchStatus) {
+        handlers.onSearchStatus('searching');
+      }
     }
 
     const res = await fetch(endpoint || OPENAI_ENDPOINT, {
@@ -1260,7 +1280,8 @@ window.API = (() => {
         } else {
           await sendChatCompletions({
             apiKey, model, systemPrompt, convo, controller, handlers,
-            endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter', thinking, reasoningEffort: effort
+            endpoint: window.APP_CONFIG.getOpenRouterEndpoint(), provider: 'openrouter',
+            thinking, reasoningEffort: effort, webSearch
           });
         }
       } else if (tools.length || (thinking && provider === 'openai')) {

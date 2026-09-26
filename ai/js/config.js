@@ -9,24 +9,25 @@ window.APP_CONFIG = {
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
-    { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
-    { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true },
-    { id: 'openrouter-mimo-v2-6-flash', apiModel: 'xiaomi/mimo-v2.6-flash', label: 'MiMo V2.6 Flash (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
-    { id: 'openrouter-mimo-v2-6-pro', apiModel: 'xiaomi/mimo-v2.6-pro', label: 'MiMo V2.6 Pro (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
-    { id: 'openrouter-gpt-luna-latest', apiModel: '~openai/gpt-luna-latest', label: 'GPT Luna Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gpt-sol-latest', apiModel: '~openai/gpt-sol-latest', label: 'GPT Sol Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-gemini-flash-latest', apiModel: '~google/gemini-flash-latest', label: 'Gemini Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
-    { id: 'openrouter-kimi-latest', apiModel: '~moonshotai/kimi-latest', label: 'Kimi Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-grok-latest', apiModel: '~x-ai/grok-latest', label: 'Grok Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-claude-haiku-latest', apiModel: '~anthropic/claude-haiku-latest', label: 'Claude Haiku Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
-    { id: 'openrouter-claude-sonnet-latest', apiModel: '~anthropic/claude-sonnet-latest', label: 'Claude Sonnet Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
-    { id: 'openrouter-claude-opus-latest', apiModel: '~anthropic/claude-opus-latest', label: 'Claude Opus Latest (OpenRouter)', provider: 'openrouter', webSearch: false, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true },
+    { id: 'openrouter-mimo-v2-6-flash', apiModel: 'xiaomi/mimo-v2.6-flash', label: 'MiMo V2.6 Flash (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-mimo-v2-6-pro', apiModel: 'xiaomi/mimo-v2.6-pro', label: 'MiMo V2.6 Pro (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-gpt-luna-latest', apiModel: '~openai/gpt-luna-latest', label: 'GPT Luna Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gpt-sol-latest', apiModel: '~openai/gpt-sol-latest', label: 'GPT Sol Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-gemini-flash-latest', apiModel: '~google/gemini-flash-latest', label: 'Gemini Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 65536 },
+    { id: 'openrouter-kimi-latest', apiModel: '~moonshotai/kimi-latest', label: 'Kimi Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-grok-latest', apiModel: '~x-ai/grok-latest', label: 'Grok Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-claude-haiku-latest', apiModel: '~anthropic/claude-haiku-latest', label: 'Claude Haiku Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 64000 },
+    { id: 'openrouter-claude-sonnet-latest', apiModel: '~anthropic/claude-sonnet-latest', label: 'Claude Sonnet Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 128000 },
+    { id: 'openrouter-claude-opus-latest', apiModel: '~anthropic/claude-opus-latest', label: 'Claude Opus Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 128000 },
     { id: 'openrouter-free-router', apiModel: 'openrouter/free', label: 'Free Models Router (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-free-ling-3-flash-sante', apiModel: 'inclusionai/ling-3.0-flash-sante:free', label: 'Ling 3.0 Flash Sante (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-free-ling-3-flash-fin', apiModel: 'inclusionai/ling-3.0-flash-fin:free', label: 'Ling 3.0 Flash Fin (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'openrouter-free-ling-3-flash-vl', apiModel: 'inclusionai/ling-3.0-flash-vl', label: 'Ling 3.0 Flash VL (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-free-north-mini-code', apiModel: 'cohere/north-mini-code:free', label: 'North Mini Code (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
+    { id: 'openrouter-free-dots-3-note-preview', apiModel: 'dots-studio/dots-3-note-preview:free', label: 'Dots3 Note Preview (OpenRouter Free)', provider: 'openrouter-free', webSearch: false, imageGen: false, thinking: true, vision: false },
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false }
   ],
 
@@ -59,6 +60,7 @@ window.APP_CONFIG = {
     'openrouter-free-ling-3-flash-fin': { input: 0, output: 0 },
     'openrouter-free-ling-3-flash-vl': { input: 0, output: 0 },
     'openrouter-free-north-mini-code': { input: 0, output: 0 },
+    'openrouter-free-dots-3-note-preview': { input: 0, output: 0 },
     'deepseek-v4-pro': { input: 0.435, output: 0.87 }
   },
 
@@ -134,7 +136,8 @@ window.APP_CONFIG = {
     'openrouter-free-ling-3-flash-sante': ['low', 'medium', 'high'],
     'openrouter-free-ling-3-flash-fin': ['low', 'medium', 'high'],
     'openrouter-free-ling-3-flash-vl': ['low', 'medium', 'high'],
-    'openrouter-free-north-mini-code': ['low', 'medium', 'high']
+    'openrouter-free-north-mini-code': ['low', 'medium', 'high'],
+    'openrouter-free-dots-3-note-preview': ['low', 'medium', 'high']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -408,6 +411,39 @@ window.APP_CONFIG = {
   modelSupportsWebSearch(modelId) {
     const m = this.MODELS.find((x) => x.id === modelId);
     return !!(m && m.webSearch);
+  },
+
+  modelUsesOpenRouterWebSearchPlugin(modelId) {
+    const m = this.getModel(modelId);
+    return !!(m && m.webSearch && m.webSearchPlugin);
+  },
+
+  getOpenRouterWebSearchContextSize() {
+    const size = String(this.SEARCH_CONTEXT_SIZE || 'high').toLowerCase();
+    if (size === 'low' || size === 'medium' || size === 'high') return size;
+    return 'high';
+  },
+
+  getOpenRouterWebSearchFields(modelId) {
+    if (!this.modelSupportsWebSearch(modelId)) return null;
+    const maxResults = 5;
+    const maxUses = Math.max(1, Number(this.WEB_SEARCH_MAX_USES) || 5);
+    const searchContextSize = this.getOpenRouterWebSearchContextSize();
+    if (this.modelUsesOpenRouterWebSearchPlugin(modelId)) {
+      return {
+        plugins: [{ id: 'web', max_results: maxResults }]
+      };
+    }
+    return {
+      tools: [{
+        type: 'openrouter:web_search',
+        parameters: {
+          max_results: maxResults,
+          max_uses: maxUses,
+          search_context_size: searchContextSize
+        }
+      }]
+    };
   },
 
   modelSupportsImageGen(modelId) {

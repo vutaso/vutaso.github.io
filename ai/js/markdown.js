@@ -21,6 +21,11 @@ window.Markdown = (() => {
     return '<button type="button" class="copy-table-btn" data-copy-table title="' + title + '" aria-label="' + title + '"><i class="fa-solid fa-table"></i></button>';
   };
 
+  const downloadTableCsvBtn = () => {
+    const title = escapeHTML(copyBtnTitle('downloadTableCsv', 'Tải file CSV'));
+    return '<button type="button" class="copy-table-btn" data-download-table-csv title="' + title + '" aria-label="' + title + '"><i class="fa-solid fa-file-csv"></i></button>';
+  };
+
   const previewMdBtn = () =>
     '<button type="button" class="preview-md-btn" data-preview-md title="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '" aria-label="' + escapeHTML(previewBtnTitle('previewMarkdown', 'Preview Markdown')) + '"><i class="fa-solid fa-eye"></i></button>';
 
@@ -640,6 +645,20 @@ window.Markdown = (() => {
     return mdRows.join('\n');
   };
 
+  const escapeCsvCell = (text) => {
+    const value = String(text ?? '');
+    if (/[",\n\r]/.test(value)) return '"' + value.replace(/"/g, '""') + '"';
+    return value;
+  };
+
+  const tableToCsv = (table) => {
+    const rows = [...table.querySelectorAll('tr')];
+    if (!rows.length) return '';
+    return rows.map((row) =>
+      [...row.querySelectorAll('th, td')].map((cell) => escapeCsvCell(cellText(cell))).join(',')
+    ).join('\r\n');
+  };
+
   const enhanceTables = (root) => {
     if (!root) return;
     root.querySelectorAll('table').forEach((table) => {
@@ -650,7 +669,7 @@ window.Markdown = (() => {
       const header = document.createElement('div');
       header.className = 'table-header';
       header.innerHTML = '<span class="table-label">' + escapeHTML(copyBtnTitle('tableLabel', 'Bảng')) + '</span>'
-        + '<div class="table-header-actions">' + copyTableMarkdownBtn() + copyTablePlainBtn() + '</div>';
+        + '<div class="table-header-actions">' + copyTableMarkdownBtn() + copyTablePlainBtn() + downloadTableCsvBtn() + '</div>';
       const scroll = document.createElement('div');
       scroll.className = 'table-scroll';
 
@@ -704,5 +723,5 @@ window.Markdown = (() => {
     initMermaid();
   };
 
-  return { init, render, wrapMath, enhanceCodeBlocks, enhanceTables, enhanceLinks, tableToMarkdown, tableToPlainText, typesetMath, renderMermaid, renderMermaidPreview, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
+  return { init, render, wrapMath, enhanceCodeBlocks, enhanceTables, enhanceLinks, tableToMarkdown, tableToPlainText, tableToCsv, typesetMath, renderMermaid, renderMermaidPreview, resetMermaidBlocks, initMermaid, updateMermaidTheme, getMermaidSource, isMarkdownLang };
 })();
