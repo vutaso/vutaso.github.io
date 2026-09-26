@@ -2,8 +2,10 @@ window.APP_CONFIG = {
   STORAGE_KEY: 'testchatai',
 
   MODELS: [
-    { id: 'gpt-6-luna', label: 'GPT-6 Luna', provider: 'openai', webSearch: true, imageGen: true, thinking: true, maxOutputTokens: 128000 },
-    { id: 'gpt-6-sol', label: 'GPT-6 Sol', provider: 'openai', webSearch: true, imageGen: true, thinking: true, maxOutputTokens: 128000 },
+    { id: 'gpt-6-luna', label: 'GPT-6 Luna', provider: 'openai', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 128000 },
+    { id: 'gpt-6-sol', label: 'GPT-6 Sol', provider: 'openai', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 128000 },
+    { id: 'gpt-image-2.5-flare', label: 'GPT Image 2.5 Flare', provider: 'openai', webSearch: false, imageGen: true, imageOnly: true, thinking: false, vision: true, apiMode: 'openai-images' },
+    { id: 'gpt-image-2.5-sunburst', label: 'GPT Image 2.5 Sunburst', provider: 'openai', webSearch: false, imageGen: true, imageOnly: true, thinking: false, vision: true, apiMode: 'openai-images' },
     { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, maxOutputTokens: 64000 },
     { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
@@ -37,6 +39,8 @@ window.APP_CONFIG = {
   MODEL_PRICING: {
     'gpt-6-sol': { input: 2.00, output: 10.00 },
     'gpt-6-luna': { input: 0.10, output: 0.50 },
+    'gpt-image-2.5-flare': { input: 5.00, output: 30.00 },
+    'gpt-image-2.5-sunburst': { input: 5.00, output: 30.00 },
     'claude-haiku-4-5': { input: 1.00, output: 5.00 },
     'claude-sonnet-5': { input: 3.00, output: 15.00 },
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
@@ -150,6 +154,7 @@ window.APP_CONFIG = {
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
 
   getEffortLevels(modelId) {
+    if (this.modelUsesOpenAIImages(modelId)) return [];
     if (this.modelUsesAnthropicManualThinking(modelId)) {
       return [];
     }
@@ -300,8 +305,18 @@ window.APP_CONFIG = {
     return Math.min(budget, Math.max(1024, cap - 1));
   },
 
+  isImageWorkspace() {
+    return !!(window.Storage && window.Storage.get && window.Storage.get().workspace === 'image');
+  },
+
+  visibleModels() {
+    return this.isImageWorkspace()
+      ? this.MODELS.filter((m) => m.imageGen)
+      : this.MODELS.filter((m) => !m.imageOnly);
+  },
+
   getProviders() {
-    const ids = new Set(this.MODELS.map((m) => m.provider));
+    const ids = new Set(this.visibleModels().map((m) => m.provider));
     return this.PROVIDERS.filter((p) => ids.has(p.id));
   },
 
@@ -312,7 +327,7 @@ window.APP_CONFIG = {
   },
 
   getModelsByProvider(providerId) {
-    return this.MODELS.filter((m) => m.provider === providerId);
+    return this.visibleModels().filter((m) => m.provider === providerId);
   },
 
   getModelDisplayLabel(model) {
@@ -536,6 +551,13 @@ window.APP_CONFIG = {
     return !!(m && m.imageGen);
   },
 
+  defaultImageModel() {
+    const dedicated = this.MODELS.find((m) => m.apiMode === 'openai-images');
+    if (dedicated) return dedicated.id;
+    const found = this.MODELS.find((m) => m.imageGen);
+    return found ? found.id : this.DEFAULT_MODEL;
+  },
+
   modelSupportsThinking(modelId) {
     const m = this.MODELS.find((x) => x.id === modelId);
     return !!(m && m.thinking);
@@ -592,13 +614,15 @@ window.APP_CONFIG = {
     return 'Translate to ' + this.getTranslateLanguage(code).label;
   },
 
+  // OpenAI Images và tool image_generation chỉ nhận 1024x1024, 1024x1536, 1536x1024.
+  // Tỷ lệ khác dùng khung gần nhất; prompt vẫn ghi đúng tỷ lệ người dùng chọn.
   IMAGE_GEN_RATIOS: [
     { id: '1:1', label: '1:1', desc: 'ảnh hồ sơ', size: '1024x1024', w: 1, h: 1 },
     { id: '2:3', label: '2:3', desc: 'ảnh tự sướng trên mạng xã hội', size: '1024x1536', w: 2, h: 3 },
-    { id: '3:4', label: '3:4', desc: 'ảnh cổ điển', size: '1152x1536', w: 3, h: 4 },
-    { id: '4:3', label: '4:3', desc: 'hình minh họa trong bài viết', size: '1536x1152', w: 4, h: 3 },
-    { id: '9:16', label: '9:16', desc: 'hình nền thiết bị di động, dọc', size: '1152x2048', w: 9, h: 16 },
-    { id: '16:9', label: '16:9', desc: 'hình nền máy tính, ngang', size: '2048x1152', w: 16, h: 9 }
+    { id: '3:4', label: '3:4', desc: 'ảnh cổ điển', size: '1024x1536', w: 3, h: 4 },
+    { id: '4:3', label: '4:3', desc: 'hình minh họa trong bài viết', size: '1536x1024', w: 4, h: 3 },
+    { id: '9:16', label: '9:16', desc: 'hình nền thiết bị di động, dọc', size: '1024x1536', w: 9, h: 16 },
+    { id: '16:9', label: '16:9', desc: 'hình nền máy tính, ngang', size: '1536x1024', w: 16, h: 9 }
   ],
 
   IMAGE_GEN_STYLES: [
@@ -619,9 +643,19 @@ window.APP_CONFIG = {
     { id: 'minimal', label: 'Tối giản', prompt: 'Bố cục tối giản, nhiều khoảng trống.' }
   ],
 
+  IMAGE_GEN_QUALITIES: [
+    { id: 'auto' },
+    { id: 'low' },
+    { id: 'medium' },
+    { id: 'high' },
+    { id: 'xhigh' },
+    { id: 'max' }
+  ],
+
   DEFAULT_IMAGE_GEN_RATIO: '1:1',
   DEFAULT_IMAGE_GEN_STYLE: 'auto',
   DEFAULT_IMAGE_GEN_TEMPLATE: 'none',
+  DEFAULT_IMAGE_GEN_QUALITY: 'low',
 
   getImageGenRatio(id) {
     return this.IMAGE_GEN_RATIOS.find((r) => r.id === id) || this.IMAGE_GEN_RATIOS[0];
@@ -635,22 +669,41 @@ window.APP_CONFIG = {
     return this.IMAGE_GEN_TEMPLATES.find((t) => t.id === id) || this.IMAGE_GEN_TEMPLATES[0];
   },
 
+  getImageGenQuality(id) {
+    return this.IMAGE_GEN_QUALITIES.find((q) => q.id === id)
+      || this.IMAGE_GEN_QUALITIES.find((q) => q.id === this.DEFAULT_IMAGE_GEN_QUALITY)
+      || this.IMAGE_GEN_QUALITIES[0];
+  },
+
   buildImageGenPrompt(text, { ratioId, styleId, templateId }) {
     const hints = [];
     const style = this.getImageGenStyle(styleId);
     const template = this.getImageGenTemplate(templateId);
     const ratio = this.getImageGenRatio(ratioId);
-    if (style.prompt) hints.push(style.prompt);
-    if (template.prompt) hints.push(template.prompt);
-    hints.push('Tỷ lệ khung hình ' + ratio.label + '.');
+    const stylePrompt = window.I18n?.imageGenPrompt?.('style', style.id) || style.prompt;
+    const templatePrompt = window.I18n?.imageGenPrompt?.('template', template.id) || template.prompt;
+    const ratioHint = window.I18n?.imageGenPrompt?.('ratio', ratio.label) || ('Aspect ratio ' + ratio.label + '.');
+    if (stylePrompt) hints.push(stylePrompt);
+    if (templatePrompt) hints.push(templatePrompt);
+    if (ratioHint) hints.push(ratioHint);
     const base = (text || '').trim();
     if (!hints.length) return base;
     return base ? base + '\n\n' + hints.join(' ') : hints.join(' ');
   },
+
+  getResponsesImageToolModel(modelId) {
+    if (modelId === 'gpt-6-sol') return 'gpt-image-2.5-sunburst';
+    return 'gpt-image-2.5-flare';
+  },
+
+  ACCEPTED_REF_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  REF_IMAGE_MAX_BYTES: 20 * 1024 * 1024,
   DEFAULT_SYSTEM_PROMPT: 'Bạn là một trợ lý AI thông minh, tận tâm và chính xác. Hãy tuân thủ các nguyên tắc sau:\n\n1. Suy nghĩ từng bước trước khi trả lời các câu hỏi phức tạp.\n2. Trả lời chi tiết, đầy đủ và có cấu trúc rõ ràng. Sử dụng markdown để định dạng khi cần (tiêu đề, danh sách, bảng, code block).\n3. Nếu không chắc chắn, hãy nói rõ giới hạn kiến thức của bạn thay vì bịa đặt.\n4. Khi được hỏi về code hoặc kỹ thuật, hãy giải thích nguyên lý đằng sau, không chỉ đưa ra code.\n5. Luôn trả lời bằng tiếng Việt, trừ khi người dùng yêu cầu ngôn ngữ khác.\n6. Đưa ra ví dụ cụ thể khi có thể để minh họa cho câu trả lời.',
   DEFAULT_THEME: 'claude-dark',
 
   OPENAI_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
+  OPENAI_IMAGES_ENDPOINT: 'https://api.openai.com/v1/images/generations',
+  OPENAI_IMAGE_EDITS_ENDPOINT: 'https://api.openai.com/v1/images/edits',
   RESPONSES_ENDPOINT: 'https://api.openai.com/v1/responses',
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
@@ -697,6 +750,10 @@ window.APP_CONFIG = {
 
   modelUsesOpenRouterImages(modelId) {
     return this.getModel(modelId).apiMode === 'openrouter-images';
+  },
+
+  modelUsesOpenAIImages(modelId) {
+    return this.getModel(modelId).apiMode === 'openai-images';
   },
 
   openRouterImagesSupportsAspectRatio(modelId) {

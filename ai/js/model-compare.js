@@ -9,8 +9,10 @@ window.ModelCompare = (() => {
     'openrouter-gpt-luna-latest',
   ];
 
+  const chatModelIds = () => MODELS.filter((m) => !m.imageOnly).map((m) => m.id);
+
   const getDefaultModels = (currentModelId) => {
-    const valid = new Set(MODELS.map((m) => m.id));
+    const valid = new Set(chatModelIds());
     const picks = [];
     const current = currentModelId || window.APP_CONFIG.DEFAULT_MODEL;
     if (valid.has(current)) picks.push(current);
@@ -18,9 +20,9 @@ window.ModelCompare = (() => {
       if (picks.length >= COMPARE_MAX_MODELS) break;
       if (valid.has(id) && !picks.includes(id)) picks.push(id);
     }
-    for (const m of MODELS) {
+    for (const id of chatModelIds()) {
       if (picks.length >= COMPARE_MAX_MODELS) break;
-      if (!picks.includes(m.id)) picks.push(m.id);
+      if (!picks.includes(id)) picks.push(id);
     }
     while (picks.length < COMPARE_MIN_MODELS) {
       picks.push(picks[0] || MODELS[0]?.id || current);
@@ -29,7 +31,7 @@ window.ModelCompare = (() => {
   };
 
   const normalizeModelList = (models) => {
-    const valid = new Set(MODELS.map((m) => m.id));
+    const valid = new Set(chatModelIds());
     const seen = new Set();
     const out = [];
     for (const id of models || []) {

@@ -18,12 +18,17 @@ window.Storage = (() => {
     webSearchEnabled: false,
     shellEnabled: false,
     imageGenEnabled: false,
+    workspace: 'chat',
+    chatModel: '',
+    imageModel: '',
+    lastChatConversationId: null,
     thinkingEnabled: window.APP_CONFIG.DEFAULT_EFFORT !== 'default'
       && window.APP_CONFIG.modelUsesEffortLinkedThinking(window.APP_CONFIG.DEFAULT_MODEL),
     reasoningEffort: window.APP_CONFIG.DEFAULT_EFFORT,
     imageGenRatio: window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
     imageGenStyle: window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
     imageGenTemplate: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
+    imageGenQuality: window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY,
     translateEnabled: false,
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
     tokenSaveEnabled: false,
@@ -484,6 +489,13 @@ window.Storage = (() => {
     if (!validTemplates.includes(state.imageGenTemplate)) {
       setField('imageGenTemplate', window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE);
     }
+    const validQualities = window.APP_CONFIG.IMAGE_GEN_QUALITIES.map((q) => q.id);
+    if (!validQualities.includes(state.imageGenQuality)) {
+      setField('imageGenQuality', window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY);
+    } else if (!state.imageGenLowDefaultApplied && state.imageGenQuality === 'auto') {
+      setField('imageGenQuality', window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY);
+    }
+    if (!state.imageGenLowDefaultApplied) setField('imageGenLowDefaultApplied', true);
     const allEfforts = ['minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'default'];
     if (!allEfforts.includes(state.reasoningEffort)) {
       setField('reasoningEffort', window.APP_CONFIG.DEFAULT_EFFORT);

@@ -91,7 +91,9 @@
 
 /* New chat is a quiet row, not a filled button. */
 :root[data-theme="claude"] .sidebar-header .btn-primary,
-:root[data-theme="claude-dark"] .sidebar-header .btn-primary {
+:root[data-theme="claude-dark"] .sidebar-header .btn-primary,
+:root[data-theme="claude"] .sidebar-header .sidebar-nav-btn,
+:root[data-theme="claude-dark"] .sidebar-header .sidebar-nav-btn {
   justify-content: flex-start;
   height: 36px;
   padding: 0 10px;
@@ -104,7 +106,11 @@
 }
 
 :root[data-theme="claude"] .sidebar-header .btn-primary:hover,
-:root[data-theme="claude-dark"] .sidebar-header .btn-primary:hover {
+:root[data-theme="claude-dark"] .sidebar-header .btn-primary:hover,
+:root[data-theme="claude"] .sidebar-header .sidebar-nav-btn:hover,
+:root[data-theme="claude-dark"] .sidebar-header .sidebar-nav-btn:hover,
+:root[data-theme="claude"] .sidebar-header .sidebar-nav-btn.is-active,
+:root[data-theme="claude-dark"] .sidebar-header .sidebar-nav-btn.is-active {
   background: var(--bg-hover);
   color: var(--text);
   box-shadow: none;

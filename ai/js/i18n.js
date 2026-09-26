@@ -19,6 +19,7 @@ window.I18n = (() => {
     en: {
       newChat: 'New chat',
       history: 'History',
+      historyImage: 'Images',
       search: 'Search',
       searchPlaceholder: 'Search chat history...',
       searchClear: 'Clear',
@@ -80,6 +81,7 @@ window.I18n = (() => {
       shellTitle: 'Run commands in OpenRouter sandbox (Responses API)',
       imageGen: 'Generate image',
       imageGenTitle: 'Generate images with AI',
+      backToChat: 'Back to chat',
       translate: 'Translate',
       translateTitle: 'Translate text to another language',
       slides: 'Create Slides',
@@ -306,7 +308,9 @@ window.I18n = (() => {
       viewImage: 'View image',
       zoomImage: 'Zoom image',
       hello: 'Hello!',
+      helloImage: 'Create an image',
       emptySub: 'How can I help you today? Drag and drop images or documents to analyze.',
+      emptySubImage: 'Describe the image you want. Choose a ratio, style, and template in the box below.',
       scrollRailLabel: 'Jump to question',
       scrollRailPrev: 'Previous question',
       scrollRailNext: 'Next question',
@@ -442,11 +446,18 @@ window.I18n = (() => {
       ratio: 'Ratio',
       style: 'Style',
       template: 'Template',
+      quality: 'Quality',
       auto: 'Auto',
       noTemplate: 'No template',
-      changeRatio: 'Change ratio',
-      changeStyle: 'Change style',
-      changeTemplate: 'Change template',
+      changeRatio: 'Reset ratio',
+      changeStyle: 'Reset style',
+      changeTemplate: 'Reset template',
+      changeQuality: 'Reset quality',
+      removeReferenceImage: 'Remove reference image',
+      toastRefImageRemoved: 'Reference image removed',
+      toastRefImageTooLarge: 'Reference image must be under 20 MB',
+      toastRefImageTypes: 'Reference images must be JPEG, PNG, or WebP',
+      toastRefImageOne: 'Using the first image as the reference',
       disableImageGen: 'Disable image generation',
       disableTranslate: 'Disable translate',
       translateTo: 'Translate to',
@@ -463,6 +474,7 @@ window.I18n = (() => {
       ratioPrefix: 'Ratio ',
       stylePrefix: 'Style ',
       templatePrefix: 'Template ',
+      qualityPrefix: 'Quality ',
       showHide: 'Show/Hide',
       missingApiKeyOpenAI: 'Enter your API key in Settings first',
       missingApiKeyAnthropic: 'Enter your Anthropic API key in Settings first',
@@ -520,6 +532,10 @@ window.I18n = (() => {
       toastImageGenOff: 'Image generation disabled',
       toastRefImageAdded: 'Reference image added',
       toastRefImageFail: 'Could not read reference image',
+      imageGenNoPrompt: 'Enter a description to generate an image',
+      imageGenNoImage: 'The API did not return an image',
+      imageGenRefUnreadable: 'Could not read the reference image',
+      emptyErrorMessage: 'An error occurred and the message is empty.',
       toastTranslateOn: 'Translate enabled',
       toastSlidesOn: 'Slides mode enabled',
       toastSlidesOff: 'Slides mode disabled',
@@ -601,7 +617,7 @@ window.I18n = (() => {
       guideStep5Body: 'Use attach buttons, drag & drop, or paste from clipboard (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>). Supports txt, md, pdf, docx, xlsx, csv, json and many code formats.',
       guideStep5Body2: 'When <strong>Generate image</strong> is on, regular attachments are disabled; use a reference image for edits.',
       guideStep6Title: 'Manage conversations',
-      guideStep6Body: '<strong>New chat</strong> in the sidebar creates a new session. Click items in <strong>History</strong> to switch. AI remembers all messages in the current session. Title is auto-generated from the first user message; rename via the conversation menu.',
+      guideStep6Body: '<strong>New chat</strong> in the sidebar creates a new session. <strong>Generate image</strong> under it opens a workspace only for creating images (ratio, style, template, reference image). History shows chats or image sessions for the tab you are in. Click an item to switch. AI remembers all messages in the current session. Title is auto-generated from the first user message; rename via the conversation menu.',
       guideStep7Title: 'Message actions',
       guideStep7Li1: '<strong>User</strong> messages: Edit, Copy, Delete (cuts messages after)',
       guideStep7Li2: '<strong>Assistant</strong> messages: Regenerate, Continue when cut off, switch version <strong>1/N</strong>, Copy',
@@ -613,6 +629,7 @@ window.I18n = (() => {
     vi: {
       newChat: 'Cuộc trò chuyện mới',
       history: 'Lịch sử',
+      historyImage: 'Hình ảnh',
       search: 'Tìm kiếm',
       searchPlaceholder: 'Tìm trong lịch sử chat...',
       searchClear: 'Xoá',
@@ -674,6 +691,7 @@ window.I18n = (() => {
       shellTitle: 'Chạy lệnh trong sandbox OpenRouter (Responses API)',
       imageGen: 'Tạo hình ảnh',
       imageGenTitle: 'Tạo hình ảnh bằng AI',
+      backToChat: 'Quay lại chat',
       translate: 'Dịch',
       translateTitle: 'Dịch văn bản sang ngôn ngữ khác',
       slides: 'Tạo Slides',
@@ -900,7 +918,9 @@ window.I18n = (() => {
       viewImage: 'Xem ảnh',
       zoomImage: 'Xem ảnh phóng to',
       hello: 'All chats are private',
+      helloImage: 'Tạo hình ảnh',
       emptySub: 'Tôi có thể giúp gì cho bạn hôm nay? Kéo thả ảnh hoặc tài liệu vào màn hình để phân tích.',
+      emptySubImage: 'Mô tả hình ảnh bạn muốn tạo. Chọn tỷ lệ, phong cách và mẫu ở ô nhập bên dưới.',
       scrollRailLabel: 'Nhảy đến câu hỏi',
       scrollRailPrev: 'Câu hỏi trước',
       scrollRailNext: 'Câu hỏi sau',
@@ -1036,11 +1056,18 @@ window.I18n = (() => {
       ratio: 'Tỷ lệ',
       style: 'Phong cách',
       template: 'Mẫu',
+      quality: 'Chất lượng',
       auto: 'Tự động',
       noTemplate: 'Không dùng mẫu',
-      changeRatio: 'Đổi tỷ lệ',
-      changeStyle: 'Đổi phong cách',
-      changeTemplate: 'Đổi mẫu',
+      changeRatio: 'Đặt lại tỷ lệ',
+      changeStyle: 'Đặt lại phong cách',
+      changeTemplate: 'Đặt lại mẫu',
+      changeQuality: 'Đặt lại chất lượng',
+      removeReferenceImage: 'Bỏ ảnh tham chiếu',
+      toastRefImageRemoved: 'Đã bỏ ảnh tham chiếu',
+      toastRefImageTooLarge: 'Ảnh tham chiếu phải nhỏ hơn 20 MB',
+      toastRefImageTypes: 'Ảnh tham chiếu chỉ nhận JPEG, PNG hoặc WebP',
+      toastRefImageOne: 'Chỉ dùng ảnh đầu tiên làm tham chiếu',
       disableImageGen: 'Tắt tạo hình ảnh',
       disableTranslate: 'Tắt dịch',
       translateTo: 'Dịch sang',
@@ -1057,6 +1084,7 @@ window.I18n = (() => {
       ratioPrefix: 'Tỷ lệ ',
       stylePrefix: 'Phong cách ',
       templatePrefix: 'Mẫu ',
+      qualityPrefix: 'Chất lượng ',
       showHide: 'Hiện/Ẩn',
       missingApiKeyOpenAI: 'Nhập API key trong Cài đặt trước',
       missingApiKeyAnthropic: 'Nhập Anthropic API key trong Cài đặt trước',
@@ -1114,6 +1142,10 @@ window.I18n = (() => {
       toastImageGenOff: 'Đã tắt tạo hình ảnh',
       toastRefImageAdded: 'Đã thêm ảnh tham chiếu',
       toastRefImageFail: 'Không đọc được ảnh tham chiếu',
+      imageGenNoPrompt: 'Nhập mô tả để tạo ảnh',
+      imageGenNoImage: 'API không trả về ảnh',
+      imageGenRefUnreadable: 'Không đọc được ảnh tham chiếu',
+      emptyErrorMessage: 'Đã xảy ra lỗi, tin nhắn trống.',
       toastTranslateOn: 'Đã bật dịch',
       toastSlidesOn: 'Đã bật tạo slides',
       toastSlidesOff: 'Đã tắt tạo slides',
@@ -1195,7 +1227,7 @@ window.I18n = (() => {
       guideStep5Body: 'Dùng nút đính kèm ảnh/tài liệu, kéo thả vào màn hình, hoặc dán ảnh từ clipboard (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>). Hỗ trợ txt, md, pdf, docx, xlsx, csv, json và nhiều định dạng code.',
       guideStep5Body2: 'Khi bật <strong>Tạo hình ảnh</strong>, đính kèm thường bị tắt; có thể dùng ảnh tham chiếu để chỉnh sửa.',
       guideStep6Title: 'Quản lý hội thoại',
-      guideStep6Body: '<strong>Cuộc trò chuyện mới</strong> ở sidebar để tạo phiên mới. Click mục trong <strong>Lịch sử</strong> để chuyển phiên. AI nhớ toàn bộ tin nhắn trong phiên hiện tại. Tiêu đề tự lấy từ tin user đầu tiên; có thể đổi tên qua menu từng cuộc trò chuyện.',
+      guideStep6Body: '<strong>Cuộc trò chuyện mới</strong> ở sidebar để tạo phiên mới. <strong>Tạo hình ảnh</strong> ngay bên dưới mở tab chỉ dùng để sinh ảnh (tỷ lệ, phong cách, mẫu, ảnh tham chiếu). Lịch sử hiện chat hoặc phiên ảnh tùy tab đang mở. Click mục để chuyển phiên. AI nhớ toàn bộ tin nhắn trong phiên hiện tại. Tiêu đề tự lấy từ tin user đầu tiên; có thể đổi tên qua menu từng cuộc trò chuyện.',
       guideStep7Title: 'Thao tác trên tin nhắn',
       guideStep7Li1: 'Tin <strong>user</strong>: Sửa, Sao chép, Xóa (cắt tin phía sau)',
       guideStep7Li2: 'Tin <strong>assistant</strong>: Tạo lại, Tiếp tục khi bị cắt, chuyển phiên bản <strong>1/N</strong>, Sao chép',
@@ -1207,6 +1239,7 @@ window.I18n = (() => {
     jp: {
       newChat: '新しいチャット',
       history: '履歴',
+      historyImage: '画像',
       search: '検索',
       searchPlaceholder: 'チャット履歴を検索...',
       searchClear: 'クリア',
@@ -1268,6 +1301,7 @@ window.I18n = (() => {
       shellTitle: 'OpenRouterサンドボックスでコマンド実行（Responses API）',
       imageGen: '画像生成',
       imageGenTitle: 'AIで画像を生成',
+      backToChat: 'チャットに戻る',
       translate: '翻訳',
       translateTitle: '別の言語に翻訳',
       slides: 'スライド作成',
@@ -1494,7 +1528,9 @@ window.I18n = (() => {
       viewImage: '画像を表示',
       zoomImage: '画像を拡大',
       hello: 'こんにちは！',
+      helloImage: '画像を作成',
       emptySub: '今日は何をお手伝いしましょうか？画像やドキュメントをドラッグ＆ドロップして分析できます。',
+      emptySubImage: '作りたい画像を説明してください。下の入力欄で比率、スタイル、テンプレートを選べます。',
       scrollRailLabel: '質問へジャンプ',
       scrollRailPrev: '前の質問',
       scrollRailNext: '次の質問',
@@ -1630,11 +1666,18 @@ window.I18n = (() => {
       ratio: '比率',
       style: 'スタイル',
       template: 'テンプレート',
+      quality: '画質',
       auto: '自動',
       noTemplate: 'テンプレートなし',
-      changeRatio: '比率を変更',
-      changeStyle: 'スタイルを変更',
-      changeTemplate: 'テンプレートを変更',
+      changeRatio: '比率をリセット',
+      changeStyle: 'スタイルをリセット',
+      changeTemplate: 'テンプレートをリセット',
+      changeQuality: '画質をリセット',
+      removeReferenceImage: '参照画像を削除',
+      toastRefImageRemoved: '参照画像を削除しました',
+      toastRefImageTooLarge: '参照画像は 20 MB 未満にしてください',
+      toastRefImageTypes: '参照画像は JPEG、PNG、WebP のみ対応',
+      toastRefImageOne: '最初の画像を参照画像として使います',
       disableImageGen: '画像生成をオフ',
       disableTranslate: '翻訳をオフ',
       translateTo: '翻訳先',
@@ -1651,6 +1694,7 @@ window.I18n = (() => {
       ratioPrefix: '比率 ',
       stylePrefix: 'スタイル ',
       templatePrefix: 'テンプレート ',
+      qualityPrefix: '画質 ',
       showHide: '表示/非表示',
       missingApiKeyOpenAI: '先に設定でAPIキーを入力してください',
       missingApiKeyAnthropic: '先に設定でAnthropic APIキーを入力してください',
@@ -1708,6 +1752,10 @@ window.I18n = (() => {
       toastImageGenOff: '画像生成をオフにしました',
       toastRefImageAdded: '参照画像を追加しました',
       toastRefImageFail: '参照画像を読み込めませんでした',
+      imageGenNoPrompt: '画像を生成するには説明を入力してください',
+      imageGenNoImage: 'APIが画像を返しませんでした',
+      imageGenRefUnreadable: '参照画像を読み込めませんでした',
+      emptyErrorMessage: 'エラーが発生し、メッセージは空です。',
       toastTranslateOn: '翻訳をオンにしました',
       toastSlidesOn: 'スライドモードをオンにしました',
       toastSlidesOff: 'スライドモードをオフにしました',
@@ -1789,7 +1837,7 @@ window.I18n = (() => {
       guideStep5Body: '添付ボタン、ドラッグ＆ドロップ、クリップボードから貼り付け (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>)。txt, md, pdf, docx, xlsx, csv, json など多数対応。',
       guideStep5Body2: '<strong>画像生成</strong>オン時は通常の添付は無効。編集には参照画像を使用。',
       guideStep6Title: '会話の管理',
-      guideStep6Body: 'サイドバーの<strong>新しいチャット</strong>で新セッション作成。<strong>履歴</strong>の項目をクリックして切替。AIは現在のセッションの全メッセージを記憶。タイトルは最初のユーザーメッセージから自動生成。会話メニューから名前変更可能。',
+      guideStep6Body: 'サイドバーの<strong>新しいチャット</strong>で新セッション作成。その下の<strong>画像生成</strong>は画像作成専用のタブです（比率、スタイル、テンプレート、参照画像）。履歴は開いているタブのチャットまたは画像セッションを表示します。項目をクリックして切替。AIは現在のセッションの全メッセージを記憶。タイトルは最初のユーザーメッセージから自動生成。会話メニューから名前変更可能。',
       guideStep7Title: 'メッセージ操作',
       guideStep7Li1: '<strong>ユーザー</strong>メッセージ: 編集、コピー、削除（以降をカット）',
       guideStep7Li2: '<strong>アシスタント</strong>メッセージ: 再生成、途中切れの続き、バージョン <strong>1/N</strong> 切替、コピー',
@@ -1801,6 +1849,7 @@ window.I18n = (() => {
     zh: {
       newChat: '新对话',
       history: '历史',
+      historyImage: '图片',
       search: '搜索',
       searchPlaceholder: '搜索聊天记录...',
       searchClear: '清除',
@@ -1862,6 +1911,7 @@ window.I18n = (() => {
       shellTitle: '在 OpenRouter 沙箱中运行命令（Responses API）',
       imageGen: '生成图片',
       imageGenTitle: '使用 AI 生成图片',
+      backToChat: '返回对话',
       translate: '翻译',
       translateTitle: '将文本翻译为其他语言',
       slides: '创建幻灯片',
@@ -2088,7 +2138,9 @@ window.I18n = (() => {
       viewImage: '查看图片',
       zoomImage: '放大图片',
       hello: '你好！',
+      helloImage: '生成图片',
       emptySub: '今天我能帮你什么？拖放图片或文档到屏幕进行分析。',
+      emptySubImage: '描述你想创建的图片。在下方输入框选择比例、风格和模板。',
       scrollRailLabel: '跳转到问题',
       scrollRailPrev: '上一个问题',
       scrollRailNext: '下一个问题',
@@ -2224,11 +2276,18 @@ window.I18n = (() => {
       ratio: '比例',
       style: '风格',
       template: '模板',
+      quality: '画质',
       auto: '自动',
       noTemplate: '不使用模板',
-      changeRatio: '更改比例',
-      changeStyle: '更改风格',
-      changeTemplate: '更改模板',
+      changeRatio: '重置比例',
+      changeStyle: '重置风格',
+      changeTemplate: '重置模板',
+      changeQuality: '重置画质',
+      removeReferenceImage: '移除参考图片',
+      toastRefImageRemoved: '已移除参考图片',
+      toastRefImageTooLarge: '参考图片必须小于 20 MB',
+      toastRefImageTypes: '参考图片仅支持 JPEG、PNG 或 WebP',
+      toastRefImageOne: '仅使用第一张图片作为参考',
       disableImageGen: '关闭图片生成',
       disableTranslate: '关闭翻译',
       translateTo: '翻译为',
@@ -2245,6 +2304,7 @@ window.I18n = (() => {
       ratioPrefix: '比例 ',
       stylePrefix: '风格 ',
       templatePrefix: '模板 ',
+      qualityPrefix: '画质 ',
       showHide: '显示/隐藏',
       missingApiKeyOpenAI: '请先在设置中输入 API Key',
       missingApiKeyAnthropic: '请先在设置中输入 Anthropic API Key',
@@ -2302,6 +2362,10 @@ window.I18n = (() => {
       toastImageGenOff: '已关闭图片生成',
       toastRefImageAdded: '已添加参考图片',
       toastRefImageFail: '无法读取参考图片',
+      imageGenNoPrompt: '请输入描述以生成图片',
+      imageGenNoImage: 'API 没有返回图片',
+      imageGenRefUnreadable: '无法读取参考图片',
+      emptyErrorMessage: '发生错误，消息为空。',
       toastTranslateOn: '已开启翻译',
       toastSlidesOn: '已开启幻灯片模式',
       toastSlidesOff: '已关闭幻灯片模式',
@@ -2383,7 +2447,7 @@ window.I18n = (() => {
       guideStep5Body: '使用附加按钮、拖放，或从剪贴板粘贴（<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd>）。支持 txt、md、pdf、docx、xlsx、csv、json 及多种代码格式。',
       guideStep5Body2: '开启<strong>生成图片</strong>时，常规附件会被禁用；可使用参考图片进行编辑。',
       guideStep6Title: '管理对话',
-      guideStep6Body: '侧边栏<strong>新对话</strong>创建新会话。点击<strong>历史</strong>中的项目切换。AI 会记住当前会话的全部消息。标题从首条用户消息自动生成；可通过对话菜单重命名。',
+      guideStep6Body: '侧边栏<strong>新对话</strong>创建新会话。其下方的<strong>生成图片</strong>是只用于创建图片的标签（比例、风格、模板、参考图）。历史会显示当前标签下的对话或图片会话。点击项目切换。AI 会记住当前会话的全部消息。标题从首条用户消息自动生成；可通过对话菜单重命名。',
       guideStep7Title: '消息操作',
       guideStep7Li1: '<strong>用户</strong>消息：编辑、复制、删除（截断后续消息）',
       guideStep7Li2: '<strong>助手</strong>消息：重新生成、被截断时继续、切换版本 <strong>1/N</strong>、复制',
@@ -2405,7 +2469,24 @@ window.I18n = (() => {
         '16:9': { desc: 'desktop wallpaper, landscape' }
       },
       style: { auto: 'Auto', photo: 'Photo', illustration: 'Illustration', anime: 'Anime', oil: 'Oil painting', pixel: 'Pixel art' },
-      template: { none: 'No template', portrait: 'Portrait', product: 'Product', logo: 'Logo', abstract: 'Abstract background', minimal: 'Minimal' }
+      template: { none: 'No template', portrait: 'Portrait', product: 'Product', logo: 'Logo', abstract: 'Abstract background', minimal: 'Minimal' },
+      quality: { auto: 'Auto', low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra high', max: 'Max' },
+      stylePrompt: {
+        photo: 'Photorealistic photograph, high detail.',
+        illustration: 'Digital illustration style.',
+        anime: 'Japanese anime style.',
+        oil: 'Classical oil painting style.',
+        pixel: 'Retro pixel art style.'
+      },
+      templatePrompt: {
+        portrait: 'Professional portrait composition.',
+        product: 'Product photo on a clean background with studio lighting.',
+        logo: 'Minimal logo design, vector-like.',
+        abstract: 'Abstract background with no clear subject.',
+        minimal: 'Minimal composition with lots of negative space.'
+      },
+      ratioHint: 'Aspect ratio {ratio}.',
+      systemPrompt: 'Create images with the image generation tool. Follow the description, aspect ratio, style, and template. If a reference image is attached, edit that image. Keep any text reply to one short sentence.'
     },
     vi: {
       ratio: {
@@ -2417,7 +2498,24 @@ window.I18n = (() => {
         '16:9': { desc: 'hình nền máy tính, ngang' }
       },
       style: { auto: 'Tự động', photo: 'Ảnh thật', illustration: 'Minh họa', anime: 'Anime', oil: 'Tranh sơn dầu', pixel: 'Pixel art' },
-      template: { none: 'Không dùng mẫu', portrait: 'Chân dung', product: 'Sản phẩm', logo: 'Logo', abstract: 'Nền trừu tượng', minimal: 'Tối giản' }
+      template: { none: 'Không dùng mẫu', portrait: 'Chân dung', product: 'Sản phẩm', logo: 'Logo', abstract: 'Nền trừu tượng', minimal: 'Tối giản' },
+      quality: { auto: 'Tự động', low: 'Thấp', medium: 'Trung bình', high: 'Cao', xhigh: 'Rất cao', max: 'Tối đa' },
+      stylePrompt: {
+        photo: 'Phong cách ảnh chụp thực tế, chi tiết cao.',
+        illustration: 'Phong cách minh họa kỹ thuật số.',
+        anime: 'Phong cách anime Nhật Bản.',
+        oil: 'Phong cách tranh sơn dầu cổ điển.',
+        pixel: 'Phong cách pixel art retro.'
+      },
+      templatePrompt: {
+        portrait: 'Bố cục chân dung chuyên nghiệp.',
+        product: 'Ảnh sản phẩm trên nền sạch, ánh sáng studio.',
+        logo: 'Thiết kế logo tối giản, vector-like.',
+        abstract: 'Hình nền trừu tượng, không có chủ thể rõ.',
+        minimal: 'Bố cục tối giản, nhiều khoảng trống.'
+      },
+      ratioHint: 'Tỷ lệ khung hình {ratio}.',
+      systemPrompt: 'Tạo hình bằng công cụ tạo ảnh. Làm đúng mô tả, tỷ lệ, phong cách và mẫu. Nếu có ảnh tham chiếu thì sửa ảnh đó. Phần chữ trả lời chỉ một câu ngắn.'
     },
     jp: {
       ratio: {
@@ -2429,7 +2527,24 @@ window.I18n = (() => {
         '16:9': { desc: 'デスクトップ壁紙、横' }
       },
       style: { auto: '自動', photo: '写真', illustration: 'イラスト', anime: 'アニメ', oil: '油絵', pixel: 'ピクセルアート' },
-      template: { none: 'テンプレートなし', portrait: 'ポートレート', product: '商品', logo: 'ロゴ', abstract: '抽象背景', minimal: 'ミニマル' }
+      template: { none: 'テンプレートなし', portrait: 'ポートレート', product: '商品', logo: 'ロゴ', abstract: '抽象背景', minimal: 'ミニマル' },
+      quality: { auto: '自動', low: '低', medium: '中', high: '高', xhigh: '最高に近い', max: '最大' },
+      stylePrompt: {
+        photo: '実写写真のスタイル、高精細。',
+        illustration: 'デジタルイラストのスタイル。',
+        anime: '日本のアニメスタイル。',
+        oil: '古典的な油絵のスタイル。',
+        pixel: 'レトロなピクセルアートのスタイル。'
+      },
+      templatePrompt: {
+        portrait: 'プロのポートレート構図。',
+        product: '清潔な背景とスタジオ照明の商品写真。',
+        logo: 'ミニマルなロゴ、ベクター風。',
+        abstract: '明確な被写体のない抽象的な背景。',
+        minimal: '余白の多いミニマルな構図。'
+      },
+      ratioHint: 'アスペクト比 {ratio}。',
+      systemPrompt: '画像生成ツールで画像を作る。説明、比率、スタイル、テンプレートに従う。参照画像がある場合はその画像を編集する。テキストの返答は短い1文にする。'
     },
     zh: {
       ratio: {
@@ -2441,7 +2556,24 @@ window.I18n = (() => {
         '16:9': { desc: '电脑壁纸，横屏' }
       },
       style: { auto: '自动', photo: '照片', illustration: '插画', anime: '动漫', oil: '油画', pixel: '像素风' },
-      template: { none: '不使用模板', portrait: '人像', product: '产品', logo: 'Logo', abstract: '抽象背景', minimal: '极简' }
+      template: { none: '不使用模板', portrait: '人像', product: '产品', logo: 'Logo', abstract: '抽象背景', minimal: '极简' },
+      quality: { auto: '自动', low: '低', medium: '中', high: '高', xhigh: '超高', max: '最高' },
+      stylePrompt: {
+        photo: '写实摄影风格，细节丰富。',
+        illustration: '数字插画风格。',
+        anime: '日本动漫风格。',
+        oil: '古典油画风格。',
+        pixel: '复古像素艺术风格。'
+      },
+      templatePrompt: {
+        portrait: '专业人像构图。',
+        product: '干净背景、影棚灯光的产品照片。',
+        logo: '极简 logo，矢量风格。',
+        abstract: '没有明确主体的抽象背景。',
+        minimal: '留白很多的极简构图。'
+      },
+      ratioHint: '画面比例 {ratio}。',
+      systemPrompt: '使用图像生成工具创建图片。遵循描述、比例、风格和模板。如果附有参考图，请编辑该图片。文字回复只保留一句短句。'
     }
   };
 
@@ -2729,9 +2861,9 @@ window.I18n = (() => {
     { sel: '#shellBtn span', key: 'shell' },
     { sel: '#shellBtn', attr: 'title', key: 'shellTitle' },
     { sel: '#shellBtn', attr: 'aria-label', key: 'shell' },
-    { sel: '#imageGenBtn span', key: 'imageGen' },
-    { sel: '#imageGenBtn', attr: 'title', key: 'imageGenTitle' },
-    { sel: '#imageGenBtn', attr: 'aria-label', key: 'imageGen' },
+    { sel: '#imageStudioBtn .label', key: 'imageGen' },
+    { sel: '#imageStudioBtn', attr: 'title', key: 'imageGenTitle' },
+    { sel: '#imageStudioBtn', attr: 'aria-label', key: 'imageGen' },
     { sel: '#translateBtn span', key: 'translate' },
     { sel: '#translateBtn', attr: 'title', key: 'translateTitle' },
     { sel: '#translateBtn', attr: 'aria-label', key: 'translate' },
@@ -2806,11 +2938,13 @@ window.I18n = (() => {
     { sel: '#closeModelCompareBtn', attr: 'aria-label', key: 'close' },
     { sel: '#composerInput', attr: 'aria-label', key: 'composerPlaceholder' },
     { sel: '#composerImageGenBar .mode-chip span', key: 'imageGen', filter: (el) => el.closest('.imagegen-chip') },
-    { sel: '#imageGenChipClose', attr: 'title', key: 'disableImageGen' },
-    { sel: '#imageGenChipClose', attr: 'aria-label', key: 'disableImageGen' },
+    { sel: '#imageGenChipClose', attr: 'title', key: 'backToChat' },
+    { sel: '#imageGenChipClose', attr: 'aria-label', key: 'backToChat' },
     { sel: '#imageGenRatioBtn span:not(.ratio-icon):not(.fa-solid)', key: 'ratio' },
     { sel: '#imageGenRatioMenu .composer-dropdown-header', key: 'ratio' },
     { sel: '#imageGenRatioMenu', attr: 'aria-label', key: 'ratio' },
+    { sel: '#imageGenRefClear', attr: 'title', key: 'removeReferenceImage' },
+    { sel: '#imageGenRefClear', attr: 'aria-label', key: 'removeReferenceImage' },
     { sel: '#imageGenRatioChipClear', attr: 'title', key: 'changeRatio' },
     { sel: '#imageGenRatioChipClear', attr: 'aria-label', key: 'changeRatio' },
     { sel: '#imageGenStyleBtn span:not(.fa-palette)', key: 'style' },
@@ -2818,11 +2952,11 @@ window.I18n = (() => {
     { sel: '#imageGenStyleMenu', attr: 'aria-label', key: 'style' },
     { sel: '#imageGenStyleChipClear', attr: 'title', key: 'changeStyle' },
     { sel: '#imageGenStyleChipClear', attr: 'aria-label', key: 'changeStyle' },
-    { sel: '#imageGenTemplateBtn span:not(.fa-regular)', key: 'template' },
-    { sel: '#imageGenTemplateMenu .composer-dropdown-header', key: 'template' },
-    { sel: '#imageGenTemplateMenu', attr: 'aria-label', key: 'template' },
-    { sel: '#imageGenTemplateChipClear', attr: 'title', key: 'changeTemplate' },
-    { sel: '#imageGenTemplateChipClear', attr: 'aria-label', key: 'changeTemplate' },
+    { sel: '#imageGenQualityBtn span:not(.fa-solid)', key: 'quality' },
+    { sel: '#imageGenQualityMenu .composer-dropdown-header', key: 'quality' },
+    { sel: '#imageGenQualityMenu', attr: 'aria-label', key: 'quality' },
+    { sel: '#imageGenQualityChipClear', attr: 'title', key: 'changeQuality' },
+    { sel: '#imageGenQualityChipClear', attr: 'aria-label', key: 'changeQuality' },
     { sel: '.translate-chip span', key: 'translate' },
     { sel: '#translateChipClose', attr: 'title', key: 'disableTranslate' },
     { sel: '#translateChipClose', attr: 'aria-label', key: 'disableTranslate' },
@@ -3026,7 +3160,25 @@ window.I18n = (() => {
     }
     if (type === 'style') return bucket.style[id] || bucket.style.auto;
     if (type === 'template') return bucket.template[id] || bucket.template.none;
+    if (type === 'quality') return bucket.quality?.[id] || IMAGE_GEN.en.quality[id] || id;
     return id;
+  };
+
+  const imageGenPrompt = (type, id) => {
+    const bucket = IMAGE_GEN[locale] || IMAGE_GEN.en;
+    const fallback = IMAGE_GEN.en;
+    if (type === 'style') return bucket.stylePrompt?.[id] || fallback.stylePrompt?.[id] || '';
+    if (type === 'template') return bucket.templatePrompt?.[id] || fallback.templatePrompt?.[id] || '';
+    if (type === 'ratio') {
+      const hint = bucket.ratioHint || fallback.ratioHint || '';
+      return hint.replace('{ratio}', id);
+    }
+    return '';
+  };
+
+  const getImageSystemPrompt = () => {
+    const bucket = IMAGE_GEN[locale] || IMAGE_GEN.en;
+    return bucket.systemPrompt || IMAGE_GEN.en.systemPrompt || '';
   };
 
   const getTranslateLabel = (code) => {
@@ -3093,7 +3245,7 @@ window.I18n = (() => {
       { title: 'guideStep1Title', body: 'guideStep1Body' },
       { title: 'guideStep2Title', body: 'guideStep2Body' },
       { title: 'guideStep3Title', body: 'guideStep3Body', list: ['guideStep3Li1', 'guideStep3Li2', 'guideStep3Li3', 'guideStep3Li4', 'guideStep3Li5'] },
-      { title: 'guideStep4Title', body: 'guideStep4Body', list: ['guideStep4Li1', 'guideStep4Li2', 'guideStep4Li3', 'guideStep4Li4'] },
+      { title: 'guideStep4Title', body: 'guideStep4Body', list: ['guideStep4Li1', 'guideStep4Li2', 'guideStep4Li4'] },
       { title: 'guideStep5Title', body: 'guideStep5Body', body2: 'guideStep5Body2' },
       { title: 'guideStep6Title', body: 'guideStep6Body' },
       { title: 'guideStep7Title', list: ['guideStep7Li1', 'guideStep7Li2', 'guideStep7Li3'] },
@@ -3175,6 +3327,8 @@ window.I18n = (() => {
     isTokenSaveSystemPrompt,
     isDefaultSystemPrompt,
     imageGenLabel,
+    imageGenPrompt,
+    getImageSystemPrompt,
     getTranslateLabel,
     getMissingApiKeyMessage,
     getMissingApiKeyError,

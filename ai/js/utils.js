@@ -22,9 +22,41 @@ window.Utils = (() => {
 
   const isSafeImageDataUrl = (dataUrl) => {
     if (typeof dataUrl !== 'string') return false;
-    if (dataUrl.length > 8_000_000) return false;
+    if (dataUrl.length > 18_000_000) return false;
     return SAFE_IMAGE_DATA_RE.test(dataUrl.replace(/\s+/g, ''));
   };
+
+  const compressImageDataUrl = (dataUrl, { maxDim = 2048, quality = 0.92, maxChars = 2_500_000 } = {}) => new Promise((resolve) => {
+    if (!dataUrl || typeof dataUrl !== 'string') {
+      resolve(dataUrl || '');
+      return;
+    }
+    const image = new Image();
+    image.onload = () => {
+      const longest = Math.max(image.width, image.height, 1);
+      if (longest <= maxDim && dataUrl.length <= maxChars) {
+        resolve(dataUrl);
+        return;
+      }
+      const scale = Math.min(1, maxDim / longest);
+      const width = Math.max(1, Math.round(image.width * scale));
+      const height = Math.max(1, Math.round(image.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(dataUrl);
+        return;
+      }
+      ctx.drawImage(image, 0, 0, width, height);
+      let next = canvas.toDataURL('image/jpeg', quality);
+      if (next.length > maxChars) next = canvas.toDataURL('image/jpeg', 0.72);
+      resolve(next && next.length < dataUrl.length ? next : dataUrl);
+    };
+    image.onerror = () => resolve(dataUrl);
+    image.src = dataUrl;
+  });
 
   const safeImageSrc = (src) => {
     const raw = String(src || '').trim();
@@ -334,7 +366,8 @@ window.Utils = (() => {
           ? '\n\n_' + [
             'Tỷ lệ ' + window.APP_CONFIG.getImageGenRatio(msg.imageGen.ratio).label,
             msg.imageGen.style !== 'auto' ? window.APP_CONFIG.getImageGenStyle(msg.imageGen.style).label : '',
-            msg.imageGen.template !== 'none' ? window.APP_CONFIG.getImageGenTemplate(msg.imageGen.template).label : ''
+            msg.imageGen.template !== 'none' ? window.APP_CONFIG.getImageGenTemplate(msg.imageGen.template).label : '',
+            msg.imageGen.quality && msg.imageGen.quality !== 'auto' ? window.APP_CONFIG.getImageGenQuality(msg.imageGen.quality).id : ''
           ].filter(Boolean).join(' · ') + '_'
           : '';
         const imgNote = msg.images && msg.images.length
@@ -367,7 +400,8 @@ window.Utils = (() => {
           lines.push('(' + [
             'Tỷ lệ ' + window.APP_CONFIG.getImageGenRatio(msg.imageGen.ratio).label,
             msg.imageGen.style !== 'auto' ? window.APP_CONFIG.getImageGenStyle(msg.imageGen.style).label : '',
-            msg.imageGen.template !== 'none' ? window.APP_CONFIG.getImageGenTemplate(msg.imageGen.template).label : ''
+            msg.imageGen.template !== 'none' ? window.APP_CONFIG.getImageGenTemplate(msg.imageGen.template).label : '',
+            msg.imageGen.quality && msg.imageGen.quality !== 'auto' ? window.APP_CONFIG.getImageGenQuality(msg.imageGen.quality).id : ''
           ].filter(Boolean).join(' · ') + ')');
         }
         if (msg.images && msg.images.length) {
@@ -995,7 +1029,7 @@ window.Utils = (() => {
   };
 
   return {
-    escapeHTML, safeHref, safeImageSrc, isSafeImageDataUrl, sanitizeHtml,
+    escapeHTML, safeHref, safeImageSrc, isSafeImageDataUrl, compressImageDataUrl, sanitizeHtml,
     formatTime, uuid, debounce, normalizeSearchQuery, normalizeSearchText,
     getCodeBlockSource,
     buildSearchFold, includesSearchFold, findSearchRangeInFold, findAllSearchRangesInFold,

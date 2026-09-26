@@ -227,7 +227,8 @@ const sanitizeShareMessage = (m) => {
       out.imageGen = {
         ratio: String(m.imageGen.ratio || '').slice(0, 40),
         style: String(m.imageGen.style || '').slice(0, 40),
-        template: String(m.imageGen.template || '').slice(0, 40)
+        template: String(m.imageGen.template || '').slice(0, 40),
+        quality: String(m.imageGen.quality || '').slice(0, 40)
       };
     }
     if (m.translateTo) out.translateTo = String(m.translateTo).slice(0, 20);

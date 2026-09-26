@@ -232,7 +232,7 @@ window.API = (() => {
     return tools;
   };
 
-  const buildResponsesTools = ({ webSearch, imageGen, imageGenOptions }) => {
+  const buildResponsesTools = ({ webSearch, imageGen, imageGenOptions, model }) => {
     const tools = [];
     if (webSearch) {
       tools.push({
@@ -241,8 +241,12 @@ window.API = (() => {
       });
     }
     if (imageGen) {
-      const tool = { type: 'image_generation' };
+      const tool = {
+        type: 'image_generation',
+        model: window.APP_CONFIG.getResponsesImageToolModel(model)
+      };
       if (imageGenOptions?.size) tool.size = imageGenOptions.size;
+      if (imageGenOptions?.quality) tool.quality = imageGenOptions.quality;
       if (imageGenOptions?.action) tool.action = imageGenOptions.action;
       tools.push(tool);
     }
@@ -446,13 +450,92 @@ window.API = (() => {
     return 'data:' + mime + ';base64,' + b64;
   };
 
+  const imageTracker = (handlers) => {
+    if (!handlers._images) handlers._images = { next: 0, lastFinal: '' };
+    return handlers._images;
+  };
+
+  const emitTrackedImage = async (handlers, dataUrl, { partial = false } = {}) => {
+    if (!dataUrl) return false;
+    const track = imageTracker(handlers);
+    let url = dataUrl;
+    if (!partial && dataUrl.length > 2_500_000 && window.Utils?.compressImageDataUrl) {
+      try {
+        url = await window.Utils.compressImageDataUrl(dataUrl, {
+          maxDim: 2048,
+          quality: 0.92,
+          maxChars: 2_500_000
+        });
+      } catch { /* keep original */ }
+    }
+    if (partial) {
+      if (handlers.onImagePartial) {
+        handlers.onImagePartial({ dataUrl: url, index: track.next, partial: true });
+      }
+      return true;
+    }
+    if (url === track.lastFinal) return false;
+    track.lastFinal = url;
+    if (handlers.onImageComplete) {
+      handlers.onImageComplete({ dataUrl: url, index: track.next });
+    }
+    track.next += 1;
+    return true;
+  };
+
   const getOpenRouterImagePromptFromConvo = (convo) => {
     const users = (convo.messages || []).filter((m) => m.role === 'user');
     const last = users[users.length - 1];
     if (!last) return { prompt: '', images: [] };
-    const prompt = (last.content || '').trim();
+    let prompt = (last.content || '').trim();
+    if (last.imageGen) {
+      prompt = window.APP_CONFIG.buildImageGenPrompt(prompt, {
+        ratioId: last.imageGen.ratio,
+        styleId: last.imageGen.style,
+        templateId: last.imageGen.template
+      });
+    }
     const images = (last.images || []).filter((img) => img?.dataUrl);
     return { prompt, images };
+  };
+
+  const attachPreviousGeneratedImage = (convo) => {
+    const messages = convo?.messages || [];
+    let lastUserIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        lastUserIdx = i;
+        break;
+      }
+    }
+    if (lastUserIdx < 0) return convo;
+    const last = messages[lastUserIdx];
+    if ((last.images || []).some((img) => img?.dataUrl)) return convo;
+    let prior = null;
+    for (let i = lastUserIdx - 1; i >= 0; i--) {
+      const imgs = messages[i].generatedImages;
+      if (messages[i].role === 'assistant' && imgs?.length) {
+        prior = [...imgs].reverse().find((img) => img?.dataUrl) || null;
+        if (prior) break;
+      }
+    }
+    if (!prior?.dataUrl) return convo;
+    const nextMessages = messages.slice();
+    nextMessages[lastUserIdx] = {
+      ...last,
+      images: [{
+        dataUrl: prior.dataUrl,
+        name: prior.name || 'previous.png',
+        mime: prior.mime || 'image/png',
+        reference: true
+      }]
+    };
+    return { ...convo, messages: nextMessages };
+  };
+
+  const imageGenError = (key) => {
+    const msg = window.I18n?.t?.(key);
+    return new Error(msg && msg !== key ? msg : key);
   };
 
   const parseApiError = async (res, provider = 'openai') => {
@@ -638,7 +721,7 @@ window.API = (() => {
     }
   };
 
-  const handleStreamData = (data, handlers) => {
+  const handleStreamData = async (data, handlers) => {
     if (!data || data === '[DONE]') {
       return data === '[DONE]' ? 'done' : null;
     }
@@ -684,28 +767,17 @@ window.API = (() => {
         return null;
       }
       if (json.type === 'response.image_generation_call.partial_image' && json.partial_image_b64) {
-        if (handlers.onImagePartial) {
-          handlers.onImagePartial({
-            dataUrl: toImageDataUrl(json.partial_image_b64),
-            index: json.partial_image_index ?? 0,
-            partial: true
-          });
-        }
-        return null;
+        return emitTrackedImage(handlers, toImageDataUrl(json.partial_image_b64), { partial: true });
       }
       if (json.type === 'response.image_generation_call.completed') {
         if (handlers.onImageStatus) handlers.onImageStatus('completed');
         const result = json.result || json.item?.result;
-        if (result && handlers.onImageComplete) {
-          handlers.onImageComplete({ dataUrl: toImageDataUrl(result) });
-        }
+        if (result) return emitTrackedImage(handlers, toImageDataUrl(result));
         return null;
       }
       if (json.type === 'response.output_item.done' && json.item?.type === 'image_generation_call') {
         const result = json.item.result;
-        if (result && handlers.onImageComplete) {
-          handlers.onImageComplete({ dataUrl: toImageDataUrl(result) });
-        }
+        if (result) return emitTrackedImage(handlers, toImageDataUrl(result));
         return null;
       }
       if (json.type === 'content_block_start' && json.content_block) {
@@ -734,10 +806,7 @@ window.API = (() => {
         const parts = candidate.content?.parts || [];
         for (const part of parts) {
           if (part.inlineData?.data) {
-            const dataUrl = toGeminiInlineDataUrl(part.inlineData);
-            if (dataUrl && handlers.onImageComplete) {
-              handlers.onImageComplete({ dataUrl });
-            }
+            await emitTrackedImage(handlers, toGeminiInlineDataUrl(part.inlineData));
             continue;
           }
           if (!part.text) continue;
@@ -798,7 +867,7 @@ window.API = (() => {
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
 
-    const flushLine = (line) => {
+    const flushLine = async (line) => {
       const trimmed = line.trim();
       if (!trimmed || !trimmed.startsWith('data:')) return null;
       return handleStreamData(trimmed.slice(5).trim(), handlers);
@@ -814,7 +883,7 @@ window.API = (() => {
         const block = buffer.slice(0, sep);
         buffer = buffer.slice(sep + 2);
         for (const line of block.split('\n')) {
-          if (flushLine(line) === 'done') return;
+          if (await flushLine(line) === 'done') return;
         }
       }
 
@@ -822,13 +891,13 @@ window.API = (() => {
       while ((idx = buffer.indexOf('\n')) >= 0) {
         const line = buffer.slice(0, idx);
         buffer = buffer.slice(idx + 1);
-        if (flushLine(line) === 'done') return;
+        if (await flushLine(line) === 'done') return;
       }
     }
 
     if (buffer.trim()) {
       for (const line of buffer.split('\n')) {
-        if (flushLine(line) === 'done') return;
+        if (await flushLine(line) === 'done') return;
       }
     }
   };
@@ -973,9 +1042,7 @@ window.API = (() => {
 
   const sendOpenRouterImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
     const { prompt, images } = getOpenRouterImagePromptFromConvo(convo);
-    if (!prompt) {
-      throw new Error('Không có mô tả ảnh để tạo');
-    }
+    if (!prompt) throw imageGenError('imageGenNoPrompt');
 
     const body = {
       model: window.APP_CONFIG.getApiModel(model),
@@ -1008,18 +1075,115 @@ window.API = (() => {
     emitUsage(handlers, extractUsage(json));
 
     const items = json.data || [];
-    if (!items.length) {
-      throw new Error('API không trả về ảnh');
-    }
+    if (!items.length) throw imageGenError('imageGenNoImage');
 
     if (handlers.onImageStatus) handlers.onImageStatus('completed');
+    let emitted = 0;
     for (const item of items) {
       if (!item?.b64_json) continue;
       const dataUrl = toImageDataUrlFromB64(item.b64_json, item.media_type);
-      if (dataUrl && handlers.onImageComplete) {
-        handlers.onImageComplete({ dataUrl });
-      }
+      if (await emitTrackedImage(handlers, dataUrl)) emitted += 1;
     }
+    if (!emitted) throw imageGenError('imageGenNoImage');
+  };
+
+  const dataUrlToBlob = (dataUrl, name) => {
+    const parsed = parseDataUrl(dataUrl);
+    if (!parsed) return null;
+    const binary = atob(parsed.data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const mime = parsed.media_type || 'image/png';
+    const ext = mime === 'image/jpeg' ? 'jpg'
+      : mime === 'image/webp' ? 'webp'
+      : mime === 'image/gif' ? 'gif'
+      : 'png';
+    const filename = name && /\.[a-z0-9]+$/i.test(name) ? name : 'reference.' + ext;
+    return { blob: new Blob([bytes], { type: mime }), filename };
+  };
+
+  const getOpenAIImageRequestFromConvo = (convo) => {
+    const users = (convo.messages || []).filter((m) => m.role === 'user');
+    const last = users[users.length - 1];
+    if (!last) return { prompt: '', images: [] };
+    let prompt = (last.content || '').trim();
+    if (last.imageGen) {
+      prompt = window.APP_CONFIG.buildImageGenPrompt(prompt, {
+        ratioId: last.imageGen.ratio,
+        styleId: last.imageGen.style,
+        templateId: last.imageGen.template
+      });
+    }
+    const images = (last.images || []).filter((img) => img?.dataUrl);
+    return { prompt, images };
+  };
+
+  const emitOpenAIImages = async (json, handlers) => {
+    emitUsage(handlers, extractUsage(json));
+    const items = json.data || [];
+    if (!items.length) throw imageGenError('imageGenNoImage');
+    if (handlers.onImageStatus) handlers.onImageStatus('completed');
+    let emitted = 0;
+    for (const item of items) {
+      const dataUrl = item?.b64_json
+        ? toImageDataUrlFromB64(item.b64_json, item.output_format === 'jpeg' ? 'image/jpeg' : item.output_format === 'webp' ? 'image/webp' : 'image/png')
+        : '';
+      if (await emitTrackedImage(handlers, dataUrl)) emitted += 1;
+    }
+    if (!emitted) throw imageGenError('imageGenNoImage');
+  };
+
+  const sendOpenAIImages = async ({ apiKey, model, convo, controller, handlers, imageGenOptions }) => {
+    const { prompt, images } = getOpenAIImageRequestFromConvo(convo);
+    if (!prompt) throw imageGenError('imageGenNoPrompt');
+
+    const apiModel = window.APP_CONFIG.getApiModel(model);
+    const size = imageGenOptions?.size || '';
+    if (handlers.onImageStatus) handlers.onImageStatus('generating');
+
+    let res;
+    if (images.length) {
+      const form = new FormData();
+      form.append('model', apiModel);
+      form.append('prompt', prompt);
+      form.append('quality', imageGenOptions?.quality || 'auto');
+      form.append('output_format', 'png');
+      if (size) form.append('size', size);
+      let attached = 0;
+      images.forEach((img, i) => {
+        const file = dataUrlToBlob(img.dataUrl, img.name || ('reference-' + (i + 1) + '.png'));
+        if (!file) return;
+        form.append('image[]', file.blob, file.filename);
+        attached += 1;
+      });
+      if (!attached) throw imageGenError('imageGenRefUnreadable');
+      res = await fetch(window.APP_CONFIG.OPENAI_IMAGE_EDITS_ENDPOINT, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + apiKey },
+        body: form,
+        signal: controller.signal
+      });
+    } else {
+      const body = {
+        model: apiModel,
+        prompt,
+        quality: imageGenOptions?.quality || 'auto',
+        output_format: 'png'
+      };
+      if (size) body.size = size;
+      res = await fetch(window.APP_CONFIG.OPENAI_IMAGES_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + apiKey
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+    }
+
+    if (!res.ok) throw await parseApiError(res, 'openai');
+    await emitOpenAIImages(await res.json(), handlers);
   };
 
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort, webSearch }) => {
@@ -1313,9 +1477,11 @@ window.API = (() => {
     if (!last?.imageGen) return null;
     const ratio = window.APP_CONFIG.getImageGenRatio(last.imageGen.ratio);
     const hasRef = !!(last.images && last.images.length);
+    const quality = window.APP_CONFIG.getImageGenQuality(last.imageGen.quality).id;
     return {
       size: ratio.size,
       aspectRatio: ratio.id,
+      quality,
       action: hasRef ? 'edit' : 'auto'
     };
   };
@@ -1361,18 +1527,21 @@ window.API = (() => {
         if (onUsage) onUsage(requestUsage);
       }
     };
-    const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(convo) : null;
-    const tools = buildResponsesTools({ webSearch, imageGen, imageGenOptions });
+    const requestConvo = imageGen ? attachPreviousGeneratedImage(convo) : convo;
+    const imageGenOptions = imageGen ? getImageGenOptionsFromConvo(requestConvo) : null;
+    const tools = buildResponsesTools({ webSearch, imageGen, imageGenOptions, model });
 
     const effort = window.APP_CONFIG.normalizeEffortForModel(
       reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
       model
     );
     try {
-      if (provider === 'anthropic') {
+      if (window.APP_CONFIG.modelUsesOpenAIImages(model)) {
+        await sendOpenAIImages({ apiKey, model, convo: requestConvo, controller, handlers, imageGenOptions });
+      } else if (provider === 'anthropic') {
         await sendAnthropic({ apiKey, model, systemPrompt, convo, webSearch, thinking, reasoningEffort: effort, controller, handlers });
       } else if (provider === 'google') {
-        await sendGemini({ apiKey, model, systemPrompt, convo, webSearch, imageGen, thinking, reasoningEffort: effort, controller, handlers });
+        await sendGemini({ apiKey, model, systemPrompt, convo: requestConvo, webSearch, imageGen, thinking, reasoningEffort: effort, controller, handlers });
       } else if (provider === 'deepseek') {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
@@ -1386,7 +1555,7 @@ window.API = (() => {
       } else if (window.APP_CONFIG.isOpenRouterProvider(provider)) {
         if (window.APP_CONFIG.modelUsesOpenRouterImages(model)) {
           await sendOpenRouterImages({
-            apiKey, model, convo, controller, handlers, imageGenOptions
+            apiKey, model, convo: requestConvo, controller, handlers, imageGenOptions
           });
         } else if (shell && window.APP_CONFIG.modelSupportsShell(model)) {
           const orTools = window.APP_CONFIG.getOpenRouterResponsesTools(model, { webSearch, shell: true });
@@ -1405,7 +1574,7 @@ window.API = (() => {
           });
         }
       } else if (tools.length || (thinking && provider === 'openai')) {
-        await sendWithResponsesTools({ apiKey, model, systemPrompt, convo, tools, thinking, reasoningEffort: effort, controller, handlers });
+        await sendWithResponsesTools({ apiKey, model, systemPrompt, convo: requestConvo, tools, thinking, reasoningEffort: effort, controller, handlers });
       } else {
         await sendChatCompletions({ apiKey, model, systemPrompt, convo, controller, handlers, thinking, reasoningEffort: effort });
       }

@@ -21,7 +21,6 @@ window.Events = (() => {
   let pendingReferenceImage = null;
   let imageGenRatioPicked = false;
   let imageGenStylePicked = false;
-  let imageGenTemplatePicked = false;
   let pendingReplyText = '';
   let compareContext = null;
 
@@ -36,18 +35,16 @@ window.Events = (() => {
       translateTargetLang: s.translateTargetLang,
       imageGenRatio: s.imageGenRatio,
       imageGenStyle: s.imageGenStyle,
-      imageGenTemplate: s.imageGenTemplate,
+      imageGenQuality: s.imageGenQuality,
       referenceImage: pendingReferenceImage,
       imageGenRatioPicked,
-      imageGenStylePicked,
-      imageGenTemplatePicked
+      imageGenStylePicked
     };
   };
 
   const resetImageGenPicked = () => {
     imageGenRatioPicked = false;
     imageGenStylePicked = false;
-    imageGenTemplatePicked = false;
   };
 
   const syncComposerTools = (modelId, patch = {}) => {
@@ -63,8 +60,12 @@ window.Events = (() => {
     let reasoningEffort = window.APP_CONFIG.normalizeEffortForModel(s.reasoningEffort, modelId);
     if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) webSearchEnabled = false;
     if (!window.APP_CONFIG.modelSupportsShell(modelId)) shellEnabled = false;
-    if (!window.APP_CONFIG.modelSupportsImageGen(modelId)) imageGenEnabled = false;
-    if (window.APP_CONFIG.modelUsesOpenRouterImages(modelId)) imageGenEnabled = true;
+    if (s.workspace === 'image') {
+      imageGenEnabled = window.APP_CONFIG.modelSupportsImageGen(modelId)
+        || window.APP_CONFIG.modelUsesOpenRouterImages(modelId);
+    } else {
+      imageGenEnabled = false;
+    }
     if (imageGenEnabled && webSearchEnabled) webSearchEnabled = false;
     if (imageGenEnabled && shellEnabled) shellEnabled = false;
     if (!window.APP_CONFIG.modelSupportsThinking(modelId)) thinkingEnabled = false;
@@ -555,8 +556,45 @@ window.Events = (() => {
     }
   };
 
+  const setReferenceImageFromFile = async (file) => {
+    if (!file) return false;
+    if (!window.APP_CONFIG.ACCEPTED_REF_IMAGE_TYPES.includes(file.type)) {
+      ui.showToast(t('toastRefImageTypes'));
+      return false;
+    }
+    if (file.size > window.APP_CONFIG.REF_IMAGE_MAX_BYTES) {
+      ui.showToast(t('toastRefImageTooLarge'));
+      return false;
+    }
+    try {
+      const raw = await readFileAsDataUrl(file);
+      const dataUrl = await window.Utils.compressImageDataUrl(raw, {
+        maxDim: 2048,
+        quality: 0.9,
+        maxChars: 3_500_000
+      });
+      pendingReferenceImage = { dataUrl, name: file.name, mime: file.type };
+      syncComposerTools();
+      ui.showToast(t('toastRefImageAdded'));
+      return true;
+    } catch {
+      ui.showToast(t('toastRefImageFail'));
+      return false;
+    }
+  };
+
   const addDroppedFiles = async (files) => {
     if (!files || !files.length) return;
+    if (state.get().workspace === 'image' || state.get().imageGenEnabled) {
+      const imageFiles = Array.from(files).filter((file) => fileMod.getKind(file) === 'image');
+      if (!imageFiles.length) {
+        ui.showToast(t('toastRefImageTypes'));
+        return;
+      }
+      const added = await setReferenceImageFromFile(imageFiles[0]);
+      if (added && imageFiles.length > 1) ui.showToast(t('toastRefImageOne'));
+      return;
+    }
     const imageFiles = [];
     const docFiles = [];
     for (const file of files) {
@@ -967,13 +1005,12 @@ window.Events = (() => {
     };
 
     const upsertGeneratedImage = (payload) => {
-      const img = {
+      const index = Number.isInteger(payload.index) && payload.index >= 0 ? payload.index : 0;
+      generatedImages[index] = {
         dataUrl: payload.dataUrl,
-        name: payload.partial ? 'Xem trước ' + ((payload.index ?? 0) + 1) : 'Hình ảnh AI'
+        name: t('aiImage', { n: index + 1 })
       };
-      generatedImages[payload.index ?? 0] = img;
-      generatedImages = generatedImages.filter(Boolean);
-      if (streamingContext) streamingContext.generatedImages = generatedImages;
+      if (streamingContext) streamingContext.generatedImages = generatedImages.slice();
       refreshStreamingContent();
     };
 
@@ -981,7 +1018,8 @@ window.Events = (() => {
       if (streamingContext?.discardSave) return;
       if (!convoMod.getById(convo.id)) return;
       const extra = { responseModel: modelId, truncated: !!truncated };
-      if (generatedImages.length) extra.generatedImages = generatedImages.slice();
+      const savedImages = generatedImages.filter((img) => img?.dataUrl);
+      if (savedImages.length) extra.generatedImages = savedImages;
       if (reasoningBuffer) extra.reasoningContent = reasoningBuffer;
       if (groundingMetadata) extra.groundingMetadata = groundingMetadata;
       if (isRetry || isContinue) {
@@ -1027,7 +1065,7 @@ window.Events = (() => {
         streamEndPromise = null;
       }
 
-      if (useImageGen && generatedImages.length && !aborted) {
+      if (useImageGen && generatedImages.length && !aborted && state.get().workspace !== 'image') {
         state.set({ imageGenEnabled: false });
         resetImageGenPicked();
         syncComposerTools(modelId, { imageGenEnabled: false });
@@ -1067,12 +1105,12 @@ window.Events = (() => {
     await apiSend({
       apiKey: window.APP_CONFIG.getApiKey(s, modelId),
       model: modelId,
-      systemPrompt: s.systemPrompt,
+      systemPrompt: useImageGen ? (window.I18n.getImageSystemPrompt?.() || '') : s.systemPrompt,
       convo: requestConvo,
       webSearch: useWebSearch,
       shell: useShell,
       imageGen: useImageGen,
-      thinking: useThinking,
+      thinking: useImageGen ? false : useThinking,
       reasoningEffort: s.reasoningEffort || window.APP_CONFIG.DEFAULT_EFFORT,
       seedGroundingMetadata: isContinue ? groundingMetadata : null,
       onSearchStatus: (status) => {
@@ -1122,6 +1160,9 @@ window.Events = (() => {
         const hasResult = buffer || generatedImages.length;
         const aborted = !!(info && info.aborted);
         const hasText = !!(buffer && String(buffer).trim());
+        if (useImageGen && !aborted && !generatedImages.some((img) => img?.dataUrl)) {
+          ui.showError(new Error(t('imageGenNoImage')));
+        }
         if (aborted) {
           const truncated = isContinue && hasText;
           if (hasResult && !discard) {
@@ -1153,7 +1194,7 @@ window.Events = (() => {
         const discard = !!(streamingContext && streamingContext.discardSave);
         if (!discard) {
           const truncated = !!(buffer && String(buffer).trim()) && !!err?.truncated;
-          const finalText = buffer || '_Đã xảy ra lỗi, tin nhắn trống._';
+          const finalText = buffer || t('emptyErrorMessage');
           saveAssistantResult(finalText, { truncated });
           if (err?.usage) {
             convoMod.addTokenUsage(convo, modelId, err.usage);
@@ -1191,6 +1232,24 @@ window.Events = (() => {
     if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput.focus();
   };
 
+  const currentImageGenSettings = () => {
+    const s = state.get();
+    if (s.workspace !== 'image' && !s.imageGenEnabled) return null;
+    return {
+      ratio: s.imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
+      style: s.imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
+      template: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
+      quality: s.imageGenQuality || window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY
+    };
+  };
+
+  const applyCurrentImageGen = (convo, userIdx) => {
+    const settings = currentImageGenSettings();
+    if (!settings || userIdx < 0) return;
+    if (!convoMod.patchMessageImageGen(convo, userIdx, settings)) return;
+    ui.refreshUserMessage(userIdx, convo.messages[userIdx]);
+  };
+
   const retryAssistantMessage = async (idx) => {
     const s = state.get();
     const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
@@ -1206,6 +1265,14 @@ window.Events = (() => {
     const msg = convo.messages[idx];
     if (!msg || msg.role !== 'assistant') return;
 
+    let userIdx = -1;
+    for (let i = idx - 1; i >= 0; i--) {
+      if (convo.messages[i].role === 'user') {
+        userIdx = i;
+        break;
+      }
+    }
+    applyCurrentImageGen(convo, userIdx);
     convoMod.prepareRetry(convo, idx);
     const updated = convo.messages[idx];
     ui.updateAssistantMessage(idx, updated);
@@ -1282,7 +1349,8 @@ window.Events = (() => {
       userMsg.imageGen = {
         ratio: s.imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO,
         style: s.imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE,
-        template: s.imageGenTemplate || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE
+        template: window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE,
+        quality: s.imageGenQuality || window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY
       };
       if (pendingReferenceImage) {
         userMsg.images = [{
@@ -1319,7 +1387,6 @@ window.Events = (() => {
     clearComposerInput();
     clearPendingAttachments();
     pendingReferenceImage = null;
-    resetImageGenPicked();
     syncComposerTools();
     autoResize(ui.els.composerInput);
     ui.removeError();
@@ -1353,6 +1420,7 @@ window.Events = (() => {
     const convo = convoMod.getCurrent();
     if (!convo) return;
     convoMod.editMessage(convo, idx, newContent);
+    applyCurrentImageGen(convo, idx);
     ui.renderMessages(convo);
     ui.showToast(t('toastEditSaved'));
     streamResponse(convo);
@@ -1742,19 +1810,112 @@ window.Events = (() => {
 
     ui.els.stopBtn.addEventListener('click', stopStreaming);
 
-    const startNewChat = async () => {
+    const presentWorkspace = (convo) => {
+      ui.syncWorkspaceNav();
+      ui.initModelSelect(state.get().currentModel);
+      syncComposerTools();
+      ui.syncCompareBar(state.get());
+      ui.refreshConversationList(convo ? convo.id : null);
+      ui.renderMessages(convo);
+      ui.updateSettingsTokenUsage(state.get());
+      updateSendEnabled();
+      ui.closeMobileSidebar();
+      if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput?.focus();
+    };
+
+    const enterChatWorkspace = async ({ createNew = false } = {}) => {
       await settleActiveStream({ discard: false });
       ui.setExportSelectMode(false);
-      const c = convoMod.create();
-      clearPendingAttachments();
-      ui.refreshConversationList(c.id);
-      ui.renderMessages(c);
-      ui.updateSettingsTokenUsage(state.get());
-      ui.els.composerInput.focus();
+      const s = state.get();
+      const fromImage = s.workspace === 'image';
+      const chatModel = (fromImage && s.chatModel) ? s.chatModel : (s.currentModel || window.APP_CONFIG.DEFAULT_MODEL);
+      const patch = {
+        workspace: 'chat',
+        imageGenEnabled: false,
+        currentModel: chatModel
+      };
+      if (fromImage) patch.imageModel = s.currentModel;
+      pendingReferenceImage = null;
+      resetImageGenPicked();
+      if (createNew) clearPendingAttachments();
+      state.set(patch);
+      applyModelChange(chatModel, { showToast: false });
+      let convo = null;
+      if (createNew) {
+        convo = convoMod.create(chatModel, { kind: 'chat' });
+      } else {
+        const saved = s.lastChatConversationId ? convoMod.getById(s.lastChatConversationId) : null;
+        if (saved && saved.kind !== 'image') {
+          convo = convoMod.select(saved.id);
+        } else {
+          const latest = convoMod.getAll()
+            .filter((c) => c.kind !== 'image')
+            .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+          convo = latest ? convoMod.select(latest.id) : convoMod.create(chatModel, { kind: 'chat' });
+        }
+      }
+      presentWorkspace(convo);
     };
+
+    const enterImageWorkspace = async () => {
+      await settleActiveStream({ discard: false });
+      ui.setExportSelectMode(false);
+      const s = state.get();
+      const already = s.workspace === 'image';
+      const imageModel = (s.imageModel && window.APP_CONFIG.modelSupportsImageGen(s.imageModel))
+        ? s.imageModel
+        : (window.APP_CONFIG.modelSupportsImageGen(s.currentModel)
+          ? s.currentModel
+          : window.APP_CONFIG.defaultImageModel());
+      if (already) {
+        const cur = convoMod.getCurrent();
+        if (cur && cur.kind === 'image' && !cur.messages.length) {
+          ui.closeMobileSidebar();
+          if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput?.focus();
+          return;
+        }
+      }
+      const patch = {
+        workspace: 'image',
+        imageGenEnabled: true,
+        webSearchEnabled: false,
+        shellEnabled: false,
+        translateEnabled: false,
+        compareEnabled: false,
+        currentModel: imageModel,
+        imageModel
+      };
+      if (!already) {
+        patch.chatModel = s.currentModel;
+        const cur = convoMod.getCurrent();
+        if (cur && cur.kind !== 'image') patch.lastChatConversationId = cur.id;
+      }
+      clearPendingAttachments();
+      if (already) {
+        pendingReferenceImage = null;
+        resetImageGenPicked();
+      }
+      state.set(patch);
+      applyModelChange(imageModel, { showToast: false });
+      let convo;
+      if (already) {
+        convo = convoMod.create(imageModel, { kind: 'image' });
+      } else {
+        const latest = convoMod.getAll()
+          .filter((c) => c.kind === 'image')
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+        convo = latest ? convoMod.select(latest.id) : convoMod.create(imageModel, { kind: 'image' });
+      }
+      presentWorkspace(convo);
+    };
+
+    const startNewChat = () => enterChatWorkspace({ createNew: true });
 
     ui.els.newChatBtn.addEventListener('click', startNewChat);
     ui.els.headerNewChatBtn?.addEventListener('click', startNewChat);
+    ui.els.imageStudioBtn?.addEventListener('click', () => {
+      enterImageWorkspace();
+    });
 
     if (ui.els.toggleSidebarSearchBtn) {
       ui.els.toggleSidebarSearchBtn.addEventListener('click', () => {
@@ -1879,6 +2040,7 @@ window.Events = (() => {
 
     ui.els.systemPromptModeBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (window.APP_CONFIG.isImageWorkspace()) return;
       ui.togglePromptModeMenu();
     });
 
@@ -2217,6 +2379,7 @@ window.Events = (() => {
 
     ui.els.webSearchBtn.addEventListener('click', () => {
       const s = state.get();
+      if (s.workspace === 'image') return;
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       if (!window.APP_CONFIG.modelSupportsWebSearch(modelId)) return;
       const next = !s.webSearchEnabled;
@@ -2234,6 +2397,7 @@ window.Events = (() => {
 
     ui.els.shellBtn?.addEventListener('click', () => {
       const s = state.get();
+      if (s.workspace === 'image') return;
       const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
       if (!window.APP_CONFIG.modelSupportsShell(modelId)) return;
       const next = !s.shellEnabled;
@@ -2294,6 +2458,7 @@ window.Events = (() => {
     };
 
     ui.els.compareBtn?.addEventListener('click', () => {
+      if (state.get().workspace === 'image') return;
       setCompareEnabled(!state.get().compareEnabled);
     });
 
@@ -2353,33 +2518,8 @@ window.Events = (() => {
       closeCompareOverlay({ toastKey: 'compareClosed' });
     });
 
-    const setImageGenEnabled = (enabled) => {
-      const s = state.get();
-      const modelId = s.currentModel || window.APP_CONFIG.DEFAULT_MODEL;
-      if (enabled && !window.APP_CONFIG.modelSupportsImageGen(modelId)) return;
-      const patch = { imageGenEnabled: enabled };
-      if (enabled) {
-        patch.webSearchEnabled = false;
-        patch.shellEnabled = false;
-        patch.translateEnabled = false;
-        clearPendingAttachments();
-        resetImageGenPicked();
-      } else {
-        pendingReferenceImage = null;
-        resetImageGenPicked();
-      }
-      state.set(patch);
-      syncComposerTools(modelId, patch);
-      updateSendEnabled();
-      ui.showToast(enabled ? t('toastImageGenOn') : t('toastImageGenOff'));
-    };
-
-    ui.els.imageGenBtn.addEventListener('click', () => {
-      setImageGenEnabled(!state.get().imageGenEnabled);
-    });
-
     ui.els.imageGenChipClose.addEventListener('click', () => {
-      setImageGenEnabled(false);
+      enterChatWorkspace({ createNew: false });
     });
 
     ui.els.imageGenRefBtn.addEventListener('click', () => {
@@ -2391,18 +2531,13 @@ window.Events = (() => {
       const file = ui.els.imageGenRefInput.files && ui.els.imageGenRefInput.files[0];
       ui.els.imageGenRefInput.value = '';
       if (!file) return;
-      if (!window.APP_CONFIG.ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-        ui.showToast(t('toastImageTypes'));
-        return;
-      }
-      try {
-        const dataUrl = await readFileAsDataUrl(file);
-        pendingReferenceImage = { dataUrl, name: file.name, mime: file.type };
-        syncComposerTools();
-        ui.showToast(t('toastRefImageAdded'));
-      } catch {
-        ui.showToast(t('toastRefImageFail'));
-      }
+      await setReferenceImageFromFile(file);
+    });
+
+    ui.els.imageGenRefClear?.addEventListener('click', () => {
+      pendingReferenceImage = null;
+      syncComposerTools();
+      ui.showToast(t('toastRefImageRemoved'));
     });
 
     ui.els.imageGenRatioBtn.addEventListener('click', (e) => {
@@ -2417,10 +2552,10 @@ window.Events = (() => {
       ui.toggleImageGenMenu(ui.els.imageGenStyleMenu, ui.els.imageGenStyleBtn);
     });
 
-    ui.els.imageGenTemplateBtn.addEventListener('click', (e) => {
+    ui.els.imageGenQualityBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!state.get().imageGenEnabled) return;
-      ui.toggleImageGenMenu(ui.els.imageGenTemplateMenu, ui.els.imageGenTemplateBtn);
+      ui.toggleImageGenMenu(ui.els.imageGenQualityMenu, ui.els.imageGenQualityBtn);
     });
 
     ui.els.imageGenRatioOptions.addEventListener('click', (e) => {
@@ -2443,32 +2578,33 @@ window.Events = (() => {
       syncComposerTools(null, { imageGenStyle: styleId });
     });
 
-    ui.els.imageGenTemplateOptions.addEventListener('click', (e) => {
-      const option = e.target.closest('.composer-dropdown-option');
-      if (!option) return;
-      const templateId = option.dataset.value;
-      if (!templateId) return;
-      imageGenTemplatePicked = true;
-      state.set({ imageGenTemplate: templateId });
-      syncComposerTools(null, { imageGenTemplate: templateId });
-    });
-
     ui.els.imageGenRatioChipClear.addEventListener('click', () => {
+      const imageGenRatio = window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO;
       imageGenRatioPicked = false;
-      syncComposerTools();
-      ui.els.imageGenRatioBtn?.click();
+      state.set({ imageGenRatio });
+      syncComposerTools(null, { imageGenRatio });
     });
 
     ui.els.imageGenStyleChipClear.addEventListener('click', () => {
+      const imageGenStyle = window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE;
       imageGenStylePicked = false;
-      syncComposerTools();
-      ui.els.imageGenStyleBtn?.click();
+      state.set({ imageGenStyle });
+      syncComposerTools(null, { imageGenStyle });
     });
 
-    ui.els.imageGenTemplateChipClear.addEventListener('click', () => {
-      imageGenTemplatePicked = false;
-      syncComposerTools();
-      ui.els.imageGenTemplateBtn?.click();
+    ui.els.imageGenQualityOptions?.addEventListener('click', (e) => {
+      const option = e.target.closest('.composer-dropdown-option');
+      if (!option) return;
+      const qualityId = option.dataset.value;
+      if (!qualityId) return;
+      state.set({ imageGenQuality: qualityId });
+      syncComposerTools(null, { imageGenQuality: qualityId });
+    });
+
+    ui.els.imageGenQualityChipClear?.addEventListener('click', () => {
+      const imageGenQuality = window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY;
+      state.set({ imageGenQuality });
+      syncComposerTools(null, { imageGenQuality });
     });
 
     const setTranslateEnabled = (enabled) => {
@@ -2485,6 +2621,7 @@ window.Events = (() => {
     };
 
     ui.els.translateBtn.addEventListener('click', () => {
+      if (state.get().workspace === 'image') return;
       setTranslateEnabled(!state.get().translateEnabled);
     });
 
@@ -2595,7 +2732,7 @@ window.Events = (() => {
       if (!confirm(t('confirmClearAll'))) return;
       await settleActiveStream({ discard: true });
       await ui.animateClearAll();
-      convoMod.clearAll();
+      convoMod.clearAll(state.get().workspace === 'image' ? 'image' : 'chat');
       ui.clearConversationSearch();
       ui.refreshConversationList(null);
       ui.renderMessages(null, { animateEmpty: true });
@@ -3003,7 +3140,7 @@ window.Events = (() => {
         }
         if (!ui.els.imageGenRatioMenu.classList.contains('hidden')
           || !ui.els.imageGenStyleMenu.classList.contains('hidden')
-          || !ui.els.imageGenTemplateMenu.classList.contains('hidden')) {
+          || (ui.els.imageGenQualityMenu && !ui.els.imageGenQualityMenu.classList.contains('hidden'))) {
           ui.closeImageGenMenus();
           return;
         }

@@ -131,12 +131,16 @@ window.Conversations = (() => {
     return matchSearchEntry(entry, normQuery)?.snippet || '';
   };
 
-  const create = (modelId) => {
+  const create = (modelId, opts = {}) => {
     const model = modelId || window.Storage.get().currentModel || window.APP_CONFIG.DEFAULT_MODEL;
+    const kind = opts.kind === 'image' || opts.kind === 'chat'
+      ? opts.kind
+      : (window.Storage.get().workspace === 'image' ? 'image' : 'chat');
     const convo = {
       id: uuid(),
       title: window.I18n.t('newConversation'),
       model,
+      kind,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       messages: []
@@ -148,7 +152,10 @@ window.Conversations = (() => {
 
   const ensure = () => {
     let c = getCurrent();
-    if (!c) c = create();
+    if (!c) {
+      const image = window.Storage.get().workspace === 'image';
+      c = create(undefined, { kind: image ? 'image' : 'chat' });
+    }
     return c;
   };
 
@@ -159,10 +166,15 @@ window.Conversations = (() => {
   };
 
   const remove = (id) => {
+    const target = getById(id);
+    const image = target?.kind === 'image';
     const all = getAll().filter(c => c.id !== id);
     const cur = get().currentConversationId;
     let nextCur = cur;
-    if (cur === id) nextCur = all[0] ? all[0].id : null;
+    if (cur === id) {
+      const next = all.find((c) => (c.kind === 'image') === image);
+      nextCur = next ? next.id : null;
+    }
     set({ conversations: all, currentConversationId: nextCur });
     return nextCur;
   };
@@ -358,6 +370,21 @@ window.Conversations = (() => {
     saveConvo(convo);
   };
 
+  const patchMessageImageGen = (convo, messageIndex, imageGen) => {
+    const msg = convo?.messages?.[messageIndex];
+    if (!msg || msg.role !== 'user' || !msg.imageGen || !imageGen) return false;
+    msg.imageGen = {
+      ratio: imageGen.ratio,
+      style: imageGen.style,
+      template: imageGen.template,
+      quality: imageGen.quality
+    };
+    convo.updatedAt = Date.now();
+    const all = getAll().map(c => c.id === convo.id ? convo : c);
+    set({ conversations: all });
+    return true;
+  };
+
   const editMessage = (convo, messageIndex, newContent) => {
     convo.messages[messageIndex].content = newContent;
     convo.messages[messageIndex].ts = Date.now();
@@ -434,6 +461,7 @@ window.Conversations = (() => {
       parentId: convo.id,
       branchFromMessageIndex: messageIndex,
       branchedAt: Date.now(),
+      kind: convo.kind === 'image' ? 'image' : 'chat',
     };
 
     const all = [branched, ...getAll()];
@@ -518,14 +546,21 @@ window.Conversations = (() => {
     return !!(convo?.costWarningShownByModel?.[modelId]);
   };
 
-  const clearAll = () => {
+  const clearAll = (kind) => {
+    if (kind === 'image' || kind === 'chat') {
+      const rest = getAll().filter((c) => (c.kind === 'image') !== (kind === 'image'));
+      const cur = get().currentConversationId;
+      const curStill = rest.some((c) => c.id === cur);
+      set({ conversations: rest, currentConversationId: curStill ? cur : null });
+      return;
+    }
     set({ conversations: [], currentConversationId: null });
   };
 
   return {
     getAll, getById, getCurrent, create, ensure, select, remove, rename,
     getModel, setModel, getTokenUsage, addTokenUsage, isCostWarningShown, markCostWarningShown, matchesSearch, filterBySearch, searchConversations, getSearchSnippet,
-    addMessage, updateMessage, editMessage, deleteMessageFrom, branchFromMessage, isBranch, compressWithSummary, clearAll,
+    addMessage, updateMessage, editMessage, patchMessageImageGen, deleteMessageFrom, branchFromMessage, isBranch, compressWithSummary, clearAll,
     getAssistantContent, getResponseModel, prepareRetry, setAssistantVariant, cancelRetryVariant, finalizeAssistantMessage
   };
 })();

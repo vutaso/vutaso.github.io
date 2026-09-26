@@ -2,7 +2,7 @@
   await window.Storage.load();
   window.Markdown.init();
 
-  const state = window.Storage.get();
+  let state = window.Storage.get();
   const ui = window.UI;
   const convoMod = window.Conversations;
 
@@ -28,6 +28,44 @@
   ui.setTheme(theme);
   theme = document.documentElement.getAttribute('data-theme');
   if (state.theme !== theme) window.Storage.set({ theme });
+
+  if (state.workspace === 'image') {
+    const imageModel = (state.imageModel && window.APP_CONFIG.modelSupportsImageGen(state.imageModel))
+      ? state.imageModel
+      : (window.APP_CONFIG.modelSupportsImageGen(state.currentModel)
+        ? state.currentModel
+        : window.APP_CONFIG.defaultImageModel());
+    window.Storage.set({
+      workspace: 'image',
+      imageGenEnabled: true,
+      webSearchEnabled: false,
+      shellEnabled: false,
+      translateEnabled: false,
+      compareEnabled: false,
+      currentModel: imageModel,
+      imageModel
+    });
+    const current = convoMod.getCurrent();
+    if (!current || current.kind !== 'image') {
+      const latest = convoMod.getAll()
+        .filter((c) => c.kind === 'image')
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+      if (latest) convoMod.select(latest.id);
+      else convoMod.create(imageModel, { kind: 'image' });
+    }
+  } else {
+    window.Storage.set({ workspace: 'chat', imageGenEnabled: false });
+    const current = convoMod.getCurrent();
+    if (current && current.kind === 'image') {
+      const latestChat = convoMod.getAll()
+        .filter((c) => c.kind !== 'image')
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+      if (latestChat) convoMod.select(latestChat.id);
+      else window.Storage.set({ currentConversationId: null });
+    }
+  }
+  state = window.Storage.get();
+
   ui.initModelSelect(state.currentModel);
   ui.syncSystemPromptModeUI(state);
   ui.initTranslateLangMenu();
@@ -53,10 +91,7 @@
     translateTargetLang: state.translateTargetLang,
     imageGenRatio: state.imageGenRatio,
     imageGenStyle: state.imageGenStyle,
-    imageGenTemplate: state.imageGenTemplate,
-    imageGenRatioPicked: false,
-    imageGenStylePicked: false,
-    imageGenTemplatePicked: false,
+    imageGenQuality: state.imageGenQuality,
     referenceImage: null
   });
   ui.syncCompareBar(state);

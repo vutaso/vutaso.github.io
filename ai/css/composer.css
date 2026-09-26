@@ -45,6 +45,11 @@
   display: none;
 }
 
+.app[data-workspace="image"] .composer-tools,
+.app[data-workspace="image"] .header-prompt-mode-wrap {
+  display: none;
+}
+
 .translate-chip,
 .mode-chip {
   display: inline-flex;
@@ -235,6 +240,48 @@
 
 .imagegen-option-chip.hidden {
   display: none;
+}
+
+.imagegen-ref-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+}
+
+.imagegen-ref-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.imagegen-ref-thumb.hidden,
+.imagegen-ref-clear.hidden {
+  display: none;
+}
+
+.composer-pill-btn.has-thumb > .fa-paperclip {
+  display: none;
+}
+
+.imagegen-ref-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.imagegen-ref-clear:hover {
+  color: var(--text);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.06));
 }
 
 .composer-dropdown-wrap.hidden {

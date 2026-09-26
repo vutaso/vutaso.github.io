@@ -25,22 +25,46 @@
 
 .sidebar-header {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
   padding: 4px 10px 8px;
 }
 
-.sidebar-header .btn-primary {
-  flex: 1;
+.sidebar-header .btn-primary,
+.sidebar-header .sidebar-nav-btn {
+  flex: 0 0 auto;
+  width: 100%;
+  justify-content: flex-start;
   height: 34px;
   padding: 0 12px;
   font-size: 13px;
   gap: 6px;
   border-radius: var(--radius-sm);
+}
+
+.sidebar-header .btn-primary {
   box-shadow: 0 2px 6px var(--accent-glow);
 }
 
-.sidebar-header .btn-primary .icon {
+.sidebar-header .sidebar-nav-btn {
+  background: transparent;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sidebar-header .sidebar-nav-btn:hover,
+.sidebar-header .sidebar-nav-btn.is-active {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.sidebar-header .sidebar-nav-btn.is-active {
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-hover));
+}
+
+.sidebar-header .btn-primary .icon,
+.sidebar-header .sidebar-nav-btn .icon {
   font-size: 12px;
 }
 

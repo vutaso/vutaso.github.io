@@ -26,6 +26,8 @@ window.UI = (() => {
     els.sendBtn = $('#sendBtn');
     els.stopBtn = $('#stopBtn');
     els.newChatBtn = $('#newChatBtn');
+    els.imageStudioBtn = $('#imageStudioBtn');
+    els.sidebarHistoryLabel = $('#sidebarHistoryLabel');
     els.themeToggleBtn = $('#themeToggleBtn');
     els.themeIcon = $('#themeIcon');
     els.openSidebarBtn = $('#openSidebarBtn');
@@ -151,6 +153,8 @@ window.UI = (() => {
     els.imageGenChipClose = $('#imageGenChipClose');
     els.imageGenRefBtn = $('#imageGenRefBtn');
     els.imageGenRefLabel = $('#imageGenRefLabel');
+    els.imageGenRefThumb = $('#imageGenRefThumb');
+    els.imageGenRefClear = $('#imageGenRefClear');
     els.imageGenRefInput = $('#imageGenRefInput');
     els.imageGenRatioBtn = $('#imageGenRatioBtn');
     els.imageGenRatioPicker = $('#imageGenRatioPicker');
@@ -166,13 +170,13 @@ window.UI = (() => {
     els.imageGenStyleChipClear = $('#imageGenStyleChipClear');
     els.imageGenStyleMenu = $('#imageGenStyleMenu');
     els.imageGenStyleOptions = $('#imageGenStyleOptions');
-    els.imageGenTemplateBtn = $('#imageGenTemplateBtn');
-    els.imageGenTemplatePicker = $('#imageGenTemplatePicker');
-    els.imageGenTemplateChip = $('#imageGenTemplateChip');
-    els.imageGenTemplateChipLabel = $('#imageGenTemplateChipLabel');
-    els.imageGenTemplateChipClear = $('#imageGenTemplateChipClear');
-    els.imageGenTemplateMenu = $('#imageGenTemplateMenu');
-    els.imageGenTemplateOptions = $('#imageGenTemplateOptions');
+    els.imageGenQualityBtn = $('#imageGenQualityBtn');
+    els.imageGenQualityPicker = $('#imageGenQualityPicker');
+    els.imageGenQualityChip = $('#imageGenQualityChip');
+    els.imageGenQualityChipLabel = $('#imageGenQualityChipLabel');
+    els.imageGenQualityChipClear = $('#imageGenQualityChipClear');
+    els.imageGenQualityMenu = $('#imageGenQualityMenu');
+    els.imageGenQualityOptions = $('#imageGenQualityOptions');
     els.slashCommandMenu = $('#slashCommandMenu');
     els.slashCommandList = $('#slashCommandList');
     els.slashCommandHint = $('#slashCommandHint');
@@ -255,16 +259,18 @@ window.UI = (() => {
   const syncComposerToolsUI = (modelId, toolState) => {
     const {
       webSearchEnabled, shellEnabled, imageGenEnabled, thinkingEnabled, translateEnabled, translateTargetLang,
-      imageGenRatio, imageGenStyle, imageGenTemplate
+      imageGenRatio, imageGenStyle, imageGenQuality
     } = toolState;
+    const imageWorkspace = window.APP_CONFIG.isImageWorkspace();
     const showWebSearch = window.APP_CONFIG.modelSupportsWebSearch(modelId);
     const showShell = window.APP_CONFIG.modelSupportsShell(modelId);
     const showImageGen = window.APP_CONFIG.modelSupportsImageGen(modelId);
     const showThinking = window.APP_CONFIG.modelSupportsThinking(modelId);
-    const hasTools = showWebSearch || showShell || showImageGen || showThinking || true;
+    const hasTools = showWebSearch || showShell || showThinking || true;
+    const imageOn = imageWorkspace && showImageGen && !!imageGenEnabled;
 
     if (els.composerTools) {
-      els.composerTools.classList.toggle('hidden', !hasTools);
+      els.composerTools.classList.toggle('hidden', imageWorkspace || !hasTools);
     }
     if (els.webSearchBtn) {
       els.webSearchBtn.classList.toggle('hidden', !showWebSearch);
@@ -277,12 +283,6 @@ window.UI = (() => {
       const active = showShell && !!shellEnabled;
       els.shellBtn.classList.toggle('is-active', active);
       els.shellBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    }
-    if (els.imageGenBtn) {
-      els.imageGenBtn.classList.toggle('hidden', !showImageGen);
-      const active = showImageGen && !!imageGenEnabled;
-      els.imageGenBtn.classList.toggle('is-active', active);
-      els.imageGenBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
     if (els.thinkingBtn) {
       els.thinkingBtn.classList.toggle('hidden', !showThinking);
@@ -305,18 +305,32 @@ window.UI = (() => {
       els.compareBtn.setAttribute('aria-pressed', compareOn ? 'true' : 'false');
     }
     syncCompareBar(window.Storage.get());
-    syncTranslateUI({ translateEnabled, translateTargetLang: translateTargetLang || stateTranslateLang });
+    syncTranslateUI({
+      translateEnabled: imageWorkspace ? false : translateEnabled,
+      translateTargetLang: translateTargetLang || stateTranslateLang
+    });
     syncImageGenUI({
-      imageGenEnabled: showImageGen && !!imageGenEnabled,
+      imageGenEnabled: imageOn,
       imageGenRatio,
       imageGenStyle,
-      imageGenTemplate,
-      referenceImage: toolState.referenceImage,
-      imageGenRatioPicked: toolState.imageGenRatioPicked,
-      imageGenStylePicked: toolState.imageGenStylePicked,
-      imageGenTemplatePicked: toolState.imageGenTemplatePicked
+      imageGenQuality,
+      referenceImage: toolState.referenceImage
     });
-    syncComposerPlaceholder({ imageGenEnabled, translateEnabled });
+    syncComposerPlaceholder({ imageGenEnabled: imageOn, translateEnabled: imageWorkspace ? false : translateEnabled });
+  };
+
+  const syncWorkspaceNav = () => {
+    const image = window.APP_CONFIG.isImageWorkspace();
+    const app = els.app || document.getElementById('app');
+    if (app) app.dataset.workspace = image ? 'image' : 'chat';
+    if (image) closePromptModeMenu();
+    if (els.imageStudioBtn) {
+      els.imageStudioBtn.classList.toggle('is-active', image);
+      els.imageStudioBtn.setAttribute('aria-pressed', image ? 'true' : 'false');
+    }
+    if (els.sidebarHistoryLabel) {
+      els.sidebarHistoryLabel.textContent = t(image ? 'historyImage' : 'history');
+    }
   };
 
   let stateTranslateLang = window.APP_CONFIG.DEFAULT_TRANSLATE_LANG;
@@ -378,10 +392,10 @@ window.UI = (() => {
   };
 
   const closeImageGenMenus = () => {
-    [els.imageGenRatioMenu, els.imageGenStyleMenu, els.imageGenTemplateMenu].forEach((menu) => {
+    [els.imageGenRatioMenu, els.imageGenStyleMenu, els.imageGenQualityMenu].forEach((menu) => {
       if (menu) menu.classList.add('hidden');
     });
-    [els.imageGenRatioBtn, els.imageGenStyleBtn, els.imageGenTemplateBtn].forEach((btn) => {
+    [els.imageGenRatioBtn, els.imageGenStyleBtn, els.imageGenQualityBtn].forEach((btn) => {
       if (btn) btn.setAttribute('aria-expanded', 'false');
     });
   };
@@ -417,20 +431,19 @@ window.UI = (() => {
         + '</button>'
       ).join('');
     }
-    if (els.imageGenTemplateOptions) {
-      els.imageGenTemplateOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_TEMPLATES.map((tpl) =>
-        '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(tpl.id) + '">'
-        + '<span class="composer-dropdown-option-text">' + escapeHTML(window.I18n.imageGenLabel('template', tpl.id)) + '</span>'
+    if (els.imageGenQualityOptions) {
+      els.imageGenQualityOptions.innerHTML = window.APP_CONFIG.IMAGE_GEN_QUALITIES.map((quality) =>
+        '<button type="button" class="composer-dropdown-option" role="option" data-value="' + escapeHTML(quality.id) + '">'
+        + '<span class="composer-dropdown-option-text">' + escapeHTML(window.I18n.imageGenLabel('quality', quality.id)) + '</span>'
         + '<i class="fa-solid fa-check" aria-hidden="true"></i>'
         + '</button>'
       ).join('');
     }
   };
 
-  const setImageGenOptionPicked = (type, picked, { ratioId, styleId, templateId } = {}) => {
+  const setImageGenOptionPicked = (type, picked, { ratioId, styleId, qualityId } = {}) => {
     const ratio = window.APP_CONFIG.getImageGenRatio(ratioId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO);
     const style = window.APP_CONFIG.getImageGenStyle(styleId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE);
-    const template = window.APP_CONFIG.getImageGenTemplate(templateId || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE);
 
     if (type === 'ratio') {
       if (els.imageGenRatioPicker) els.imageGenRatioPicker.classList.toggle('hidden', picked);
@@ -454,23 +467,25 @@ window.UI = (() => {
       if (picked) closeImageGenMenus();
     }
 
-    if (type === 'template') {
-      if (els.imageGenTemplatePicker) els.imageGenTemplatePicker.classList.toggle('hidden', picked);
-      if (els.imageGenTemplateChip) els.imageGenTemplateChip.classList.toggle('hidden', !picked);
-      if (picked && els.imageGenTemplateChipLabel) {
-        els.imageGenTemplateChipLabel.textContent = window.I18n.imageGenLabel('template', templateId);
+    if (type === 'quality') {
+      if (els.imageGenQualityPicker) els.imageGenQualityPicker.classList.toggle('hidden', picked);
+      if (els.imageGenQualityChip) els.imageGenQualityChip.classList.toggle('hidden', !picked);
+      if (picked && els.imageGenQualityChipLabel) {
+        els.imageGenQualityChipLabel.textContent = window.I18n.imageGenLabel('quality', qualityId);
       }
       if (picked) closeImageGenMenus();
     }
   };
 
   const syncImageGenUI = ({
-    imageGenEnabled, imageGenRatio, imageGenStyle, imageGenTemplate, referenceImage,
-    imageGenRatioPicked, imageGenStylePicked, imageGenTemplatePicked
+    imageGenEnabled, imageGenRatio, imageGenStyle, imageGenQuality, referenceImage
   }) => {
     const ratioId = imageGenRatio || window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO;
     const styleId = imageGenStyle || window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE;
-    const templateId = imageGenTemplate || window.APP_CONFIG.DEFAULT_IMAGE_GEN_TEMPLATE;
+    const qualityId = imageGenQuality || window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY;
+    const ratioActive = ratioId !== window.APP_CONFIG.DEFAULT_IMAGE_GEN_RATIO;
+    const styleActive = styleId !== window.APP_CONFIG.DEFAULT_IMAGE_GEN_STYLE;
+    const qualityActive = qualityId !== window.APP_CONFIG.DEFAULT_IMAGE_GEN_QUALITY;
 
     if (els.composerImageGenBar) {
       const on = !!imageGenEnabled;
@@ -481,9 +496,9 @@ window.UI = (() => {
       const icon = els.imageGenRatioBtn.querySelector('.ratio-icon');
       if (icon) icon.setAttribute('data-ratio', ratioId);
     }
-    setImageGenOptionPicked('ratio', !!imageGenRatioPicked, { ratioId });
-    setImageGenOptionPicked('style', !!imageGenStylePicked, { styleId });
-    setImageGenOptionPicked('template', !!imageGenTemplatePicked, { templateId });
+    setImageGenOptionPicked('ratio', ratioActive, { ratioId });
+    setImageGenOptionPicked('style', styleActive, { styleId });
+    setImageGenOptionPicked('quality', qualityActive, { qualityId });
     if (els.imageGenRatioOptions) {
       els.imageGenRatioOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
         const selected = btn.dataset.value === ratioId;
@@ -498,27 +513,39 @@ window.UI = (() => {
         btn.setAttribute('aria-selected', selected ? 'true' : 'false');
       });
     }
-    if (els.imageGenTemplateOptions) {
-      els.imageGenTemplateOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
-        const selected = btn.dataset.value === templateId;
+    if (els.imageGenQualityOptions) {
+      els.imageGenQualityOptions.querySelectorAll('.composer-dropdown-option').forEach((btn) => {
+        const selected = btn.dataset.value === qualityId;
         btn.classList.toggle('is-selected', selected);
         btn.setAttribute('aria-selected', selected ? 'true' : 'false');
       });
     }
-    if (els.imageGenRefBtn) {
+    if (referenceImage !== undefined && els.imageGenRefBtn) {
       const hasRef = !!referenceImage;
       els.imageGenRefBtn.classList.toggle('is-active', hasRef);
+      els.imageGenRefBtn.classList.toggle('has-thumb', hasRef);
       if (els.imageGenRefLabel) {
         els.imageGenRefLabel.textContent = hasRef
           ? truncate(referenceImage.name || t('referenceImage'), 18)
           : t('referenceImage');
       }
+      if (els.imageGenRefThumb) {
+        const src = hasRef ? safeImageSrc(referenceImage.dataUrl) : '';
+        els.imageGenRefThumb.classList.toggle('hidden', !src);
+        if (src) {
+          els.imageGenRefThumb.src = src;
+          els.imageGenRefThumb.alt = referenceImage.name || t('referenceImage');
+        } else {
+          els.imageGenRefThumb.removeAttribute('src');
+        }
+      }
+      if (els.imageGenRefClear) els.imageGenRefClear.classList.toggle('hidden', !hasRef);
     }
     if (!imageGenEnabled) {
       closeImageGenMenus();
       setImageGenOptionPicked('ratio', false);
       setImageGenOptionPicked('style', false);
-      setImageGenOptionPicked('template', false);
+      setImageGenOptionPicked('quality', false);
     }
   };
 
@@ -583,6 +610,7 @@ window.UI = (() => {
   const generatedImagesHTML = (images) => {
     if (!images || !images.length) return '';
     return '<div class="message-images message-generated-images">' + images.map((img, i) => {
+      if (!img?.dataUrl) return '';
       const src = imageSrcAttr(img.dataUrl);
       if (!src) return '';
       const alt = escapeHTML(img.name || t('aiImage', { n: i + 1 }));
@@ -1115,6 +1143,8 @@ window.UI = (() => {
         const templateId = m.imageGen.template;
         if (styleId !== 'auto') parts.push(t('stylePrefix') + window.I18n.imageGenLabel('style', styleId).toLowerCase());
         if (templateId !== 'none') parts.push(t('templatePrefix') + window.I18n.imageGenLabel('template', templateId).toLowerCase());
+        const qualityId = m.imageGen.quality;
+        if (qualityId && qualityId !== 'auto') parts.push(t('qualityPrefix') + window.I18n.imageGenLabel('quality', qualityId).toLowerCase());
         text = '<p class="message-imagegen-prompt">' + escaped + '</p>'
           + '<p class="message-imagegen-label">' + escapeHTML(parts.join(' · ')) + '</p>';
       } else if (m.slides) {
@@ -1200,7 +1230,7 @@ window.UI = (() => {
           const branchMeta = isBranchConvo
             ? '<span class="conversation-branch-meta">' + escapeHTML(t('branchBadge')) + '</span>'
             : '';
-          const iconClass = isBranchConvo ? 'fa-code-branch' : 'fa-message';
+          const iconClass = isBranchConvo ? 'fa-code-branch' : (c.kind === 'image' ? 'fa-image' : 'fa-message');
           return `
           <li class="conversation-item ${c.id === currentId ? 'active' : ''}${isBranchConvo ? ' is-branch' : ''}" data-id="${c.id}">
             <span class="icon" aria-hidden="true"><i class="fa-solid ${iconClass}"></i></span>
@@ -1277,7 +1307,7 @@ window.UI = (() => {
   const buildCompareModelOptionsHTML = (selectedId, takenIds = []) => {
     const { MODELS } = window.APP_CONFIG;
     const taken = new Set(takenIds || []);
-    return MODELS.map((m) => {
+    return MODELS.filter((m) => !m.imageOnly).map((m) => {
       const selected = m.id === selectedId;
       const disabled = !selected && taken.has(m.id);
       return '<option value="' + escapeHTML(m.id) + '"'
@@ -1560,15 +1590,18 @@ window.UI = (() => {
   };
 
   const refreshConversationList = (currentId) => {
+    syncWorkspaceNav();
+    const image = window.APP_CONFIG.isImageWorkspace();
+    const inWorkspace = (c) => (c.kind === 'image') === image;
     const id = currentId !== undefined
       ? currentId
       : (window.Conversations.getCurrent()?.id || null);
     const q = conversationSearchQuery.trim();
     if (!q) {
-      renderConversationList(window.Conversations.getAll(), id, '');
+      renderConversationList(window.Conversations.getAll().filter(inWorkspace), id, '');
       return;
     }
-    const results = window.Conversations.searchConversations(q);
+    const results = window.Conversations.searchConversations(q).filter((r) => inWorkspace(r.convo));
     const snippetMap = new Map(results.map((r) => [r.convo.id, r.snippet]));
     renderConversationList(results.map((r) => r.convo), id, q, snippetMap);
   };
@@ -1614,7 +1647,10 @@ window.UI = (() => {
   const renderEmpty = (animate = false) => {
     closeMarkdownPreview();
     syncCompressContextBar(null);
-    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(t('hello')) + '</h2><p class="messages-empty-sub">' + escapeHTML(t('emptySub')) + '</p></div>';
+    const image = window.APP_CONFIG.isImageWorkspace();
+    const title = image ? t('helloImage') : t('hello');
+    const sub = image ? t('emptySubImage') : t('emptySub');
+    els.messages.innerHTML = '<div class="messages-empty"><div class="brand-avatar brand-avatar-lg" aria-hidden="true">V</div><h2>' + escapeHTML(title) + '</h2><p class="messages-empty-sub">' + escapeHTML(sub) + '</p></div>';
     updateMessageScrollRail();
     refreshChatFind({ keepIndex: false, scroll: false });
     if (!animate) return;
@@ -1832,6 +1868,13 @@ window.UI = (() => {
     if (!toolbar || m?.role !== 'assistant') return;
     const idx = parseInt(article.dataset.idx, 10);
     toolbar.innerHTML = assistantToolbarHTML(m, Number.isNaN(idx) ? undefined : idx);
+  };
+
+  const refreshUserMessage = (idx, m) => {
+    const article = els.messages?.querySelector('.message.user[data-idx="' + idx + '"]');
+    const content = article?.querySelector('.content');
+    if (!content || !m) return;
+    content.innerHTML = userContentHTML(m);
   };
 
   const updateAssistantMessage = (idx, m) => {
@@ -3022,10 +3065,8 @@ window.UI = (() => {
     if (els.imageGenRefBtn) els.imageGenRefBtn.disabled = on;
     if (els.imageGenRatioBtn) els.imageGenRatioBtn.disabled = on;
     if (els.imageGenStyleBtn) els.imageGenStyleBtn.disabled = on;
-    if (els.imageGenTemplateBtn) els.imageGenTemplateBtn.disabled = on;
     if (els.imageGenRatioChipClear) els.imageGenRatioChipClear.disabled = on;
     if (els.imageGenStyleChipClear) els.imageGenStyleChipClear.disabled = on;
-    if (els.imageGenTemplateChipClear) els.imageGenTemplateChipClear.disabled = on;
     if (els.compareBtn) els.compareBtn.disabled = on;
     if (els.compareAddModelBtn) els.compareAddModelBtn.disabled = on;
     if (els.compareModelPickers) {
@@ -3479,11 +3520,7 @@ window.UI = (() => {
       translateTargetLang: appState.translateTargetLang,
       imageGenRatio: appState.imageGenRatio,
       imageGenStyle: appState.imageGenStyle,
-      imageGenTemplate: appState.imageGenTemplate,
-      imageGenRatioPicked: false,
-      imageGenStylePicked: false,
-      imageGenTemplatePicked: false,
-      referenceImage: null
+      imageGenQuality: appState.imageGenQuality
     });
     refreshConversationList(window.Conversations.getCurrent()?.id || null);
     const convo = window.Conversations.getCurrent();
@@ -4707,7 +4744,7 @@ window.UI = (() => {
   };
 
   return {
-    cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect,
+    cacheEls, setTheme, initModelSelect, initProviderSelects, updateModelSelect, syncProviderSelect, syncWorkspaceNav,
     initEffortSelect, syncEffortSelect, initTranslateLangMenu, initImageGenMenus,
     syncComposerToolsUI, syncTranslateUI, closeTranslateLangMenu, closeImageGenMenus, toggleImageGenMenu, setImageGenOptionPicked,
     setStreamingSearchStatus, setStreamingShellStatus, setStreamingImageStatus, updateStreamingAssistantContent,
@@ -4734,7 +4771,7 @@ window.UI = (() => {
     syncSlashCommandMenu, closeSlashCommandMenu, isSlashCommandMenuOpen,
     moveSlashCommandHighlight, confirmSlashCommand, applySlashSnippet,
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
-    setAssistantToolbar, updateAssistantMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
+    setAssistantToolbar, updateAssistantMessage, refreshUserMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
     openSourcesPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,
