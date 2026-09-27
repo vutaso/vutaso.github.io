@@ -1807,6 +1807,8 @@ window.UI = (() => {
       + '<i class="fa-solid fa-print" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatPdf')) + '</span></button>'
       + '<button type="button" class="msg-export-option" data-export-format="docx" role="menuitem">'
       + '<i class="fa-solid fa-file-word" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatDocs')) + '</span></button>'
+      + '<button type="button" class="msg-export-option" data-export-format="html" role="menuitem">'
+      + '<i class="fa-solid fa-file-code" aria-hidden="true"></i><span>' + escapeHTML(t('exportFormatHtml')) + '</span></button>'
       + imageExportOption
       + '</div></div>';
 
@@ -2235,7 +2237,8 @@ window.UI = (() => {
     root.appendChild(sheet);
     document.body.appendChild(root);
 
-    polishContent(root, { renderMermaid: true });
+    polishContent(root, { renderMermaid: false });
+    window.Markdown?.initMermaid?.();
     if (window.mermaid) {
       try {
         window.mermaid.initialize({

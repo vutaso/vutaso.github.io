@@ -425,6 +425,34 @@ window.Events = (() => {
     }
   };
 
+  const exportSingleMessageHtml = async (idx) => {
+    if (htmlExporting) return;
+    const exportConvo = requireMessageExportConvo(idx);
+    if (!exportConvo) return;
+
+    htmlExporting = true;
+    ui.setPdfExportLoading(true, {
+      title: t('exportHtmlTitle'),
+      hint: t('exportHtmlHint'),
+    });
+
+    try {
+      const result = await window.HtmlExport.exportToHtml(exportConvo);
+      const status = ui.finishExportDownload(result, {
+        readyTitle: t('exportDownloadReadyTitle'),
+        readyHint: t('exportDownloadReadyHint'),
+        readyDownloadLabel: t('exportDownloadHtmlBtn'),
+        kind: 'html',
+      });
+      if (status === 'downloaded') ui.showToast(t('toastExportHtmlOk'));
+    } catch (err) {
+      ui.setPdfExportLoading(false);
+      ui.showToast(t('toastExportHtmlFail', { err: err.message || err }));
+    } finally {
+      htmlExporting = false;
+    }
+  };
+
   const exportSingleMessagePdf = async (idx) => {
     if (pdfExporting) return;
     const exportConvo = requireMessageExportConvo(idx);
@@ -2320,7 +2348,7 @@ window.Events = (() => {
         const streaming = isCurrentStreaming();
         ui.setPdfExportLoading(true, {
           title: t('exportHtmlTitle'),
-          hint: streaming ? t('toastExportingWordStream') : t('exportPdfHint'),
+          hint: streaming ? t('toastExportingWordStream') : t('exportHtmlHint'),
         });
 
         try {
@@ -3694,6 +3722,7 @@ window.Events = (() => {
         else if (format === 'txt') exportSingleMessageTxt(idx);
         else if (format === 'pdf') exportSingleMessagePdf(idx);
         else if (format === 'docx') exportSingleMessageDocx(idx);
+        else if (format === 'html') exportSingleMessageHtml(idx);
         else if (format === 'image') exportSingleMessageImages(idx);
         return;
       }

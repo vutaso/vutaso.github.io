@@ -285,13 +285,11 @@ body {
 
 .message .content .code-block-body code,
 .message .content .code-block-body code.hljs,
-.message .content .code-block-body code.hljs span,
 .message .content pre code,
-.message .content pre code.hljs,
-.message .content pre code.hljs span {
+.message .content pre code.hljs {
   display: block;
   flex: 1;
-  min-width: max-content;
+  min-width: 0;
   padding: 14px 14px 14px 12px;
   color: #111118 !important;
   background: transparent !important;
@@ -304,6 +302,22 @@ body {
   font-size: 12.5px;
   line-height: 1.55;
   font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.message .content .code-block-body code.hljs span,
+.message .content pre code.hljs span {
+  display: inline;
+  flex: none;
+  min-width: 0;
+  padding: 0;
+  color: #111118 !important;
+  background: transparent !important;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
 }
 
 .message .content .table-block,
@@ -464,4 +478,67 @@ script.mermaid-source-raw {
 
 .mermaid-block.show-source .mermaid-view {
   display: block !important;
+}
+
+.slides-download-card,
+.excel-download-card,
+.document-download-card,
+.pdf-download-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e4ec;
+  background: #f6f8fa;
+  color: #111118;
+}
+
+.slides-download-info,
+.excel-download-info,
+.document-download-info,
+.pdf-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.slides-download-icon,
+.excel-download-icon,
+.document-download-icon,
+.pdf-download-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eef1f6;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.slides-download-icon { color: #d24726; }
+.excel-download-icon { color: #217346; }
+.document-download-icon { color: #2b579a; }
+.pdf-download-icon { color: #e5252a; }
+
+.slides-download-title,
+.excel-download-title,
+.document-download-title,
+.pdf-download-title {
+  margin: 0;
+  font-weight: 600;
+  color: #111118;
+}
+
+.slides-download-meta,
+.excel-download-meta,
+.document-download-meta,
+.pdf-download-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #6b6b78;
 }
