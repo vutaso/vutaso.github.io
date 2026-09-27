@@ -10,6 +10,9 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ### Changed
 
+#### Chế độ system prompt: chỉ Mặc định, Tiết kiệm token, Tùy chỉnh (`js/i18n.js`, `js/context-compress.js`)
+**Ý nghĩa:** Gỡ các preset chuyên biệt (sáng tạo, code review, planning, …) khỏi menu **Chế độ**; user cũ đang dùng preset đã bỏ được chuyển sang **Tùy chỉnh** và giữ nguyên nội dung prompt. Nén context dùng system prompt riêng, không phụ thuộc preset đã xóa.
+
 #### Chế độ system prompt mặc định: Tiết kiệm token (`js/config.js`, `js/storage.js`)
 **Ý nghĩa:** Phiên mới và user chưa lưu chế độ prompt sẽ dùng prompt ngắn gọn để giảm token in/out; vẫn đổi sang **Mặc định** hoặc preset khác trong Cài đặt.
 

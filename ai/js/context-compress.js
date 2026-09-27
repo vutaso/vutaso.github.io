@@ -90,7 +90,7 @@ window.ContextCompress = (() => {
         ts: Date.now()
       }]
     };
-    const systemPrompt = window.I18n.getSystemPromptForMode('contentSummarizer', locale);
+    const systemPrompt = window.I18n.getCompressContextSystemPrompt(locale);
     const thinking = !!window.APP_CONFIG.modelThinkingRequired(modelId);
 
     let buffer = '';
