@@ -231,7 +231,7 @@
   }
 
   .pdf-export-overlay {
-    padding: 16px clamp(40px, 10vw, 72px) 16px 20px;
+    padding: 16px;
   }
 
   .pdf-export-overlay-content {
