@@ -5,6 +5,16 @@ window.Snippets = (() => {
     { id: 'preset-writeEmail', titleKey: 'snippetPresetWriteEmailTitle', contentKey: 'snippetPresetWriteEmailContent' },
     { id: 'preset-explainSimple', titleKey: 'snippetPresetExplainSimpleTitle', contentKey: 'snippetPresetExplainSimpleContent' },
     { id: 'preset-polishText', titleKey: 'snippetPresetPolishTextTitle', contentKey: 'snippetPresetPolishTextContent' },
+    { id: 'preset-stepByStep', titleKey: 'snippetPresetStepByStepTitle', contentKey: 'snippetPresetStepByStepContent' },
+    { id: 'preset-role', titleKey: 'snippetPresetRoleTitle', contentKey: 'snippetPresetRoleContent' },
+    { id: 'preset-fewShot', titleKey: 'snippetPresetFewShotTitle', contentKey: 'snippetPresetFewShotContent' },
+    { id: 'preset-structured', titleKey: 'snippetPresetStructuredTitle', contentKey: 'snippetPresetStructuredContent' },
+    { id: 'preset-grounded', titleKey: 'snippetPresetGroundedTitle', contentKey: 'snippetPresetGroundedContent' },
+    { id: 'preset-critique', titleKey: 'snippetPresetCritiqueTitle', contentKey: 'snippetPresetCritiqueContent' },
+    { id: 'preset-clarify', titleKey: 'snippetPresetClarifyTitle', contentKey: 'snippetPresetClarifyContent' },
+    { id: 'preset-improvePrompt', titleKey: 'snippetPresetImprovePromptTitle', contentKey: 'snippetPresetImprovePromptContent' },
+    { id: 'preset-compare', titleKey: 'snippetPresetCompareTitle', contentKey: 'snippetPresetCompareContent' },
+    { id: 'preset-fullTemplate', titleKey: 'snippetPresetFullTemplateTitle', contentKey: 'snippetPresetFullTemplateContent' },
   ];
 
   const newId = () => 'snip_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
@@ -16,11 +26,9 @@ window.Snippets = (() => {
     preset: true,
   }));
 
-  const ensureSeeded = () => {
-    const state = window.Storage.get();
-    if (state.promptSnippetsSeeded) return;
+  const stampPresets = (defs) => {
     const now = Date.now();
-    const snippets = getPresetDefinitions().map((s) => ({
+    return defs.map((s) => ({
       id: s.id,
       title: s.title,
       content: s.content,
@@ -28,7 +36,20 @@ window.Snippets = (() => {
       createdAt: now,
       updatedAt: now,
     }));
-    window.Storage.set({ promptSnippets: snippets, promptSnippetsSeeded: true });
+  };
+
+  const ensureSeeded = () => {
+    const state = window.Storage.get();
+    const presets = stampPresets(getPresetDefinitions());
+    if (!state.promptSnippetsSeeded) {
+      window.Storage.set({ promptSnippets: presets, promptSnippetsSeeded: true });
+      return;
+    }
+    const list = Array.isArray(state.promptSnippets) ? state.promptSnippets : [];
+    const ids = new Set(list.map((s) => s.id));
+    const missing = presets.filter((s) => !ids.has(s.id));
+    if (!missing.length) return;
+    window.Storage.set({ promptSnippets: [...list, ...missing] });
   };
 
   const getAll = () => {
@@ -99,6 +120,16 @@ window.Snippets = (() => {
     'preset-writeEmail': ['email', 'mail', 'write'],
     'preset-explainSimple': ['explain'],
     'preset-polishText': ['polish'],
+    'preset-stepByStep': ['step', 'cot'],
+    'preset-role': ['role'],
+    'preset-fewShot': ['fewshot', 'examples'],
+    'preset-structured': ['json', 'format'],
+    'preset-grounded': ['context', 'source'],
+    'preset-critique': ['critique', 'revise'],
+    'preset-clarify': ['clarify'],
+    'preset-improvePrompt': ['improve', 'prompt'],
+    'preset-compare': ['compare'],
+    'preset-fullTemplate': ['template', 'full'],
   };
 
   const SLASH_SYNONYMS = {

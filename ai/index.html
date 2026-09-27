@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/sidebar.css?v=parallel-chat-2" />
+  <link rel="stylesheet" href="css/sidebar.css?v=kbd-hints" />
   <link rel="stylesheet" href="css/chat.css" />
   <link rel="stylesheet" href="css/composer.css" />
   <link rel="stylesheet" href="css/snippets.css" />
@@ -34,13 +34,15 @@
         <div class="brand-avatar" aria-hidden="true">V</div>
       </div>
       <div class="sidebar-header">
-        <button id="newChatBtn" class="btn btn-primary" title="Cuộc trò chuyện mới">
+        <button id="newChatBtn" class="btn btn-primary" title="Cuộc trò chuyện mới" aria-keyshortcuts="Meta+K">
           <span class="icon"><i class="fa-solid fa-plus"></i></span>
           <span class="label">Cuộc trò chuyện mới</span>
+          <span class="kbd-hint" aria-hidden="true"><kbd data-kbd-mod>⌘</kbd><kbd>K</kbd></span>
         </button>
-        <button type="button" id="imageStudioBtn" class="btn sidebar-nav-btn" title="Tạo hình ảnh" aria-label="Tạo hình ảnh" aria-pressed="false">
+        <button type="button" id="imageStudioBtn" class="btn sidebar-nav-btn" title="Tạo hình ảnh" aria-label="Tạo hình ảnh" aria-pressed="false" aria-keyshortcuts="Meta+I">
           <span class="icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
           <span class="label">Tạo hình ảnh</span>
+          <span class="kbd-hint" aria-hidden="true"><kbd data-kbd-mod>⌘</kbd><kbd>I</kbd></span>
         </button>
       </div>
       <div class="sidebar-history-head">
@@ -71,8 +73,9 @@
         <button id="themeToggleBtn" class="btn btn-icon sidebar-footer-btn" title="Chuyển theme" aria-label="Chuyển theme">
           <span class="icon" id="themeIcon"><i class="fa-solid fa-sun"></i></span>
         </button>
-        <button id="openSettingsBtn" class="btn btn-icon sidebar-footer-btn" title="Cài đặt" aria-label="Cài đặt">
+        <button id="openSettingsBtn" class="btn btn-icon sidebar-footer-btn has-kbd" title="Cài đặt" aria-label="Cài đặt" aria-keyshortcuts="Shift+Meta+Comma">
           <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          <span class="kbd-hint" aria-hidden="true"><kbd data-kbd-mod>⌘</kbd><kbd>⇧</kbd><kbd>,</kbd></span>
         </button>
       </div>
     </aside>
@@ -1024,7 +1027,7 @@
   <script src="js/pdf-create.js"></script>
   <script src="js/html-export.js"></script>
   <script src="js/share.js"></script>
-  <script src="js/events.js?v=parallel-chat-2"></script>
+  <script src="js/events.js?v=kbd-hints"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

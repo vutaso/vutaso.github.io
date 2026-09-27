@@ -2066,6 +2066,11 @@ window.Events = (() => {
       enterChatWorkspace({ createNew: true });
     };
 
+    const modGlyph = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '') || /Mac OS/.test(navigator.userAgent || '');
+    document.querySelectorAll('[data-kbd-mod]').forEach((el) => {
+      el.textContent = modGlyph ? '⌘' : 'Ctrl';
+    });
+
     ui.els.newChatBtn?.setAttribute('type', 'button');
     ui.els.newChatBtn.addEventListener('click', startNewChat);
     ui.els.headerNewChatBtn?.setAttribute('type', 'button');
@@ -3375,9 +3380,20 @@ window.Events = (() => {
           return;
         }
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && !e.altKey && !e.shiftKey && !e.isComposing && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        ui.els.composerInput.focus();
+        startNewChat();
+        return;
+      }
+      if (mod && !e.altKey && !e.shiftKey && !e.isComposing && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        enterImageWorkspace();
+        return;
+      }
+      if (mod && e.shiftKey && !e.altKey && !e.isComposing && e.code === 'Comma') {
+        e.preventDefault();
+        ui.openSettings(state.get());
         return;
       }
 
