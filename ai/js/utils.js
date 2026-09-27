@@ -384,13 +384,110 @@ window.Utils = (() => {
     return parts.join('\n\n---\n\n');
   };
 
+  const INLINE_PLAIN_TAGS = new Set(['STRONG', 'B', 'EM', 'I', 'CODE', 'SPAN', 'A', 'DEL', 'S', 'SUB', 'SUP', 'MARK', 'U']);
+
+  const plainTextFromNode = (node) => {
+    if (!node) return '';
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+    const tag = node.tagName;
+    if (tag === 'BR') return '\n';
+    if (tag === 'IMG') {
+      const alt = (node.getAttribute('alt') || '').trim();
+      return alt ? '[hình: ' + alt + ']' : '';
+    }
+    if (tag === 'A') {
+      const label = [...node.childNodes].map(plainTextFromNode).join('').replace(/\s+/g, ' ').trim();
+      const href = (node.getAttribute('href') || '').trim();
+      if (!href || href === label || href.startsWith('#')) return label;
+      return label ? label + ' (' + href + ')' : href;
+    }
+    if (INLINE_PLAIN_TAGS.has(tag)) {
+      return [...node.childNodes].map(plainTextFromNode).join('');
+    }
+    return [...node.childNodes].map(plainTextFromNode).join('');
+  };
+
+  const blockPlainText = (el) => {
+    const tag = el.tagName;
+    if (tag === 'PRE') {
+      const code = el.querySelector('code') || el;
+      return (code.textContent || '').replace(/\n$/, '');
+    }
+    if (tag === 'UL' || tag === 'OL') {
+      return [...el.children]
+        .filter((child) => child.tagName === 'LI')
+        .map((li, index) => {
+          const marker = tag === 'OL' ? (index + 1) + '. ' : '- ';
+          const body = [...li.childNodes].map((child) => {
+            if (child.nodeType === Node.ELEMENT_NODE && (child.tagName === 'UL' || child.tagName === 'OL')) {
+              return '\n' + blockPlainText(child).split('\n').map((line) => (line ? '  ' + line : line)).join('\n');
+            }
+            if (child.nodeType === Node.ELEMENT_NODE && !INLINE_PLAIN_TAGS.has(child.tagName) && child.tagName !== 'BR' && child.tagName !== 'A' && child.tagName !== 'IMG') {
+              return '\n' + blockPlainText(child);
+            }
+            return plainTextFromNode(child);
+          }).join('').replace(/\n{3,}/g, '\n\n').trim();
+          return marker + body;
+        })
+        .join('\n');
+    }
+    if (tag === 'TABLE') {
+      const rows = [...el.querySelectorAll('tr')].map((tr) =>
+        [...tr.children]
+          .filter((cell) => cell.tagName === 'TH' || cell.tagName === 'TD')
+          .map((cell) => plainTextFromNode(cell).replace(/\s+/g, ' ').trim())
+          .join('\t')
+      );
+      return rows.filter(Boolean).join('\n');
+    }
+    if (tag === 'HR') return '---';
+    if (tag === 'BLOCKQUOTE') {
+      return [...el.childNodes].map((child) => (
+        child.nodeType === Node.ELEMENT_NODE ? blockPlainText(child) : plainTextFromNode(child)
+      )).join('\n').trim().split('\n').map((line) => line ? '> ' + line : '>').join('\n');
+    }
+    return [...el.childNodes].map(plainTextFromNode).join('').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  };
+
+  const markdownToPlainText = (text) => {
+    const source = String(text || '').replace(/\r\n/g, '\n');
+    if (!source.trim()) return '';
+    if (!window.Markdown?.render || typeof document === 'undefined') {
+      return source
+        .replace(/```[^\n]*\n([\s\S]*?)```/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/!\[([^\]]*)\]\([^)]+\)/g, (_, alt) => alt ? '[hình: ' + alt + ']' : '')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/(\*\*|__)(.*?)\1/g, '$2')
+        .replace(/(\*|_)(.*?)\1/g, '$2')
+        .replace(/^\s*[-*+]\s+/gm, '- ')
+        .trim();
+    }
+
+    const html = window.Markdown.render(source);
+    if (!html || !html.trim()) {
+      return source.trim();
+    }
+    const host = document.createElement('div');
+    host.innerHTML = html;
+    const blocks = [...host.childNodes].map((node) => {
+      if (node.nodeType === Node.TEXT_NODE) return (node.textContent || '').trim();
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+      return blockPlainText(node);
+    }).filter((block) => block && block.trim());
+    return blocks.join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
+  };
+
   const formatConversationPlainText = (convo) => {
     const title = (convo.title || 'Cuộc trò chuyện').trim();
     const parts = [title, '='.repeat(Math.min(Math.max(title.length, 12), 72)), ''];
 
     for (const msg of convo.messages) {
       if (msg.role === 'user') {
-        const text = msg.content || '';
+        const text = markdownToPlainText(msg.content || '');
         const lines = ['BẠN:'];
         lines.push(text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh'));
         if (msg.translateTo) {
@@ -412,7 +509,7 @@ window.Utils = (() => {
         }
         parts.push(lines.join('\n'));
       } else if (msg.role === 'assistant') {
-        const content = window.Conversations.getAssistantContent(msg);
+        const content = markdownToPlainText(window.Conversations.getAssistantContent(msg));
         if (!content) continue;
         parts.push('TRỢ LÝ:\n' + content + formatGroundingAppendix(msg.groundingMetadata, { plain: true }));
       } else {
@@ -1035,7 +1132,7 @@ window.Utils = (() => {
     buildSearchFold, includesSearchFold, findSearchRangeInFold, findAllSearchRangesInFold,
     buildSearchSnippet, includesSearch, findSearchRange, highlightSearchText,
     copyToClipboard, copyImageToClipboard, downloadDataUrlImage, truncate, autoResize,
-    collectGroundingLinks, sanitizeGroundingMetadata, formatConversation, formatConversationPlainText,
+    collectGroundingLinks, sanitizeGroundingMetadata, formatConversation, formatConversationPlainText, markdownToPlainText,
     downloadFile, downloadBlob, deliverDownload, isDownloadAllowed, markDownloadAllowed, isIOSDevice, prefersCoarsePointer,
     exportToDocx, readFileAsDataUrl,
     extractJsonCandidates
