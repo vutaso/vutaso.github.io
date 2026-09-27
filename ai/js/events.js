@@ -240,7 +240,7 @@ window.Events = (() => {
 
     const messages = convo.messages.filter((m) => {
       if (m.role !== 'user' && m.role !== 'assistant') return false;
-      if (m.role === 'assistant' && !convoMod.getAssistantContent(m)) return false;
+      if (m.role === 'assistant' && !convoMod.getAssistantContent(m) && !(m.generatedImages && m.generatedImages.length)) return false;
       return true;
     });
 

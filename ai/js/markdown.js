@@ -304,9 +304,10 @@ window.Markdown = (() => {
       const item = mathParts[Number(id)];
       if (!item) return '';
       const rendered = renderKatex(item.tex, item.display);
+      const texAttr = escapeHTML(item.tex);
       return item.display
-        ? '<div class="math-block">' + rendered + '</div>'
-        : '<span class="math-inline">' + rendered + '</span>';
+        ? '<div class="math-block" data-tex="' + texAttr + '">' + rendered + '</div>'
+        : '<span class="math-inline" data-tex="' + texAttr + '">' + rendered + '</span>';
     };
 
     let out = html.replace(/<p>\s*CODEPHX(\d+)XCODEPH\s*<\/p>/g, (_, id) => held[Number(id)] || '');
@@ -712,10 +713,12 @@ window.Markdown = (() => {
   };
 
   const wrapMath = (tex, display = false) => {
-    const rendered = renderKatex(String(tex || '').trim(), !!display);
+    const source = String(tex || '').trim();
+    const rendered = renderKatex(source, !!display);
+    const texAttr = escapeHTML(source);
     return display
-      ? '<div class="math-block">' + rendered + '</div>'
-      : '<span class="math-inline">' + rendered + '</span>';
+      ? '<div class="math-block" data-tex="' + texAttr + '">' + rendered + '</div>'
+      : '<span class="math-inline" data-tex="' + texAttr + '">' + rendered + '</span>';
   };
 
   const init = () => {

@@ -378,7 +378,11 @@ window.Utils = (() => {
           : '';
         parts.push('**' + (text || (msg.files && msg.files[0] ? msg.files[0].name : 'Hình ảnh')) + '**' + translateNote + imageGenNote + imgNote + fileNote);
       } else {
-        parts.push(window.Conversations.getAssistantContent(msg) + formatGroundingAppendix(msg.groundingMetadata));
+        let body = window.Conversations.getAssistantContent(msg) || '';
+        if (!body.trim() && msg.generatedImages?.length) {
+          body = '_[' + msg.generatedImages.length + ' hình ảnh]_';
+        }
+        parts.push(body + formatGroundingAppendix(msg.groundingMetadata));
       }
     }
     return parts.join('\n\n---\n\n');
@@ -509,7 +513,10 @@ window.Utils = (() => {
         }
         parts.push(lines.join('\n'));
       } else if (msg.role === 'assistant') {
-        const content = markdownToPlainText(window.Conversations.getAssistantContent(msg));
+        let content = markdownToPlainText(window.Conversations.getAssistantContent(msg));
+        if (!content && msg.generatedImages?.length) {
+          content = '[' + msg.generatedImages.length + ' hình ảnh]';
+        }
         if (!content) continue;
         parts.push('TRỢ LÝ:\n' + content + formatGroundingAppendix(msg.groundingMetadata, { plain: true }));
       } else {
@@ -586,13 +593,12 @@ window.Utils = (() => {
 
   const filterExportMessages = (convo) => (convo.messages || []).filter((m) => {
     if (m.role !== 'user' && m.role !== 'assistant') return false;
-    if (m.role === 'assistant' && !window.Conversations.getAssistantContent(m)) return false;
+    if (m.role === 'assistant' && !window.Conversations.getAssistantContent(m) && !(m.generatedImages && m.generatedImages.length)) return false;
     return true;
   });
 
   const DOCX_IMAGE_MAX_PX = 420;
-  const DOCX_PAGE_WIDTH_TWIPS = 12240;
-  const DOCX_H_MARGIN_TWIPS = 720;
+  const exportLabel = (key, fallback) => window.I18n?.t?.(key) || fallback;
 
   const dataUrlToBytes = (dataUrl) => {
     const base64 = String(dataUrl).split(',')[1];
@@ -673,240 +679,6 @@ window.Utils = (() => {
     return paragraphs;
   };
 
-  const parseFencedCodeBlock = (segment) => {
-    const closed = segment.match(/^```([^\n`]*)\n([\s\S]*)```$/);
-    if (closed) {
-      return { lang: closed[1].trim(), code: closed[2].replace(/\n$/, '') };
-    }
-    const open = segment.match(/^```([^\n`]*)\n?([\s\S]*)$/);
-    if (open) {
-      return { lang: open[1].trim(), code: open[2].replace(/\n$/, '') };
-    }
-    return { lang: '', code: segment.replace(/^```[^\n]*\n?/, '').replace(/```$/, '') };
-  };
-
-  const isIndentedCodeLine = (line) => /^(?: {4}|\t)/.test(line);
-
-  const stripIndentedCodePrefix = (line) => {
-    if (/^ {4}/.test(line)) return line.slice(4);
-    if (/^\t/.test(line)) return line.slice(1);
-    return line;
-  };
-
-  const parseInlineMarkdown = (text, docxLib) => {
-    const { TextRun, ShadingType } = docxLib;
-    const runs = [];
-    const parts = String(text).split(/(\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`]+`)/g);
-    for (const part of parts) {
-      if (!part) continue;
-      if (part.startsWith('**') && part.endsWith('**')) {
-        runs.push(new TextRun({ text: part.slice(2, -2), bold: true }));
-      } else if (part.startsWith('*') && part.endsWith('*')) {
-        runs.push(new TextRun({ text: part.slice(1, -1), italics: true }));
-      } else if (part.startsWith('`') && part.endsWith('`')) {
-        runs.push(new TextRun({
-          text: part.slice(1, -1),
-          font: DOCX_CODE_FONT,
-          size: DOCX_CODE_SIZE,
-          shading: { fill: 'EEEEEE', type: ShadingType.CLEAR },
-        }));
-      } else {
-        runs.push(new TextRun({ text: part }));
-      }
-    }
-    return runs.length ? runs : [new TextRun({ text: '' })];
-  };
-
-  const parseMarkdownTableCells = (line) => {
-    let trimmed = String(line || '').trim();
-    if (trimmed.startsWith('|')) trimmed = trimmed.slice(1);
-    if (trimmed.endsWith('|')) trimmed = trimmed.slice(0, -1);
-    return trimmed.split('|').map((cell) => cell.trim());
-  };
-
-  const isMarkdownTableSeparator = (line) => {
-    const cells = parseMarkdownTableCells(line);
-    return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
-  };
-
-  const isMarkdownTableRow = (line) => {
-    const trimmed = String(line || '').trim();
-    if (!trimmed.includes('|')) return false;
-    if (isMarkdownTableSeparator(trimmed)) return true;
-    return /^\|/.test(trimmed);
-  };
-
-  const buildDocxTable = (rows, docxLib) => {
-    const {
-      Table, TableRow, TableCell, Paragraph, WidthType, ShadingType, BorderStyle, TableLayoutType,
-    } = docxLib;
-    const parsedRows = rows.map(parseMarkdownTableCells);
-    const colCount = parsedRows.reduce((max, cells) => Math.max(max, cells.length), 1);
-    const contentWidth = DOCX_PAGE_WIDTH_TWIPS - DOCX_H_MARGIN_TWIPS * 2;
-    const colWidthTwips = Math.floor(contentWidth / colCount);
-    const columnWidths = Array(colCount).fill(colWidthTwips);
-    const cellBorders = {
-      top: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' },
-      bottom: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' },
-      left: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' },
-      right: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' },
-    };
-
-    const tableRows = parsedRows.map((cells, rowIndex) => {
-      const padded = cells.slice();
-      while (padded.length < colCount) padded.push('');
-      const isHeader = rowIndex === 0;
-
-      return new TableRow({
-        tableHeader: isHeader,
-        children: padded.map((cellText) => new TableCell({
-          width: { size: colWidthTwips, type: WidthType.DXA },
-          borders: cellBorders,
-          margins: { top: 60, bottom: 60, left: 100, right: 100 },
-          shading: isHeader ? { fill: 'F0F4F8', type: ShadingType.CLEAR } : undefined,
-          children: [
-            new Paragraph({
-              children: parseInlineMarkdown(cellText, docxLib),
-            }),
-          ],
-        })),
-      });
-    });
-
-    return new Table({
-      layout: TableLayoutType.FIXED,
-      width: { size: 100, type: WidthType.PERCENTAGE },
-      columnWidths,
-      rows: tableRows,
-    });
-  };
-
-  const processMarkdownLines = (text, docxLib) => {
-    const { Paragraph, TextRun, HeadingLevel } = docxLib;
-    const paragraphs = [];
-    const lines = String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
-    let i = 0;
-
-    while (i < lines.length) {
-      const line = lines[i];
-      const trimmed = line.trimEnd();
-
-      if (isIndentedCodeLine(line)) {
-        const codeLines = [];
-        while (i < lines.length && isIndentedCodeLine(lines[i])) {
-          codeLines.push(stripIndentedCodePrefix(lines[i]));
-          i++;
-        }
-        paragraphs.push(...buildDocxCodeBlockParagraphs(codeLines.join('\n'), docxLib));
-        continue;
-      }
-
-      if (!trimmed) {
-        paragraphs.push(new Paragraph({ children: [] }));
-        i++;
-        continue;
-      }
-
-      const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
-      if (headingMatch) {
-        const level = headingMatch[1].length;
-        const headingMap = {
-          1: HeadingLevel.HEADING_1,
-          2: HeadingLevel.HEADING_2,
-          3: HeadingLevel.HEADING_3,
-          4: HeadingLevel.HEADING_4,
-          5: HeadingLevel.HEADING_5,
-          6: HeadingLevel.HEADING_6,
-        };
-        paragraphs.push(new Paragraph({
-          heading: headingMap[level] || HeadingLevel.HEADING_3,
-          children: parseInlineMarkdown(headingMatch[2], docxLib),
-        }));
-        i++;
-        continue;
-      }
-
-      const bulletMatch = trimmed.match(/^[-*+]\s+(.+)$/);
-      if (bulletMatch) {
-        paragraphs.push(new Paragraph({
-          indent: { left: 360 },
-          children: parseInlineMarkdown('• ' + bulletMatch[1], docxLib),
-        }));
-        i++;
-        continue;
-      }
-
-      const numMatch = trimmed.match(/^\d+\.\s+(.+)$/);
-      if (numMatch) {
-        paragraphs.push(new Paragraph({
-          children: parseInlineMarkdown(trimmed, docxLib),
-        }));
-        i++;
-        continue;
-      }
-
-      const quoteMatch = trimmed.match(/^>\s*(.*)$/);
-      if (quoteMatch) {
-        paragraphs.push(new Paragraph({
-          indent: { left: 720 },
-          children: [new TextRun({ text: quoteMatch[1], italics: true, color: '666666' })],
-        }));
-        i++;
-        continue;
-      }
-
-      if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
-        paragraphs.push(new Paragraph({
-          spacing: { before: 120, after: 120 },
-          children: [new TextRun({ text: '—'.repeat(24), color: 'CCCCCC' })],
-        }));
-        i++;
-        continue;
-      }
-
-      if (isMarkdownTableRow(trimmed)) {
-        const tableLines = [];
-        while (i < lines.length) {
-          const rowTrimmed = lines[i].trim();
-          if (!rowTrimmed || !isMarkdownTableRow(rowTrimmed)) break;
-          tableLines.push(rowTrimmed);
-          i++;
-        }
-        const dataRows = tableLines.filter((line) => !isMarkdownTableSeparator(line));
-        if (dataRows.length) {
-          paragraphs.push(new Paragraph({ spacing: { after: 80 }, children: [] }));
-          paragraphs.push(buildDocxTable(dataRows, docxLib));
-          paragraphs.push(new Paragraph({ spacing: { before: 80 }, children: [] }));
-        }
-        continue;
-      }
-
-      paragraphs.push(new Paragraph({
-        children: parseInlineMarkdown(trimmed, docxLib),
-      }));
-      i++;
-    }
-
-    return paragraphs;
-  };
-
-  const markdownToDocxParagraphs = (text, docxLib) => {
-    const paragraphs = [];
-    const segments = String(text || '').split(/(```[\s\S]*?```)/g);
-
-    for (const seg of segments) {
-      if (!seg.trim()) continue;
-      if (seg.startsWith('```')) {
-        const { lang, code } = parseFencedCodeBlock(seg);
-        paragraphs.push(...buildDocxCodeBlockParagraphs(code, docxLib, lang || undefined));
-        continue;
-      }
-      paragraphs.push(...processMarkdownLines(seg, docxLib));
-    }
-
-    return paragraphs;
-  };
-
   const buildDocxRoleParagraph = (role, docxLib) => {
     const { Paragraph, TextRun } = docxLib;
     return new Paragraph({
@@ -915,16 +687,10 @@ window.Utils = (() => {
     });
   };
 
-  const buildDocxUserParagraphs = async (msg, docxLib) => {
+  const appendDocxImages = async (paragraphs, images, docxLib) => {
     const { Paragraph, TextRun, ImageRun } = docxLib;
-    const paragraphs = [buildDocxRoleParagraph('Bạn', docxLib)];
-
-    if (msg.content && msg.content.trim()) {
-      paragraphs.push(...await window.DocxExport.markdownToDocxParagraphs(msg.content, docxLib));
-    }
-
-    for (const img of msg.images || []) {
-      if (!img.dataUrl) continue;
+    for (const img of images || []) {
+      if (!img?.dataUrl) continue;
       try {
         const imageData = await prepareDocxImage(img.dataUrl, DOCX_IMAGE_MAX_PX);
         paragraphs.push(new Paragraph({
@@ -939,16 +705,27 @@ window.Utils = (() => {
         }));
       } catch {
         paragraphs.push(new Paragraph({
-          children: [new TextRun({ text: '[' + (img.name || 'Hình ảnh') + ']', italics: true, color: '888888' })],
+          children: [new TextRun({ text: '[' + (img.name || exportLabel('viewImage', 'Hình ảnh')) + ']', italics: true, color: '888888' })],
         }));
       }
     }
+  };
+
+  const buildDocxUserParagraphs = async (msg, docxLib) => {
+    const { Paragraph, TextRun } = docxLib;
+    const paragraphs = [buildDocxRoleParagraph(exportLabel('exportRoleUser', 'Bạn'), docxLib)];
+
+    if (msg.content && msg.content.trim()) {
+      paragraphs.push(...await window.DocxExport.markdownToDocxParagraphs(msg.content, docxLib));
+    }
+
+    await appendDocxImages(paragraphs, msg.images, docxLib);
 
     for (const file of msg.files || []) {
       paragraphs.push(new Paragraph({
         spacing: { before: 120, after: 60 },
         children: [
-          new TextRun({ text: 'Tệp: ', bold: true }),
+          new TextRun({ text: exportLabel('exportFileLabel', 'Tệp: '), bold: true }),
           new TextRun({ text: file.name || 'file' }),
           new TextRun({ text: ' (' + window.Files.formatSize(file.size || 0) + ')', color: '888888' }),
         ],
@@ -1003,14 +780,17 @@ window.Utils = (() => {
   const buildDocxAssistantParagraphs = async (msg, docxLib) => {
     const content = window.Conversations.getAssistantContent(msg);
     const grounding = buildDocxGroundingParagraphs(msg.groundingMetadata, docxLib);
-    if ((!content || !content.trim()) && !grounding.length) return [];
-    return [
-      buildDocxRoleParagraph('Trợ lý', docxLib),
+    const images = (msg.generatedImages || []).filter((img) => img?.dataUrl);
+    if ((!content || !content.trim()) && !grounding.length && !images.length) return [];
+    const paragraphs = [
+      buildDocxRoleParagraph(exportLabel('exportRoleAssistant', 'Trợ lý'), docxLib),
       ...(content && content.trim()
         ? await window.DocxExport.markdownToDocxParagraphs(content, docxLib)
         : []),
       ...grounding,
     ];
+    await appendDocxImages(paragraphs, images, docxLib);
+    return paragraphs;
   };
 
   const exportToDocx = async (convo) => {

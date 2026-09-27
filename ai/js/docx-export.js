@@ -17,14 +17,23 @@ window.DocxExport = (() => {
     return bytes;
   };
 
+  const mountOffscreen = (node) => {
+    const clip = document.createElement('div');
+    clip.setAttribute('data-docx-export-clip', '');
+    clip.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;pointer-events:none;';
+    clip.appendChild(node);
+    document.body.appendChild(clip);
+    return clip;
+  };
+
   const captureElementImage = async (el, maxWidth = DOCX_MATH_MAX_WIDTH) => {
     const html2canvas = window.html2canvas?.default || window.html2canvas;
     if (!html2canvas) throw new Error('html2canvas chưa tải');
 
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;left:0;top:0;z-index:-1;opacity:1;background:#fff;padding:2px 6px;color:#111118;';
+    wrap.style.cssText = 'width:max-content;background:#fff;padding:2px 6px;color:#111118;';
     wrap.appendChild(el.cloneNode(true));
-    document.body.appendChild(wrap);
+    const clip = mountOffscreen(wrap);
     await document.fonts.ready;
     await waitForLayout();
 
@@ -53,8 +62,44 @@ window.DocxExport = (() => {
         height,
       };
     } finally {
-      wrap.remove();
+      clip.remove();
     }
+  };
+
+  const embedImageSrc = (src, maxWidth) => new Promise((resolve, reject) => {
+    const url = String(src || '').trim();
+    if (!url || url.startsWith('blob:')) {
+      reject(new Error('Ảnh không nhúng được'));
+      return;
+    }
+    const image = new Image();
+    image.onload = () => {
+      const scale = Math.min(1, maxWidth / Math.max(image.width, image.height, 1));
+      const width = Math.max(1, Math.round(image.width * scale));
+      const height = Math.max(1, Math.round(image.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+      try {
+        resolve({
+          data: dataUrlToBytes(canvas.toDataURL('image/png')),
+          type: 'png',
+          width,
+          height,
+        });
+      } catch (err) {
+        reject(err);
+      }
+    };
+    image.onerror = () => reject(new Error('Không tải được ảnh'));
+    if (!url.startsWith('data:')) image.crossOrigin = 'anonymous';
+    image.src = url;
+  });
+
+  const mathSourceText = (el) => {
+    const tex = el?.getAttribute?.('data-tex') || el?.closest?.('[data-tex]')?.getAttribute('data-tex') || '';
+    return String(tex || '').trim();
   };
 
   const buildMathImageRun = (imageData, docxLib, { inline = false } = {}) => {
@@ -110,21 +155,19 @@ window.DocxExport = (() => {
     return paragraphs;
   };
 
-  const buildTable = (tableEl, docxLib) => {
+  const buildTable = async (tableEl, docxLib) => {
     const {
       Table, TableRow, TableCell, Paragraph, TextRun, WidthType, ShadingType, BorderStyle, TableLayoutType,
     } = docxLib;
-    const parsedRows = [...tableEl.querySelectorAll('tr')].map((tr) =>
-      [...tr.querySelectorAll('th, td')].map((cell) => (cell.textContent || '').trim())
-    );
-    if (!parsedRows.length) return null;
+    const rowEls = [...tableEl.querySelectorAll(':scope > tr, :scope > thead > tr, :scope > tbody > tr')];
+    if (!rowEls.length) return null;
 
     // Chỉ coi hàng đầu là header khi nó thực sự chứa <th>.
     // Bảng có hàng đầu là dữ liệu (không có th) sẽ không bị tô nền header.
-    const firstRow = tableEl.querySelector('tr');
-    const firstRowIsHeader = !!(firstRow && firstRow.querySelector('th'));
+    const firstRow = rowEls[0];
+    const firstRowIsHeader = !!(firstRow && firstRow.querySelector(':scope > th'));
 
-    const colCount = parsedRows.reduce((max, cells) => Math.max(max, cells.length), 1);
+    const colCount = rowEls.reduce((max, tr) => Math.max(max, tr.querySelectorAll(':scope > th, :scope > td').length), 1);
     const contentWidth = DOCX_PAGE_WIDTH_TWIPS - DOCX_H_MARGIN_TWIPS * 2;
     const colWidthTwips = Math.floor(contentWidth / colCount);
     const columnWidths = Array(colCount).fill(colWidthTwips);
@@ -135,22 +178,29 @@ window.DocxExport = (() => {
       right: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' },
     };
 
-    const tableRows = parsedRows.map((cells, rowIndex) => {
-      const padded = cells.slice();
-      while (padded.length < colCount) padded.push('');
+    const tableRows = [];
+    for (let rowIndex = 0; rowIndex < rowEls.length; rowIndex++) {
+      const cells = [...rowEls[rowIndex].querySelectorAll(':scope > th, :scope > td')];
+      while (cells.length < colCount) cells.push(null);
       const isHeader = firstRowIsHeader && rowIndex === 0;
-
-      return new TableRow({
-        tableHeader: isHeader,
-        children: padded.map((cellText) => new TableCell({
+      const docxCells = [];
+      for (const cell of cells) {
+        const runs = cell ? await walkInline(cell, docxLib) : [];
+        docxCells.push(new TableCell({
           width: { size: colWidthTwips, type: WidthType.DXA },
           borders: cellBorders,
           margins: { top: 60, bottom: 60, left: 100, right: 100 },
           shading: isHeader ? { fill: 'F0F4F8', type: ShadingType.CLEAR } : undefined,
-          children: [new Paragraph({ children: [new TextRun({ text: cellText })] })],
-        })),
-      });
-    });
+          children: [new Paragraph({
+            children: runs.length ? runs : [new TextRun({ text: '' })],
+          })],
+        }));
+      }
+      tableRows.push(new TableRow({
+        tableHeader: isHeader,
+        children: docxCells,
+      }));
+    }
 
     return new Table({
       layout: TableLayoutType.FIXED,
@@ -164,8 +214,7 @@ window.DocxExport = (() => {
     el.classList?.contains('math-inline')
     || el.classList?.contains('math-block')
     || el.classList?.contains('katex')
-    || el.classList?.contains('katex-display')
-    || !!el.querySelector?.('.katex');
+    || el.classList?.contains('katex-display');
 
   const mathCaptureTarget = (el) => {
     if (el.classList?.contains('math-block')) return el;
@@ -175,13 +224,38 @@ window.DocxExport = (() => {
     return el;
   };
 
-  const walkInline = async (node, docxLib) => {
+  const textRun = (text, style, docxLib) => {
+    if (text == null || text === '') return null;
     const { TextRun, ShadingType } = docxLib;
+    const opts = { text: String(text) };
+    if (style.bold) opts.bold = true;
+    if (style.italics) opts.italics = true;
+    if (style.strike) opts.strike = true;
+    if (style.super) opts.superScript = true;
+    if (style.sub) opts.subScript = true;
+    if (style.code) {
+      opts.font = DOCX_CODE_FONT;
+      opts.size = DOCX_CODE_SIZE;
+      opts.shading = { fill: 'EEEEEE', type: ShadingType.CLEAR };
+    }
+    if (style.link) {
+      opts.color = '2563EB';
+      opts.underline = {};
+    } else if (style.color) {
+      opts.color = style.color;
+    }
+    return new TextRun(opts);
+  };
+
+  const withStyle = (style, extra) => Object.assign({}, style, extra);
+
+  const walkInline = async (node, docxLib, style = {}) => {
+    const { TextRun, ExternalHyperlink } = docxLib;
     const runs = [];
 
     const appendText = (text) => {
-      if (!text) return;
-      runs.push(new TextRun({ text }));
+      const run = textRun(text, style, docxLib);
+      if (run) runs.push(run);
     };
 
     for (const child of node.childNodes) {
@@ -194,47 +268,64 @@ window.DocxExport = (() => {
       const el = child;
       const tag = el.tagName;
 
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'BUTTON') continue;
+
       if (isMathElement(el)) {
+        const target = mathCaptureTarget(el);
+        const display = target.classList.contains('math-block');
         try {
-          const target = mathCaptureTarget(el);
           const image = await captureElementImage(target);
-          runs.push(buildMathImageRun(image, docxLib, { inline: !target.classList.contains('math-block') }));
+          runs.push(buildMathImageRun(image, docxLib, { inline: !display }));
         } catch {
-          appendText(el.textContent || '');
+          const tex = mathSourceText(target) || mathSourceText(el);
+          appendText(tex || el.textContent || '');
         }
         continue;
       }
 
       if (tag === 'STRONG' || tag === 'B') {
-        runs.push(new TextRun({ text: el.textContent || '', bold: true }));
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { bold: true })));
       } else if (tag === 'EM' || tag === 'I') {
-        runs.push(new TextRun({ text: el.textContent || '', italics: true }));
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { italics: true })));
+      } else if (tag === 'DEL' || tag === 'S') {
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { strike: true })));
+      } else if (tag === 'SUB') {
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { sub: true })));
+      } else if (tag === 'SUP') {
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { super: true })));
       } else if (tag === 'CODE') {
-        runs.push(new TextRun({
-          text: el.textContent || '',
-          font: DOCX_CODE_FONT,
-          size: DOCX_CODE_SIZE,
-          shading: { fill: 'EEEEEE', type: ShadingType.CLEAR },
-        }));
+        runs.push(...await walkInline(el, docxLib, withStyle(style, { code: true })));
       } else if (tag === 'A') {
-        const href = el.getAttribute?.('href') || '';
-        const linkText = el.textContent || '';
-        const { ExternalHyperlink } = docxLib;
-        if (ExternalHyperlink && /^(https?:|mailto:)/i.test(href)) {
-          runs.push(new ExternalHyperlink({
-            link: href,
-            children: [new TextRun({ text: linkText, color: '2563EB', underline: {} })],
-          }));
+        const href = el.getAttribute('href') || '';
+        const inner = await walkInline(el, docxLib, withStyle(style, { link: true }));
+        const linkRuns = inner.length ? inner : [textRun(href, withStyle(style, { link: true }), docxLib)].filter(Boolean);
+        if (ExternalHyperlink && /^(https?:|mailto:)/i.test(href) && linkRuns.every((run) => run instanceof TextRun)) {
+          runs.push(new ExternalHyperlink({ link: href, children: linkRuns }));
         } else {
-          runs.push(new TextRun({ text: linkText, color: '2563EB', underline: {} }));
+          runs.push(...linkRuns);
         }
       } else if (tag === 'BR') {
-        runs.push(new TextRun({ text: '\n', break: 1 }));
-      } else if (tag === 'UL' || tag === 'OL') {
-        // List lồng nhau được xử lý ở cấp block (convertList) để giữ bullet/xuống dòng.
+        runs.push(new TextRun({ break: 1 }));
+      } else if (tag === 'IMG') {
+        const alt = (el.getAttribute('alt') || '').trim();
+        const src = el.getAttribute('src') || '';
+        try {
+          const image = await embedImageSrc(src, DOCX_MATH_MAX_WIDTH);
+          runs.push(buildMathImageRun(image, docxLib));
+        } catch {
+          if (alt) appendText(alt);
+        }
+      } else if (tag === 'INPUT' && (el.getAttribute('type') || '').toLowerCase() === 'checkbox') {
+        appendText((el.checked || el.hasAttribute('checked')) ? '☑ ' : '☐ ');
+      } else if (
+        tag === 'UL' || tag === 'OL' || tag === 'PRE' || tag === 'TABLE' || tag === 'BLOCKQUOTE'
+        || el.classList.contains('code-block')
+        || el.classList.contains('table-block')
+        || el.classList.contains('mermaid-block')
+      ) {
         continue;
       } else {
-        runs.push(...await walkInline(el, docxLib));
+        runs.push(...await walkInline(el, docxLib, style));
       }
     }
 
@@ -259,11 +350,22 @@ window.DocxExport = (() => {
         children: runs.length ? [new TextRun({ text: marker }), ...runs] : [new TextRun({ text: marker })],
       }));
 
-      for (const sub of li.querySelectorAll(':scope > ul, :scope > ol')) {
-        blocks.push(...await convertList(sub, docxLib, {
-          ordered: sub.tagName === 'OL',
-          depth: depth + 1,
-        }));
+      for (const sub of li.querySelectorAll(':scope > ul, :scope > ol, :scope > pre, :scope > blockquote, :scope > table, :scope > div')) {
+        if (sub.tagName === 'UL' || sub.tagName === 'OL') {
+          blocks.push(...await convertList(sub, docxLib, {
+            ordered: sub.tagName === 'OL',
+            depth: depth + 1,
+          }));
+        } else if (
+          sub.tagName === 'PRE'
+          || sub.tagName === 'BLOCKQUOTE'
+          || sub.tagName === 'TABLE'
+          || sub.classList.contains('code-block')
+          || sub.classList.contains('table-block')
+          || sub.classList.contains('mermaid-block')
+        ) {
+          blocks.push(...await convertBlock(sub, docxLib));
+        }
       }
     }
     return blocks;
@@ -284,7 +386,8 @@ window.DocxExport = (() => {
           children: [buildMathImageRun(image, docxLib)],
         }));
       } catch {
-        blocks.push(new Paragraph({ children: [new TextRun({ text: el.textContent || '' })] }));
+        const tex = mathSourceText(mathCaptureTarget(el)) || mathSourceText(el);
+        blocks.push(new Paragraph({ children: [new TextRun({ text: tex || '' })] }));
       }
       return blocks;
     }
@@ -331,10 +434,35 @@ window.DocxExport = (() => {
     }
 
     if (tag === 'BLOCKQUOTE') {
-      blocks.push(new Paragraph({
-        indent: { left: 720 },
-        children: [new TextRun({ text: el.textContent || '', italics: true, color: '666666' })],
-      }));
+      const quoteStyle = { italics: true, color: '666666' };
+      for (const child of el.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const text = (child.textContent || '').trim();
+          if (text) {
+            blocks.push(new Paragraph({
+              indent: { left: 720 },
+              children: [textRun(text, quoteStyle, docxLib)],
+            }));
+          }
+          continue;
+        }
+        if (child.nodeType !== Node.ELEMENT_NODE) continue;
+        if (child.tagName === 'P') {
+          const runs = await walkInline(child, docxLib, quoteStyle);
+          blocks.push(new Paragraph({
+            indent: { left: 720 },
+            children: runs.length ? runs : [new TextRun({ text: '' })],
+          }));
+        } else {
+          blocks.push(...await convertBlock(child, docxLib));
+        }
+      }
+      if (!blocks.length) {
+        blocks.push(new Paragraph({
+          indent: { left: 720 },
+          children: [new TextRun({ text: '', italics: true })],
+        }));
+      }
       return blocks;
     }
 
@@ -350,7 +478,7 @@ window.DocxExport = (() => {
       const table = el.querySelector('table');
       if (table) {
         blocks.push(new Paragraph({ spacing: { after: 80 }, children: [] }));
-        const docxTable = buildTable(table, docxLib);
+        const docxTable = await buildTable(table, docxLib);
         if (docxTable) blocks.push(docxTable);
         blocks.push(new Paragraph({ spacing: { before: 80 }, children: [] }));
       }
@@ -359,17 +487,18 @@ window.DocxExport = (() => {
 
     if (tag === 'TABLE') {
       blocks.push(new Paragraph({ spacing: { after: 80 }, children: [] }));
-      const docxTable = buildTable(el, docxLib);
+      const docxTable = await buildTable(el, docxLib);
       if (docxTable) blocks.push(docxTable);
       blocks.push(new Paragraph({ spacing: { before: 80 }, children: [] }));
       return blocks;
     }
 
     if (el.classList?.contains('mermaid-block')) {
-      const view = el.querySelector('.mermaid-view svg, .mermaid-view');
-      if (view) {
+      const failed = el.dataset.rendered === 'error' || !!el.querySelector('.mermaid-error');
+      const svg = !failed && el.querySelector('.mermaid-view svg');
+      if (svg) {
         try {
-          const image = await captureElementImage(view, DOCX_MATH_MAX_WIDTH);
+          const image = await captureElementImage(svg, DOCX_MATH_MAX_WIDTH);
           blocks.push(new Paragraph({
             alignment: AlignmentType.CENTER,
             spacing: { before: 80, after: 80 },
@@ -378,10 +507,18 @@ window.DocxExport = (() => {
           return blocks;
         } catch {}
       }
-      const code = el.querySelector('.mermaid-source code, .mermaid-view code');
-      if (code) {
-        blocks.push(...buildCodeBlockParagraphs(code.textContent || '', docxLib, 'mermaid'));
+      const source = window.Markdown?.getMermaidSource?.(el) || '';
+      if (source.trim()) {
+        blocks.push(...buildCodeBlockParagraphs(source, docxLib, 'mermaid'));
       }
+      return blocks;
+    }
+
+    if (el.classList?.contains('code-block')) {
+      const code = el.querySelector('.code-block-body code') || el.querySelector('pre code');
+      const lang = [...(code?.classList || [])].find((c) => c.startsWith('language-'))?.slice(9)
+        || (el.querySelector('.pre-header .lang')?.textContent || '').trim();
+      blocks.push(...buildCodeBlockParagraphs(code?.textContent || '', docxLib, lang));
       return blocks;
     }
 
@@ -427,9 +564,9 @@ window.DocxExport = (() => {
     const host = document.createElement('div');
     host.className = 'docx-export-host';
     host.setAttribute('data-theme', 'light');
-    host.style.cssText = 'position:fixed;left:0;top:0;width:620px;z-index:-1;background:#fff;color:#111118;padding:8px;';
+    host.style.cssText = 'width:620px;background:#fff;color:#111118;padding:8px;';
     host.innerHTML = window.Markdown.render(text);
-    document.body.appendChild(host);
+    const clip = mountOffscreen(host);
 
     window.Markdown.enhanceCodeBlocks(host);
     window.Markdown.enhanceTables(host);
@@ -454,7 +591,7 @@ window.DocxExport = (() => {
     try {
       return await convertChildren([...host.childNodes], docxLib);
     } finally {
-      host.remove();
+      clip.remove();
       window.Markdown?.updateMermaidTheme?.();
     }
   };
