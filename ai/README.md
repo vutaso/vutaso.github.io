@@ -43,14 +43,14 @@ Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github
 
 ## Model hỗ trợ
 
-**27 model** từ **6 nhà cung cấp**. Model mặc định: `deepseek-v4-flash`. Bảng giá chi tiết: [pricing.html](pricing.html).
+**32 model** từ **5 nhà cung cấp**. Model mặc định: `deepseek-v4-flash`. Bảng giá chi tiết: [pricing.html](pricing.html).
 
 | Nhà cung cấp | Model | Web search | Tạo ảnh | Thinking |
 |--------------|-------|:----------:|:-------:|:--------:|
 | **OpenAI** | GPT-6 Luna, GPT-6 Sol | ✓ | ✓ | ✓ |
 | **Anthropic** | Claude Haiku 4.5, Sonnet 5, Opus 4.8, Opus 5 | ✓ | — | ✓ |
 | **DeepSeek** | DeepSeek V4 Flash, V4 Pro | — | — | ✓ |
-| **OpenRouter** | GLM Flash/Latest, DeepSeek Flash Latest, GPT Luna/Sol Latest, Gemini Flash Latest, Kimi Latest, Grok Latest, Claude Haiku/Sonnet/Opus Latest | — | — | ✓ |
+| **OpenRouter** | GLM 5.3 FlashX, GLM Flash/Latest, DeepSeek Flash Latest, MiMo V2.6 Flash/Pro, GPT Luna/Sol Latest, Gemini Flash Latest, Kimi Latest, Grok Latest, Claude Haiku/Sonnet/Opus Latest | — | — | ✓ |
 
 > Model **OpenRouter** hỗ trợ reasoning và vision; web search / tạo ảnh trong app chỉ có trên provider gốc (OpenAI, Anthropic).
 
@@ -63,7 +63,7 @@ Repo này nằm trong [vutaso.github.io](https://github.com/vutaso/vutaso.github
 | Tính năng | Mô tả |
 |-----------|--------|
 | **Trò chuyện với AI** | Gửi tin nhắn văn bản và nhận phản hồi streaming từ model đang chọn |
-| **Chọn model** | Dropdown trên header với 27 model từ 6 nhà cung cấp |
+| **Chọn model** | Dropdown trên header với 32 model từ 5 nhà cung cấp |
 | **So sánh model** | Gửi cùng câu hỏi tới 2–3 model song song, chọn bản trả lời tốt nhất |
 | **Streaming** | Hiển thị câu trả lời theo thời gian thực (token-by-token) |
 | **Dừng phản hồi** | Nút Stop để hủy yêu cầu đang chạy; nội dung đã nhận được vẫn được giữ lại |

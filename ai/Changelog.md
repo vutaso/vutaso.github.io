@@ -8,7 +8,18 @@ Tất cả các thay đổi đáng chú ý của **Vutaso AI** được ghi lạ
 
 ## [Unreleased]
 
+### Changed
+
+#### Chế độ system prompt mặc định: Tiết kiệm token (`js/config.js`, `js/storage.js`)
+**Ý nghĩa:** Phiên mới và user chưa lưu chế độ prompt sẽ dùng prompt ngắn gọn để giảm token in/out; vẫn đổi sang **Mặc định** hoặc preset khác trong Cài đặt.
+
 ### Added
+
+#### Thời gian tạo tin nhắn (`js/ui.js`, `js/events.js`, `css/chat.css`)
+**Ý nghĩa:** Hover một tin nhắn thì cạnh hàng nút hiện thời gian tương đối (ví dụ **5 days ago**). Hover chính dòng thời gian đó thì hiện thời điểm: `dd/MM/YY at 10:20 AM`.
+
+#### Model GLM 5.3 FlashX (OpenRouter, `z-ai/glm-5.3-flashx`)
+**Ý nghĩa:** Biến thể tốc độ cao của GLM 5.3 Flash — reasoning bắt buộc, vision (ảnh/video), context 1M, output tới 131K. Effort `low` / `high` / `max`, mặc định `max`. Giá $0.37 / $1.25 mỗi 1M token.
 
 #### Slash command từ thư viện prompt (`js/snippets.js`, `js/ui.js`, `js/events.js`)
 **Ý nghĩa:** Bookmark vẫn dùng được, nhưng prompt hay dùng nên gõ nhanh ngay trong ô nhập — `/review`, `/summary` — không mở menu.

@@ -1824,7 +1824,75 @@ window.UI = (() => {
       + continueBtn
       + branchToolbarBtnHTML()
       + exportMenu
-      + pager;
+      + pager
+      + messageTimeHTML(m);
+  };
+
+  const formatRelativeMessageTime = (ts) => {
+    const diff = Math.max(0, Date.now() - ts);
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+    if (diff < 45 * 1000) return t('timeJustNow');
+    if (diff < hour) {
+      const n = Math.max(1, Math.round(diff / minute));
+      return n === 1 ? t('timeMinuteAgo') : t('timeMinutesAgo', { n });
+    }
+    if (diff < day) {
+      const n = Math.max(1, Math.round(diff / hour));
+      return n === 1 ? t('timeHourAgo') : t('timeHoursAgo', { n });
+    }
+    if (diff < 7 * day) {
+      const n = Math.max(1, Math.round(diff / day));
+      return n === 1 ? t('timeDayAgo') : t('timeDaysAgo', { n });
+    }
+    if (diff < 30 * day) {
+      const n = Math.max(1, Math.round(diff / (7 * day)));
+      return n === 1 ? t('timeWeekAgo') : t('timeWeeksAgo', { n });
+    }
+    if (diff < 365 * day) {
+      const n = Math.max(1, Math.round(diff / (30 * day)));
+      return n === 1 ? t('timeMonthAgo') : t('timeMonthsAgo', { n });
+    }
+    const n = Math.max(1, Math.round(diff / (365 * day)));
+    return n === 1 ? t('timeYearAgo') : t('timeYearsAgo', { n });
+  };
+
+  const formatAbsoluteMessageTime = (ts) => {
+    const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return '';
+    const date = String(d.getDate()).padStart(2, '0')
+      + '/' + String(d.getMonth() + 1).padStart(2, '0')
+      + '/' + String(d.getFullYear()).slice(-2);
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? t('timePM') : t('timeAM');
+    hours = hours % 12 || 12;
+    const clockTime = hours + ':' + String(d.getMinutes()).padStart(2, '0');
+    const locale = window.I18n.getLocale();
+    const clock = (locale === 'jp' || locale === 'zh')
+      ? ampm + ' ' + clockTime
+      : clockTime + ' ' + ampm;
+    return t('timeAbsolute', { date, clock });
+  };
+
+  const messageTimeHTML = (m) => {
+    const ts = Number(m?.ts);
+    if (!Number.isFinite(ts) || ts <= 0) return '';
+    const abs = formatAbsoluteMessageTime(ts);
+    return '<time class="msg-time" datetime="' + new Date(ts).toISOString() + '" data-ts="' + ts
+      + '" data-abs="' + escapeHTML(abs) + '" tabindex="0" aria-label="' + escapeHTML(abs) + '">'
+      + escapeHTML(formatRelativeMessageTime(ts)) + '</time>';
+  };
+
+  const syncMessageTime = (article) => {
+    const el = article?.querySelector?.('.msg-time');
+    if (!el) return;
+    const ts = Number(el.dataset.ts);
+    if (!Number.isFinite(ts) || ts <= 0) return;
+    const abs = formatAbsoluteMessageTime(ts);
+    el.dataset.abs = abs;
+    el.setAttribute('aria-label', abs);
+    el.textContent = formatRelativeMessageTime(ts);
   };
 
   const messageHTML = (m, idx) => {
@@ -1848,11 +1916,13 @@ window.UI = (() => {
       : '';
     const toolbar = isSummary
       ? '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
+        + messageTimeHTML(m)
       : isUser
         ? editBtn
           + branchToolbarBtnHTML()
           + '<button type="button" class="tb-btn" data-action="copy" title="' + escapeHTML(t('copy')) + '"><i class="fa-solid fa-copy"></i></button>'
           + delBtn
+          + messageTimeHTML(m)
         : assistantToolbarHTML(m, idx);
     return '<article class="message ' + m.role + summaryClass + '" data-role="' + m.role + '"' + idxAttr + '>'
       + avatar
@@ -3443,7 +3513,7 @@ window.UI = (() => {
 
   const syncSystemPromptModeUI = (appState) => {
     const locale = appState?.locale || window.APP_CONFIG.DEFAULT_LOCALE;
-    let mode = appState?.systemPromptMode || 'default';
+    let mode = appState?.systemPromptMode || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT_MODE;
     const prompt = (appState?.systemPrompt || '').trim();
     if (mode !== 'custom' && prompt && prompt !== window.I18n.getSystemPromptForMode(mode, locale)) {
       mode = window.I18n.detectSystemPromptMode(prompt, locale);
@@ -4805,7 +4875,7 @@ window.UI = (() => {
     syncSlashCommandMenu, closeSlashCommandMenu, isSlashCommandMenuOpen,
     moveSlashCommandHighlight, confirmSlashCommand, applySlashSnippet,
     getEditingSnippetId, saveSnippetFromForm, toggleSidebar, closeMobileSidebar, initSidebar, bindSidebarResize, bindComposerViewport, showToast, rerenderMermaid,
-    setAssistantToolbar, updateAssistantMessage, refreshUserMessage, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
+    setAssistantToolbar, updateAssistantMessage, refreshUserMessage, syncMessageTime, syncMessageModelLabel, beginRetryStreaming, beginContinueStreaming,
     openMarkdownPreview, openHtmlPreview, openArtifactPreview, refreshArtifactPreview, openArtifactPreviewInNewTab,
     openSourcesPreview, closeMarkdownPreview, bindPreviewResize,
     openImagePreview, closeImagePreview, isImagePreviewOpen,

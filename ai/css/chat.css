@@ -1270,6 +1270,50 @@
   color: var(--text);
 }
 
+.message .toolbar .msg-time {
+  position: relative;
+  margin-left: 6px;
+  padding: 4px 2px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--text-dim);
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.message .toolbar .msg-time::after {
+  content: attr(data-abs);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--popup-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity var(--transition);
+}
+
+.message.user .toolbar .msg-time::after {
+  left: auto;
+  right: 0;
+}
+
+.message .toolbar .msg-time:hover::after,
+.message .toolbar .msg-time:focus-visible::after,
+.message .toolbar .msg-time.is-open::after {
+  opacity: 1;
+}
+
 .message .toolbar .tb-btn[data-action="delete-msg"] {
   margin-left: 2px;
 }

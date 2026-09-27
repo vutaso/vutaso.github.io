@@ -185,6 +185,22 @@ window.Events = (() => {
 
     ui.els.messages.addEventListener('scroll', hideSelectionReplyTooltip, { passive: true });
 
+    ui.els.messages.addEventListener('mouseover', (e) => {
+      const article = e.target.closest?.('.message');
+      if (!article || (e.relatedTarget && article.contains(e.relatedTarget))) return;
+      ui.syncMessageTime(article);
+    });
+
+    ui.els.messages.addEventListener('click', (e) => {
+      const timeEl = e.target.closest('.msg-time');
+      ui.els.messages.querySelectorAll('.msg-time.is-open').forEach((el) => {
+        if (el !== timeEl) el.classList.remove('is-open');
+      });
+      if (!timeEl || !window.Utils.prefersCoarsePointer()) return;
+      e.stopPropagation();
+      timeEl.classList.toggle('is-open');
+    });
+
     const onReplyTap = (e) => {
       if (!e.target.closest('[data-action="selection-reply"]')) return;
       e.preventDefault();
@@ -3075,7 +3091,7 @@ window.Events = (() => {
       const locale = settingsOpen
         ? (ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE)
         : (prev.locale || window.APP_CONFIG.DEFAULT_LOCALE);
-      let mode = ui.els.systemPromptModeSelect?.value || prev.systemPromptMode || 'default';
+      let mode = ui.els.systemPromptModeSelect?.value || prev.systemPromptMode || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT_MODE;
       let systemPrompt = ui.els.systemPromptInput.value.trim();
       let customSystemPrompt = prev.customSystemPrompt || '';
 
@@ -3161,7 +3177,7 @@ window.Events = (() => {
 
     ui.els.systemPromptInput?.addEventListener('input', () => {
       const locale = ui.els.settingsLocaleSelect?.value || window.APP_CONFIG.DEFAULT_LOCALE;
-      let mode = ui.els.systemPromptModeSelect?.value || 'default';
+      let mode = ui.els.systemPromptModeSelect?.value || window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT_MODE;
       const text = ui.els.systemPromptInput.value.trim();
       if (mode !== 'custom') {
         const preset = window.I18n.getSystemPromptForMode(mode, locale);

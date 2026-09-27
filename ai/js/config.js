@@ -13,6 +13,7 @@ window.APP_CONFIG = {
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
+    { id: 'openrouter-glm-5-3-flashx', apiModel: 'z-ai/glm-5.3-flashx', label: 'GLM 5.3 FlashX (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-deepseek-flash-latest', apiModel: '~deepseek/deepseek-flash-latest', label: 'DeepSeek Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-mimo-v2-6-flash', apiModel: 'xiaomi/mimo-v2.6-flash', label: 'MiMo V2.6 Flash (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-mimo-v2-6-pro', apiModel: 'xiaomi/mimo-v2.6-pro', label: 'MiMo V2.6 Pro (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, vision: true, maxOutputTokens: 131072 },
@@ -35,7 +36,7 @@ window.APP_CONFIG = {
     { id: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: false }
   ],
 
-  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-09-24
+  // USD per 1M tokens — giá chuẩn (cache miss / standard tier), cập nhật 2026-09-27
   // Nguồn: openai.com/developers, platform.claude.com, api-docs.deepseek.com,
   //        ai.google.dev/gemini-api/docs/pricing, platform.kimi.ai, openrouter.ai/api/v1/models
   MODEL_PRICING: {
@@ -50,6 +51,7 @@ window.APP_CONFIG = {
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
     'openrouter-glm-flash-latest': { input: 0.075, output: 0.25 },
     'openrouter-glm-latest': { input: 0.56, output: 2.50 },
+    'openrouter-glm-5-3-flashx': { input: 0.37, output: 1.25 },
     'openrouter-deepseek-flash-latest': { input: 0.13, output: 0.52 },
     'openrouter-mimo-v2-6-flash': { input: 0.14, output: 0.28 },
     'openrouter-mimo-v2-6-pro': { input: 0.435, output: 0.87 },
@@ -139,6 +141,7 @@ window.APP_CONFIG = {
     'openrouter-mimo-v2-6-pro': ['low', 'high', 'max'],
     'openrouter-glm-flash-latest': ['low', 'high', 'max'],
     'openrouter-glm-latest': ['low', 'high', 'max'],
+    'openrouter-glm-5-3-flashx': ['low', 'high', 'max'],
     'openrouter-claude-haiku-latest': ['low', 'medium', 'high'],
     'openrouter-claude-sonnet-latest': ['low', 'medium', 'high', 'max'],
     'openrouter-claude-opus-latest': ['low', 'medium', 'high', 'xhigh', 'max'],
@@ -253,7 +256,7 @@ window.APP_CONFIG = {
     if (modelId === 'openrouter-gemini-flash-latest') return 'medium';
     if (modelId === 'openrouter-deepseek-flash-latest' || modelId === 'openrouter-mimo-v2-6-flash' || modelId === 'openrouter-mimo-v2-6-pro') return 'high';
     if (modelId === 'gpt-6-luna' || modelId === 'gpt-6-sol' || modelId === 'openrouter-gpt-luna-latest' || modelId === 'openrouter-gpt-sol-latest') return 'medium';
-    if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest') return 'max';
+    if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest' || modelId === 'openrouter-glm-5-3-flashx') return 'max';
     if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
     if (modelId === 'openrouter-grok-latest') return 'medium';
     if (modelId === 'openrouter-free-space-bunny-alpha') return 'max';
@@ -704,6 +707,7 @@ window.APP_CONFIG = {
 
   ACCEPTED_REF_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
   REF_IMAGE_MAX_BYTES: 20 * 1024 * 1024,
+  DEFAULT_SYSTEM_PROMPT_MODE: 'tokenSave',
   DEFAULT_SYSTEM_PROMPT: 'Bạn là một trợ lý AI thông minh, tận tâm và chính xác. Hãy tuân thủ các nguyên tắc sau:\n\n1. Suy nghĩ từng bước trước khi trả lời các câu hỏi phức tạp.\n2. Trả lời chi tiết, đầy đủ và có cấu trúc rõ ràng. Sử dụng markdown để định dạng khi cần (tiêu đề, danh sách, bảng, code block).\n3. Nếu không chắc chắn, hãy nói rõ giới hạn kiến thức của bạn thay vì bịa đặt.\n4. Khi được hỏi về code hoặc kỹ thuật, hãy giải thích nguyên lý đằng sau, không chỉ đưa ra code.\n5. Luôn trả lời bằng tiếng Việt, trừ khi người dùng yêu cầu ngôn ngữ khác.\n6. Đưa ra ví dụ cụ thể khi có thể để minh họa cho câu trả lời.',
   DEFAULT_THEME: 'claude-dark',
 

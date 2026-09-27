@@ -32,7 +32,7 @@ window.Storage = (() => {
     translateEnabled: false,
     translateTargetLang: window.APP_CONFIG.DEFAULT_TRANSLATE_LANG,
     tokenSaveEnabled: false,
-    systemPromptMode: 'default',
+    systemPromptMode: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT_MODE,
     systemPrompt: window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT,
     customSystemPrompt: '',
     mdPreviewWidth: null,
@@ -514,7 +514,7 @@ window.Storage = (() => {
       setField('locale', 'vi');
     }
     if (!state.systemPromptMode) {
-      setField('systemPromptMode', state.tokenSaveEnabled ? 'tokenSave' : 'default');
+      setField('systemPromptMode', state.tokenSaveEnabled ? 'tokenSave' : window.APP_CONFIG.DEFAULT_SYSTEM_PROMPT_MODE);
     }
     if (!window.I18n.SYSTEM_PROMPT_MODE_IDS.includes(state.systemPromptMode)) {
       setField('systemPromptMode', 'custom');
