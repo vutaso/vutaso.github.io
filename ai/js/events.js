@@ -2019,12 +2019,23 @@ window.Events = (() => {
       if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput?.focus();
     };
 
+    const isEmptyChat = (c) => !!(c && c.kind !== 'image' && !(c.messages && c.messages.length));
+
+    const latestEmptyChat = () => convoMod.getAll()
+      .filter(isEmptyChat)
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0] || null;
+
     const enterChatWorkspace = async ({ createNew = false } = {}) => {
       leaveCurrentStreamView();
       ui.setExportSelectMode(false);
       const s = state.get();
       const fromImage = s.workspace === 'image';
       const chatModel = (fromImage && s.chatModel) ? s.chatModel : (s.currentModel || window.APP_CONFIG.DEFAULT_MODEL);
+      if (createNew && !fromImage && isEmptyChat(convoMod.getCurrent())) {
+        ui.closeMobileSidebar();
+        if (!window.Utils.prefersCoarsePointer()) ui.els.composerInput?.focus();
+        return;
+      }
       const patch = {
         workspace: 'chat',
         imageGenEnabled: false,
@@ -2038,7 +2049,16 @@ window.Events = (() => {
       applyModelChange(chatModel, { showToast: false });
       let convo = null;
       if (createNew) {
-        convo = convoMod.create(chatModel, { kind: 'chat' });
+        const empty = latestEmptyChat();
+        if (empty) {
+          convo = convoMod.select(empty.id);
+          if (convo && convoMod.getModel(convo) !== chatModel) {
+            convoMod.setModel(convo.id, chatModel);
+            convo = convoMod.getById(convo.id);
+          }
+        } else {
+          convo = convoMod.create(chatModel, { kind: 'chat' });
+        }
       } else {
         const saved = s.lastChatConversationId ? convoMod.getById(s.lastChatConversationId) : null;
         if (saved && saved.kind !== 'image') {
