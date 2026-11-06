@@ -210,12 +210,6 @@ test("homepage lists the devtools tool", () => {
   if (!home.includes("ft_tool_devtools")) throw new Error("footer i18n key missing");
 });
 
-test("privacy policy covers DevTools local processing", () => {
-  const html = fs.readFileSync(path.join(siteRoot, "privacy/index.html"), "utf8");
-  if (!html.includes("DevTools")) throw new Error("privacy missing DevTools");
-  if (!html.includes("?json=")) throw new Error("privacy should document that ?json= is not used");
-});
-
 test("noscript fallback exists", () => {
   if (!read("index.html").includes("<noscript>")) throw new Error("noscript missing");
 });

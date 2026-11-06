@@ -11,10 +11,11 @@
 
 .legal .wrap {
   max-width: 800px;
+  text-align: left;
 }
 
 .legal .page-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 40px;
 }
 
@@ -40,9 +41,10 @@
 .legal .apps-badge {
   display: flex;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin-top: 16px;
+  margin-bottom: 28px;
 }
 
 .legal .app-tag {
@@ -161,34 +163,41 @@
   text-decoration: underline;
 }
 
+.legal ul,
 .legal .doc ul {
   list-style: none;
-  margin: 0 0 18px;
+  margin: 0 0 22px;
   padding: 0;
 }
 
+.legal ul li,
 .legal .doc ul li {
   position: relative;
-  padding: 8px 0 8px 20px;
+  padding: 8px 0 8px 22px;
   font-size: 0.92rem;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
   line-height: 1.6;
 }
 
+.legal ul li:last-child,
 .legal .doc ul li:last-child {
   border-bottom: none;
 }
 
+.legal ul li::before,
 .legal .doc ul li::before {
-  content: '';
+  content: '–';
   position: absolute;
   left: 0;
-  top: 15px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand);
+  top: 8px;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  color: var(--brand);
+  font-weight: 700;
+  line-height: 1.6;
 }
 
 .legal .doc ul li strong {
