@@ -53,16 +53,17 @@ test.describe('QR Generator', () => {
     expect(download.suggestedFilename()).toMatch(/\.png$/i);
   });
 
-  test('dark mode applies dark CSS tokens', async ({ page }) => {
+  test('theme is locked to light (bay shell)', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#theme-toggle').click();
     const state = await page.evaluate(() => ({
       theme: document.documentElement.getAttribute('data-theme'),
-      bg: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+      bg: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+      toggleVisible: !!document.querySelector('#theme-toggle') &&
+        getComputedStyle(document.querySelector('#theme-toggle')).display !== 'none'
     }));
-    expect(state.theme).toBe('dark');
-    expect(state.bg.toLowerCase()).not.toBe('#f7f9fc');
-    expect(state.bg.toLowerCase()).toMatch(/#0f0f1a|#0f0f/);
+    expect(state.theme).toBe('light');
+    expect(state.bg.toLowerCase()).toMatch(/#ffffff|#fff/);
+    expect(state.toggleVisible).toBe(false);
   });
 
   test('Vietnamese default has no English Content suffix', async ({ page }) => {

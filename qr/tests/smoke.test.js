@@ -397,15 +397,14 @@ test('phone validation requires 7+ digits', () => {
   if (!src.includes('digits.length < 7')) throw new Error('phone validation must count digits');
 });
 
-test('dark theme tokens are not overridden by light :root', () => {
+test('qr-theme locks light tokens for bay shell', () => {
   const html = read('index.html');
   const block = html.match(/<style id="qr-theme">([\s\S]*?)<\/style>/);
   if (!block) throw new Error('qr-theme style missing');
-  const root = block[1].match(/:root\s*\{([^}]*)\}/);
-  if (root && /--bg\s*:/.test(root[1])) {
-    throw new Error('qr-theme still sets --bg on :root (breaks dark mode)');
+  if (!block[1].includes('--bg: #ffffff') && !block[1].includes('--bg:#ffffff')) {
+    throw new Error('qr-theme must lock light --bg');
   }
-  if (!html.includes('[data-theme="dark"]')) throw new Error('qr-theme missing dark token block');
+  if (!html.includes('data-theme="light"')) throw new Error('html must default to light theme');
 });
 
 test('library-load fallback is deferred (CSP safe)', () => {
