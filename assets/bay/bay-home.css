@@ -1,0 +1,205 @@
+/* VUTASO homepage extras — complements bay-landing.css */
+
+.span6 {
+  grid-column: span 6;
+}
+
+@media (max-width: 900px) {
+  .span6 {
+    grid-column: span 12;
+  }
+}
+
+.home-hero .hero-grid {
+  grid-template-columns: 1fr;
+  max-width: 780px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.home-hero .hero-cta,
+.home-hero .trust {
+  justify-content: center;
+}
+
+.home-hero .hero-copy {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.hl-orange {
+  color: #FF6B00;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 20px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-dark);
+  background: var(--brand-soft);
+  border: 1px solid transparent;
+}
+
+.chip.orange {
+  color: #B45A00;
+  background: #FFF0E6;
+}
+
+.prod-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.card .prod-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.lang-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lang-btn.active,
+.lang-btn:hover {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-dd {
+  position: relative;
+}
+
+.nav-dd > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-dd > button svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  transition: transform var(--trans);
+}
+
+.nav-dd.open > button svg {
+  transform: rotate(180deg);
+}
+
+.nav-dd-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 200px;
+  padding: 8px;
+  border-radius: var(--r-md);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--trans), transform var(--trans), visibility var(--trans);
+  z-index: 40;
+}
+
+.nav-dd.open .nav-dd-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav-dd-menu a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-dd-menu a:hover {
+  background: var(--bg-soft);
+  color: var(--brand);
+}
+
+.mmenu-group {
+  display: grid;
+  gap: 4px;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin: 4px 0;
+}
+
+.mmenu-group .label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 0;
+}
+
+.btn-orange {
+  background: #FF6B00;
+  color: #fff;
+}
+
+.btn-orange:hover {
+  background: #E05A00;
+}
+
+@media (max-width: 900px) {
+  .home-hero .hero-cta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

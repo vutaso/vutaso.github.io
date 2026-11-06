@@ -61,26 +61,17 @@
     return translated && translated !== key ? translated : type.label;
   }
 
-  /* ── Theme ── */
+  /* ── Theme (locked light — sync with bay landing) ── */
   function initTheme() {
-    const stored = localStorage.getItem('qr-theme');
-    const theme = stored || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    updateThemeIcon(theme);
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('qr-theme', 'light');
   }
 
   function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('qr-theme', next);
-    updateThemeIcon(next);
+    initTheme();
   }
 
-  function updateThemeIcon(theme) {
-    const icon = $('#theme-toggle i');
-    if (icon) icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-  }
+  function updateThemeIcon() { /* theme toggle removed */ }
 
   /* ── Language ── */
   function initLangToggle() {

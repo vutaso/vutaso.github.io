@@ -8,7 +8,7 @@
     <meta name="keywords" content="JSON formatter, Base64 encode decode, MD5, SHA-256, hash, VUTASO" />
     <meta name="author" content="VUTASO" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#0d0e13" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href="https://vutaso.com/devtools/" />
     <link rel="alternate" hreflang="vi" href="https://vutaso.com/devtools/" />
     <link rel="alternate" hreflang="en" href="https://vutaso.com/devtools/" />
@@ -32,7 +32,16 @@
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css?v=1.7" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>document.documentElement.classList.add('js');</script>
+
+    <link rel="stylesheet" href="../assets/bay/bay-landing.css" />
+    <link rel="stylesheet" href="../assets/bay/bay-home.css" />
+    <link rel="stylesheet" href="styles.css?v=1.9" />
+    <link rel="stylesheet" href="../assets/bay/bay-devtools.css" />
 
     <script type="application/ld+json">
       {
@@ -49,10 +58,66 @@
     </script>
   </head>
   <body>
-    <noscript>
+    <a class="skip" href="#main">Skip navigation</a>
+
+    <header class="nav" id="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../" aria-label="VUTASO home">
+          <span>VUTASO</span>
+        </a>
+
+        <nav class="links" aria-label="Main">
+          <a href="../#products">Products</a>
+          <div class="nav-dd" id="nav-utils">
+            <button type="button" aria-expanded="false" aria-haspopup="true">
+              <span>Tools</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            <div class="nav-dd-menu" role="menu">
+              <a href="../ai/" role="menuitem">AI</a>
+              <a href="../translate/" role="menuitem">AI Translate</a>
+              <a href="../qr/" role="menuitem">QR Generator</a>
+              <a href="../appicon/" role="menuitem">App Icon Generator</a>
+              <a href="../markdown/" role="menuitem">Markdown Editor</a>
+              <a href="./" aria-current="page" role="menuitem">DevTools</a>
+            </div>
+          </div>
+          <a href="../privacy/">Privacy</a>
+          <a href="../terms/">Terms</a>
+          <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="btn btn-primary btn-sm" href="../moneybay/">MoneyBay</a>
+          <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mmenu" id="mmenu">
+      <a href="../#products">Products</a>
+      <div class="mmenu-group">
+        <div class="label">Tools</div>
+        <a href="../ai/">AI</a>
+        <a href="../translate/">AI Translate</a>
+        <a href="../qr/">QR Generator</a>
+        <a href="../appicon/">App Icon Generator</a>
+        <a href="../markdown/">Markdown Editor</a>
+        <a href="./" aria-current="page">DevTools</a>
+      </div>
+      <a href="../privacy/">Privacy</a>
+      <a href="../terms/">Terms</a>
+      <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+      <a class="btn btn-primary" href="../moneybay/">MoneyBay</a>
+    </div>
+
+    <div id="main" class="devtools-shell">
+      <div class="devtools-app">
+<noscript>
       <p>DevTools needs JavaScript. / DevTools cần JavaScript.</p>
     </noscript>
-    <div class="noise"></div>
     <header class="site-header">
       <div class="brand-wrap">
         <a class="vutaso-link" href="../" data-i18n="brand.home">VUTASO</a>
@@ -148,7 +213,71 @@
       </span>
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+    </div>
 
+    <footer>
+      <div class="wrap">
+        <div class="ft-grid">
+          <div class="ft-brand">
+            <a class="brand" href="../"><span>VUTASO</span></a>
+            <p class="ft-tag" data-i18n="footer.left">DEVTOOLS / JSON · BASE64 · HASH</p>
+          </div>
+          <div class="ft-col">
+            <h4>Tools</h4>
+            <ul>
+              <li><a href="./">DevTools</a></li>
+              <li><a href="../translate/">AI Translate</a></li>
+              <li><a href="../qr/">QR Generator</a></li>
+              <li><a href="../ai/">AI</a></li>
+            </ul>
+          </div>
+          <div class="ft-col">
+            <h4>Apps</h4>
+            <ul>
+              <li><a href="../moneybay/">MoneyBay</a></li>
+              <li><a href="../qrbay/">QRBay</a></li>
+              <li><a href="../cleanbay/">CleanBay</a></li>
+            </ul>
+          </div>
+          <div class="ft-col ft-support">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a></li>
+              <li><a href="../terms/" data-i18n="footer.terms">Điều khoản</a></li>
+              <li><a href="mailto:vutaso.com@gmail.com">Email</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="ft-bottom">
+          <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../assets/bay/bay-landing.js" defer></script>
+    <script>
+      (function () {
+        var dd = document.getElementById('nav-utils');
+        if (!dd) return;
+        var btn = dd.querySelector('button');
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var open = dd.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function () {
+          dd.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            dd.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      })();
+    </script>
     <script src="core.js?v=1.7"></script>
     <script src="i18n.js?v=1.7"></script>
     <script src="app.js?v=1.9"></script>

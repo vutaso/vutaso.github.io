@@ -3,22 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Translate</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>AI Translate — VUTASO</title>
+  <meta name="description" content="AI Translate by VUTASO — translate text, documents, and batches with DeepSeek. Supports PDF, DOCX, PPTX, XLSX and glossary presets.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vutaso.com/translate/">
+  <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+  <meta name="theme-color" content="#ffffff">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+
+  <link rel="stylesheet" href="../assets/bay/bay-landing.css">
+  <link rel="stylesheet" href="../assets/bay/bay-home.css">
+  <link rel="stylesheet" href="../assets/bay/bay-translate.css">
+  <link rel="stylesheet" href="css/style.css">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
-  <div class="container">
+  <a class="skip" href="#main">Skip navigation</a>
+
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="../" aria-label="VUTASO home">
+        <span>VUTASO</span>
+      </a>
+
+      <nav class="links" aria-label="Main">
+        <a href="../#products">Products</a>
+        <div class="nav-dd" id="nav-utils">
+          <button type="button" aria-expanded="false" aria-haspopup="true">
+            <span>Tools</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+          </button>
+          <div class="nav-dd-menu" role="menu">
+            <a href="../ai/" target="_blank" rel="noopener noreferrer" role="menuitem">AI</a>
+            <a href="./" aria-current="page" role="menuitem">AI Translate</a>
+            <a href="../qr/" target="_blank" rel="noopener noreferrer" role="menuitem">QR Generator</a>
+            <a href="../appicon/" target="_blank" rel="noopener noreferrer" role="menuitem">App Icon Generator</a>
+            <a href="../markdown/" target="_blank" rel="noopener noreferrer" role="menuitem">Markdown Editor</a>
+            <a href="../devtools/" target="_blank" rel="noopener noreferrer" role="menuitem">DevTools</a>
+          </div>
+        </div>
+        <a href="../privacy/">Privacy</a>
+        <a href="../terms/">Terms</a>
+        <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" href="../moneybay/">MoneyBay</a>
+        <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mmenu" id="mmenu">
+    <a href="../#products">Products</a>
+    <div class="mmenu-group">
+      <div class="label">Tools</div>
+      <a href="../ai/">AI</a>
+      <a href="./" aria-current="page">AI Translate</a>
+      <a href="../qr/">QR Generator</a>
+      <a href="../appicon/">App Icon Generator</a>
+      <a href="../markdown/">Markdown Editor</a>
+      <a href="../devtools/">DevTools</a>
+    </div>
+    <a href="../privacy/">Privacy</a>
+    <a href="../terms/">Terms</a>
+    <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+    <a class="btn btn-primary" href="../moneybay/">MoneyBay</a>
+  </div>
+
+  <div id="main" class="translate-shell">
+    <div class="translate-app">
+<div class="container">
     <header class="header">
       <div class="logo">
         <svg aria-hidden="true" width="32" height="32" viewBox="0 0 32 32" fill="none">
           <defs>
             <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
-              <stop offset="0%" stop-color="#007AFF"/>
-              <stop offset="100%" stop-color="#5856D6"/>
+              <stop offset="0%" stop-color="#2B7FFF"/>
+              <stop offset="100%" stop-color="#1A5FCC"/>
             </linearGradient>
           </defs>
           <rect width="32" height="32" rx="8.5" fill="url(#logoGrad)"/>
@@ -31,10 +102,6 @@
         </svg>
         <h1>AI Translate</h1>
       </div>
-      <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
-        <svg aria-hidden="true" class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg aria-hidden="true" class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
       <div class="api-key-section">
         <input type="password" id="apiKey" class="api-key-input" placeholder="DeepSeek API Key" autocomplete="off" aria-label="DeepSeek API key">
         <button id="saveApiKey" class="btn btn-sm btn-primary">Save</button>
@@ -413,12 +480,71 @@
       <button id="loadingCancel" class="btn btn-outline btn-sm hidden">Cancel</button>
     </div>
   </div>
+    </div>
+  </div>
 
-  <footer class="footer">
-    <hr>
-    <p>&copy;2026 <a href="https://vutaso.com" target="_blank" rel="noopener">VUTASO.com</a></p>
+  <footer>
+    <div class="wrap">
+      <div class="ft-grid">
+        <div class="ft-brand">
+          <a class="brand" href="../"><span>VUTASO</span></a>
+          <p class="ft-tag">AI Translate — text, files, and batch translation with glossary support.</p>
+        </div>
+        <div class="ft-col">
+          <h4>Tools</h4>
+          <ul>
+            <li><a href="./">AI Translate</a></li>
+            <li><a href="../ai/">AI</a></li>
+            <li><a href="../qr/">QR Generator</a></li>
+            <li><a href="../devtools/">DevTools</a></li>
+          </ul>
+        </div>
+        <div class="ft-col">
+          <h4>Apps</h4>
+          <ul>
+            <li><a href="../moneybay/">MoneyBay</a></li>
+            <li><a href="../qrbay/">QRBay</a></li>
+            <li><a href="../cleanbay/">CleanBay</a></li>
+          </ul>
+        </div>
+        <div class="ft-col ft-support">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="../privacy/">Privacy</a></li>
+            <li><a href="../terms/">Terms</a></li>
+            <li><a href="mailto:vutaso.com@gmail.com">Email</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 <a href="https://vutaso.com">VUTASO.com</a></span>
+      </div>
+    </div>
   </footer>
 
+  <script src="../assets/bay/bay-landing.js" defer></script>
+  <script>
+    (function () {
+      var dd = document.getElementById('nav-utils');
+      if (!dd) return;
+      var btn = dd.querySelector('button');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = dd.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', function () {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          dd.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+  </script>
   <script src="js/languages.js"></script>
   <script src="js/glossaryPresets.js"></script>
   <script src="js/translator.js"></script>

@@ -1,0 +1,85 @@
+/* DevTools shell under bay landing chrome */
+
+body {
+  background: #ffffff !important;
+  color: #0B1220;
+  display: block !important;
+  overflow: auto !important;
+  min-height: 100vh;
+}
+
+body:before,
+body::before,
+.noise {
+  display: none !important;
+}
+
+.devtools-shell {
+  padding: calc(var(--nav-h) + 16px) 0 32px;
+}
+
+.devtools-shell .devtools-app {
+  width: min(1280px, 100% - 48px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-h) - 220px);
+}
+
+.devtools-app .site-header {
+  width: 100%;
+  margin: 0 0 8px;
+  border: 1px solid rgba(11, 18, 32, 0.08);
+  border-radius: 16px;
+  padding: 0 16px;
+  background: #ffffff;
+}
+
+.devtools-app .brand-wrap .vutaso-link {
+  display: none;
+}
+
+.devtools-app .tool-tabs,
+.devtools-app .toolbar,
+.devtools-app .workspace,
+.devtools-app .site-footer {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.devtools-app .workspace {
+  min-height: 420px;
+  border-radius: 0 0 16px 16px;
+}
+
+.devtools-app .lang-btn.is-active {
+  background: #EAF2FF;
+  color: #2B7FFF;
+}
+
+.devtools-app .tab-btn.is-active {
+  background: #EAF2FF;
+}
+
+.devtools-app .site-footer {
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(11, 18, 32, 0.08);
+  color: #667085;
+}
+
+.devtools-app .site-footer .footer-meta {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .devtools-shell {
+    padding: calc(var(--nav-h) + 12px) 0 24px;
+  }
+
+  .devtools-shell .devtools-app {
+    width: min(1280px, 100% - 24px);
+  }
+}

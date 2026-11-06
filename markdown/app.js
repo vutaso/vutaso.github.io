@@ -478,7 +478,7 @@ html, body {
   async function renderPdfBlob(bodyHtml) {
     await ensureHtml2Pdf();
     const veil = document.createElement("div");
-    veil.style.cssText = "position:fixed;inset:0;background:#0d0e13;z-index:2147483646;pointer-events:none;";
+    veil.style.cssText = "position:fixed;inset:0;background:#ffffff;z-index:2147483646;pointer-events:none;";
     document.body.appendChild(veil);
     const iframe = await openPdfFrame(bodyHtml);
     try {

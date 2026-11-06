@@ -2,44 +2,64 @@
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chính sách Bảo mật - MoneyBay</title>
-
-    <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Chính sách bảo mật MoneyBay - Ứng dụng quản lý chi tiêu. Cam kết bảo vệ quyền riêng tư và dữ liệu tài chính của bạn.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://vutaso.com/moneybay/privacy/">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Link to shared CSS -->
-    <link rel="stylesheet" href="../../general/style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chính sách Bảo mật - MoneyBay</title>
+  <meta name="description" content="Chính sách bảo mật MoneyBay - Ứng dụng quản lý chi tiêu. Cam kết bảo vệ quyền riêng tư và dữ liệu tài chính của bạn.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vutaso.com/moneybay/privacy/">
+  <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="../../assets/bay/bay-landing.css">
+  <link rel="stylesheet" href="../../assets/bay/bay-legal.css">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="top-nav">
-        <div class="nav-content">
-            <a href="../index.html" class="logo">MoneyBay</a>
-            <div class="language-toggle">
-                <button class="lang-btn active" data-lang="vi">VI</button>
-                <button class="lang-btn" data-lang="en">EN</button>
-                <button class="lang-btn" data-lang="jp">JP</button>
-            </div>
+  <a class="skip" href="#main">Bỏ qua điều hướng</a>
+
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="../index.html" aria-label="MoneyBay">
+        <img src="../assets/images/Logo_MoneyBay.png" alt="" width="32" height="32">
+        <span>MoneyBay</span>
+      </a>
+
+      <nav class="links" aria-label="Điều hướng chính">
+        <a href="./" aria-current="page">Bảo mật</a>
+        <a href="../terms/">Điều khoản</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="language-toggle" aria-label="Language">
+          <button class="lang-btn active" data-lang="vi" type="button">VI</button>
+          <button class="lang-btn" data-lang="en" type="button">EN</button>
+          <button class="lang-btn" data-lang="jp" type="button">JP</button>
         </div>
-    </nav>
+        <button class="burger" id="burger" aria-label="Mở menu" aria-expanded="false" aria-controls="mmenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <div class="container">
-        <div id="content">
-            <h1 data-key="title">Chính sách Bảo mật</h1>
-            <p class="last-updated" data-key="last-updated">Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025</p>
+  <div class="mmenu" id="mmenu">
+    <a href="./">Bảo mật</a>
+    <a href="../terms/">Điều khoản</a>
+    <a class="btn btn-primary" href="../index.html">Về trang chủ</a>
+  </div>
 
-            <div class="highlight">
+  <main id="main" class="legal">
+    <div class="wrap">
+      <div id="content" class="doc">
+        <div class="page-header">
+          <h1 data-key="title">Chính sách Bảo mật</h1>
+          <p class="last-updated" data-key="last-updated">Cập nhật lần cuối: Ngày 12 tháng 7 năm 2025</p>
+        </div>
+        <div class="highlight">
                 <p data-key="intro-text">MoneyBay cam kết bảo vệ quyền riêng tư và dữ liệu tài chính của bạn. Chính sách
                     này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn khi sử dụng ứng dụng
                     quản lý chi tiêu MoneyBay.</p>
@@ -169,11 +189,22 @@
                 <li data-key="contact-website">Website: <a href="https://vutaso.com">https://vutaso.com</a></li>
                 <li data-key="contact-app">Qua ứng dụng MoneyBay: Nhiều hơn > Trợ giúp > Liên hệ trợ giúp</li>
             </ul>
-        </div>
+      </div>
     </div>
+  </main>
 
-    <script src="../../general/translation-manager.js"></script>
-    <script src="../../js/privacy-translations.js"></script>
+  <footer>
+    <div class="wrap">
+      <div class="ft-bottom">
+        <span>© 2025 <a href="https://vutaso.com">VUTASO.com</a></span>
+        <span>Một sản phẩm của <a href="https://vutaso.com" target="_blank" rel="noopener noreferrer">VUTASO</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/bay/bay-landing.js" defer></script>
+  <script src="../../general/translation-manager.js"></script>
+  <script src="../../js/privacy-translations.js"></script>
 </body>
 
 </html>

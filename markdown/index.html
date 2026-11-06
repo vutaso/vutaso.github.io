@@ -8,7 +8,7 @@
     <meta name="keywords" content="markdown editor, markdown preview, xuất HTML, xuất PDF, GFM, VUTASO" />
     <meta name="author" content="VUTASO" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#0d0e13" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href="https://vutaso.com/markdown/" />
     <link rel="alternate" hreflang="vi" href="https://vutaso.com/markdown/" />
     <link rel="alternate" hreflang="en" href="https://vutaso.com/markdown/" />
@@ -32,7 +32,16 @@
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css?v=1.2" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>document.documentElement.classList.add('js');</script>
+
+    <link rel="stylesheet" href="../assets/bay/bay-landing.css" />
+    <link rel="stylesheet" href="../assets/bay/bay-home.css" />
+    <link rel="stylesheet" href="styles.css?v=1.3" />
+    <link rel="stylesheet" href="../assets/bay/bay-markdown.css" />
 
     <script type="application/ld+json">
       {
@@ -49,110 +58,231 @@
     </script>
   </head>
   <body>
-    <noscript>
-      <p>MarkDown needs JavaScript to render Markdown in your browser. / MarkDown cần JavaScript để xem trước trên trình duyệt.</p>
-    </noscript>
-    <div class="noise"></div>
-    <header class="site-header">
-      <div class="brand-wrap">
-        <a class="vutaso-link" href="../" data-i18n="brand.home">VUTASO</a>
-        <a class="brand" href="./" data-i18n-aria="brand.app" aria-label="MarkDown trang chủ">
-          <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
-          <span>Mark<span>Down</span></span>
+    <a class="skip" href="#main">Skip navigation</a>
+
+    <header class="nav" id="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../" aria-label="VUTASO home">
+          <span>VUTASO</span>
         </a>
-      </div>
-      <div class="header-actions">
-        <div class="header-note"><span class="status-dot"></span><span data-i18n="header.note">Chạy hoàn toàn trên trình duyệt</span></div>
-        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Ngôn ngữ">
-          <button type="button" class="lang-btn is-active" data-lang="vi" aria-pressed="true">VI</button>
-          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+
+        <nav class="links" aria-label="Main">
+          <a href="../#products">Products</a>
+          <div class="nav-dd" id="nav-utils">
+            <button type="button" aria-expanded="false" aria-haspopup="true">
+              <span>Tools</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            <div class="nav-dd-menu" role="menu">
+              <a href="../ai/" role="menuitem">AI</a>
+              <a href="../translate/" role="menuitem">AI Translate</a>
+              <a href="../qr/" role="menuitem">QR Generator</a>
+              <a href="../appicon/" role="menuitem">App Icon Generator</a>
+              <a href="./" aria-current="page" role="menuitem">Markdown Editor</a>
+              <a href="../devtools/" role="menuitem">DevTools</a>
+            </div>
+          </div>
+          <a href="../privacy/">Privacy</a>
+          <a href="../terms/">Terms</a>
+          <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="btn btn-primary btn-sm" href="../moneybay/">MoneyBay</a>
+          <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </div>
     </header>
 
-    <div class="toolbar" id="toolbar" role="toolbar" data-i18n-aria="workspace.label" aria-label="Soạn thảo Markdown">
-      <div class="tool-group">
-        <button type="button" class="tool-btn" id="btnHeading" data-i18n-title="tool.heading" title="Tiêu đề">H</button>
-        <button type="button" class="tool-btn" id="btnBold" data-i18n-title="tool.bold" title="In đậm">B</button>
-        <button type="button" class="tool-btn" id="btnItalic" data-i18n-title="tool.italic" title="In nghiêng">I</button>
-        <button type="button" class="tool-btn" id="btnLink" data-i18n-title="tool.link" title="Liên kết">Link</button>
-        <button type="button" class="tool-btn" id="btnList" data-i18n-title="tool.list" title="Danh sách">List</button>
-        <button type="button" class="tool-btn" id="btnCode" data-i18n-title="tool.code" title="Mã">Code</button>
-        <button type="button" class="tool-btn" id="btnQuote" data-i18n-title="tool.quote" title="Trích dẫn">Quote</button>
+    <div class="mmenu" id="mmenu">
+      <a href="../#products">Products</a>
+      <div class="mmenu-group">
+        <div class="label">Tools</div>
+        <a href="../ai/">AI</a>
+        <a href="../translate/">AI Translate</a>
+        <a href="../qr/">QR Generator</a>
+        <a href="../appicon/">App Icon Generator</a>
+        <a href="./" aria-current="page">Markdown Editor</a>
+        <a href="../devtools/">DevTools</a>
       </div>
-      <div class="tool-group">
-        <button type="button" class="tool-btn" id="btnOpen" data-i18n="tool.open">Mở file .md</button>
-        <input id="fileInput" class="visually-hidden" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-i18n-aria="file.choose" aria-label="Chọn file Markdown" />
-        <button type="button" class="tool-btn" id="btnCopy" data-i18n="tool.copy">Sao chép Markdown</button>
-        <button type="button" class="tool-btn" id="btnClear" data-i18n="tool.clear">Xóa nội dung</button>
-      </div>
-      <div class="tool-group view-toggle" role="group">
-        <button type="button" class="view-btn is-active" data-view="split" data-i18n="view.split" aria-pressed="true">Chia đôi</button>
-        <button type="button" class="view-btn" data-view="editor" data-i18n="view.editor" aria-pressed="false">Soạn</button>
-        <button type="button" class="view-btn" data-view="preview" data-i18n="view.preview" aria-pressed="false">Preview</button>
-      </div>
-      <div class="toolbar-spacer"></div>
-      <div class="tool-group export-row">
-        <button type="button" class="export-btn" id="btnExportMd" data-i18n="export.md">Tải .md</button>
-        <button type="button" class="export-btn" id="btnExportHtml" data-i18n="export.html">Xuất HTML</button>
-        <button type="button" class="export-btn primary" id="btnExportPdf" data-i18n="export.pdf">Xuất PDF</button>
-      </div>
+      <a href="../privacy/">Privacy</a>
+      <a href="../terms/">Terms</a>
+      <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+      <a class="btn btn-primary" href="../moneybay/">MoneyBay</a>
     </div>
 
-    <div class="mobile-tabs" role="tablist">
-      <button type="button" class="tab-btn is-active" role="tab" data-mobile="write" data-i18n="mobile.write" aria-selected="true">Viết</button>
-      <button type="button" class="tab-btn" role="tab" data-mobile="preview" data-i18n="mobile.preview" aria-selected="false">Xem trước</button>
-    </div>
+    <div id="main" class="markdown-shell">
+      <div class="markdown-app">
+        <noscript>
+          <p>MarkDown needs JavaScript to render Markdown in your browser. / MarkDown cần JavaScript để xem trước trên trình duyệt.</p>
+        </noscript>
 
-    <main class="workspace" id="workspace" data-view="split" data-mobile="write" data-i18n-aria="workspace.label" aria-label="Soạn thảo Markdown">
-      <section class="pane editor-pane">
-        <div class="pane-label"><span>01</span> <span data-i18n="pane.write">VIẾT</span></div>
-        <textarea id="editor" spellcheck="true" autocapitalize="off" autocomplete="off" data-i18n-aria="editor.label" aria-label="Nội dung Markdown"></textarea>
-      </section>
-      <div
-        class="split-gutter"
-        id="splitGutter"
-        role="separator"
-        aria-orientation="vertical"
-        aria-valuemin="18"
-        aria-valuemax="82"
-        aria-valuenow="30"
-        tabindex="0"
-        data-i18n-aria="split.label"
-        data-i18n-title="split.label"
-        aria-label="Kéo để chỉnh tỉ lệ khung Viết / Xem trước"
-        title="Kéo để chỉnh tỉ lệ khung Viết / Xem trước"
-      >
-        <span class="split-grip" aria-hidden="true">
-          <span class="split-arrow split-arrow-left"></span>
-          <span class="split-track"></span>
-          <span class="split-arrow split-arrow-right"></span>
-        </span>
-      </div>
-      <section class="pane preview-pane">
-        <div class="pane-label"><span>02</span> <span data-i18n="pane.preview">XEM TRƯỚC</span></div>
-        <div class="preview-scroll" id="previewScroll">
-          <article id="preview" class="md-preview"></article>
+        <header class="site-header">
+          <div class="brand-wrap">
+            <a class="vutaso-link" href="../" data-i18n="brand.home">VUTASO</a>
+            <a class="brand" href="./" data-i18n-aria="brand.app" aria-label="MarkDown trang chủ">
+              <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
+              <span>Mark<span>Down</span></span>
+            </a>
+          </div>
+          <div class="header-actions">
+            <div class="header-note"><span class="status-dot"></span><span data-i18n="header.note">Chạy hoàn toàn trên trình duyệt</span></div>
+            <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Ngôn ngữ">
+              <button type="button" class="lang-btn is-active" data-lang="vi" aria-pressed="true">VI</button>
+              <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="toolbar" id="toolbar" role="toolbar" data-i18n-aria="workspace.label" aria-label="Soạn thảo Markdown">
+          <div class="tool-group">
+            <button type="button" class="tool-btn" id="btnHeading" data-i18n-title="tool.heading" title="Tiêu đề">H</button>
+            <button type="button" class="tool-btn" id="btnBold" data-i18n-title="tool.bold" title="In đậm">B</button>
+            <button type="button" class="tool-btn" id="btnItalic" data-i18n-title="tool.italic" title="In nghiêng">I</button>
+            <button type="button" class="tool-btn" id="btnLink" data-i18n-title="tool.link" title="Liên kết">Link</button>
+            <button type="button" class="tool-btn" id="btnList" data-i18n-title="tool.list" title="Danh sách">List</button>
+            <button type="button" class="tool-btn" id="btnCode" data-i18n-title="tool.code" title="Mã">Code</button>
+            <button type="button" class="tool-btn" id="btnQuote" data-i18n-title="tool.quote" title="Trích dẫn">Quote</button>
+          </div>
+          <div class="tool-group">
+            <button type="button" class="tool-btn" id="btnOpen" data-i18n="tool.open">Mở file .md</button>
+            <input id="fileInput" class="visually-hidden" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-i18n-aria="file.choose" aria-label="Chọn file Markdown" />
+            <button type="button" class="tool-btn" id="btnCopy" data-i18n="tool.copy">Sao chép Markdown</button>
+            <button type="button" class="tool-btn" id="btnClear" data-i18n="tool.clear">Xóa nội dung</button>
+          </div>
+          <div class="tool-group view-toggle" role="group">
+            <button type="button" class="view-btn is-active" data-view="split" data-i18n="view.split" aria-pressed="true">Chia đôi</button>
+            <button type="button" class="view-btn" data-view="editor" data-i18n="view.editor" aria-pressed="false">Soạn</button>
+            <button type="button" class="view-btn" data-view="preview" data-i18n="view.preview" aria-pressed="false">Preview</button>
+          </div>
+          <div class="toolbar-spacer"></div>
+          <div class="tool-group export-row">
+            <button type="button" class="export-btn" id="btnExportMd" data-i18n="export.md">Tải .md</button>
+            <button type="button" class="export-btn" id="btnExportHtml" data-i18n="export.html">Xuất HTML</button>
+            <button type="button" class="export-btn primary" id="btnExportPdf" data-i18n="export.pdf">Xuất PDF</button>
+          </div>
         </div>
-      </section>
-    </main>
 
-    <footer class="site-footer">
-      <span class="stats" id="stats"></span>
-      <span class="footer-meta">
-        <span data-i18n="footer.left">MARKDOWN / WRITE · PREVIEW · EXPORT</span>
-        <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
-        <a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a>
-        <a href="../terms/" data-i18n="footer.terms">Điều khoản</a>
-      </span>
+        <div class="mobile-tabs" role="tablist">
+          <button type="button" class="tab-btn is-active" role="tab" data-mobile="write" data-i18n="mobile.write" aria-selected="true">Viết</button>
+          <button type="button" class="tab-btn" role="tab" data-mobile="preview" data-i18n="mobile.preview" aria-selected="false">Xem trước</button>
+        </div>
+
+        <main class="workspace" id="workspace" data-view="split" data-mobile="write" data-i18n-aria="workspace.label" aria-label="Soạn thảo Markdown">
+          <section class="pane editor-pane">
+            <div class="pane-label"><span>01</span> <span data-i18n="pane.write">VIẾT</span></div>
+            <textarea id="editor" spellcheck="true" autocapitalize="off" autocomplete="off" data-i18n-aria="editor.label" aria-label="Nội dung Markdown"></textarea>
+          </section>
+          <div
+            class="split-gutter"
+            id="splitGutter"
+            role="separator"
+            aria-orientation="vertical"
+            aria-valuemin="18"
+            aria-valuemax="82"
+            aria-valuenow="30"
+            tabindex="0"
+            data-i18n-aria="split.label"
+            data-i18n-title="split.label"
+            aria-label="Kéo để chỉnh tỉ lệ khung Viết / Xem trước"
+            title="Kéo để chỉnh tỉ lệ khung Viết / Xem trước"
+          >
+            <span class="split-grip" aria-hidden="true">
+              <span class="split-arrow split-arrow-left"></span>
+              <span class="split-track"></span>
+              <span class="split-arrow split-arrow-right"></span>
+            </span>
+          </div>
+          <section class="pane preview-pane">
+            <div class="pane-label"><span>02</span> <span data-i18n="pane.preview">XEM TRƯỚC</span></div>
+            <div class="preview-scroll" id="previewScroll">
+              <article id="preview" class="md-preview"></article>
+            </div>
+          </section>
+        </main>
+
+        <footer class="site-footer">
+          <span class="stats" id="stats"></span>
+          <span class="footer-meta">
+            <span data-i18n="footer.left">MARKDOWN / WRITE · PREVIEW · EXPORT</span>
+            <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
+            <a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a>
+            <a href="../terms/" data-i18n="footer.terms">Điều khoản</a>
+          </span>
+        </footer>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="wrap">
+        <div class="ft-grid">
+          <div class="ft-brand">
+            <a class="brand" href="../"><span>VUTASO</span></a>
+            <p class="ft-tag" data-i18n="footer.left">MARKDOWN / WRITE · PREVIEW · EXPORT</p>
+          </div>
+          <div class="ft-col">
+            <h4>Tools</h4>
+            <ul>
+              <li><a href="./">Markdown Editor</a></li>
+              <li><a href="../translate/">AI Translate</a></li>
+              <li><a href="../qr/">QR Generator</a></li>
+              <li><a href="../devtools/">DevTools</a></li>
+            </ul>
+          </div>
+          <div class="ft-col">
+            <h4>Apps</h4>
+            <ul>
+              <li><a href="../moneybay/">MoneyBay</a></li>
+              <li><a href="../qrbay/">QRBay</a></li>
+              <li><a href="../cleanbay/">CleanBay</a></li>
+            </ul>
+          </div>
+          <div class="ft-col ft-support">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="../privacy/" data-i18n="footer.privacy">Bảo mật</a></li>
+              <li><a href="../terms/" data-i18n="footer.terms">Điều khoản</a></li>
+              <li><a href="mailto:vutaso.com@gmail.com">Email</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="ft-bottom">
+          <span data-i18n="footer.right">© 2026 VUTASO.com · LOCAL · PRIVATE · OPEN</span>
+        </div>
+      </div>
     </footer>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+    <script src="../assets/bay/bay-landing.js" defer></script>
+    <script>
+      (function () {
+        var dd = document.getElementById('nav-utils');
+        if (!dd) return;
+        var btn = dd.querySelector('button');
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var open = dd.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function () {
+          dd.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            dd.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      })();
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.4/purify.min.js" integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="core.js?v=1.1"></script>
     <script src="i18n.js?v=1.3"></script>
-    <script src="app.js?v=1.9"></script>
+    <script src="app.js?v=1.10"></script>
   </body>
 </html>

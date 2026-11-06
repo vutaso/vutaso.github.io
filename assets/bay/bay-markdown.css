@@ -1,0 +1,86 @@
+/* Markdown editor shell under bay landing chrome */
+
+body {
+  background: #ffffff !important;
+  color: #0B1220;
+  display: block !important;
+  overflow: auto !important;
+  min-height: 100vh;
+}
+
+body:before,
+body::before,
+.noise {
+  display: none !important;
+}
+
+.markdown-shell {
+  padding: calc(var(--nav-h) + 16px) 0 32px;
+}
+
+.markdown-shell .markdown-app {
+  width: min(1280px, 100% - 48px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-h) - 220px);
+}
+
+.markdown-app .site-header {
+  width: 100%;
+  margin: 0 0 8px;
+  border: 1px solid rgba(11, 18, 32, 0.08);
+  border-radius: 16px;
+  padding: 0 16px;
+  background: #ffffff;
+}
+
+.markdown-app .brand-wrap .vutaso-link {
+  display: none;
+}
+
+.markdown-app .toolbar,
+.markdown-app .mobile-tabs,
+.markdown-app .workspace,
+.markdown-app .site-footer {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.markdown-app .workspace {
+  min-height: 520px;
+  border-radius: 0 0 16px 16px;
+}
+
+.markdown-app .lang-btn.is-active {
+  background: #EAF2FF;
+  color: #2B7FFF;
+}
+
+.markdown-app .view-btn.is-active,
+.markdown-app .tab-btn.is-active {
+  background: #EAF2FF;
+  color: #2B7FFF;
+}
+
+.markdown-app .site-footer {
+  margin: 8px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(11, 18, 32, 0.08);
+  color: #667085;
+}
+
+.markdown-app .site-footer .footer-meta {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .markdown-shell {
+    padding: calc(var(--nav-h) + 12px) 0 24px;
+  }
+
+  .markdown-shell .markdown-app {
+    width: min(1280px, 100% - 24px);
+  }
+}

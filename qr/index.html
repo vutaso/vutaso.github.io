@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <script>
     (function () {
-      var theme = localStorage.getItem('qr-theme');
-      document.documentElement.setAttribute('data-theme', theme || 'light');
+      localStorage.setItem('qr-theme', 'light');
+      document.documentElement.setAttribute('data-theme', 'light');
       var lang = localStorage.getItem('qr-lang');
       if (lang) document.documentElement.lang = lang;
     })();
@@ -16,10 +16,9 @@
   <meta name="keywords" content="QR code generator, tạo mã QR, VUTASO, WiFi QR, vCard QR, batch QR">
   <meta name="author" content="VUTASO">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#0071e3">
+  <meta name="theme-color" content="#ffffff">
   <link rel="canonical" href="https://vutaso.com/qr/">
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="VUTASO — Tạo mã QR miễn phí">
   <meta property="og:description" content="Tạo mã QR đẹp, miễn phí — 11 loại, tùy chỉnh đầy đủ, batch, xuất nhiều định dạng.">
@@ -30,7 +29,6 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="VUTASO — Tạo mã QR miễn phí">
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="VUTASO — Tạo mã QR miễn phí">
   <meta name="twitter:description" content="Create beautiful custom QR codes for free. 11 types, full styling, batch mode.">
@@ -38,250 +36,72 @@
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=12">
   <link rel="apple-touch-icon" href="favicon.svg?v=12">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob: https://plausible.io; base-uri 'self'; form-action 'self' mailto: https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+
+  <link rel="stylesheet" href="../assets/bay/bay-landing.css">
+  <link rel="stylesheet" href="../assets/bay/bay-home.css">
+  <link rel="stylesheet" href="../assets/bay/bay-qr.css">
+
   <link rel="preload" href="assets/css/fonts.css" as="style">
   <link rel="preload" href="assets/css/style.css" as="style">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' data: blob: https://plausible.io; base-uri 'self'; form-action 'self' mailto: https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="assets/vendor/pickr.nano.min.css">
-  <link rel="stylesheet" href="assets/css/style.css?v=10">
+  <link rel="stylesheet" href="assets/css/style.css?v=11">
 
   <style id="qr-theme">
-    :root {
+    :root, [data-theme="light"], [data-theme="dark"] {
       --radius: 16px;
       --radius-sm: 12px;
       --radius-lg: 20px;
-    }
-
-    [data-theme="light"] {
-      --bg: #f7f9fc;
+      --bg: #ffffff;
       --bg-panel: #ffffff;
-      --bg-hover: #edf3ff;
-      --text: #172235;
-      --text-muted: #647186;
-      --border: #e5eaf2;
-      --accent: #437df4;
-      --accent-hover: #2859c7;
-      --accent-mid: #69b5ff;
-      --accent-light: #edf3ff;
+      --bg-hover: #F7F8FA;
+      --text: #0B1220;
+      --text-muted: #667085;
+      --border: rgba(11, 18, 32, 0.08);
+      --accent: #2B7FFF;
+      --accent-hover: #1A5FCC;
+      --accent-mid: #5B9FFF;
+      --accent-light: #EAF2FF;
       --input-bg: #ffffff;
-      --moneybay: #437df4;
-      --moneybay-hover: #2859c7;
-      --qrbay: #e49b43;
-      --qrbay-hover: #c47d2a;
-      --shadow: 0 9px 28px rgba(32, 67, 125, .08);
-      --shadow-lg: 0 24px 70px rgba(32, 67, 125, .13);
+      --moneybay: #2B7FFF;
+      --moneybay-hover: #1A5FCC;
+      --qrbay: #FF6B00;
+      --qrbay-hover: #E05A00;
+      --shadow: 0 1px 3px rgba(11, 18, 32, 0.06), 0 8px 24px rgba(11, 18, 32, 0.06);
+      --shadow-lg: 0 4px 24px rgba(11, 18, 32, 0.08);
     }
 
-    [data-theme="dark"] {
-      --bg: #0f0f1a;
-      --bg-panel: #1a1a2e;
-      --bg-hover: #252540;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --border: #2d2d4a;
-      --accent: #42a5f5;
-      --accent-hover: #2196f3;
-      --accent-mid: #64b5f6;
-      --accent-light: #0d2847;
-      --input-bg: #252540;
-      --moneybay: #437df4;
-      --moneybay-hover: #2859c7;
-      --qrbay: #e49b43;
-      --qrbay-hover: #c47d2a;
-      --shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 4px 12px rgba(0, 0, 0, .2);
-      --shadow-lg: 0 4px 24px rgba(0, 0, 0, .4);
-    }
-
-    body {
-      background:
-        radial-gradient(circle at 7% 0%, rgba(105, 181, 255, .14), transparent 28%),
-        radial-gradient(circle at 94% 14%, rgba(98, 185, 155, .1), transparent 25%),
-        var(--bg);
-      color: var(--text);
-    }
-
-    [data-theme="dark"] body {
-      background:
-        radial-gradient(circle at 7% 0%, rgba(66, 165, 245, .08), transparent 28%),
-        radial-gradient(circle at 94% 14%, rgba(98, 185, 155, .06), transparent 25%),
-        var(--bg);
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .2;
-      background-image: radial-gradient(rgba(67, 125, 244, .2) 1px, transparent 1px);
-      background-size: 34px 34px;
-      mask-image: radial-gradient(ellipse 60% 42% at 50% 0%, #000, transparent 80%);
-    }
-
-    [data-theme="dark"] body::before {
-      opacity: .12;
-      background-image: radial-gradient(rgba(66, 165, 245, .25) 1px, transparent 1px);
-    }
-
-    .header {
-      background: color-mix(in srgb, var(--bg) 84%, transparent);
-      border-bottom-color: transparent;
-      box-shadow: 0 5px 18px rgba(32, 67, 125, .04);
-    }
-
-    [data-theme="dark"] .header {
-      box-shadow: 0 5px 18px rgba(0, 0, 0, .25);
-    }
-
-    [data-theme="light"] .logo__img {
-      height: 30px;
-      filter: brightness(0) saturate(100%) invert(32%) sepia(91%) saturate(1228%) hue-rotate(202deg) brightness(96%);
-    }
-
-    [data-theme="dark"] .logo__img {
-      height: 30px;
-    }
-
-    .header__app-link {
-      border-radius: 13px;
-      box-shadow: none;
-    }
-
-    .header__app-link:hover {
-      box-shadow: 0 10px 22px rgba(67, 125, 244, .2);
-    }
-
-    .header__app-link--qrbay:hover {
-      box-shadow: 0 10px 22px rgba(228, 155, 67, .22);
-    }
-
-    .lang-switch {
+    .qr-app .lang-switch {
       padding: 3px;
       border: 1px solid var(--border);
       border-radius: 99px;
       background: var(--bg-panel);
     }
 
-    .lang-btn {
+    .qr-app .lang-btn {
       border-radius: 99px;
       color: var(--text-muted);
     }
 
-    .lang-btn--active {
+    .qr-app .lang-btn--active {
       background: var(--accent-light);
       color: var(--accent);
     }
 
-    .main {
-      position: relative;
-      z-index: 1;
-      padding-top: 34px;
-    }
-
-    .panel {
-      border-color: var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .panel__title {
-      color: var(--text);
-      letter-spacing: .08em;
-    }
-
-    .type-btn {
-      border-radius: 13px;
-    }
-
-    .type-btn:hover,
-    .type-btn--active {
-      background: var(--accent-light);
-      border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
-      color: var(--accent);
-    }
-
-    .customizer__section,
-    .accordion__item {
-      border-color: var(--border);
-    }
-
-    .accordion__item {
-      border-radius: 15px;
-      overflow: hidden;
-    }
-
-    .accordion__header {
-      background: var(--bg-hover);
-    }
-
-    .accordion__header:hover {
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .btn {
-      border-radius: 13px;
-    }
-
-    .btn--primary {
+    .qr-app .btn--primary {
       background: var(--accent);
-      box-shadow: 0 10px 22px rgba(67, 125, 244, .2);
+      box-shadow: 0 10px 22px rgba(43, 127, 255, .2);
     }
 
-    .btn--primary:hover {
+    .qr-app .btn--primary:hover {
       background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn--secondary,
-    .btn--ghost {
-      border-color: var(--border);
-      color: var(--text-muted);
-      background: var(--bg-panel);
-    }
-
-    .btn--secondary:hover,
-    .btn--ghost:hover {
-      border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-      color: var(--accent);
-      background: var(--accent-light);
-    }
-
-    input,
-    select,
-    textarea,
-    .input,
-    .select {
-      border-color: var(--border);
-      border-radius: 12px;
-      background: var(--input-bg);
-      color: var(--text);
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus,
-    .input:focus,
-    .select:focus {
-      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
-      outline: none;
-    }
-
-    .footer {
-      background: color-mix(in srgb, var(--bg-panel) 78%, transparent);
-      border-top-color: var(--border);
-    }
-
-    @media (max-width: 768px) {
-      .header {
-        background: color-mix(in srgb, var(--bg) 94%, transparent);
-      }
-
-      .main {
-        padding-top: 20px;
-      }
     }
   </style>
 
@@ -321,9 +141,64 @@
   </script>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a class="skip" href="#main">Skip navigation</a>
 
-  <header class="header">
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="../" aria-label="VUTASO home">
+        <span>VUTASO</span>
+      </a>
+
+      <nav class="links" aria-label="Main">
+        <a href="../#products">Products</a>
+        <div class="nav-dd" id="nav-utils">
+          <button type="button" aria-expanded="false" aria-haspopup="true">
+            <span>Tools</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+          </button>
+          <div class="nav-dd-menu" role="menu">
+            <a href="../ai/" role="menuitem">AI</a>
+            <a href="../translate/" role="menuitem">AI Translate</a>
+            <a href="./" aria-current="page" role="menuitem">QR Generator</a>
+            <a href="../appicon/" role="menuitem">App Icon Generator</a>
+            <a href="../markdown/" role="menuitem">Markdown Editor</a>
+            <a href="../devtools/" role="menuitem">DevTools</a>
+          </div>
+        </div>
+        <a href="../privacy/">Privacy</a>
+        <a href="../terms/">Terms</a>
+        <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" href="../qrbay/">QRBay</a>
+        <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mmenu" id="mmenu">
+    <a href="../#products">Products</a>
+    <div class="mmenu-group">
+      <div class="label">Tools</div>
+      <a href="../ai/">AI</a>
+      <a href="../translate/">AI Translate</a>
+      <a href="./" aria-current="page">QR Generator</a>
+      <a href="../appicon/">App Icon Generator</a>
+      <a href="../markdown/">Markdown Editor</a>
+      <a href="../devtools/">DevTools</a>
+    </div>
+    <a href="../privacy/">Privacy</a>
+    <a href="../terms/">Terms</a>
+    <a href="https://blog.vutaso.com" target="_blank" rel="noopener noreferrer">Blog</a>
+    <a class="btn btn-primary" href="../qrbay/">QRBay</a>
+  </div>
+
+  <div id="main" class="qr-shell">
+    <div class="qr-app">
+<header class="header">
     <div class="header__inner container">
       <a href="https://vutaso.com/" class="logo" aria-label="VUTASO home">
         <img src="assets/img/logo.svg" alt="VUTASO" width="108" height="32" class="logo__img">
@@ -716,47 +591,54 @@ wifi,MyWiFi|password|WPA,Office WiFi"></textarea>
       <div id="faq-list" class="faq-list"></div>
     </section>
   </main>
-
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <img src="assets/img/logo.svg" alt="VUTASO" width="96" height="28" class="logo__img">
-        <p class="footer__tagline" data-i18n="footer.tagline">Create beautiful QR codes for free. No signup required. 100% client-side — your data never leaves your browser.</p>
-      </div>
-      <div class="footer__links">
-        <h3 data-i18n="footer.types">Supported QR Types</h3>
-        <ul>
-          <li data-i18n="footer.type.urlWebsite">URL &amp; Website</li>
-          <li data-i18n="footer.type.wifi">WiFi Network</li>
-          <li data-i18n="footer.type.vcard">vCard Contact</li>
-          <li data-i18n="footer.type.emailSms">Email &amp; SMS</li>
-          <li data-i18n="footer.type.locationSocial">Location &amp; Social Media</li>
-          <li data-i18n="footer.type.cryptoAppstore">Crypto &amp; App Store</li>
-        </ul>
-      </div>
-      <div class="footer__links">
-        <h3 data-i18n="footer.features">Features</h3>
-        <ul>
-          <li data-i18n="footer.feature.colors">Custom colors &amp; gradients</li>
-          <li data-i18n="footer.feature.logo">Logo embedding</li>
-          <li data-i18n="footer.feature.export">PNG, SVG, JPEG, PDF export</li>
-          <li data-i18n="footer.feature.batch">Batch generation</li>
-          <li data-i18n="footer.feature.darkMode">Dark mode</li>
-        </ul>
-      </div>
     </div>
-    <div class="footer__bottom container">
-      <nav class="footer__legal" aria-label="Legal">
-        <a href="privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
-        <span aria-hidden="true">·</span>
-        <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
-      </nav>
-      <p data-i18n="footer.copyright">&copy; 2026 VUTASO. All rights reserved.</p>
-      <p class="footer__trademark" data-i18n="footer.qrTrademark">'Mã QR' là nhãn hiệu của DENSO WAVE INCORPORATED</p>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="ft-grid">
+        <div class="ft-brand">
+          <a class="brand" href="../"><span>VUTASO</span></a>
+          <p class="ft-tag" data-i18n="footer.tagline">Create beautiful QR codes for free. No signup required. 100% client-side — your data never leaves your browser.</p>
+        </div>
+        <div class="ft-col">
+          <h4 data-i18n="footer.types">Supported QR Types</h4>
+          <ul>
+            <li data-i18n="footer.type.urlWebsite">URL &amp; Website</li>
+            <li data-i18n="footer.type.wifi">WiFi Network</li>
+            <li data-i18n="footer.type.vcard">vCard Contact</li>
+            <li data-i18n="footer.type.emailSms">Email &amp; SMS</li>
+            <li data-i18n="footer.type.locationSocial">Location &amp; Social Media</li>
+            <li data-i18n="footer.type.cryptoAppstore">Crypto &amp; App Store</li>
+          </ul>
+        </div>
+        <div class="ft-col">
+          <h4 data-i18n="footer.features">Features</h4>
+          <ul>
+            <li data-i18n="footer.feature.colors">Custom colors &amp; gradients</li>
+            <li data-i18n="footer.feature.logo">Logo embedding</li>
+            <li data-i18n="footer.feature.export">PNG, SVG, JPEG, PDF export</li>
+            <li data-i18n="footer.feature.batch">Batch generation</li>
+          </ul>
+        </div>
+        <div class="ft-col ft-support">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="privacy.html" data-i18n="footer.privacy">Privacy Policy</a></li>
+            <li><a href="terms.html" data-i18n="footer.terms">Terms of Service</a></li>
+            <li><a href="../privacy/">VUTASO Privacy</a></li>
+            <li><a href="../terms/">VUTASO Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span data-i18n="footer.copyright">&copy; 2026 VUTASO. All rights reserved.</span>
+        <span class="footer__trademark" data-i18n="footer.qrTrademark">'Mã QR' là nhãn hiệu của DENSO WAVE INCORPORATED</span>
+      </div>
     </div>
   </footer>
 
-  <!-- Toast notification -->
+<!-- Toast notification -->
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
     <i class="toast__icon fa-solid" aria-hidden="true"></i>
     <span class="toast__text"></span>
@@ -770,6 +652,29 @@ wifi,MyWiFi|password|WPA,Office WiFi"></textarea>
     </button>
   </div>
 
+  <script src="../assets/bay/bay-landing.js" defer></script>
+  <script>
+    (function () {
+      var dd = document.getElementById('nav-utils');
+      if (!dd) return;
+      var btn = dd.querySelector('button');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = dd.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', function () {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          dd.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+  </script>
   <!-- Self-hosted libraries (see scripts/vendor-libs.sh) -->
   <script src="assets/vendor/qr-code-styling.js"></script>
   <script src="assets/vendor/jspdf.umd.min.js"></script>

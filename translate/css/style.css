@@ -47,29 +47,29 @@ textarea:focus-visible,
 }
 
 :root {
-  /* ===== Light Mode (default) ===== */
-  --bg: #F2F2F7;
-  --bg-elevated: rgba(255, 255, 255, 0.72);
-  --bg-card: rgba(255, 255, 255, 0.80);
-  --bg-input: rgba(255, 255, 255, 0.60);
-  --bg-hover: rgba(0, 0, 0, 0.04);
+  /* ===== Light Mode (locked — sync with bay landing) ===== */
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: rgba(11, 18, 32, 0.04);
 
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --separator: rgba(0, 0, 0, 0.06);
+  --border: rgba(11, 18, 32, 0.08);
+  --border-strong: rgba(11, 18, 32, 0.14);
+  --separator: rgba(11, 18, 32, 0.08);
 
-  --text: #1C1C1E;
-  --text-secondary: #636366;
-  --text-tertiary: #8E8E93;
-  --text-quaternary: #C7C7CC;
+  --text: #0B1220;
+  --text-secondary: #667085;
+  --text-tertiary: #98A2B3;
+  --text-quaternary: #D0D5DD;
   --text-inverse: #FFFFFF;
 
   /* Apple blue */
-  --primary: #007AFF;
-  --primary-hover: #0066D6;
-  --primary-pressed: #0055B3;
-  --primary-light: rgba(0, 122, 255, 0.08);
-  --primary-light-hover: rgba(0, 122, 255, 0.12);
+  --primary: #2B7FFF;
+  --primary-hover: #1A5FCC;
+  --primary-pressed: #154FA8;
+  --primary-light: rgba(43, 127, 255, 0.08);
+  --primary-light-hover: rgba(43, 127, 255, 0.12);
 
   --success: #34C759;
   --success-light: rgba(52, 199, 89, 0.10);
@@ -79,8 +79,8 @@ textarea:focus-visible,
   --warning-light: rgba(255, 149, 0, 0.10);
 
   /* Frosted-glass base tints (used in gradients & pseudo-elements) */
-  --glass-tint: rgba(255, 255, 255, 0.85);
-  --glass-tint-light: rgba(255, 255, 255, 0.40);
+  --glass-tint: #ffffff;
+  --glass-tint-light: #ffffff;
 
   /* Apple radii */
   --radius-xs: 6px;
@@ -102,75 +102,52 @@ textarea:focus-visible,
   --transition-spring: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ===== Dark Mode ===== */
+/* Dark mode disabled — keep light tokens if data-theme is ever set */
 :root[data-theme="dark"] {
-  --bg: #000000;
-  --bg-elevated: rgba(28, 28, 30, 0.76);
-  --bg-card: rgba(28, 28, 30, 0.82);
-  --bg-input: rgba(44, 44, 46, 0.70);
-  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: rgba(11, 18, 32, 0.04);
 
-  --border: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --separator: rgba(255, 255, 255, 0.08);
+  --border: rgba(11, 18, 32, 0.08);
+  --border-strong: rgba(11, 18, 32, 0.14);
+  --separator: rgba(11, 18, 32, 0.08);
 
-  --text: #F5F5F7;
-  --text-secondary: #98989D;
-  --text-tertiary: #636366;
-  --text-quaternary: #48484A;
-  --text-inverse: #000000;
+  --text: #0B1220;
+  --text-secondary: #667085;
+  --text-tertiary: #98A2B3;
+  --text-quaternary: #D0D5DD;
+  --text-inverse: #FFFFFF;
 
-  --primary: #0A84FF;
-  --primary-hover: #409CFF;
-  --primary-pressed: #0066CC;
-  --primary-light: rgba(10, 132, 255, 0.15);
-  --primary-light-hover: rgba(10, 132, 255, 0.22);
+  --primary: #2B7FFF;
+  --primary-hover: #1A5FCC;
+  --primary-pressed: #154FA8;
+  --primary-light: rgba(43, 127, 255, 0.08);
+  --primary-light-hover: rgba(43, 127, 255, 0.12);
 
-  --success: #30D158;
-  --success-light: rgba(48, 209, 88, 0.15);
-  --danger: #FF453A;
-  --danger-light: rgba(255, 69, 58, 0.15);
-  --warning: #FF9F0A;
-  --warning-light: rgba(255, 159, 10, 0.15);
-
-  --glass-tint: rgba(30, 30, 32, 0.90);
-  --glass-tint-light: rgba(44, 44, 46, 0.50);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.28);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.35);
+  --glass-tint: #ffffff;
+  --glass-tint-light: #ffffff;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
-  background: var(--bg);
+.translate-app {
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
+  background: transparent;
   color: var(--text);
-  min-height: 100vh;
+  min-height: 0;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -20%, var(--primary-light), transparent),
-    radial-gradient(ellipse 60% 50% at 80% 80%, var(--success-light), transparent);
-  pointer-events: none;
-  z-index: -1;
-}
-
 .container {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 12px 20px 20px;
+  padding: 0 0 20px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 0;
 }
 
 .main-content {

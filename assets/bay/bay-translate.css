@@ -1,0 +1,45 @@
+/* Translate app shell under bay landing chrome */
+
+body {
+  background: #ffffff;
+  color: #0B1220;
+}
+
+.translate-app .theme-toggle {
+  display: none !important;
+}
+
+.translate-shell {
+  padding: calc(var(--nav-h) + 24px) 0 48px;
+}
+
+.translate-shell .translate-app {
+  width: min(1160px, 100% - 48px);
+  margin: 0 auto;
+}
+
+.translate-shell .translate-app .container {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+.translate-app .header {
+  position: relative;
+  top: auto;
+  z-index: 1;
+}
+
+.translate-app .footer {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .translate-shell {
+    padding: calc(var(--nav-h) + 16px) 0 32px;
+  }
+
+  .translate-shell .translate-app {
+    width: min(var(--maxw), 100% - 24px);
+  }
+}

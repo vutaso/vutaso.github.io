@@ -1,0 +1,59 @@
+/* QR generator shell under bay landing chrome */
+
+body {
+  background: #ffffff !important;
+  color: #0B1220;
+  display: block !important;
+  min-height: 100vh;
+}
+
+body::before {
+  display: none !important;
+}
+
+.qr-shell {
+  padding: calc(var(--nav-h) + 16px) 0 48px;
+}
+
+.qr-shell .qr-app {
+  width: min(1200px, 100% - 48px);
+  margin: 0 auto;
+}
+
+.qr-app .header {
+  position: relative !important;
+  top: auto !important;
+  z-index: 2;
+  margin-bottom: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(11, 18, 32, 0.08);
+  border-radius: 16px;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.qr-app .header .logo {
+  display: none;
+}
+
+.qr-app #theme-toggle {
+  display: none !important;
+}
+
+.qr-app .main {
+  padding-top: 0;
+}
+
+.qr-app .footer {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .qr-shell {
+    padding: calc(var(--nav-h) + 12px) 0 32px;
+  }
+
+  .qr-shell .qr-app {
+    width: min(1200px, 100% - 24px);
+  }
+}

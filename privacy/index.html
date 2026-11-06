@@ -2,672 +2,61 @@
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chính sách Bảo mật — VUTASO</title>
-    <meta name="description"
-        content="Chính sách bảo mật VUTASO — Cam kết bảo vệ quyền riêng tư và dữ liệu của bạn khi sử dụng MoneyBay và QRBay.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://vutaso.com/privacy/">
-    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #060B14;
-            --bg-2: #0A1020;
-            --bg-card: rgba(255, 255, 255, 0.04);
-            --primary: #2B7FFF;
-            --primary-light: #5B9FFF;
-            --accent: #00E5FF;
-            --orange: #FF6B00;
-            --orange-light: #FF9B44;
-            --success: #00D68F;
-            --text: #E8EEF8;
-            --text-muted: #6B7A99;
-            --border: rgba(43, 127, 255, 0.15);
-            --border-bright: rgba(43, 127, 255, 0.4);
-            --glass: rgba(255, 255, 255, 0.04);
-            --gradient: linear-gradient(135deg, #2B7FFF, #00E5FF);
-            --gradient-orange: linear-gradient(135deg, #FF6B00, #FFB347);
-            --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
-
-        a {
-            color: var(--primary-light);
-            text-decoration: none;
-            transition: color var(--trans);
-        }
-
-        a:hover {
-            color: var(--accent);
-        }
-
-        /* === Background orbs === */
-        .bg-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bg-orb.a {
-            width: 500px;
-            height: 500px;
-            background: rgba(43, 127, 255, 0.08);
-            top: -150px;
-            left: -100px;
-        }
-
-        .bg-orb.b {
-            width: 400px;
-            height: 400px;
-            background: rgba(0, 229, 255, 0.05);
-            bottom: -100px;
-            right: -100px;
-        }
-
-        /* === Nav === */
-        .top-nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(6, 11, 20, 0.9);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 6%;
-        }
-
-        .nav-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 1.15rem;
-            font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-        }
-
-        .nav-link {
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            background: transparent;
-            border: 1px solid transparent;
-            transition: var(--trans);
-            text-decoration: none;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--text);
-            background: var(--glass);
-            border-color: var(--border);
-        }
-
-        /* === Container === */
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 24px 80px;
-        }
-
-        /* === Header === */
-        .page-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .page-header h1 {
-            font-size: clamp(1.6rem, 4vw, 2.4rem);
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .page-header h1 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .last-updated {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        /* === Apps badge === */
-        .apps-badge {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .app-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 99px;
-            font-size: 0.72rem;
-            font-weight: 700;
-        }
-
-        .app-tag.blue {
-            background: rgba(43, 127, 255, 0.12);
-            border: 1px solid rgba(43, 127, 255, 0.25);
-            color: var(--primary-light);
-        }
-
-        .app-tag.orange {
-            background: rgba(255, 107, 0, 0.12);
-            border: 1px solid rgba(255, 107, 0, 0.25);
-            color: var(--orange-light);
-        }
-
-        .app-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .app-dot.blue {
-            background: var(--primary);
-        }
-
-        .app-dot.orange {
-            background: var(--orange);
-        }
-
-        /* === Content === */
-        .highlight {
-            background: rgba(43, 127, 255, 0.08);
-            border-left: 3px solid var(--primary);
-            border-radius: 0 12px 12px 0;
-            padding: 18px 20px;
-            margin-bottom: 32px;
-            font-size: 0.92rem;
-            color: rgba(232, 238, 248, 0.85);
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 40px 0 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin: 24px 0 10px;
-            color: var(--text);
-        }
-
-        h4 {
-            font-size: 0.92rem;
-            font-weight: 600;
-            margin: 18px 0 8px;
-            color: var(--primary-light);
-        }
-
-        p {
-            margin-bottom: 14px;
-            color: rgba(232, 238, 248, 0.8);
-            font-size: 0.92rem;
-        }
-
-        ul {
-            list-style: none;
-            margin-bottom: 18px;
-            padding-left: 0;
-        }
-
-        ul li {
-            position: relative;
-            padding: 8px 0 8px 22px;
-            font-size: 0.88rem;
-            color: rgba(232, 238, 248, 0.8);
-            border-bottom: 1px solid rgba(43, 127, 255, 0.06);
-        }
-
-        ul li:last-child {
-            border-bottom: none;
-        }
-
-        ul li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 16px;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--gradient);
-        }
-
-        ul li strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .warning-box {
-            background: rgba(255, 91, 91, 0.08);
-            border-left: 3px solid #FF5B5B;
-            border-radius: 0 12px 12px 0;
-            padding: 16px 18px;
-            margin: 16px 0;
-        }
-
-        .warning-box p {
-            color: #FF9B9B;
-            margin: 0;
-        }
-
-        .success-box {
-            background: rgba(0, 214, 143, 0.08);
-            border-left: 3px solid var(--success);
-            border-radius: 0 12px 12px 0;
-            padding: 16px 18px;
-            margin: 16px 0;
-        }
-
-        .success-box p {
-            color: #5AEBC0;
-            margin: 0;
-        }
-
-        /* === Footer === */
-        .footer {
-            text-align: center;
-            padding: 32px 24px;
-            border-top: 1px solid var(--border);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .footer a {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
-
-        .footer p {
-            margin: 4px 0;
-        }
-
-        .footer .divider {
-            width: 40px;
-            height: 1px;
-            background: var(--border);
-            margin: 12px auto;
-        }
-
-        .footer .made-in {
-            font-size: 0.68rem;
-            opacity: 0.7;
-        }
-
-        /* === Responsive === */
-        @media (max-width: 600px) {
-            .container {
-                padding: 32px 16px 60px;
-            }
-
-            h2 {
-                font-size: 1.15rem;
-            }
-        }
-
-        /* Alternative color theme */
-        :root {
-            --bg: #f7f9fc;
-            --bg-2: #ffffff;
-            --bg-card: #ffffff;
-            --primary: #437df4;
-            --primary-light: #437df4;
-            --accent: #62b99b;
-            --orange: #e49b43;
-            --orange-light: #d28b31;
-            --success: #2c9e79;
-            --text: #172235;
-            --text-muted: #647186;
-            --border: #e5eaf2;
-            --border-bright: #ccdcfc;
-            --glass: rgba(255, 255, 255, .78);
-            --gradient: linear-gradient(135deg, #2859c7, #69b5ff);
-            --gradient-orange: linear-gradient(135deg, #d28b31, #f4ba56);
-            --shadow: 0 24px 70px rgba(32, 67, 125, .13);
-        }
-
-        body {
-            background:
-                radial-gradient(circle at 8% 0%, rgba(105, 181, 255, .16), transparent 29%),
-                radial-gradient(circle at 92% 18%, rgba(98, 185, 155, .1), transparent 25%),
-                var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            opacity: .22;
-            background-image: radial-gradient(rgba(67, 125, 244, .2) 1px, transparent 1px);
-            background-size: 34px 34px;
-            mask-image: radial-gradient(ellipse 60% 45% at 50% 0%, #000, transparent 80%);
-        }
-
-        .bg-orb {
-            filter: blur(100px);
-        }
-
-        .bg-orb.a {
-            background: rgba(105, 181, 255, .14);
-        }
-
-        .bg-orb.b {
-            background: rgba(98, 185, 155, .1);
-        }
-
-        .top-nav {
-            padding: 14px max(24px, 6%);
-            background: rgba(247, 249, 252, .82);
-            border-bottom: 1px solid transparent;
-            box-shadow: none;
-        }
-
-        .nav-content {
-            max-width: 1160px;
-        }
-
-        .logo {
-            color: var(--text);
-            background: none;
-            -webkit-text-fill-color: initial;
-            font-size: 1rem;
-            letter-spacing: .02em;
-        }
-
-        .nav-links {
-            gap: 8px;
-        }
-
-        .nav-link {
-            border-radius: 99px;
-            color: #718096;
-            padding: 8px 15px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--primary);
-            background: #e9f0ff;
-            border-color: transparent;
-        }
-
-        .container {
-            max-width: 860px;
-            padding: 74px 30px 92px;
-        }
-
-        .page-header {
-            margin-bottom: 46px;
-        }
-
-        .page-header h1 {
-            color: var(--text);
-            font-weight: 400;
-            letter-spacing: -.045em;
-        }
-
-        .page-header h1 span {
-            background: none;
-            color: var(--primary);
-            -webkit-text-fill-color: initial;
-        }
-
-        .last-updated {
-            color: var(--text-muted);
-        }
-
-        .apps-badge {
-            gap: 8px;
-        }
-
-        .app-tag {
-            border-radius: 99px;
-            box-shadow: 0 4px 14px rgba(32, 67, 125, .05);
-        }
-
-        .app-tag.blue {
-            background: #edf3ff;
-            border-color: #d8e4ff;
-            color: var(--primary);
-        }
-
-        .app-tag.orange {
-            background: #fff2dc;
-            border-color: #f7dfae;
-            color: #b47727;
-        }
-
-        .highlight,
-        .warning-box,
-        .success-box {
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(32, 67, 125, .05);
-        }
-
-        .highlight {
-            background: linear-gradient(135deg, #edf4ff, #f7fbff);
-            border: 1px solid #dce8ff;
-            border-left: 4px solid var(--primary);
-            color: var(--text-muted);
-        }
-
-        h2 {
-            color: var(--text);
-            background: none;
-            -webkit-text-fill-color: initial;
-            font-weight: 400;
-            letter-spacing: -.025em;
-            border-bottom-color: var(--border);
-        }
-
-        h3 {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        h4 {
-            color: var(--primary);
-        }
-
-        p,
-        ul li {
-            color: var(--text-muted);
-        }
-
-        ul li {
-            border-bottom-color: #eef2f8;
-        }
-
-        ul li::before {
-            background: var(--primary);
-            box-shadow: 0 0 0 3px #edf3ff;
-        }
-
-        ul li strong {
-            color: var(--text);
-        }
-
-        .warning-box {
-            background: #fff4f2;
-            border-left-color: #e57c6e;
-        }
-
-        .warning-box p {
-            color: #bb6157;
-        }
-
-        .success-box {
-            background: #eaf8f2;
-            border-left-color: var(--success);
-        }
-
-        .success-box p {
-            color: #258164;
-        }
-
-        .footer {
-            padding: 34px 24px 28px;
-            background: rgba(255, 255, 255, .72);
-            border-top-color: var(--border);
-            color: var(--text-muted);
-        }
-
-        .footer a {
-            background: none;
-            color: var(--primary);
-            -webkit-text-fill-color: initial;
-        }
-
-        .footer .divider {
-            background: var(--border);
-        }
-
-        @media (max-width: 600px) {
-            .top-nav {
-                padding: 11px 16px;
-            }
-
-            .container {
-                padding: 54px 20px 68px;
-            }
-
-            .page-header {
-                margin-bottom: 36px;
-            }
-        }
-
-        /* Clean white reading theme */
-        body {
-            background: #ffffff;
-            color: #111827;
-        }
-
-        body::before,
-        .bg-orb {
-            display: none;
-        }
-
-        .top-nav {
-            background: rgba(255, 255, 255, .94);
-            border-bottom-color: #e5e7eb;
-        }
-
-        .page-header h1,
-        h2,
-        h3,
-        ul li strong {
-            color: #111827;
-        }
-
-        .last-updated,
-        p,
-        ul li {
-            color: #374151;
-        }
-
-        .highlight {
-            background: #f8fbff;
-            color: #374151;
-        }
-
-        .footer {
-            background: #ffffff;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chính sách Bảo mật — VUTASO</title>
+  <meta name="description" content="Chính sách bảo mật VUTASO — Cam kết bảo vệ quyền riêng tư và dữ liệu của bạn khi sử dụng MoneyBay và QRBay.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vutaso.com/privacy/">
+  <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="../assets/bay/bay-landing.css">
+  <link rel="stylesheet" href="../assets/bay/bay-legal.css">
 </head>
-
 <body>
-    <div class="bg-orb a"></div>
-    <div class="bg-orb b"></div>
+  <a class="skip" href="#main">Bỏ qua điều hướng</a>
 
-    <nav class="top-nav">
-        <div class="nav-content">
-            <a href="https://vutaso.com" class="logo">VUTASO</a>
-            <div class="nav-links">
-                <a href="../privacy/" class="nav-link active">Bảo mật</a>
-                <a href="../terms/" class="nav-link">Điều khoản</a>
-            </div>
-        </div>
-    </nav>
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="https://vutaso.com" aria-label="VUTASO">
+        <span>VUTASO</span>
+      </a>
 
-    <div class="container">
-        <div class="page-header">
-            <h1>Chính sách <span>Bảo mật</span></h1>
+      <nav class="links" aria-label="Điều hướng chính">
+        <a href="../privacy/" aria-current="page">Bảo mật</a>
+        <a href="../terms/">Điều khoản</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="burger" id="burger" aria-label="Mở menu" aria-expanded="false" aria-controls="mmenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mmenu" id="mmenu">
+    <a href="../privacy/">Bảo mật</a>
+    <a href="../terms/">Điều khoản</a>
+    <a class="btn btn-primary" href="https://vutaso.com">Về trang chủ</a>
+  </div>
+
+  <main id="main" class="legal">
+    <div class="wrap">
+      <div class="page-header">
+            <h1>Chính sách <span class="hl">Bảo mật</span></h1>
             <p class="last-updated">🔒 Cập nhật lần cuối: Ngày 2 tháng 9 năm 2026</p>
             <div class="apps-badge">
                 <span class="app-tag blue"><span class="app-dot blue"></span> MoneyBay</span>
                 <span class="app-tag orange"><span class="app-dot orange"></span> QRBay</span>
                 <span class="app-tag blue"><span class="app-dot blue"></span> DevTools</span>
             </div>
+
+      <div class="doc">
         </div>
 
         <div class="highlight">
@@ -802,11 +191,20 @@
             <li>Email: <a href="mailto:vutaso.com@gmail.com">vutaso.com@gmail.com</a></li>
             <li>Website: <a href="https://vutaso.com">https://vutaso.com</a></li>
         </ul>
+      </div>
     </div>
+  </main>
 
-    <div class="footer">
-        <p>&copy; 2025 <a href="https://vutaso.com">VUTASO.com</a></p>
+  <footer>
+    <div class="wrap">
+      <div class="ft-bottom">
+        <span>© 2025 <a href="https://vutaso.com">VUTASO.com</a></span>
+        <span>Một sản phẩm của <a href="https://vutaso.com" target="_blank" rel="noopener noreferrer">VUTASO</a></span>
+      </div>
     </div>
+  </footer>
+
+  <script src="../assets/bay/bay-landing.js" defer></script>
 </body>
 
 </html>

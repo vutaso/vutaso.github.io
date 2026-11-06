@@ -1,0 +1,78 @@
+/* App Icon generator shell under bay landing chrome */
+
+body {
+  background: #ffffff !important;
+  color: #0B1220;
+  display: block !important;
+  overflow: auto !important;
+  min-height: 100vh;
+}
+
+body:before,
+body::before,
+.noise {
+  display: none !important;
+}
+
+.appicon-shell {
+  padding: calc(var(--nav-h) + 16px) 0 32px;
+}
+
+.appicon-shell .appicon-app {
+  width: min(1120px, 100% - 48px);
+  margin: 0 auto;
+}
+
+.appicon-app .site-header {
+  width: 100%;
+  max-width: none;
+  margin: 0 0 8px;
+  height: auto;
+  min-height: 64px;
+  border: 1px solid rgba(11, 18, 32, 0.08);
+  border-radius: 16px;
+  padding: 0 16px;
+  background: #ffffff;
+}
+
+.appicon-app .brand-wrap .vutaso-link {
+  display: none;
+}
+
+.appicon-app main,
+.appicon-app .composer-note {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.appicon-app > footer {
+  display: none;
+}
+
+.appicon-app .lang-btn.is-active {
+  background: #EAF2FF;
+  color: #2B7FFF;
+}
+
+.appicon-app .hero {
+  padding: 28px 0 32px;
+}
+
+@media (max-width: 800px) {
+  .appicon-shell {
+    padding: calc(var(--nav-h) + 12px) 0 24px;
+  }
+
+  .appicon-shell .appicon-app {
+    width: min(1120px, 100% - 24px);
+  }
+
+  .appicon-app .site-header,
+  .appicon-app main,
+  .appicon-app .composer-note {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

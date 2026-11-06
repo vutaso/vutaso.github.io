@@ -3,49 +3,50 @@
    ============================================================ */
 
 :root {
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
   --transition: 0.2s ease;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px rgba(11, 18, 32, 0.06), 0 4px 12px rgba(11, 18, 32, 0.04);
+  --shadow-lg: 0 4px 24px rgba(11, 18, 32, 0.08);
 
-  --bg: #f8f9fc;
+  --bg: #ffffff;
   --bg-panel: #ffffff;
-  --bg-hover: #f1f3f9;
-  --text: #1a1a2e;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --accent: #0071e3;
-  --accent-hover: #005bb5;
-  --accent-mid: #2196f3;
-  --accent-light: #e3f2fd;
-  --success: #22c55e;
-  --error: #ef4444;
+  --bg-hover: #F7F8FA;
+  --text: #0B1220;
+  --text-muted: #667085;
+  --border: rgba(11, 18, 32, 0.08);
+  --accent: #2B7FFF;
+  --accent-hover: #1A5FCC;
+  --accent-mid: #5B9FFF;
+  --accent-light: #EAF2FF;
+  --success: #12B76A;
+  --error: #F04438;
   --input-bg: #ffffff;
 
-  --moneybay: #2563eb;
-  --moneybay-hover: #1d4ed8;
-  --qrbay: #ea580c;
-  --qrbay-hover: #c2410c;
-  --preview-sticky-top: 84px;
+  --moneybay: #2B7FFF;
+  --moneybay-hover: #1A5FCC;
+  --qrbay: #FF6B00;
+  --qrbay-hover: #E05A00;
+  --preview-sticky-top: 100px;
 }
 
+/* Dark mode disabled — keep light tokens */
 [data-theme="dark"] {
-  --bg: #0f0f1a;
-  --bg-panel: #1a1a2e;
-  --bg-hover: #252540;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --border: #2d2d4a;
-  --accent: #42a5f5;
-  --accent-hover: #2196f3;
-  --accent-mid: #64b5f6;
-  --accent-light: #0d2847;
-  --input-bg: #252540;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --bg: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-hover: #F7F8FA;
+  --text: #0B1220;
+  --text-muted: #667085;
+  --border: rgba(11, 18, 32, 0.08);
+  --accent: #2B7FFF;
+  --accent-hover: #1A5FCC;
+  --accent-mid: #5B9FFF;
+  --accent-light: #EAF2FF;
+  --input-bg: #ffffff;
+  --shadow: 0 1px 3px rgba(11, 18, 32, 0.06), 0 4px 12px rgba(11, 18, 32, 0.04);
+  --shadow-lg: 0 4px 24px rgba(11, 18, 32, 0.08);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

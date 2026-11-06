@@ -112,8 +112,6 @@
     // Theme toggle
   };
 
-  const themeToggle = document.getElementById('themeToggle');
-
   let currentFileText = '';
   let currentFileName = '';
   let currentFileObject = null; // the loaded File itself (for keep-format Office export)
@@ -351,38 +349,14 @@
     refreshPresetSelects();
   }
 
-  // ===== Theme Toggle =====
-  function getTheme() {
-    const saved = localStorage.getItem('translation_theme');
-    if (saved === 'dark' || saved === 'light') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
-
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
+  // ===== Theme (locked light — sync with bay landing) =====
+  function applyTheme() {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('translation_theme', 'light');
   }
 
   function setupThemeToggle() {
-    const current = getTheme();
-    applyTheme(current);
-
-    themeToggle.addEventListener('click', () => {
-      const isDark = document.documentElement.hasAttribute('data-theme');
-      const next = isDark ? 'light' : 'dark';
-      applyTheme(next);
-      localStorage.setItem('translation_theme', next);
-    });
-
-    // Watch for system preference changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('translation_theme')) {
-        applyTheme(e.matches ? 'dark' : 'light');
-      }
-    });
+    applyTheme();
   }
 
   // ===== API Key =====
