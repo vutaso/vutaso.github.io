@@ -81,6 +81,8 @@ ul.contains-task-list { padding-left: 0.4em; }
   let markedReady = false;
   let persistWarned = false;
   let sanitizeHooked = false;
+  let scrollSyncEnabled = true;
+  const SCROLL_SYNC_KEY = "markdown-scroll-sync";
 
   function showToast(message, isError) {
     toastEl.textContent = message;
@@ -203,6 +205,36 @@ ul.contains-task-list { padding-left: 0.4em; }
     });
   }
 
+  function countNewlines(text) {
+    const match = String(text || "").match(/\n/g);
+    return match ? match.length : 0;
+  }
+
+  function annotatePreviewLines(source) {
+    if (!preview || !window.marked || !source.trim()) return;
+    let tokens;
+    try {
+      tokens = marked.lexer(source);
+    } catch {
+      return;
+    }
+    let line = 1;
+    const starts = [];
+    tokens.forEach((token) => {
+      if (token.type === "space") {
+        line += countNewlines(token.raw);
+        return;
+      }
+      starts.push(line);
+      line += countNewlines(token.raw);
+    });
+    const children = [...preview.children].filter((el) => !el.classList.contains("preview-empty"));
+    const n = Math.min(children.length, starts.length);
+    for (let i = 0; i < n; i++) {
+      children[i].setAttribute("data-line", String(starts[i]));
+    }
+  }
+
   function updatePreview() {
     const source = editor.value;
     const html = renderMarkdown(source);
@@ -213,6 +245,7 @@ ul.contains-task-list { padding-left: 0.4em; }
     } else {
       preview.innerHTML = html;
       decoratePreview(preview);
+      annotatePreviewLines(source);
     }
     stats.textContent = t("stats.meta", {
       words: String(countWords(source)),
@@ -333,64 +366,117 @@ ul.contains-task-list { padding-left: 0.4em; }
 
   const HTML2PDF_SRC = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js";
   const HTML2PDF_SRI = "sha384-jxZ2EFKjdq0Gra2Kt8wRo3xqMp2EPnNV6k9y0bDDgb2wTGrxSyZJn7aQq35UqYIj";
+  /* Content width ≈ A4 usable area at 96dpi with ~12mm side margins: (210-24)/25.4*96 ≈ 702 */
+  const PDF_CONTENT_WIDTH = 702;
   const PDF_DOC_CSS = `
 html, body {
   margin: 0;
   padding: 0;
   background: #ffffff;
   color: #000000;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 #pdfRoot {
   box-sizing: border-box;
-  width: 794px;
+  width: ${PDF_CONTENT_WIDTH}px;
+  max-width: ${PDF_CONTENT_WIDTH}px;
   padding: 0;
   background: #ffffff;
-  color: #000000;
-  font-size: 15px;
-  line-height: 1.7;
+  color: #111111;
+  font-size: 14.5px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
 }
-#pdfRoot, #pdfRoot *:not(a) { color: #000000 !important; }
-#pdfRoot a { color: #0b6bcb !important; }
-#pdfRoot * { box-sizing: border-box; }
+#pdfRoot, #pdfRoot *:not(a) { color: #111111 !important; }
+#pdfRoot a { color: #0b6bcb !important; text-decoration: underline; }
+#pdfRoot * { box-sizing: border-box; max-width: 100%; }
 #pdfRoot > :first-child { margin-top: 0; }
 #pdfRoot h1, #pdfRoot h2, #pdfRoot h3, #pdfRoot h4 {
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  margin: 1.4em 0 0.5em;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 1.25em 0 0.45em;
+  page-break-after: avoid;
+  break-after: avoid-page;
 }
-#pdfRoot h1 { font-size: 1.85rem; border-bottom: 1px solid #dddddd; padding-bottom: 0.35em; }
-#pdfRoot h2 { font-size: 1.35rem; border-bottom: 1px solid #eeeeee; padding-bottom: 0.3em; }
-#pdfRoot h3 { font-size: 1.12rem; }
-#pdfRoot p, #pdfRoot ul, #pdfRoot ol, #pdfRoot blockquote, #pdfRoot table, #pdfRoot pre { margin: 0.85em 0; }
+#pdfRoot h1 { font-size: 1.7rem; border-bottom: 1px solid #dddddd; padding-bottom: 0.3em; }
+#pdfRoot h2 { font-size: 1.28rem; border-bottom: 1px solid #eeeeee; padding-bottom: 0.25em; }
+#pdfRoot h3 { font-size: 1.1rem; }
+#pdfRoot h4 { font-size: 1rem; }
+#pdfRoot p, #pdfRoot ul, #pdfRoot ol, #pdfRoot blockquote, #pdfRoot table, #pdfRoot pre { margin: 0.75em 0; }
+#pdfRoot ul, #pdfRoot ol { padding-left: 1.4em; }
+#pdfRoot li { margin: 0.2em 0; }
+#pdfRoot li > p { margin: 0.25em 0; }
 #pdfRoot code {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.88em;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
   background: #f4f4f5 !important;
   border: 1px solid #e6e6e8;
-  padding: 0.12em 0.38em;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  white-space: break-spaces;
+  overflow-wrap: anywhere;
 }
 #pdfRoot pre {
   background: #f6f7f9 !important;
   border: 1px solid #e6e6e8;
-  padding: 14px 16px;
-  overflow: visible;
+  padding: 12px 14px;
+  overflow: hidden;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+  overflow-wrap: anywhere !important;
+  page-break-inside: avoid;
+  break-inside: avoid-page;
 }
-#pdfRoot pre code { background: none !important; border: 0; padding: 0; font-size: 12.5px; line-height: 1.55; }
+#pdfRoot pre code,
+#pdfRoot pre code * {
+  background: none !important;
+  border: 0;
+  padding: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+  overflow-wrap: anywhere !important;
+  border-radius: 0;
+}
 #pdfRoot blockquote {
   border-left: 3px solid #3b9cff;
   margin-left: 0;
-  padding: 0.15em 0 0.15em 1em;
+  padding: 0.2em 0 0.2em 0.95em;
   color: #333333 !important;
+  page-break-inside: avoid;
+  break-inside: avoid-page;
 }
-#pdfRoot table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
-#pdfRoot th, #pdfRoot td { border: 1px solid #dddddd; padding: 8px 10px; text-align: left; }
-#pdfRoot th { background: #f6f7f9 !important; }
-#pdfRoot img { max-width: 100%; height: auto; }
+#pdfRoot table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12.5px;
+  table-layout: fixed;
+  page-break-inside: avoid;
+  break-inside: avoid-page;
+}
+#pdfRoot th, #pdfRoot td {
+  border: 1px solid #dddddd;
+  padding: 7px 9px;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+#pdfRoot td a, #pdfRoot th a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+#pdfRoot th { background: #f6f7f9 !important; font-weight: 650; }
+#pdfRoot img { max-width: 100%; height: auto; display: block; page-break-inside: avoid; break-inside: avoid-page; }
 #pdfRoot img.img-blocked { display: none; }
-#pdfRoot hr { border: 0; border-top: 1px solid #dddddd; margin: 1.6em 0; }
-#pdfRoot .task-list-item { list-style: none; }
-#pdfRoot ul.contains-task-list { padding-left: 0.4em; }
+#pdfRoot hr { border: 0; border-top: 1px solid #dddddd; margin: 1.4em 0; }
+#pdfRoot .task-list-item { list-style: none; margin-left: 0; }
+#pdfRoot ul.contains-task-list { padding-left: 0.2em; }
+#pdfRoot .pdf-check { font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif; margin-right: 0.35em; }
 `;
 
   let html2pdfLoader = null;
@@ -439,11 +525,30 @@ html, body {
     });
   }
 
+  function preparePdfBody(root) {
+    root.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      const mark = document.createElement("span");
+      mark.className = "pdf-check";
+      mark.textContent = input.checked ? "☑" : "☐";
+      mark.setAttribute("aria-hidden", "true");
+      input.replaceWith(mark);
+    });
+    root.querySelectorAll("a[href]").forEach((a) => {
+      const href = a.getAttribute("href") || "";
+      if (!href || href.startsWith("#")) return;
+      if (!a.textContent.trim()) return;
+      if (a.textContent.trim() === href) return;
+      if (/^https?:/i.test(href) || href.startsWith("mailto:")) {
+        a.setAttribute("title", href);
+      }
+    });
+  }
+
   function openPdfFrame(bodyHtml) {
     const iframe = document.createElement("iframe");
     iframe.setAttribute("title", "PDF");
     iframe.setAttribute("aria-hidden", "true");
-    iframe.style.cssText = "position:fixed;left:0;top:0;width:794px;height:1123px;border:0;background:#ffffff;z-index:0;";
+    iframe.style.cssText = "position:fixed;left:0;top:0;width:" + PDF_CONTENT_WIDTH + "px;height:1123px;border:0;background:#ffffff;z-index:0;";
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -486,13 +591,14 @@ html, body {
       const win = iframe.contentWindow;
       const root = doc.getElementById("pdfRoot");
       if (!doc || !win || !root) throw new Error("iframe");
-      iframe.style.height = Math.max(1123, root.scrollHeight + 48) + "px";
+      const captureHeight = Math.max(1123, root.scrollHeight + 48);
+      iframe.style.height = captureHeight + "px";
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const html2pdf = await loadHtml2PdfIn(doc);
       return await html2pdf()
         .set({
-          margin: 15,
-          image: { type: "png", quality: 1 },
+          margin: 12,
+          image: { type: "jpeg", quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
@@ -500,11 +606,11 @@ html, body {
             logging: false,
             scrollX: 0,
             scrollY: 0,
-            windowWidth: 794,
-            windowHeight: Math.max(1123, root.scrollHeight + 48),
+            windowWidth: PDF_CONTENT_WIDTH,
+            windowHeight: captureHeight,
             onclone: (clonedDoc) => {
               const force = clonedDoc.createElement("style");
-              force.textContent = "#pdfRoot,#pdfRoot *:not(a){color:#000000 !important}#pdfRoot a{color:#0b6bcb !important}html,body,#pdfRoot{background:#ffffff !important}";
+              force.textContent = "#pdfRoot,#pdfRoot *:not(a){color:#111111 !important}#pdfRoot a{color:#0b6bcb !important}html,body,#pdfRoot{background:#ffffff !important}";
               clonedDoc.head.appendChild(force);
             },
           },
@@ -529,6 +635,7 @@ html, body {
       const wrap = document.createElement("div");
       wrap.innerHTML = renderMarkdown(editor.value) || "";
       decoratePreview(wrap);
+      preparePdfBody(wrap);
       const blob = await renderPdfBlob(wrap.innerHTML);
       downloadBlob(blob, core.suggestFilename(editor.value) + ".pdf");
     } catch {
@@ -564,7 +671,7 @@ html, body {
 
   function setView(view) {
     workspace.setAttribute("data-view", view);
-    document.querySelectorAll(".view-btn").forEach((btn) => {
+    document.querySelectorAll(".view-btn[data-view]").forEach((btn) => {
       const active = btn.getAttribute("data-view") === view;
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-pressed", active ? "true" : "false");
@@ -580,14 +687,124 @@ html, body {
     });
   }
 
-  function syncScroll(from, to) {
-    if (syncing) return;
+  function canSyncScroll() {
+    if (!scrollSyncEnabled || !workspace || !editor || !previewScroll) return false;
+    if (workspace.getAttribute("data-view") !== "split") return false;
+    if (window.matchMedia("(max-width: 800px)").matches) return false;
+    return editor.clientHeight > 0 && previewScroll.clientHeight > 0;
+  }
+
+  function editorLineMetrics() {
+    const style = getComputedStyle(editor);
+    let lineHeight = parseFloat(style.lineHeight);
+    if (!Number.isFinite(lineHeight) || lineHeight <= 0) {
+      const fontSize = parseFloat(style.fontSize) || 13.5;
+      lineHeight = fontSize * 1.65;
+    }
+    const paddingTop = parseFloat(style.paddingTop) || 0;
+    return { lineHeight, paddingTop };
+  }
+
+  function lineAtEditorScroll() {
+    const { lineHeight, paddingTop } = editorLineMetrics();
+    const max = editor.scrollHeight - editor.clientHeight;
+    if (max <= 0) return 1;
+    if (editor.scrollTop >= max - 1) {
+      return Math.max(1, countNewlines(editor.value) + 1);
+    }
+    return Math.max(1, Math.floor((editor.scrollTop + 1 - paddingTop) / lineHeight) + 1);
+  }
+
+  function scrollEditorToLine(line, ratio) {
+    const { lineHeight, paddingTop } = editorLineMetrics();
+    const max = Math.max(0, editor.scrollHeight - editor.clientHeight);
+    if (ratio >= 0.995) {
+      editor.scrollTop = max;
+      return;
+    }
+    editor.scrollTop = Math.min(max, Math.max(0, paddingTop + (Math.max(1, line) - 1) * lineHeight));
+  }
+
+  function previewAnchorForLine(line) {
+    const nodes = preview.querySelectorAll("[data-line]");
+    if (!nodes.length) return null;
+    let chosen = nodes[0];
+    for (let i = 0; i < nodes.length; i++) {
+      const n = Number(nodes[i].getAttribute("data-line")) || 1;
+      if (n <= line) chosen = nodes[i];
+      else break;
+    }
+    return chosen;
+  }
+
+  function lineAtPreviewScroll() {
+    const nodes = preview.querySelectorAll("[data-line]");
+    if (!nodes.length) return 1;
+    const top = previewScroll.scrollTop + 4;
+    let line = Number(nodes[0].getAttribute("data-line")) || 1;
+    for (let i = 0; i < nodes.length; i++) {
+      const offset = nodes[i].offsetTop;
+      if (offset <= top) line = Number(nodes[i].getAttribute("data-line")) || line;
+      else break;
+    }
+    return line;
+  }
+
+  function scrollPreviewToLine(line, ratio) {
+    const max = Math.max(0, previewScroll.scrollHeight - previewScroll.clientHeight);
+    if (ratio >= 0.995) {
+      previewScroll.scrollTop = max;
+      return;
+    }
+    const anchor = previewAnchorForLine(line);
+    if (!anchor) {
+      previewScroll.scrollTop = ratio * max;
+      return;
+    }
+    previewScroll.scrollTop = Math.min(max, Math.max(0, anchor.offsetTop));
+  }
+
+  function syncScroll(fromEditor) {
+    if (syncing || !canSyncScroll()) return;
+    const from = fromEditor ? editor : previewScroll;
+    const to = fromEditor ? previewScroll : editor;
     const fromMax = from.scrollHeight - from.clientHeight;
     const toMax = to.scrollHeight - to.clientHeight;
     if (fromMax <= 0 || toMax <= 0) return;
+    const ratio = from.scrollTop / fromMax;
     syncing = true;
-    to.scrollTop = (from.scrollTop / fromMax) * toMax;
+    if (preview.querySelector("[data-line]")) {
+      if (fromEditor) scrollPreviewToLine(lineAtEditorScroll(), ratio);
+      else scrollEditorToLine(lineAtPreviewScroll(), ratio);
+    } else {
+      to.scrollTop = ratio * toMax;
+    }
     requestAnimationFrame(() => { syncing = false; });
+  }
+
+  function applyScrollSyncUi() {
+    const btn = document.querySelector("#btnScrollSync");
+    if (!btn) return;
+    btn.classList.toggle("is-active", scrollSyncEnabled);
+    btn.setAttribute("aria-pressed", scrollSyncEnabled ? "true" : "false");
+  }
+
+  function setScrollSync(enabled) {
+    scrollSyncEnabled = !!enabled;
+    applyScrollSyncUi();
+    try {
+      localStorage.setItem(SCROLL_SYNC_KEY, scrollSyncEnabled ? "1" : "0");
+    } catch {}
+    if (scrollSyncEnabled) syncScroll(true);
+  }
+
+  function restoreScrollSyncPref() {
+    try {
+      const raw = localStorage.getItem(SCROLL_SYNC_KEY);
+      if (raw === "0") scrollSyncEnabled = false;
+      else if (raw === "1") scrollSyncEnabled = true;
+    } catch {}
+    applyScrollSyncUi();
   }
 
   function copyMarkdown() {
@@ -781,8 +998,13 @@ html, body {
     editor.addEventListener("change", onEditorInput);
     editor.addEventListener("keydown", onKeydown);
     editor.addEventListener("paste", onPaste);
-    editor.addEventListener("scroll", () => syncScroll(editor, previewScroll));
-    previewScroll.addEventListener("scroll", () => syncScroll(previewScroll, editor));
+    editor.addEventListener("scroll", () => syncScroll(true), { passive: true });
+    previewScroll.addEventListener("scroll", () => syncScroll(false), { passive: true });
+
+    const syncBtn = document.querySelector("#btnScrollSync");
+    if (syncBtn) {
+      syncBtn.addEventListener("click", () => setScrollSync(!scrollSyncEnabled));
+    }
 
     document.querySelector("#btnHeading").addEventListener("click", toggleHeading);
     document.querySelector("#btnBold").addEventListener("click", () => surround("**", "**", t("ph.bold")));
@@ -804,7 +1026,7 @@ html, body {
       fileInput.value = "";
     });
 
-    document.querySelectorAll(".view-btn").forEach((btn) => {
+    document.querySelectorAll(".view-btn[data-view]").forEach((btn) => {
       btn.addEventListener("click", () => setView(btn.getAttribute("data-view")));
     });
     document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -813,6 +1035,7 @@ html, body {
 
     bindToolbarKeys();
     bindSplitter();
+    restoreScrollSyncPref();
 
     ["dragenter", "dragover"].forEach((type) => {
       editor.addEventListener(type, (event) => {

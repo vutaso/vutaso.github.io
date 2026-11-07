@@ -101,8 +101,12 @@ test("PDF exporter uses SRI and A4-only content", () => {
   }
   if (!js.includes("backgroundColor: \"#ffffff\"")) throw new Error("white PDF background missing");
   if (!js.includes("pdfRoot")) throw new Error("isolated PDF root missing");
-  if (!js.includes("color: #000000")) throw new Error("black PDF text missing");
+  if (!js.includes("color: #111111")) throw new Error("readable PDF text color missing");
   if (!js.includes("loadHtml2PdfIn")) throw new Error("in-iframe html2pdf capture missing");
+  if (!js.includes("preparePdfBody")) throw new Error("PDF body prep missing");
+  if (!js.includes("white-space: pre-wrap !important")) throw new Error("code wrap for readable PDF missing");
+  if (!js.includes("break-inside: avoid-page")) throw new Error("page-break avoid rules missing");
+  if (!js.includes("PDF_CONTENT_WIDTH")) throw new Error("A4 content width missing");
   if (js.includes("pdf.hint")) throw new Error("print-header hint still referenced");
 });
 
@@ -127,6 +131,20 @@ test("split gutter defaults to 30/70 and is draggable", () => {
   const i18n = read("i18n.js");
   const splitCount = i18n.split('"split.label"').length - 1;
   if (splitCount < 2) throw new Error("split.label missing from a locale");
+});
+
+test("scroll sync maps by source line and is toggleable", () => {
+  const html = read("index.html");
+  if (!html.includes('id="btnScrollSync"')) throw new Error("scroll sync button missing");
+  const js = read("app.js");
+  if (!js.includes("annotatePreviewLines")) throw new Error("line annotation missing");
+  if (!js.includes('data-line')) throw new Error("data-line markers missing");
+  if (!js.includes("markdown-scroll-sync")) throw new Error("scroll sync persistence missing");
+  if (!js.includes("canSyncScroll")) throw new Error("canSyncScroll missing");
+  if (!js.includes("setScrollSync")) throw new Error("setScrollSync missing");
+  const i18n = read("i18n.js");
+  if ((i18n.split('"tool.sync"').length - 1) < 2) throw new Error("tool.sync missing from a locale");
+  if ((i18n.split('"tool.sync.hint"').length - 1) < 2) throw new Error("tool.sync.hint missing from a locale");
 });
 
 test("app.js i18n keys exist in both locales", () => {
