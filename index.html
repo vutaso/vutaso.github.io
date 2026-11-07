@@ -14,13 +14,6 @@
   <meta name="theme-color" content="#ffffff">
   <link rel="canonical" href="https://vutaso.com/">
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-<!-- Alternate domains (giúp Google liên kết tất cả domain về cùng 1 site) -->
-  <link rel="alternate" href="https://moneybay.app" hreflang="vi">
-  <link rel="alternate" href="https://moneybay.vn" hreflang="vi">
-  <link rel="alternate" href="https://sothuchi.id.vn" hreflang="vi">
-  <link rel="alternate" href="https://vutaso.com/" hreflang="en">
-
-
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://vutaso.com/">
@@ -147,6 +140,55 @@
   }
   </script>
 
+  <!-- JSON-LD: FAQPage — khớp câu hỏi/trả lời hiển thị trên trang -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Ứng dụng có miễn phí không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cả MoneyBay và QRBay đều miễn phí với đầy đủ tính năng cốt lõi. MoneyBay có gói Pro để mở khóa tính năng nâng cao."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Dữ liệu có an toàn không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hoàn toàn an toàn. Dữ liệu chỉ lưu trên thiết bị và iCloud cá nhân. Chúng tôi không thu thập bất kỳ thông tin nào."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Có hỗ trợ Android không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hiện tại ứng dụng được tối ưu cho iOS. Phiên bản Android đang được cân nhắc phát triển trong tương lai."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "MoneyBay có tính năng gì nổi bật?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ghi chép thu chi bằng giọng nói & chat AI, quét hóa đơn tự động, báo cáo biểu đồ, sổ nợ, hạn mức chi, đồng bộ iCloud và nhiều tiện ích khác."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "QRBay hỗ trợ những loại mã nào?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "QRBay hỗ trợ 10+ định dạng: QR Code, Data Matrix, Aztec, PDF 417, EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 93, Code 39, Codabar và ITF."
+        }
+      }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -224,8 +266,8 @@
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <div class="badge" data-i18n="hero_badge"><span class="dot"></span> Ứng dụng iOS — Miễn phí</div>
-          <h1 data-i18n="hero_title">Ứng dụng cho cuộc sống <span class="hl">hiện đại</span></h1>
-          <p class="lead" data-i18n="hero_sub">Hai sản phẩm — một hệ sinh thái. <strong>MoneyBay</strong> giúp bạn làm chủ tài chính với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.</p>
+          <h1 data-i18n="hero_title">App quản lý chi tiêu MoneyBay &amp; quét mã QR QRBay</h1>
+          <p class="lead" data-i18n="hero_sub">Hai sản phẩm iOS — một hệ sinh thái. <strong>MoneyBay</strong> là app sổ thu chi, quản lý chi tiêu với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="https://vutaso.com/moneybay/" data-i18n="hero_btn_mb">Khám phá MoneyBay</a>
             <a class="btn btn-orange" href="https://vutaso.com/qrbay/" data-i18n="hero_btn_qr">Khám phá QRBay</a>
@@ -522,8 +564,8 @@
         nav_tool_devtools: 'DevTools',
         nav_download: 'Tải App',
         hero_badge: '<span class="dot"></span> Ứng dụng iOS — Miễn phí',
-        hero_title: 'Ứng dụng cho cuộc sống <span class="hl">hiện đại</span>',
-        hero_sub: 'Hai sản phẩm — một hệ sinh thái. <strong>MoneyBay</strong> giúp bạn làm chủ tài chính với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.',
+        hero_title: 'App quản lý chi tiêu MoneyBay &amp; quét mã QR QRBay',
+        hero_sub: 'Hai sản phẩm iOS — một hệ sinh thái. <strong>MoneyBay</strong> là app sổ thu chi, quản lý chi tiêu với AI. <strong>QRBay</strong> biến camera thành công cụ quét mã mạnh mẽ.',
         hero_btn_mb: 'Khám phá MoneyBay',
         hero_btn_qr: 'Khám phá QRBay',
         hero_stat1: '<strong>2</strong> sản phẩm iOS',
@@ -583,8 +625,8 @@
         nav_tool_devtools: 'DevTools',
         nav_download: 'Download',
         hero_badge: '<span class="dot"></span> iOS Apps — Free',
-        hero_title: 'Apps for <span class="hl">modern life</span>',
-        hero_sub: 'Two products — one ecosystem. <strong>MoneyBay</strong> helps you master your finances with AI. <strong>QRBay</strong> turns your camera into a powerful code scanner.',
+        hero_title: 'MoneyBay expense tracker &amp; QRBay QR scanner apps',
+        hero_sub: 'Two iOS products — one ecosystem. <strong>MoneyBay</strong> is an AI-powered expense tracker &amp; money manager. <strong>QRBay</strong> turns your camera into a powerful code scanner.',
         hero_btn_mb: 'Explore MoneyBay',
         hero_btn_qr: 'Explore QRBay',
         hero_stat1: '<strong>2</strong> iOS Products',
