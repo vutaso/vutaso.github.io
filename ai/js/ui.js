@@ -38,6 +38,8 @@ window.UI = (() => {
     els.anthropicApiKeyIcon = $('#anthropicApiKeyIcon');
     els.deepseekApiKeyInput = $('#deepseekApiKeyInput');
     els.deepseekApiKeyIcon = $('#deepseekApiKeyIcon');
+    els.nvidiaApiKeyInput = $('#nvidiaApiKeyInput');
+    els.nvidiaApiKeyIcon = $('#nvidiaApiKeyIcon');
     els.openrouterApiKeyInput = $('#openrouterApiKeyInput');
     els.openrouterApiKeyIcon = $('#openrouterApiKeyIcon');
     els.systemPromptInput = $('#systemPromptInput');
@@ -102,6 +104,7 @@ window.UI = (() => {
     els.toggleApiKeyBtn = $('#toggleApiKeyBtn');
     els.toggleAnthropicApiKeyBtn = $('#toggleAnthropicApiKeyBtn');
     els.toggleDeepseekApiKeyBtn = $('#toggleDeepseekApiKeyBtn');
+    els.toggleNvidiaApiKeyBtn = $('#toggleNvidiaApiKeyBtn');
     els.toggleOpenrouterApiKeyBtn = $('#toggleOpenrouterApiKeyBtn');
     els.composerAttachments = $('#composerAttachments');
     els.composerTools = $('#composerTools');
@@ -3576,6 +3579,7 @@ window.UI = (() => {
     els.apiKeyInput.value = state.apiKey || '';
     els.anthropicApiKeyInput.value = state.anthropicApiKey || '';
     els.deepseekApiKeyInput.value = state.deepseekApiKey || '';
+    els.nvidiaApiKeyInput.value = state.nvidiaApiKey || '';
     els.openrouterApiKeyInput.value = state.openrouterApiKey || '';
     const promptForInput = state.systemPromptMode === 'custom'
       ? (state.customSystemPrompt || state.systemPrompt || '')
@@ -3590,6 +3594,8 @@ window.UI = (() => {
     els.anthropicApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.deepseekApiKeyInput.type = 'password';
     els.deepseekApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    els.nvidiaApiKeyInput.type = 'password';
+    els.nvidiaApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     els.openrouterApiKeyInput.type = 'password';
     els.openrouterApiKeyIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
     updateSettingsTokenUsage(state);

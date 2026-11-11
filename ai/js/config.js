@@ -11,6 +11,7 @@ window.APP_CONFIG = {
     { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true },
     { id: 'claude-opus-5', label: 'Claude Opus 5', provider: 'anthropic', webSearch: true, imageGen: false, thinking: true, thinkingRequired: true },
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', webSearch: false, imageGen: false, thinking: true, vision: true },
+    { id: 'nvidia-deepseek-v4.1-flash', apiModel: 'deepseek-ai/deepseek-v4.1-flash', label: 'DeepSeek V4.1 Flash (NVIDIA)', provider: 'nvidia', webSearch: false, imageGen: false, thinking: true, vision: true },
     { id: 'openrouter-glm-flash-latest', apiModel: '~z-ai/glm-flash-latest', label: 'GLM Flash Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-glm-latest', apiModel: '~z-ai/glm-latest', label: 'GLM Latest (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
     { id: 'openrouter-glm-5-3-flashx', apiModel: 'z-ai/glm-5.3-flashx', label: 'GLM 5.3 FlashX (OpenRouter)', provider: 'openrouter', webSearch: true, webSearchPlugin: true, imageGen: false, thinking: true, thinkingRequired: true, vision: true, maxOutputTokens: 131072 },
@@ -49,6 +50,7 @@ window.APP_CONFIG = {
     'claude-opus-4-8': { input: 5.00, output: 25.00 },
     'claude-opus-5': { input: 5.00, output: 25.00 },
     'deepseek-v4-flash': { input: 0.14, output: 0.28 },
+    'nvidia-deepseek-v4.1-flash': { input: 0, output: 0 },
     'openrouter-glm-flash-latest': { input: 0.075, output: 0.25 },
     'openrouter-glm-latest': { input: 0.56, output: 2.50 },
     'openrouter-glm-5-3-flashx': { input: 0.37, output: 1.25 },
@@ -91,6 +93,7 @@ window.APP_CONFIG = {
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'deepseek', label: 'DeepSeek' },
+    { id: 'nvidia', label: 'NVIDIA' },
     { id: 'openrouter', label: 'OpenRouter' },
     { id: 'openrouter-free', label: 'OpenRouter Free' }
   ],
@@ -103,6 +106,10 @@ window.APP_CONFIG = {
     google: 'M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81',
     openrouter: 'M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z',
     'openrouter-free': 'M16.778 1.844v1.919q-.569-.026-1.138-.032-.708-.008-1.415.037c-1.93.126-4.023.728-6.149 2.237-2.911 2.066-2.731 1.95-4.14 2.75-.396.223-1.342.574-2.185.798-.841.225-1.753.333-1.751.333v4.229s.768.108 1.61.333c.842.224 1.789.575 2.185.799 1.41.798 1.228.683 4.14 2.75 2.126 1.509 4.22 2.11 6.148 2.236.88.058 1.716.041 2.555.005v1.918l7.222-4.168-7.222-4.17v2.176c-.86.038-1.611.065-2.278.021-1.364-.09-2.417-.357-3.979-1.465-2.244-1.593-2.866-2.027-3.68-2.508.889-.518 1.449-.906 3.822-2.59 1.56-1.109 2.614-1.377 3.978-1.466.667-.044 1.418-.017 2.278.02v2.176L24 6.014Z'
+  },
+
+  PROVIDER_ICON_HTML: {
+    nvidia: '<i class="fa-solid fa-microchip provider-logo-icon" aria-hidden="true"></i>'
   },
 
   // Tuỳ chỉnh gọi API (để trống max output = dùng mặc định của provider)
@@ -125,6 +132,7 @@ window.APP_CONFIG = {
     anthropic: ['low', 'medium', 'high', 'xhigh', 'max'],
     google:    ['low', 'medium', 'high'],
     deepseek:  ['default', 'high', 'max'],
+    nvidia:    ['default', 'high', 'max'],
     openrouter: ['low', 'medium', 'high'],
     'openrouter-free': ['low', 'medium', 'high'],
     kimi:      [] // binary thinking only: enabled/disabled via Thinking toggle
@@ -156,7 +164,8 @@ window.APP_CONFIG = {
     'openrouter-free-ling-3-flash-vl': ['low', 'medium', 'high'],
     'openrouter-free-north-mini-code': ['low', 'medium', 'high'],
     'openrouter-free-dots-3-note-preview': ['low', 'medium', 'high'],
-    'openrouter-free-space-bunny-alpha': ['low', 'medium', 'high', 'xhigh', 'max']
+    'openrouter-free-space-bunny-alpha': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'nvidia-deepseek-v4.1-flash': ['high', 'max']
   },
 
   ANTHROPIC_HAIKU_THINKING_BUDGET: 16384,
@@ -187,7 +196,13 @@ window.APP_CONFIG = {
   modelUsesEffortLinkedThinking(modelId) {
     if (this.modelUsesGptOssReasoning(modelId)) return false;
     if (this.modelUsesOpenRouterReasoning(modelId)) return false;
-    return this.getModelProvider(modelId) === 'deepseek';
+    const provider = this.getModelProvider(modelId);
+    return provider === 'deepseek' || provider === 'nvidia';
+  },
+
+  modelUsesNvidiaDeepSeekChatTemplate(modelId) {
+    if (this.getModelProvider(modelId) !== 'nvidia') return false;
+    return /^deepseek-ai\//.test(this.getApiModel(modelId));
   },
 
   modelUsesBinaryThinking(modelId) {
@@ -254,7 +269,7 @@ window.APP_CONFIG = {
 
   getDefaultEffortForModel(modelId) {
     if (modelId === 'openrouter-gemini-flash-latest') return 'medium';
-    if (modelId === 'openrouter-deepseek-flash-latest' || modelId === 'openrouter-mimo-v2-6-flash' || modelId === 'openrouter-mimo-v2-6-pro') return 'high';
+    if (modelId === 'nvidia-deepseek-v4.1-flash' || modelId === 'openrouter-deepseek-flash-latest' || modelId === 'openrouter-mimo-v2-6-flash' || modelId === 'openrouter-mimo-v2-6-pro') return 'high';
     if (modelId === 'gpt-6-luna' || modelId === 'gpt-6-sol' || modelId === 'openrouter-gpt-luna-latest' || modelId === 'openrouter-gpt-sol-latest') return 'medium';
     if (modelId === 'openrouter-glm-flash-latest' || modelId === 'openrouter-glm-latest' || modelId === 'openrouter-glm-5-3-flashx') return 'max';
     if (modelId === 'openrouter-claude-haiku-latest' || modelId === 'openrouter-claude-sonnet-latest' || modelId === 'openrouter-claude-opus-latest' || modelId === 'openrouter-kimi-latest') return 'high';
@@ -330,6 +345,8 @@ window.APP_CONFIG = {
   },
 
   getProviderLogoHTML(providerId) {
+    const icon = this.PROVIDER_ICON_HTML?.[providerId];
+    if (icon) return icon;
     const d = this.PROVIDER_LOGOS[providerId];
     if (!d) return '';
     return '<svg class="provider-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="' + d + '"/></svg>';
@@ -342,7 +359,7 @@ window.APP_CONFIG = {
   getModelDisplayLabel(model) {
     if (!model) return '';
     if (model.shortLabel) return model.shortLabel;
-    return model.label.replace(/\s*\(OpenRouter\)\s*$/, '');
+    return model.label.replace(/\s*\((?:OpenRouter|NVIDIA)\)\s*$/, '');
   },
 
   getModel(modelId) {
@@ -397,6 +414,9 @@ window.APP_CONFIG = {
       // OpenRouter từ chối request nếu max_tokens vượt số credit còn lại — để null = không gửi max_tokens.
       return this.OPENROUTER_MAX_OUTPUT_TOKENS || null;
     }
+    if (this.getModelProvider(modelId) === 'nvidia') {
+      return this.NVIDIA_MAX_OUTPUT_TOKENS || configured;
+    }
     const cap = this.getModel(modelId).maxOutputTokens;
     return cap ? Math.min(configured, cap) : configured;
   },
@@ -409,6 +429,7 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return state.anthropicApiKey || '';
     if (provider === 'deepseek') return state.deepseekApiKey || '';
+    if (provider === 'nvidia') return state.nvidiaApiKey || '';
     if (this.isOpenRouterProvider(provider)) return state.openrouterApiKey || '';
     return state.apiKey || '';
   },
@@ -418,6 +439,7 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'Enter your Anthropic API key in Settings first';
     if (provider === 'deepseek') return 'Enter your DeepSeek API key in Settings first';
+    if (provider === 'nvidia') return 'Enter your NVIDIA API key in Settings first';
     if (this.isOpenRouterProvider(provider)) return 'Enter your OpenRouter API key in Settings first';
     return 'Enter your API key in Settings first';
   },
@@ -427,12 +449,49 @@ window.APP_CONFIG = {
     const provider = this.getModelProvider(modelId);
     if (provider === 'anthropic') return 'No Anthropic API key. Open Settings to enter one.';
     if (provider === 'deepseek') return 'No DeepSeek API key. Open Settings to enter one.';
+    if (provider === 'nvidia') return 'No NVIDIA API key. Open Settings to enter one.';
     if (this.isOpenRouterProvider(provider)) return 'No OpenRouter API key. Open Settings to enter one.';
     return 'No API key. Open Settings to enter one.';
   },
 
+  getNvidiaProxyRequiredError() {
+    if (window.I18n) return window.I18n.t('nvidiaProxyRequired');
+    return 'NVIDIA API requires a CORS proxy. Deploy worker/ and set NVIDIA_PROXY_ENDPOINT in config.js.';
+  },
+
   formatApiError(err, modelId) {
-    return err?.message || String(err || '');
+    const msg = err?.message || String(err || '');
+    const isNetwork = /load failed|failed to fetch|networkerror|network error/i.test(msg);
+    const provider = this.getModelProvider(modelId);
+    if (isNetwork && provider === 'nvidia') {
+      if (!this.NVIDIA_PROXY_ENDPOINT && !this.NVIDIA_LOCAL_PROXY_ENDPOINT) {
+        return this.getNvidiaProxyRequiredError();
+      }
+      if (typeof location !== 'undefined') {
+        const host = location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') {
+          if (window.I18n) return window.I18n.t('nvidiaLocalProxyHint');
+          return 'Could not reach NVIDIA proxy. Start local worker: cd ai/worker && npm run dev (port 8787), then reload.';
+        }
+      }
+      if (window.I18n) return window.I18n.t('nvidiaProxyNetworkError');
+      return 'Could not reach NVIDIA proxy. Redeploy worker (cd ai/worker && npm run deploy). Open via https://vutaso.github.io or localhost, not file://.';
+    }
+    if (provider === 'nvidia') {
+      if (/Proxy not configured|Model not allowed|Method not allowed/i.test(msg)) {
+        if (window.I18n) return window.I18n.t('nvidiaWorkerOutdated');
+        return 'NVIDIA proxy on Cloudflare is outdated (missing /nvidia). Run: cd ai/worker && npx wrangler login && npm run deploy';
+      }
+      if (/Origin not allowed/i.test(msg)) {
+        if (window.I18n) return window.I18n.t('nvidiaOriginNotAllowed');
+        return 'Origin not allowed by proxy. Open the app at https://vutaso.github.io/ai/ or http://127.0.0.1:5500/ (not file://).';
+      }
+    }
+    if (/DEGRADED function cannot be invoked/i.test(msg) && provider === 'nvidia') {
+      if (window.I18n) return window.I18n.t('nvidiaDegradedError');
+      return 'NVIDIA endpoint is degraded (overloaded or maintenance). Retry later.';
+    }
+    return msg;
   },
 
   hasApiKey(state, modelId) {
@@ -718,6 +777,12 @@ window.APP_CONFIG = {
   ANTHROPIC_ENDPOINT: 'https://api.anthropic.com/v1/messages',
   ANTHROPIC_VERSION: '2023-06-01',
   DEEPSEEK_ENDPOINT: 'https://api.deepseek.com/v1/chat/completions',
+  NVIDIA_ENDPOINT: 'https://integrate.api.nvidia.com/v1/chat/completions',
+  // Cloudflare Worker proxy — bắt buộc cho NVIDIA (API không hỗ trợ CORS từ trình duyệt).
+  NVIDIA_PROXY_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/nvidia',
+  // Local: cd ai/worker && npm run dev  →  http://127.0.0.1:8787/nvidia
+  NVIDIA_LOCAL_PROXY_ENDPOINT: 'http://127.0.0.1:8787/nvidia',
+  NVIDIA_MAX_OUTPUT_TOKENS: 65536,
   // Share snapshots: POST create / GET /share/:id (Cloudflare KV)
   SHARE_ENDPOINT: 'https://testchatai-deepseek-proxy.vutaso-chatai.workers.dev/share',
   OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
@@ -748,6 +813,104 @@ window.APP_CONFIG = {
       modelId
     );
     return { enabled: true, effort };
+  },
+
+  _nvidiaEndpointCache: null,
+  _nvidiaEndpointCacheAt: 0,
+
+  isLocalHttpHost() {
+    if (typeof location === 'undefined') return false;
+    const host = location.hostname;
+    return location.protocol === 'http:' && (host === 'localhost' || host === '127.0.0.1');
+  },
+
+  isProductionWebHost() {
+    if (typeof location === 'undefined') return false;
+    const host = location.hostname;
+    return host === 'vutaso.github.io'
+      || host === 'vutaso.com'
+      || host === 'www.vutaso.com';
+  },
+
+  getNvidiaEndpointCandidates() {
+    const list = [];
+    // Production / GitHub Pages: only Cloudflare proxy (no localhost — mixed content).
+    if (this.isProductionWebHost()) {
+      if (this.NVIDIA_PROXY_ENDPOINT) list.push(this.NVIDIA_PROXY_ENDPOINT);
+      const shareBase = String(this.SHARE_ENDPOINT || '').replace(/\/share\/?$/, '');
+      if (shareBase) list.push(shareBase + '/nvidia');
+      return [...new Set(list.filter(Boolean))];
+    }
+    if (this.isLocalHttpHost()) {
+      // Same-origin first (ai/dev-server.mjs serves /nvidia)
+      list.push(location.origin.replace(/\/$/, '') + '/nvidia');
+      if (this.NVIDIA_LOCAL_PROXY_ENDPOINT) list.push(this.NVIDIA_LOCAL_PROXY_ENDPOINT);
+      list.push('http://127.0.0.1:8787/nvidia');
+      list.push('http://127.0.0.1:8788/nvidia');
+      list.push('http://localhost:8787/nvidia');
+      list.push('http://localhost:8788/nvidia');
+    }
+    if (this.NVIDIA_PROXY_ENDPOINT) list.push(this.NVIDIA_PROXY_ENDPOINT);
+    const shareBase = String(this.SHARE_ENDPOINT || '').replace(/\/share\/?$/, '');
+    if (shareBase) list.push(shareBase + '/nvidia');
+    return [...new Set(list.filter(Boolean))];
+  },
+
+  getNvidiaEndpoint() {
+    if (this._nvidiaEndpointCache) return this._nvidiaEndpointCache;
+    const candidates = this.getNvidiaEndpointCandidates();
+    return candidates[0] || this.NVIDIA_ENDPOINT;
+  },
+
+  async probeNvidiaEndpoint(url, signal) {
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: signal || AbortSignal.timeout(2500)
+      });
+      if (!res.ok) return false;
+      const data = await res.json().catch(() => null);
+      return !!(data && data.ok && data.route === 'nvidia');
+    } catch {
+      return false;
+    }
+  },
+
+  async resolveNvidiaEndpoint(force) {
+    const now = Date.now();
+    if (!force && this._nvidiaEndpointCache && (now - this._nvidiaEndpointCacheAt) < 60_000) {
+      return this._nvidiaEndpointCache;
+    }
+    const candidates = this.getNvidiaEndpointCandidates();
+    // On GitHub Pages / production hosts, prefer the configured Cloudflare proxy
+    // immediately; only probe local candidates when developing on localhost.
+    if (this.isProductionWebHost() && this.NVIDIA_PROXY_ENDPOINT) {
+      const ok = await this.probeNvidiaEndpoint(this.NVIDIA_PROXY_ENDPOINT);
+      this._nvidiaEndpointCache = this.NVIDIA_PROXY_ENDPOINT;
+      this._nvidiaEndpointCacheAt = now;
+      this._nvidiaProxyHealthy = ok;
+      return this.NVIDIA_PROXY_ENDPOINT;
+    }
+    for (const url of candidates) {
+      if (await this.probeNvidiaEndpoint(url)) {
+        this._nvidiaEndpointCache = url;
+        this._nvidiaEndpointCacheAt = now;
+        this._nvidiaProxyHealthy = true;
+        return url;
+      }
+    }
+    const fallback = this.NVIDIA_PROXY_ENDPOINT
+      || candidates[0]
+      || this.NVIDIA_ENDPOINT;
+    this._nvidiaEndpointCache = fallback;
+    this._nvidiaEndpointCacheAt = now;
+    this._nvidiaProxyHealthy = false;
+    return fallback;
+  },
+
+  nvidiaRequiresProxy() {
+    return true;
   },
 
   getOpenRouterEndpoint() {

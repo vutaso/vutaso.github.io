@@ -11,6 +11,7 @@ window.Storage = (() => {
     apiKey: '',
     anthropicApiKey: '',
     deepseekApiKey: '',
+    nvidiaApiKey: '',
     openrouterApiKey: '',
     geminiApiKey: '',
     kimiApiKey: '',
@@ -671,6 +672,7 @@ window.Storage = (() => {
       apiKey: state.apiKey,
       anthropicApiKey: state.anthropicApiKey,
       deepseekApiKey: state.deepseekApiKey,
+      nvidiaApiKey: state.nvidiaApiKey,
       openrouterApiKey: state.openrouterApiKey,
       geminiApiKey: state.geminiApiKey,
       kimiApiKey: state.kimiApiKey,
@@ -705,6 +707,7 @@ window.Storage = (() => {
     'apiKey',
     'anthropicApiKey',
     'deepseekApiKey',
+    'nvidiaApiKey',
     'openrouterApiKey',
     'geminiApiKey',
     'kimiApiKey'

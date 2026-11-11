@@ -568,6 +568,8 @@ window.API = (() => {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
       } else if (provider === 'google' && errJson.error) {
         errMsg = errJson.error.message || JSON.stringify(errJson.error);
+      } else if (provider === 'nvidia') {
+        errMsg = errJson.detail || errJson.error?.message || errJson.title || errMsg;
       } else if (provider === 'openrouter') {
         const meta = errJson.error?.metadata;
         errMsg = meta?.raw || meta?.message || errJson.error?.message || errMsg;
@@ -988,6 +990,27 @@ window.API = (() => {
     return body;
   };
 
+  const buildNvidiaBody = (model, systemPrompt, convo, thinking, reasoningEffort) => {
+    const body = {
+      model: window.APP_CONFIG.getApiModel(model),
+      messages: buildMessages(convo, systemPrompt),
+      stream: true
+    };
+    if (window.APP_CONFIG.modelUsesNvidiaDeepSeekChatTemplate(model)) {
+      body.chat_template_kwargs = { thinking: !!thinking };
+    } else if (!thinking) {
+      // Bỏ qua reasoning_effort — nhiều model NVIDIA từ chối giá trị không hợp lệ khi tắt thinking.
+    } else {
+      const effort = window.APP_CONFIG.normalizeDeepSeekEffort(reasoningEffort);
+      body.reasoning_effort = effort === 'max' ? 'max' : 'high';
+    }
+    const maxOutputTokens = window.APP_CONFIG.getMaxOutputTokens(model);
+    if (maxOutputTokens) {
+      body.max_tokens = maxOutputTokens;
+    }
+    return body;
+  };
+
   const buildKimiMessages = (convo, systemPrompt, modelId) => {
     const msgs = [];
     if (systemPrompt && systemPrompt.trim()) {
@@ -1215,6 +1238,8 @@ window.API = (() => {
   const sendChatCompletions = async ({ apiKey, model, systemPrompt, convo, controller, handlers, endpoint, provider, thinking, reasoningEffort, webSearch }) => {
     const body = provider === 'deepseek'
       ? buildDeepseekBody(model, systemPrompt, convo, thinking, reasoningEffort)
+      : provider === 'nvidia'
+        ? buildNvidiaBody(model, systemPrompt, convo, thinking, reasoningEffort)
       : provider === 'openrouter'
             ? buildOpenRouterBody(model, systemPrompt, convo, thinking, reasoningEffort, webSearch)
           : provider === 'kimi'
@@ -1573,6 +1598,15 @@ window.API = (() => {
         await sendChatCompletions({
           apiKey, model, systemPrompt, convo, controller, handlers,
           endpoint: DEEPSEEK_ENDPOINT, provider: 'deepseek', thinking, reasoningEffort: effort
+        });
+      } else if (provider === 'nvidia') {
+        const endpoint = await window.APP_CONFIG.resolveNvidiaEndpoint();
+        if (window.APP_CONFIG.nvidiaRequiresProxy() && !endpoint) {
+          throw new Error(window.APP_CONFIG.getNvidiaProxyRequiredError());
+        }
+        await sendChatCompletions({
+          apiKey, model, systemPrompt, convo, controller, handlers,
+          endpoint, provider: 'nvidia', thinking, reasoningEffort: effort
         });
       } else if (provider === 'kimi') {
         await sendChatCompletions({

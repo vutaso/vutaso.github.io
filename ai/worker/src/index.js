@@ -1,5 +1,7 @@
 const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions';
+const NVIDIA_API = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const ALLOWED_DEEPSEEK_MODELS = new Set(['deepseek-v4-flash', 'deepseek-v4-pro']);
+const ALLOWED_NVIDIA_MODELS = new Set(['deepseek-ai/deepseek-v4.1-flash']);
 const DEFAULT_ORIGINS = [
   'https://vutaso.com',
   'https://www.vutaso.com',
@@ -9,7 +11,11 @@ const DEFAULT_ORIGINS = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
-  'http://127.0.0.1:3000'
+  'http://127.0.0.1:3000',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+  'https://localhost:5173',
+  'https://127.0.0.1:5173'
 ];
 
 const parseAllowedOrigins = (env) => {
@@ -71,6 +77,14 @@ const jsonError = (message, status, requestOrigin, env) => new Response(JSON.str
 const validateDeepseekBody = (body) => {
   if (!body || typeof body !== 'object') return 'Invalid request body';
   if (!ALLOWED_DEEPSEEK_MODELS.has(body.model)) return 'Model not allowed';
+  if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
+  if (body.stream !== true) return 'stream must be true';
+  return null;
+};
+
+const validateNvidiaBody = (body) => {
+  if (!body || typeof body !== 'object') return 'Invalid request body';
+  if (!ALLOWED_NVIDIA_MODELS.has(body.model)) return 'Model not allowed';
   if (!Array.isArray(body.messages) || !body.messages.length) return 'messages is required';
   if (body.stream !== true) return 'stream must be true';
   return null;
@@ -313,6 +327,36 @@ const handleShareGet = async (request, env, origin, id) => {
   return shareJson(snapshot, 200, origin);
 };
 
+const handleNvidia = async (request, origin) => {
+  const auth = request.headers.get('Authorization');
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return nvidiaJsonError('Missing Authorization header', 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return nvidiaJsonError('Invalid JSON', 400, origin);
+  }
+
+  const validationError = validateNvidiaBody(body);
+  if (validationError) {
+    return nvidiaJsonError(validationError, 400, origin);
+  }
+
+  const upstream = await fetch(NVIDIA_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: auth
+    },
+    body: JSON.stringify(body)
+  });
+
+  return nvidiaStreamResponse(upstream, origin);
+};
+
 const handleDeepseek = async (request, env, origin) => {
   const apiKey = env.DEEPSEEK_API_KEY;
   if (!apiKey) {
@@ -348,6 +392,27 @@ export default {
     const origin = request.headers.get('Origin') || '';
     const url = new URL(request.url);
     const { pathname } = url;
+
+    // NVIDIA proxy (permissive CORS — client supplies nvapi-… key)
+    if (pathname.endsWith('/nvidia')) {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: nvidiaCorsHeaders(origin) });
+      }
+      if (request.method === 'GET') {
+        return new Response(JSON.stringify({ ok: true, route: 'nvidia', v: 2 }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+            ...nvidiaCorsHeaders(origin)
+          }
+        });
+      }
+      if (request.method !== 'POST') {
+        return nvidiaJsonError('Method not allowed', 405, origin);
+      }
+      return handleNvidia(request, origin);
+    }
 
     // /share and /share/:id
     const shareMatch = pathname.match(/\/share(?:\/([a-zA-Z0-9_-]{8,32}))?\/?$/);

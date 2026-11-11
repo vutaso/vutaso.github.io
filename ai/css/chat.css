@@ -270,6 +270,7 @@
 .message-model-label[data-provider="anthropic"] { --model-accent: #d97757; }
 .message-model-label[data-provider="google"] { --model-accent: #4285f4; }
 .message-model-label[data-provider="deepseek"] { --model-accent: #4d6bfe; }
+.message-model-label[data-provider="nvidia"] { --model-accent: #76b900; }
 .message-model-label[data-provider="kimi"] { --model-accent: #6366f1; }
 .message-model-label[data-provider="byteplus"] { --model-accent: #8b5cf6; }
 .message-model-label[data-provider="openrouter"] { --model-accent: #a78bfa; }

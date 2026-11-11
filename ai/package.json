@@ -1,0 +1,11 @@
+{
+  "name": "vutaso-ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node dev-server.mjs",
+    "dev": "node dev-server.mjs",
+    "proxy": "cd worker && npm run dev",
+    "deploy:worker": "cd worker && npm run deploy"
+  }
+}

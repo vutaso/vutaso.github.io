@@ -132,6 +132,7 @@
 .compare-model-chip[data-provider="anthropic"] .compare-chip-dot { background: #d97757; }
 .compare-model-chip[data-provider="google"] .compare-chip-dot { background: #4285f4; }
 .compare-model-chip[data-provider="deepseek"] .compare-chip-dot { background: #4d6bfe; }
+.compare-model-chip[data-provider="nvidia"] .compare-chip-dot { background: #76b900; }
 .compare-model-chip[data-provider="kimi"] .compare-chip-dot { background: #6366f1; }
 .compare-model-chip[data-provider="byteplus"] .compare-chip-dot { background: #8b5cf6; }
 .compare-model-chip[data-provider="openrouter"] .compare-chip-dot { background: #a78bfa; }
@@ -458,6 +459,7 @@ body.model-compare-open {
 .model-compare-col[data-provider="anthropic"] .model-compare-col-dot { background: #d97757; color: #d97757; }
 .model-compare-col[data-provider="google"] .model-compare-col-dot { background: #4285f4; color: #4285f4; }
 .model-compare-col[data-provider="deepseek"] .model-compare-col-dot { background: #4d6bfe; color: #4d6bfe; }
+.model-compare-col[data-provider="nvidia"] .model-compare-col-dot { background: #76b900; color: #76b900; }
 .model-compare-col[data-provider="kimi"] .model-compare-col-dot { background: #6366f1; color: #6366f1; }
 .model-compare-col[data-provider="byteplus"] .model-compare-col-dot { background: #8b5cf6; color: #8b5cf6; }
 .model-compare-col[data-provider="openrouter"] .model-compare-col-dot { background: #a78bfa; color: #a78bfa; }
